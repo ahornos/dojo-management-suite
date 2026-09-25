@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: dojo_password
       POSTGRES_DB: dojo_management_suite
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - dms-pg-data:/var/lib/postgresql/data
     networks:
