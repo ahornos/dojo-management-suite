@@ -1,0 +1,18 @@
+# Base image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# We don't copy package.json here because we are mounting the volume 
+# in docker-compose for local development (hot-reload).
+# Dependencies should be installed from the host machine via Turborepo.
+
+# Expose port (can be overridden by docker-compose if needed)
+EXPOSE 3000
+
+# Start command using NestJS watch mode
+CMD ["pnpm", "run", "start:dev"]
