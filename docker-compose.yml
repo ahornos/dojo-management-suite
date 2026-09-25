@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------
+  # Database & Message Broker (Infrastructure)
+  # ---------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: dms-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: dojo_admin
+      POSTGRES_PASSWORD: dojo_password
+      POSTGRES_DB: dojo_management_suite
+    ports:
+      - "5432:5432"
+    volumes:
+      - dms-pg-data:/var/lib/postgresql/data
+    networks:
+      - dms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dojo_admin -d dojo_management_suite"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: dms-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - dms-redis-data:/data
+    networks:
+      - dms-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Microservices
+  # ---------------------------------------------------------
+  api-gateway:
+    build:
+      context: ./apps/api-gateway
+      dockerfile: Dockerfile.dev
+    container_name: dms-api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/api-gateway:/app
+      - /app/node_modules
+    networks:
+      - dms-network
+    depends_on:
+      - auth-service
+      - academic-service
+      - financial-service
+
+  auth-service:
+    build:
+      context: ./apps/auth-service
+      dockerfile: Dockerfile.dev
+    container_name: dms-auth-service
+    restart: unless-stopped
+    volumes:
+      - ./apps/auth-service:/app
+      - /app/node_modules
+    networks:
+      - dms-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  academic-service:
+    build:
+      context: ./apps/academic-service
+      dockerfile: Dockerfile.dev
+    container_name: dms-academic-service
+    restart: unless-stopped
+    volumes:
+      - ./apps/academic-service:/app
+      - /app/node_modules
+    networks:
+      - dms-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  financial-service:
+    build:
+      context: ./apps/financial-service
+      dockerfile: Dockerfile.dev
+    container_name: dms-financial-service
+    restart: unless-stopped
+    volumes:
+      - ./apps/financial-service:/app
+      - /app/node_modules
+    networks:
+      - dms-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  dms-pg-data:
+  dms-redis-data:
+
+networks:
+  dms-network:
+    driver: bridge
