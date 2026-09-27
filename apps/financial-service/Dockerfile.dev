@@ -1,18 +1,31 @@
-# Base image
-FROM node:18-alpine
+FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Instalar dependencias del sistema necesarias para Prisma en Alpine
+RUN apk add --no-cache openssl libc6-compat
 
-# We don't copy package.json here because we are mounting the volume 
-# in docker-compose for local development (hot-reload).
-# Dependencies should be installed from the host machine via Turborepo.
+# Habilitar pnpm
+RUN corepack enable pnpm
 
-# Expose port (can be overridden by docker-compose if needed)
+# Copiar archivos de configuración del workspace
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+
+# Copiar paquetes compartidos
+COPY packages/ ./packages/
+
+# Copiar package.json del microservicio
+COPY apps/financial-service/package.json ./apps/financial-service/
+
+# Instalar dependencias
+RUN pnpm install --no-frozen-lockfile
+
+# Copiar código fuente
+COPY apps/financial-service/ ./apps/financial-service/
+
+WORKDIR /app/apps/financial-service
+
 EXPOSE 3000
 
-# Start command using NestJS watch mode
 CMD ["pnpm", "run", "start:dev"]
+

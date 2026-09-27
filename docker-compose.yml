@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   # ---------------------------------------------------------
-  # Database & Message Broker (Infrastructure)
+  # Database & Message Broker
   # ---------------------------------------------------------
   postgres:
     image: postgres:15-alpine
@@ -45,15 +43,17 @@ services:
   # ---------------------------------------------------------
   api-gateway:
     build:
-      context: ./apps/api-gateway
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/api-gateway/Dockerfile.dev
     container_name: dms-api-gateway
     restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
-      - ./apps/api-gateway:/app
-      - /app/node_modules
+      - ./apps/api-gateway/src:/app/apps/api-gateway/src
+      - ./packages:/app/packages
+    environment:
+      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
     networks:
       - dms-network
     depends_on:
@@ -63,13 +63,15 @@ services:
 
   auth-service:
     build:
-      context: ./apps/auth-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/auth-service/Dockerfile.dev
     container_name: dms-auth-service
     restart: unless-stopped
     volumes:
-      - ./apps/auth-service:/app
-      - /app/node_modules
+      - ./apps/auth-service/src:/app/apps/auth-service/src
+      - ./packages:/app/packages
+    environment:
+      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
     networks:
       - dms-network
     depends_on:
@@ -80,13 +82,15 @@ services:
 
   academic-service:
     build:
-      context: ./apps/academic-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/academic-service/Dockerfile.dev
     container_name: dms-academic-service
     restart: unless-stopped
     volumes:
-      - ./apps/academic-service:/app
-      - /app/node_modules
+      - ./apps/academic-service/src:/app/apps/academic-service/src
+      - ./packages:/app/packages
+    environment:
+      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
     networks:
       - dms-network
     depends_on:
@@ -97,13 +101,15 @@ services:
 
   financial-service:
     build:
-      context: ./apps/financial-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: apps/financial-service/Dockerfile.dev
     container_name: dms-financial-service
     restart: unless-stopped
     volumes:
-      - ./apps/financial-service:/app
-      - /app/node_modules
+      - ./apps/financial-service/src:/app/apps/financial-service/src
+      - ./packages:/app/packages
+    environment:
+      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
     networks:
       - dms-network
     depends_on:

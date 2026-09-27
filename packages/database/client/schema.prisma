@@ -2,8 +2,8 @@
 /// Prisma Client Generator & Datasource
 /// ---------------------------------------------------------
 generator client {
-  provider = "prisma-client-js"
-  output   = "../client"
+  provider      = "prisma-client-js"
+  output        = "../client"
   binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
@@ -46,78 +46,78 @@ enum PaymentMethod {
 
 /// Base User model handling authentication and system access.
 model User {
-  id            String   @id @default(uuid())
+  id           String  @id @default(uuid())
   /// Optional email. Minors may not have an email; communication falls back to Guardian.
-  email         String?  @unique
-  passwordHash  String?
-  firstName     String
-  lastName      String
-  role          Role     @default(STUDENT)
-  
+  email        String? @unique
+  passwordHash String?
+  firstName    String
+  lastName     String
+  role         Role    @default(STUDENT)
+
   studentProfile StudentProfile?
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
 }
 
 /// Detailed profile for system users acting as students. Contains physical and contact data.
 model StudentProfile {
-  id              String        @id @default(uuid())
-  userId          String        @unique
-  dni             String?       @unique
-  birthDate       DateTime?
-  status          StudentStatus @default(TRIAL)
-  
+  id        String        @id @default(uuid())
+  userId    String        @unique
+  dni       String?       @unique
+  birthDate DateTime?
+  status    StudentStatus @default(TRIAL)
+
   // Contact & Location
-  phone           String?
-  address         String?
-  city            String?
-  postalCode      String?
-  
+  phone      String?
+  address    String?
+  city       String?
+  postalCode String?
+
   // Equipment Management
-  hasBorrowedGi   Boolean       @default(false)
-  
+  hasBorrowedGi Boolean @default(false)
+
   // Relations
-  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guardians       StudentGuardian[]
-  statusHistory   StatusHistory[]
-  subscriptions   StudentSubscription[]
-  licenses        StudentLicense[]
-  ranks           StudentRank[]
-  attendances     Attendance[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guardians     StudentGuardian[]
+  statusHistory StatusHistory[]
+  subscriptions StudentSubscription[]
+  licenses      StudentLicense[]
+  ranks         StudentRank[]
+  attendances   Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("student_profiles")
 }
 
 /// Legal guardians or emergency contacts, primarily used for minor students.
 model Guardian {
-  id          String   @id @default(uuid())
-  dni         String   @unique
-  firstName   String
-  lastName    String
-  phone       String
+  id        String  @id @default(uuid())
+  dni       String  @unique
+  firstName String
+  lastName  String
+  phone     String
   /// Mandatory contact email for communication regarding associated minor students.
-  email       String?  
-  
-  students    StudentGuardian[]
+  email     String?
+
+  students StudentGuardian[]
 
   @@map("guardians")
 }
 
 /// Many-to-Many relationship mapping students to their guardians.
 model StudentGuardian {
-  studentId   String
-  guardianId  String
+  studentId  String
+  guardianId String
   /// Defines the relationship (e.g., 'Mother', 'Father', 'Legal Guardian').
-  relation    String?
+  relation   String?
 
-  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  guardian    Guardian       @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  student  StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  guardian Guardian       @relation(fields: [guardianId], references: [id], onDelete: Cascade)
 
   @@id([studentId, guardianId])
   @@map("student_guardians")
@@ -131,7 +131,7 @@ model StatusHistory {
   reason           String?
   changedAt        DateTime      @default(now())
 
-  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
 
   @@map("status_history")
 }
@@ -142,11 +142,11 @@ model StatusHistory {
 
 /// Standardized fee structures and pricing tiers.
 model FeePlan {
-  id            String   @id @default(uuid())
-  name          String
-  basePrice     Decimal  @db.Decimal(10, 2)
-  isActive      Boolean  @default(true)
-  
+  id        String  @id @default(uuid())
+  name      String
+  basePrice Decimal @db.Decimal(10, 2)
+  isActive  Boolean @default(true)
+
   subscriptions StudentSubscription[]
 
   @@map("fee_plans")
@@ -154,24 +154,24 @@ model FeePlan {
 
 /// Financial agreement binding a student to a specific fee plan. Includes SEPA mandate data.
 model StudentSubscription {
-  id                   String        @id @default(uuid())
-  studentProfileId     String
-  feePlanId            String
-  
+  id               String @id @default(uuid())
+  studentProfileId String
+  feePlanId        String
+
   /// Individualized price, overriding the FeePlan base price for special cases or grandfathered rates.
-  agreedPrice          Decimal       @db.Decimal(10, 2) 
-  paymentMethod        PaymentMethod @default(SEPA)
-  
+  agreedPrice   Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod @default(SEPA)
+
   // SEPA Mandate details
   iban                 String?
   accountHolderName    String?
-  mandateReference     String?       @unique
+  mandateReference     String?   @unique
   mandateSignatureDate DateTime?
-  
-  isActive             Boolean       @default(true)
 
-  studentProfile       StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  feePlan              FeePlan        @relation(fields: [feePlanId], references: [id], onDelete: Restrict)
+  isActive Boolean @default(true)
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  feePlan        FeePlan        @relation(fields: [feePlanId], references: [id], onDelete: Restrict)
 
   @@map("student_subscriptions")
 }
@@ -182,25 +182,25 @@ model StudentSubscription {
 
 /// Regulatory bodies or federations for official sports licenses.
 model Federation {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  
-  licenses    StudentLicense[]
+  id   String @id @default(uuid())
+  name String @unique
+
+  licenses StudentLicense[]
 
   @@map("federations")
 }
 
 /// Record of a student's official federation license for a specific academic year.
 model StudentLicense {
-  id               String   @id @default(uuid())
+  id               String  @id @default(uuid())
   studentProfileId String
   federationId     String
   academicYear     String
   licenseNumber    String?
-  isActive         Boolean  @default(true)
+  isActive         Boolean @default(true)
 
-  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  federation       Federation     @relation(fields: [federationId], references: [id], onDelete: Restrict)
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  federation     Federation     @relation(fields: [federationId], references: [id], onDelete: Restrict)
 
   @@unique([studentProfileId, federationId, academicYear])
   @@map("student_licenses")
@@ -222,32 +222,32 @@ model Discipline {
 
 /// Defines the hierarchical ranking system (belts) for a specific discipline.
 model BeltRank {
-  id                String   @id @default(uuid())
-  disciplineId      String
-  name              String
-  order             Int
-  maxStripes        Int      @default(4)
-  
-  discipline        Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
-  studentRanks      StudentRank[]
+  id           String @id @default(uuid())
+  disciplineId String
+  name         String
+  order        Int
+  maxStripes   Int    @default(4)
+
+  discipline   Discipline    @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  studentRanks StudentRank[]
 
   @@map("belt_ranks")
 }
 
 /// Tracks the active progression and historical belt achievements of a student.
 model StudentRank {
-  id                 String   @id @default(uuid())
-  studentProfileId   String
-  beltRankId         String
-  currentStripes     Int      @default(0)
+  id               String @id @default(uuid())
+  studentProfileId String
+  beltRankId       String
+  currentStripes   Int    @default(0)
   /// Native tracking for Hours of Grade (H.d.G.).
-  accumulatedHours   Int      @default(0)
-  
-  promotedAt         DateTime @default(now())
-  lastStripeAt       DateTime?
+  accumulatedHours Int    @default(0)
 
-  studentProfile     StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  beltRank           BeltRank       @relation(fields: [beltRankId], references: [id], onDelete: Restrict)
+  promotedAt   DateTime  @default(now())
+  lastStripeAt DateTime?
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  beltRank       BeltRank       @relation(fields: [beltRankId], references: [id], onDelete: Restrict)
 
   @@unique([studentProfileId, beltRankId])
   @@map("student_ranks")
@@ -255,14 +255,14 @@ model StudentRank {
 
 /// Daily logs of student physical attendance.
 model Attendance {
-  id                 String   @id @default(uuid())
-  studentProfileId   String
-  attendedAt         DateTime @default(now())
-  
-  /// Indicates if this record has been processed to increment the student's accumulatedHours.
-  countedForRank     Boolean  @default(false) 
+  id               String   @id @default(uuid())
+  studentProfileId String
+  attendedAt       DateTime @default(now())
 
-  studentProfile     StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  /// Indicates if this record has been processed to increment the student's accumulatedHours.
+  countedForRank Boolean @default(false)
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
 
   @@map("attendances")
 }
