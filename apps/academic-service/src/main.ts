@@ -14,8 +14,6 @@ async function bootstrap() {
     .setTitle('DMS Academic Service API')
     .setDescription('Academic management microservice for martial arts schools (Dojo Management Suite)')
     .setVersion('1.0')
-    .addTag('academic')
-    .addTag('students')
     .addApiKey({ type: 'apiKey', name: 'X-School-Id', in: 'header', description: 'School ID for multi-tenant isolation' }, 'X-School-Id')
     .build();
 
