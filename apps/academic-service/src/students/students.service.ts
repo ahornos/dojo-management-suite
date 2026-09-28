@@ -59,7 +59,7 @@ export class StudentsService {
               include: {
                 beltRank: {
                   include: {
-                    discipline: true,
+                    program: true,
                   },
                 },
               },
@@ -84,7 +84,7 @@ export class StudentsService {
               include: {
                 beltRank: {
                   include: {
-                    discipline: true,
+                    program: true,
                   },
                 },
               },

@@ -103,8 +103,7 @@ export class PromotionsService {
     // Scenario B: Promote to the next Belt Rank using the active client field (disciplineId)
     const nextBelt = await this.prisma.beltRank.findFirst({
       where: {
-        disciplineId: (activeRank.beltRank as any).disciplineId,
-        order: { gt: activeRank.beltRank.order },
+        disciplineProgramId: activeRank.beltRank.disciplineProgramId,
       },
       orderBy: { order: 'asc' },
     });
