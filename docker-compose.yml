@@ -67,6 +67,8 @@ services:
       dockerfile: apps/auth-service/Dockerfile.dev
     container_name: dms-auth-service
     restart: unless-stopped
+    ports:
+      - "3001:3000"
     volumes:
       - ./apps/auth-service/src:/app/apps/auth-service/src
       - ./packages:/app/packages
@@ -86,6 +88,8 @@ services:
       dockerfile: apps/academic-service/Dockerfile.dev
     container_name: dms-academic-service
     restart: unless-stopped
+    ports:
+      - "3002:3000"
     volumes:
       - ./apps/academic-service/src:/app/apps/academic-service/src
       - ./packages:/app/packages
@@ -105,6 +109,8 @@ services:
       dockerfile: apps/financial-service/Dockerfile.dev
     container_name: dms-financial-service
     restart: unless-stopped
+    ports:
+      - "3003:3000"
     volumes:
       - ./apps/financial-service/src:/app/apps/financial-service/src
       - ./packages:/app/packages

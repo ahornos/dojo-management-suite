@@ -8,21 +8,14 @@ RUN apk add --no-cache openssl libc6-compat
 # Habilitar pnpm
 RUN corepack enable pnpm
 
-# Copiar archivos de configuración del workspace
+# Copiar archivos de configuración del workspace y dependencias raíz
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copiar paquetes compartidos
+# Copiar los paquetes compartidos y apps
 COPY packages/ ./packages/
+COPY apps/ ./apps/
 
-# Copiar package.json del microservicio
-COPY apps/financial-service/package.json ./apps/financial-service/
-
-# Instalar dependencias
-RUN pnpm install --no-frozen-lockfile
-
-# Copiar código fuente
-COPY apps/financial-service/ ./apps/financial-service/
-
+# Establecer el directorio de trabajo en el microservicio correspondiente (ej. financial-service)
 WORKDIR /app/apps/financial-service
 
 EXPOSE 3000
