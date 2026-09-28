@@ -211,12 +211,22 @@ exports.Prisma.DisciplineScalarFieldEnum = {
   description: 'description'
 };
 
-exports.Prisma.BeltRankScalarFieldEnum = {
+exports.Prisma.DisciplineProgramScalarFieldEnum = {
   id: 'id',
   disciplineId: 'disciplineId',
   name: 'name',
+  minAge: 'minAge',
+  maxAge: 'maxAge'
+};
+
+exports.Prisma.BeltRankScalarFieldEnum = {
+  id: 'id',
+  disciplineProgramId: 'disciplineProgramId',
+  name: 'name',
   order: 'order',
-  maxStripes: 'maxStripes'
+  maxStripes: 'maxStripes',
+  minMonthsRequired: 'minMonthsRequired',
+  minHoursRequired: 'minHoursRequired'
 };
 
 exports.Prisma.StudentRankScalarFieldEnum = {
@@ -282,6 +292,7 @@ exports.Prisma.ModelName = {
   Federation: 'Federation',
   StudentLicense: 'StudentLicense',
   Discipline: 'Discipline',
+  DisciplineProgram: 'DisciplineProgram',
   BeltRank: 'BeltRank',
   StudentRank: 'StudentRank',
   Attendance: 'Attendance'

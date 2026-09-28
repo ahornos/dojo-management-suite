@@ -210,25 +210,43 @@ model StudentLicense {
 /// Academic / Progression Models
 /// ---------------------------------------------------------
 
-/// Martial arts disciplines taught at the academy (e.g., BJJ, No-Gi).
+/// Martial arts disciplines taught at the academy (e.g., BJJ, No-Gi, Judo).
 model Discipline {
-  id          String     @id @default(uuid())
-  name        String     @unique
+  id          String              @id @default(uuid())
+  name        String              @unique
   description String?
-  belts       BeltRank[]
+  programs    DisciplineProgram[]
 
   @@map("disciplines")
 }
 
-/// Defines the hierarchical ranking system (belts) for a specific discipline.
-model BeltRank {
+/// Age brackets or programmatic divisions within a discipline (e.g., "BJJ Kids", "BJJ Adults").
+model DisciplineProgram {
   id           String @id @default(uuid())
   disciplineId String
-  name         String
-  order        Int
-  maxStripes   Int    @default(4)
+  name         String // e.g., "Adults (16+)", "Kids (0-15)"
+  minAge       Int?   @default(0)
+  maxAge       Int?   @default(99)
 
-  discipline   Discipline    @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  discipline Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
+  beltRanks  BeltRank[]
+
+  @@map("discipline_programs")
+}
+
+/// Defines the hierarchical ranking system (belts and criteria) for a specific discipline program.
+model BeltRank {
+  id                  String @id @default(uuid())
+  disciplineProgramId String
+  name                String // e.g., "White", "Blue", "Gray-White"
+  order               Int // Sequence order to track progression path
+  maxStripes          Int    @default(4) // Max stripes/grades (e.g., 4 for adults, 12 for kids, 0 for Judo)
+
+  // Configurable progression requirements for this belt
+  minMonthsRequired Int @default(0) // Minimum training months required in this rank
+  minHoursRequired  Int @default(0) // Minimum accumulated Grade Hours (H.d.G.) required
+
+  program      DisciplineProgram @relation(fields: [disciplineProgramId], references: [id], onDelete: Cascade)
   studentRanks StudentRank[]
 
   @@map("belt_ranks")

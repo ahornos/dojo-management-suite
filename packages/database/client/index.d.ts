@@ -60,12 +60,17 @@ export type Federation = $Result.DefaultSelection<Prisma.$FederationPayload>
 export type StudentLicense = $Result.DefaultSelection<Prisma.$StudentLicensePayload>
 /**
  * Model Discipline
- * Martial arts disciplines taught at the academy (e.g., BJJ, No-Gi).
+ * Martial arts disciplines taught at the academy (e.g., BJJ, No-Gi, Judo).
  */
 export type Discipline = $Result.DefaultSelection<Prisma.$DisciplinePayload>
 /**
+ * Model DisciplineProgram
+ * Age brackets or programmatic divisions within a discipline (e.g., "BJJ Kids", "BJJ Adults").
+ */
+export type DisciplineProgram = $Result.DefaultSelection<Prisma.$DisciplineProgramPayload>
+/**
  * Model BeltRank
- * Defines the hierarchical ranking system (belts) for a specific discipline.
+ * Defines the hierarchical ranking system (belts and criteria) for a specific discipline program.
  */
 export type BeltRank = $Result.DefaultSelection<Prisma.$BeltRankPayload>
 /**
@@ -348,6 +353,16 @@ export class PrismaClient<
     * ```
     */
   get discipline(): Prisma.DisciplineDelegate<ExtArgs>;
+
+  /**
+   * `prisma.disciplineProgram`: Exposes CRUD operations for the **DisciplineProgram** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DisciplinePrograms
+    * const disciplinePrograms = await prisma.disciplineProgram.findMany()
+    * ```
+    */
+  get disciplineProgram(): Prisma.DisciplineProgramDelegate<ExtArgs>;
 
   /**
    * `prisma.beltRank`: Exposes CRUD operations for the **BeltRank** model.
@@ -829,6 +844,7 @@ export namespace Prisma {
     Federation: 'Federation',
     StudentLicense: 'StudentLicense',
     Discipline: 'Discipline',
+    DisciplineProgram: 'DisciplineProgram',
     BeltRank: 'BeltRank',
     StudentRank: 'StudentRank',
     Attendance: 'Attendance'
@@ -847,7 +863,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "statusHistory" | "feePlan" | "studentSubscription" | "federation" | "studentLicense" | "discipline" | "beltRank" | "studentRank" | "attendance"
+      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "statusHistory" | "feePlan" | "studentSubscription" | "federation" | "studentLicense" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1551,6 +1567,76 @@ export namespace Prisma {
           }
         }
       }
+      DisciplineProgram: {
+        payload: Prisma.$DisciplineProgramPayload<ExtArgs>
+        fields: Prisma.DisciplineProgramFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DisciplineProgramFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DisciplineProgramFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          findFirst: {
+            args: Prisma.DisciplineProgramFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DisciplineProgramFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          findMany: {
+            args: Prisma.DisciplineProgramFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>[]
+          }
+          create: {
+            args: Prisma.DisciplineProgramCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          createMany: {
+            args: Prisma.DisciplineProgramCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DisciplineProgramCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>[]
+          }
+          delete: {
+            args: Prisma.DisciplineProgramDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          update: {
+            args: Prisma.DisciplineProgramUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          deleteMany: {
+            args: Prisma.DisciplineProgramDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DisciplineProgramUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.DisciplineProgramUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DisciplineProgramPayload>
+          }
+          aggregate: {
+            args: Prisma.DisciplineProgramAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDisciplineProgram>
+          }
+          groupBy: {
+            args: Prisma.DisciplineProgramGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DisciplineProgramGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DisciplineProgramCountArgs<ExtArgs>
+            result: $Utils.Optional<DisciplineProgramCountAggregateOutputType> | number
+          }
+        }
+      }
       BeltRank: {
         payload: Prisma.$BeltRankPayload<ExtArgs>
         fields: Prisma.BeltRankFieldRefs
@@ -2091,11 +2177,11 @@ export namespace Prisma {
    */
 
   export type DisciplineCountOutputType = {
-    belts: number
+    programs: number
   }
 
   export type DisciplineCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    belts?: boolean | DisciplineCountOutputTypeCountBeltsArgs
+    programs?: boolean | DisciplineCountOutputTypeCountProgramsArgs
   }
 
   // Custom InputTypes
@@ -2112,7 +2198,38 @@ export namespace Prisma {
   /**
    * DisciplineCountOutputType without action
    */
-  export type DisciplineCountOutputTypeCountBeltsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DisciplineCountOutputTypeCountProgramsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DisciplineProgramWhereInput
+  }
+
+
+  /**
+   * Count Type DisciplineProgramCountOutputType
+   */
+
+  export type DisciplineProgramCountOutputType = {
+    beltRanks: number
+  }
+
+  export type DisciplineProgramCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    beltRanks?: boolean | DisciplineProgramCountOutputTypeCountBeltRanksArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DisciplineProgramCountOutputType without action
+   */
+  export type DisciplineProgramCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgramCountOutputType
+     */
+    select?: DisciplineProgramCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DisciplineProgramCountOutputType without action
+   */
+  export type DisciplineProgramCountOutputTypeCountBeltRanksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BeltRankWhereInput
   }
 
@@ -11126,7 +11243,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
-    belts?: boolean | Discipline$beltsArgs<ExtArgs>
+    programs?: boolean | Discipline$programsArgs<ExtArgs>
     _count?: boolean | DisciplineCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["discipline"]>
 
@@ -11143,7 +11260,7 @@ export namespace Prisma {
   }
 
   export type DisciplineInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    belts?: boolean | Discipline$beltsArgs<ExtArgs>
+    programs?: boolean | Discipline$programsArgs<ExtArgs>
     _count?: boolean | DisciplineCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type DisciplineIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -11151,7 +11268,7 @@ export namespace Prisma {
   export type $DisciplinePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Discipline"
     objects: {
-      belts: Prisma.$BeltRankPayload<ExtArgs>[]
+      programs: Prisma.$DisciplineProgramPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -11521,7 +11638,7 @@ export namespace Prisma {
    */
   export interface Prisma__DisciplineClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    belts<T extends Discipline$beltsArgs<ExtArgs> = {}>(args?: Subset<T, Discipline$beltsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BeltRankPayload<ExtArgs>, T, "findMany"> | Null>
+    programs<T extends Discipline$programsArgs<ExtArgs> = {}>(args?: Subset<T, Discipline$programsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -11868,23 +11985,23 @@ export namespace Prisma {
   }
 
   /**
-   * Discipline.belts
+   * Discipline.programs
    */
-  export type Discipline$beltsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Discipline$programsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the BeltRank
+     * Select specific fields to fetch from the DisciplineProgram
      */
-    select?: BeltRankSelect<ExtArgs> | null
+    select?: DisciplineProgramSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: BeltRankInclude<ExtArgs> | null
-    where?: BeltRankWhereInput
-    orderBy?: BeltRankOrderByWithRelationInput | BeltRankOrderByWithRelationInput[]
-    cursor?: BeltRankWhereUniqueInput
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    where?: DisciplineProgramWhereInput
+    orderBy?: DisciplineProgramOrderByWithRelationInput | DisciplineProgramOrderByWithRelationInput[]
+    cursor?: DisciplineProgramWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: BeltRankScalarFieldEnum | BeltRankScalarFieldEnum[]
+    distinct?: DisciplineProgramScalarFieldEnum | DisciplineProgramScalarFieldEnum[]
   }
 
   /**
@@ -11903,6 +12020,1003 @@ export namespace Prisma {
 
 
   /**
+   * Model DisciplineProgram
+   */
+
+  export type AggregateDisciplineProgram = {
+    _count: DisciplineProgramCountAggregateOutputType | null
+    _avg: DisciplineProgramAvgAggregateOutputType | null
+    _sum: DisciplineProgramSumAggregateOutputType | null
+    _min: DisciplineProgramMinAggregateOutputType | null
+    _max: DisciplineProgramMaxAggregateOutputType | null
+  }
+
+  export type DisciplineProgramAvgAggregateOutputType = {
+    minAge: number | null
+    maxAge: number | null
+  }
+
+  export type DisciplineProgramSumAggregateOutputType = {
+    minAge: number | null
+    maxAge: number | null
+  }
+
+  export type DisciplineProgramMinAggregateOutputType = {
+    id: string | null
+    disciplineId: string | null
+    name: string | null
+    minAge: number | null
+    maxAge: number | null
+  }
+
+  export type DisciplineProgramMaxAggregateOutputType = {
+    id: string | null
+    disciplineId: string | null
+    name: string | null
+    minAge: number | null
+    maxAge: number | null
+  }
+
+  export type DisciplineProgramCountAggregateOutputType = {
+    id: number
+    disciplineId: number
+    name: number
+    minAge: number
+    maxAge: number
+    _all: number
+  }
+
+
+  export type DisciplineProgramAvgAggregateInputType = {
+    minAge?: true
+    maxAge?: true
+  }
+
+  export type DisciplineProgramSumAggregateInputType = {
+    minAge?: true
+    maxAge?: true
+  }
+
+  export type DisciplineProgramMinAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+  }
+
+  export type DisciplineProgramMaxAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+  }
+
+  export type DisciplineProgramCountAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+    _all?: true
+  }
+
+  export type DisciplineProgramAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DisciplineProgram to aggregate.
+     */
+    where?: DisciplineProgramWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DisciplinePrograms to fetch.
+     */
+    orderBy?: DisciplineProgramOrderByWithRelationInput | DisciplineProgramOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DisciplineProgramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DisciplinePrograms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DisciplinePrograms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DisciplinePrograms
+    **/
+    _count?: true | DisciplineProgramCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DisciplineProgramAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DisciplineProgramSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DisciplineProgramMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DisciplineProgramMaxAggregateInputType
+  }
+
+  export type GetDisciplineProgramAggregateType<T extends DisciplineProgramAggregateArgs> = {
+        [P in keyof T & keyof AggregateDisciplineProgram]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDisciplineProgram[P]>
+      : GetScalarType<T[P], AggregateDisciplineProgram[P]>
+  }
+
+
+
+
+  export type DisciplineProgramGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DisciplineProgramWhereInput
+    orderBy?: DisciplineProgramOrderByWithAggregationInput | DisciplineProgramOrderByWithAggregationInput[]
+    by: DisciplineProgramScalarFieldEnum[] | DisciplineProgramScalarFieldEnum
+    having?: DisciplineProgramScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DisciplineProgramCountAggregateInputType | true
+    _avg?: DisciplineProgramAvgAggregateInputType
+    _sum?: DisciplineProgramSumAggregateInputType
+    _min?: DisciplineProgramMinAggregateInputType
+    _max?: DisciplineProgramMaxAggregateInputType
+  }
+
+  export type DisciplineProgramGroupByOutputType = {
+    id: string
+    disciplineId: string
+    name: string
+    minAge: number | null
+    maxAge: number | null
+    _count: DisciplineProgramCountAggregateOutputType | null
+    _avg: DisciplineProgramAvgAggregateOutputType | null
+    _sum: DisciplineProgramSumAggregateOutputType | null
+    _min: DisciplineProgramMinAggregateOutputType | null
+    _max: DisciplineProgramMaxAggregateOutputType | null
+  }
+
+  type GetDisciplineProgramGroupByPayload<T extends DisciplineProgramGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DisciplineProgramGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DisciplineProgramGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DisciplineProgramGroupByOutputType[P]>
+            : GetScalarType<T[P], DisciplineProgramGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DisciplineProgramSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    disciplineId?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    beltRanks?: boolean | DisciplineProgram$beltRanksArgs<ExtArgs>
+    _count?: boolean | DisciplineProgramCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["disciplineProgram"]>
+
+  export type DisciplineProgramSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    disciplineId?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["disciplineProgram"]>
+
+  export type DisciplineProgramSelectScalar = {
+    id?: boolean
+    disciplineId?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+  }
+
+  export type DisciplineProgramInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    beltRanks?: boolean | DisciplineProgram$beltRanksArgs<ExtArgs>
+    _count?: boolean | DisciplineProgramCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DisciplineProgramIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+  }
+
+  export type $DisciplineProgramPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DisciplineProgram"
+    objects: {
+      discipline: Prisma.$DisciplinePayload<ExtArgs>
+      beltRanks: Prisma.$BeltRankPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      disciplineId: string
+      name: string
+      minAge: number | null
+      maxAge: number | null
+    }, ExtArgs["result"]["disciplineProgram"]>
+    composites: {}
+  }
+
+  type DisciplineProgramGetPayload<S extends boolean | null | undefined | DisciplineProgramDefaultArgs> = $Result.GetResult<Prisma.$DisciplineProgramPayload, S>
+
+  type DisciplineProgramCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DisciplineProgramFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DisciplineProgramCountAggregateInputType | true
+    }
+
+  export interface DisciplineProgramDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DisciplineProgram'], meta: { name: 'DisciplineProgram' } }
+    /**
+     * Find zero or one DisciplineProgram that matches the filter.
+     * @param {DisciplineProgramFindUniqueArgs} args - Arguments to find a DisciplineProgram
+     * @example
+     * // Get one DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DisciplineProgramFindUniqueArgs>(args: SelectSubset<T, DisciplineProgramFindUniqueArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one DisciplineProgram that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {DisciplineProgramFindUniqueOrThrowArgs} args - Arguments to find a DisciplineProgram
+     * @example
+     * // Get one DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DisciplineProgramFindUniqueOrThrowArgs>(args: SelectSubset<T, DisciplineProgramFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first DisciplineProgram that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramFindFirstArgs} args - Arguments to find a DisciplineProgram
+     * @example
+     * // Get one DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DisciplineProgramFindFirstArgs>(args?: SelectSubset<T, DisciplineProgramFindFirstArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first DisciplineProgram that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramFindFirstOrThrowArgs} args - Arguments to find a DisciplineProgram
+     * @example
+     * // Get one DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DisciplineProgramFindFirstOrThrowArgs>(args?: SelectSubset<T, DisciplineProgramFindFirstOrThrowArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more DisciplinePrograms that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DisciplinePrograms
+     * const disciplinePrograms = await prisma.disciplineProgram.findMany()
+     * 
+     * // Get first 10 DisciplinePrograms
+     * const disciplinePrograms = await prisma.disciplineProgram.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const disciplineProgramWithIdOnly = await prisma.disciplineProgram.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DisciplineProgramFindManyArgs>(args?: SelectSubset<T, DisciplineProgramFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a DisciplineProgram.
+     * @param {DisciplineProgramCreateArgs} args - Arguments to create a DisciplineProgram.
+     * @example
+     * // Create one DisciplineProgram
+     * const DisciplineProgram = await prisma.disciplineProgram.create({
+     *   data: {
+     *     // ... data to create a DisciplineProgram
+     *   }
+     * })
+     * 
+     */
+    create<T extends DisciplineProgramCreateArgs>(args: SelectSubset<T, DisciplineProgramCreateArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many DisciplinePrograms.
+     * @param {DisciplineProgramCreateManyArgs} args - Arguments to create many DisciplinePrograms.
+     * @example
+     * // Create many DisciplinePrograms
+     * const disciplineProgram = await prisma.disciplineProgram.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DisciplineProgramCreateManyArgs>(args?: SelectSubset<T, DisciplineProgramCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DisciplinePrograms and returns the data saved in the database.
+     * @param {DisciplineProgramCreateManyAndReturnArgs} args - Arguments to create many DisciplinePrograms.
+     * @example
+     * // Create many DisciplinePrograms
+     * const disciplineProgram = await prisma.disciplineProgram.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DisciplinePrograms and only return the `id`
+     * const disciplineProgramWithIdOnly = await prisma.disciplineProgram.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DisciplineProgramCreateManyAndReturnArgs>(args?: SelectSubset<T, DisciplineProgramCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a DisciplineProgram.
+     * @param {DisciplineProgramDeleteArgs} args - Arguments to delete one DisciplineProgram.
+     * @example
+     * // Delete one DisciplineProgram
+     * const DisciplineProgram = await prisma.disciplineProgram.delete({
+     *   where: {
+     *     // ... filter to delete one DisciplineProgram
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DisciplineProgramDeleteArgs>(args: SelectSubset<T, DisciplineProgramDeleteArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one DisciplineProgram.
+     * @param {DisciplineProgramUpdateArgs} args - Arguments to update one DisciplineProgram.
+     * @example
+     * // Update one DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DisciplineProgramUpdateArgs>(args: SelectSubset<T, DisciplineProgramUpdateArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more DisciplinePrograms.
+     * @param {DisciplineProgramDeleteManyArgs} args - Arguments to filter DisciplinePrograms to delete.
+     * @example
+     * // Delete a few DisciplinePrograms
+     * const { count } = await prisma.disciplineProgram.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DisciplineProgramDeleteManyArgs>(args?: SelectSubset<T, DisciplineProgramDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DisciplinePrograms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DisciplinePrograms
+     * const disciplineProgram = await prisma.disciplineProgram.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DisciplineProgramUpdateManyArgs>(args: SelectSubset<T, DisciplineProgramUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one DisciplineProgram.
+     * @param {DisciplineProgramUpsertArgs} args - Arguments to update or create a DisciplineProgram.
+     * @example
+     * // Update or create a DisciplineProgram
+     * const disciplineProgram = await prisma.disciplineProgram.upsert({
+     *   create: {
+     *     // ... data to create a DisciplineProgram
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DisciplineProgram we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DisciplineProgramUpsertArgs>(args: SelectSubset<T, DisciplineProgramUpsertArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of DisciplinePrograms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramCountArgs} args - Arguments to filter DisciplinePrograms to count.
+     * @example
+     * // Count the number of DisciplinePrograms
+     * const count = await prisma.disciplineProgram.count({
+     *   where: {
+     *     // ... the filter for the DisciplinePrograms we want to count
+     *   }
+     * })
+    **/
+    count<T extends DisciplineProgramCountArgs>(
+      args?: Subset<T, DisciplineProgramCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DisciplineProgramCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DisciplineProgram.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DisciplineProgramAggregateArgs>(args: Subset<T, DisciplineProgramAggregateArgs>): Prisma.PrismaPromise<GetDisciplineProgramAggregateType<T>>
+
+    /**
+     * Group by DisciplineProgram.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DisciplineProgramGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DisciplineProgramGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DisciplineProgramGroupByArgs['orderBy'] }
+        : { orderBy?: DisciplineProgramGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DisciplineProgramGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDisciplineProgramGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DisciplineProgram model
+   */
+  readonly fields: DisciplineProgramFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DisciplineProgram.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DisciplineProgramClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    discipline<T extends DisciplineDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DisciplineDefaultArgs<ExtArgs>>): Prisma__DisciplineClient<$Result.GetResult<Prisma.$DisciplinePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    beltRanks<T extends DisciplineProgram$beltRanksArgs<ExtArgs> = {}>(args?: Subset<T, DisciplineProgram$beltRanksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BeltRankPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DisciplineProgram model
+   */ 
+  interface DisciplineProgramFieldRefs {
+    readonly id: FieldRef<"DisciplineProgram", 'String'>
+    readonly disciplineId: FieldRef<"DisciplineProgram", 'String'>
+    readonly name: FieldRef<"DisciplineProgram", 'String'>
+    readonly minAge: FieldRef<"DisciplineProgram", 'Int'>
+    readonly maxAge: FieldRef<"DisciplineProgram", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DisciplineProgram findUnique
+   */
+  export type DisciplineProgramFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter, which DisciplineProgram to fetch.
+     */
+    where: DisciplineProgramWhereUniqueInput
+  }
+
+  /**
+   * DisciplineProgram findUniqueOrThrow
+   */
+  export type DisciplineProgramFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter, which DisciplineProgram to fetch.
+     */
+    where: DisciplineProgramWhereUniqueInput
+  }
+
+  /**
+   * DisciplineProgram findFirst
+   */
+  export type DisciplineProgramFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter, which DisciplineProgram to fetch.
+     */
+    where?: DisciplineProgramWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DisciplinePrograms to fetch.
+     */
+    orderBy?: DisciplineProgramOrderByWithRelationInput | DisciplineProgramOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DisciplinePrograms.
+     */
+    cursor?: DisciplineProgramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DisciplinePrograms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DisciplinePrograms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DisciplinePrograms.
+     */
+    distinct?: DisciplineProgramScalarFieldEnum | DisciplineProgramScalarFieldEnum[]
+  }
+
+  /**
+   * DisciplineProgram findFirstOrThrow
+   */
+  export type DisciplineProgramFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter, which DisciplineProgram to fetch.
+     */
+    where?: DisciplineProgramWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DisciplinePrograms to fetch.
+     */
+    orderBy?: DisciplineProgramOrderByWithRelationInput | DisciplineProgramOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DisciplinePrograms.
+     */
+    cursor?: DisciplineProgramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DisciplinePrograms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DisciplinePrograms.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DisciplinePrograms.
+     */
+    distinct?: DisciplineProgramScalarFieldEnum | DisciplineProgramScalarFieldEnum[]
+  }
+
+  /**
+   * DisciplineProgram findMany
+   */
+  export type DisciplineProgramFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter, which DisciplinePrograms to fetch.
+     */
+    where?: DisciplineProgramWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DisciplinePrograms to fetch.
+     */
+    orderBy?: DisciplineProgramOrderByWithRelationInput | DisciplineProgramOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DisciplinePrograms.
+     */
+    cursor?: DisciplineProgramWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DisciplinePrograms from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DisciplinePrograms.
+     */
+    skip?: number
+    distinct?: DisciplineProgramScalarFieldEnum | DisciplineProgramScalarFieldEnum[]
+  }
+
+  /**
+   * DisciplineProgram create
+   */
+  export type DisciplineProgramCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DisciplineProgram.
+     */
+    data: XOR<DisciplineProgramCreateInput, DisciplineProgramUncheckedCreateInput>
+  }
+
+  /**
+   * DisciplineProgram createMany
+   */
+  export type DisciplineProgramCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DisciplinePrograms.
+     */
+    data: DisciplineProgramCreateManyInput | DisciplineProgramCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DisciplineProgram createManyAndReturn
+   */
+  export type DisciplineProgramCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many DisciplinePrograms.
+     */
+    data: DisciplineProgramCreateManyInput | DisciplineProgramCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DisciplineProgram update
+   */
+  export type DisciplineProgramUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DisciplineProgram.
+     */
+    data: XOR<DisciplineProgramUpdateInput, DisciplineProgramUncheckedUpdateInput>
+    /**
+     * Choose, which DisciplineProgram to update.
+     */
+    where: DisciplineProgramWhereUniqueInput
+  }
+
+  /**
+   * DisciplineProgram updateMany
+   */
+  export type DisciplineProgramUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DisciplinePrograms.
+     */
+    data: XOR<DisciplineProgramUpdateManyMutationInput, DisciplineProgramUncheckedUpdateManyInput>
+    /**
+     * Filter which DisciplinePrograms to update
+     */
+    where?: DisciplineProgramWhereInput
+  }
+
+  /**
+   * DisciplineProgram upsert
+   */
+  export type DisciplineProgramUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DisciplineProgram to update in case it exists.
+     */
+    where: DisciplineProgramWhereUniqueInput
+    /**
+     * In case the DisciplineProgram found by the `where` argument doesn't exist, create a new DisciplineProgram with this data.
+     */
+    create: XOR<DisciplineProgramCreateInput, DisciplineProgramUncheckedCreateInput>
+    /**
+     * In case the DisciplineProgram was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DisciplineProgramUpdateInput, DisciplineProgramUncheckedUpdateInput>
+  }
+
+  /**
+   * DisciplineProgram delete
+   */
+  export type DisciplineProgramDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+    /**
+     * Filter which DisciplineProgram to delete.
+     */
+    where: DisciplineProgramWhereUniqueInput
+  }
+
+  /**
+   * DisciplineProgram deleteMany
+   */
+  export type DisciplineProgramDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DisciplinePrograms to delete
+     */
+    where?: DisciplineProgramWhereInput
+  }
+
+  /**
+   * DisciplineProgram.beltRanks
+   */
+  export type DisciplineProgram$beltRanksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BeltRank
+     */
+    select?: BeltRankSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BeltRankInclude<ExtArgs> | null
+    where?: BeltRankWhereInput
+    orderBy?: BeltRankOrderByWithRelationInput | BeltRankOrderByWithRelationInput[]
+    cursor?: BeltRankWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BeltRankScalarFieldEnum | BeltRankScalarFieldEnum[]
+  }
+
+  /**
+   * DisciplineProgram without action
+   */
+  export type DisciplineProgramDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DisciplineProgram
+     */
+    select?: DisciplineProgramSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DisciplineProgramInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model BeltRank
    */
 
@@ -11917,35 +13031,45 @@ export namespace Prisma {
   export type BeltRankAvgAggregateOutputType = {
     order: number | null
     maxStripes: number | null
+    minMonthsRequired: number | null
+    minHoursRequired: number | null
   }
 
   export type BeltRankSumAggregateOutputType = {
     order: number | null
     maxStripes: number | null
+    minMonthsRequired: number | null
+    minHoursRequired: number | null
   }
 
   export type BeltRankMinAggregateOutputType = {
     id: string | null
-    disciplineId: string | null
+    disciplineProgramId: string | null
     name: string | null
     order: number | null
     maxStripes: number | null
+    minMonthsRequired: number | null
+    minHoursRequired: number | null
   }
 
   export type BeltRankMaxAggregateOutputType = {
     id: string | null
-    disciplineId: string | null
+    disciplineProgramId: string | null
     name: string | null
     order: number | null
     maxStripes: number | null
+    minMonthsRequired: number | null
+    minHoursRequired: number | null
   }
 
   export type BeltRankCountAggregateOutputType = {
     id: number
-    disciplineId: number
+    disciplineProgramId: number
     name: number
     order: number
     maxStripes: number
+    minMonthsRequired: number
+    minHoursRequired: number
     _all: number
   }
 
@@ -11953,35 +13077,45 @@ export namespace Prisma {
   export type BeltRankAvgAggregateInputType = {
     order?: true
     maxStripes?: true
+    minMonthsRequired?: true
+    minHoursRequired?: true
   }
 
   export type BeltRankSumAggregateInputType = {
     order?: true
     maxStripes?: true
+    minMonthsRequired?: true
+    minHoursRequired?: true
   }
 
   export type BeltRankMinAggregateInputType = {
     id?: true
-    disciplineId?: true
+    disciplineProgramId?: true
     name?: true
     order?: true
     maxStripes?: true
+    minMonthsRequired?: true
+    minHoursRequired?: true
   }
 
   export type BeltRankMaxAggregateInputType = {
     id?: true
-    disciplineId?: true
+    disciplineProgramId?: true
     name?: true
     order?: true
     maxStripes?: true
+    minMonthsRequired?: true
+    minHoursRequired?: true
   }
 
   export type BeltRankCountAggregateInputType = {
     id?: true
-    disciplineId?: true
+    disciplineProgramId?: true
     name?: true
     order?: true
     maxStripes?: true
+    minMonthsRequired?: true
+    minHoursRequired?: true
     _all?: true
   }
 
@@ -12073,10 +13207,12 @@ export namespace Prisma {
 
   export type BeltRankGroupByOutputType = {
     id: string
-    disciplineId: string
+    disciplineProgramId: string
     name: string
     order: number
     maxStripes: number
+    minMonthsRequired: number
+    minHoursRequired: number
     _count: BeltRankCountAggregateOutputType | null
     _avg: BeltRankAvgAggregateOutputType | null
     _sum: BeltRankSumAggregateOutputType | null
@@ -12100,53 +13236,61 @@ export namespace Prisma {
 
   export type BeltRankSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    disciplineId?: boolean
+    disciplineProgramId?: boolean
     name?: boolean
     order?: boolean
     maxStripes?: boolean
-    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    minMonthsRequired?: boolean
+    minHoursRequired?: boolean
+    program?: boolean | DisciplineProgramDefaultArgs<ExtArgs>
     studentRanks?: boolean | BeltRank$studentRanksArgs<ExtArgs>
     _count?: boolean | BeltRankCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["beltRank"]>
 
   export type BeltRankSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    disciplineId?: boolean
+    disciplineProgramId?: boolean
     name?: boolean
     order?: boolean
     maxStripes?: boolean
-    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    minMonthsRequired?: boolean
+    minHoursRequired?: boolean
+    program?: boolean | DisciplineProgramDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["beltRank"]>
 
   export type BeltRankSelectScalar = {
     id?: boolean
-    disciplineId?: boolean
+    disciplineProgramId?: boolean
     name?: boolean
     order?: boolean
     maxStripes?: boolean
+    minMonthsRequired?: boolean
+    minHoursRequired?: boolean
   }
 
   export type BeltRankInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    program?: boolean | DisciplineProgramDefaultArgs<ExtArgs>
     studentRanks?: boolean | BeltRank$studentRanksArgs<ExtArgs>
     _count?: boolean | BeltRankCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BeltRankIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    discipline?: boolean | DisciplineDefaultArgs<ExtArgs>
+    program?: boolean | DisciplineProgramDefaultArgs<ExtArgs>
   }
 
   export type $BeltRankPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "BeltRank"
     objects: {
-      discipline: Prisma.$DisciplinePayload<ExtArgs>
+      program: Prisma.$DisciplineProgramPayload<ExtArgs>
       studentRanks: Prisma.$StudentRankPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      disciplineId: string
+      disciplineProgramId: string
       name: string
       order: number
       maxStripes: number
+      minMonthsRequired: number
+      minHoursRequired: number
     }, ExtArgs["result"]["beltRank"]>
     composites: {}
   }
@@ -12511,7 +13655,7 @@ export namespace Prisma {
    */
   export interface Prisma__BeltRankClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    discipline<T extends DisciplineDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DisciplineDefaultArgs<ExtArgs>>): Prisma__DisciplineClient<$Result.GetResult<Prisma.$DisciplinePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    program<T extends DisciplineProgramDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DisciplineProgramDefaultArgs<ExtArgs>>): Prisma__DisciplineProgramClient<$Result.GetResult<Prisma.$DisciplineProgramPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     studentRanks<T extends BeltRank$studentRanksArgs<ExtArgs> = {}>(args?: Subset<T, BeltRank$studentRanksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentRankPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -12543,10 +13687,12 @@ export namespace Prisma {
    */ 
   interface BeltRankFieldRefs {
     readonly id: FieldRef<"BeltRank", 'String'>
-    readonly disciplineId: FieldRef<"BeltRank", 'String'>
+    readonly disciplineProgramId: FieldRef<"BeltRank", 'String'>
     readonly name: FieldRef<"BeltRank", 'String'>
     readonly order: FieldRef<"BeltRank", 'Int'>
     readonly maxStripes: FieldRef<"BeltRank", 'Int'>
+    readonly minMonthsRequired: FieldRef<"BeltRank", 'Int'>
+    readonly minHoursRequired: FieldRef<"BeltRank", 'Int'>
   }
     
 
@@ -14960,12 +16106,25 @@ export namespace Prisma {
   export type DisciplineScalarFieldEnum = (typeof DisciplineScalarFieldEnum)[keyof typeof DisciplineScalarFieldEnum]
 
 
-  export const BeltRankScalarFieldEnum: {
+  export const DisciplineProgramScalarFieldEnum: {
     id: 'id',
     disciplineId: 'disciplineId',
     name: 'name',
+    minAge: 'minAge',
+    maxAge: 'maxAge'
+  };
+
+  export type DisciplineProgramScalarFieldEnum = (typeof DisciplineProgramScalarFieldEnum)[keyof typeof DisciplineProgramScalarFieldEnum]
+
+
+  export const BeltRankScalarFieldEnum: {
+    id: 'id',
+    disciplineProgramId: 'disciplineProgramId',
+    name: 'name',
     order: 'order',
-    maxStripes: 'maxStripes'
+    maxStripes: 'maxStripes',
+    minMonthsRequired: 'minMonthsRequired',
+    minHoursRequired: 'minHoursRequired'
   };
 
   export type BeltRankScalarFieldEnum = (typeof BeltRankScalarFieldEnum)[keyof typeof BeltRankScalarFieldEnum]
@@ -15735,14 +16894,14 @@ export namespace Prisma {
     id?: StringFilter<"Discipline"> | string
     name?: StringFilter<"Discipline"> | string
     description?: StringNullableFilter<"Discipline"> | string | null
-    belts?: BeltRankListRelationFilter
+    programs?: DisciplineProgramListRelationFilter
   }
 
   export type DisciplineOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
-    belts?: BeltRankOrderByRelationAggregateInput
+    programs?: DisciplineProgramOrderByRelationAggregateInput
   }
 
   export type DisciplineWhereUniqueInput = Prisma.AtLeast<{
@@ -15752,7 +16911,7 @@ export namespace Prisma {
     OR?: DisciplineWhereInput[]
     NOT?: DisciplineWhereInput | DisciplineWhereInput[]
     description?: StringNullableFilter<"Discipline"> | string | null
-    belts?: BeltRankListRelationFilter
+    programs?: DisciplineProgramListRelationFilter
   }, "id" | "name">
 
   export type DisciplineOrderByWithAggregationInput = {
@@ -15773,26 +16932,90 @@ export namespace Prisma {
     description?: StringNullableWithAggregatesFilter<"Discipline"> | string | null
   }
 
+  export type DisciplineProgramWhereInput = {
+    AND?: DisciplineProgramWhereInput | DisciplineProgramWhereInput[]
+    OR?: DisciplineProgramWhereInput[]
+    NOT?: DisciplineProgramWhereInput | DisciplineProgramWhereInput[]
+    id?: StringFilter<"DisciplineProgram"> | string
+    disciplineId?: StringFilter<"DisciplineProgram"> | string
+    name?: StringFilter<"DisciplineProgram"> | string
+    minAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+    maxAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+    discipline?: XOR<DisciplineRelationFilter, DisciplineWhereInput>
+    beltRanks?: BeltRankListRelationFilter
+  }
+
+  export type DisciplineProgramOrderByWithRelationInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrderInput | SortOrder
+    maxAge?: SortOrderInput | SortOrder
+    discipline?: DisciplineOrderByWithRelationInput
+    beltRanks?: BeltRankOrderByRelationAggregateInput
+  }
+
+  export type DisciplineProgramWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DisciplineProgramWhereInput | DisciplineProgramWhereInput[]
+    OR?: DisciplineProgramWhereInput[]
+    NOT?: DisciplineProgramWhereInput | DisciplineProgramWhereInput[]
+    disciplineId?: StringFilter<"DisciplineProgram"> | string
+    name?: StringFilter<"DisciplineProgram"> | string
+    minAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+    maxAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+    discipline?: XOR<DisciplineRelationFilter, DisciplineWhereInput>
+    beltRanks?: BeltRankListRelationFilter
+  }, "id">
+
+  export type DisciplineProgramOrderByWithAggregationInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrderInput | SortOrder
+    maxAge?: SortOrderInput | SortOrder
+    _count?: DisciplineProgramCountOrderByAggregateInput
+    _avg?: DisciplineProgramAvgOrderByAggregateInput
+    _max?: DisciplineProgramMaxOrderByAggregateInput
+    _min?: DisciplineProgramMinOrderByAggregateInput
+    _sum?: DisciplineProgramSumOrderByAggregateInput
+  }
+
+  export type DisciplineProgramScalarWhereWithAggregatesInput = {
+    AND?: DisciplineProgramScalarWhereWithAggregatesInput | DisciplineProgramScalarWhereWithAggregatesInput[]
+    OR?: DisciplineProgramScalarWhereWithAggregatesInput[]
+    NOT?: DisciplineProgramScalarWhereWithAggregatesInput | DisciplineProgramScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DisciplineProgram"> | string
+    disciplineId?: StringWithAggregatesFilter<"DisciplineProgram"> | string
+    name?: StringWithAggregatesFilter<"DisciplineProgram"> | string
+    minAge?: IntNullableWithAggregatesFilter<"DisciplineProgram"> | number | null
+    maxAge?: IntNullableWithAggregatesFilter<"DisciplineProgram"> | number | null
+  }
+
   export type BeltRankWhereInput = {
     AND?: BeltRankWhereInput | BeltRankWhereInput[]
     OR?: BeltRankWhereInput[]
     NOT?: BeltRankWhereInput | BeltRankWhereInput[]
     id?: StringFilter<"BeltRank"> | string
-    disciplineId?: StringFilter<"BeltRank"> | string
+    disciplineProgramId?: StringFilter<"BeltRank"> | string
     name?: StringFilter<"BeltRank"> | string
     order?: IntFilter<"BeltRank"> | number
     maxStripes?: IntFilter<"BeltRank"> | number
-    discipline?: XOR<DisciplineRelationFilter, DisciplineWhereInput>
+    minMonthsRequired?: IntFilter<"BeltRank"> | number
+    minHoursRequired?: IntFilter<"BeltRank"> | number
+    program?: XOR<DisciplineProgramRelationFilter, DisciplineProgramWhereInput>
     studentRanks?: StudentRankListRelationFilter
   }
 
   export type BeltRankOrderByWithRelationInput = {
     id?: SortOrder
-    disciplineId?: SortOrder
+    disciplineProgramId?: SortOrder
     name?: SortOrder
     order?: SortOrder
     maxStripes?: SortOrder
-    discipline?: DisciplineOrderByWithRelationInput
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
+    program?: DisciplineProgramOrderByWithRelationInput
     studentRanks?: StudentRankOrderByRelationAggregateInput
   }
 
@@ -15801,20 +17024,24 @@ export namespace Prisma {
     AND?: BeltRankWhereInput | BeltRankWhereInput[]
     OR?: BeltRankWhereInput[]
     NOT?: BeltRankWhereInput | BeltRankWhereInput[]
-    disciplineId?: StringFilter<"BeltRank"> | string
+    disciplineProgramId?: StringFilter<"BeltRank"> | string
     name?: StringFilter<"BeltRank"> | string
     order?: IntFilter<"BeltRank"> | number
     maxStripes?: IntFilter<"BeltRank"> | number
-    discipline?: XOR<DisciplineRelationFilter, DisciplineWhereInput>
+    minMonthsRequired?: IntFilter<"BeltRank"> | number
+    minHoursRequired?: IntFilter<"BeltRank"> | number
+    program?: XOR<DisciplineProgramRelationFilter, DisciplineProgramWhereInput>
     studentRanks?: StudentRankListRelationFilter
   }, "id">
 
   export type BeltRankOrderByWithAggregationInput = {
     id?: SortOrder
-    disciplineId?: SortOrder
+    disciplineProgramId?: SortOrder
     name?: SortOrder
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
     _count?: BeltRankCountOrderByAggregateInput
     _avg?: BeltRankAvgOrderByAggregateInput
     _max?: BeltRankMaxOrderByAggregateInput
@@ -15827,10 +17054,12 @@ export namespace Prisma {
     OR?: BeltRankScalarWhereWithAggregatesInput[]
     NOT?: BeltRankScalarWhereWithAggregatesInput | BeltRankScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"BeltRank"> | string
-    disciplineId?: StringWithAggregatesFilter<"BeltRank"> | string
+    disciplineProgramId?: StringWithAggregatesFilter<"BeltRank"> | string
     name?: StringWithAggregatesFilter<"BeltRank"> | string
     order?: IntWithAggregatesFilter<"BeltRank"> | number
     maxStripes?: IntWithAggregatesFilter<"BeltRank"> | number
+    minMonthsRequired?: IntWithAggregatesFilter<"BeltRank"> | number
+    minHoursRequired?: IntWithAggregatesFilter<"BeltRank"> | number
   }
 
   export type StudentRankWhereInput = {
@@ -16571,28 +17800,28 @@ export namespace Prisma {
     id?: string
     name: string
     description?: string | null
-    belts?: BeltRankCreateNestedManyWithoutDisciplineInput
+    programs?: DisciplineProgramCreateNestedManyWithoutDisciplineInput
   }
 
   export type DisciplineUncheckedCreateInput = {
     id?: string
     name: string
     description?: string | null
-    belts?: BeltRankUncheckedCreateNestedManyWithoutDisciplineInput
+    programs?: DisciplineProgramUncheckedCreateNestedManyWithoutDisciplineInput
   }
 
   export type DisciplineUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    belts?: BeltRankUpdateManyWithoutDisciplineNestedInput
+    programs?: DisciplineProgramUpdateManyWithoutDisciplineNestedInput
   }
 
   export type DisciplineUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    belts?: BeltRankUncheckedUpdateManyWithoutDisciplineNestedInput
+    programs?: DisciplineProgramUncheckedUpdateManyWithoutDisciplineNestedInput
   }
 
   export type DisciplineCreateManyInput = {
@@ -16613,21 +17842,84 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type DisciplineProgramCreateInput = {
+    id?: string
+    name: string
+    minAge?: number | null
+    maxAge?: number | null
+    discipline: DisciplineCreateNestedOneWithoutProgramsInput
+    beltRanks?: BeltRankCreateNestedManyWithoutProgramInput
+  }
+
+  export type DisciplineProgramUncheckedCreateInput = {
+    id?: string
+    disciplineId: string
+    name: string
+    minAge?: number | null
+    maxAge?: number | null
+    beltRanks?: BeltRankUncheckedCreateNestedManyWithoutProgramInput
+  }
+
+  export type DisciplineProgramUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+    discipline?: DisciplineUpdateOneRequiredWithoutProgramsNestedInput
+    beltRanks?: BeltRankUpdateManyWithoutProgramNestedInput
+  }
+
+  export type DisciplineProgramUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+    beltRanks?: BeltRankUncheckedUpdateManyWithoutProgramNestedInput
+  }
+
+  export type DisciplineProgramCreateManyInput = {
+    id?: string
+    disciplineId: string
+    name: string
+    minAge?: number | null
+    maxAge?: number | null
+  }
+
+  export type DisciplineProgramUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type DisciplineProgramUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
   export type BeltRankCreateInput = {
     id?: string
     name: string
     order: number
     maxStripes?: number
-    discipline: DisciplineCreateNestedOneWithoutBeltsInput
+    minMonthsRequired?: number
+    minHoursRequired?: number
+    program: DisciplineProgramCreateNestedOneWithoutBeltRanksInput
     studentRanks?: StudentRankCreateNestedManyWithoutBeltRankInput
   }
 
   export type BeltRankUncheckedCreateInput = {
     id?: string
-    disciplineId: string
+    disciplineProgramId: string
     name: string
     order: number
     maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
     studentRanks?: StudentRankUncheckedCreateNestedManyWithoutBeltRankInput
   }
 
@@ -16636,25 +17928,31 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
-    discipline?: DisciplineUpdateOneRequiredWithoutBeltsNestedInput
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
+    program?: DisciplineProgramUpdateOneRequiredWithoutBeltRanksNestedInput
     studentRanks?: StudentRankUpdateManyWithoutBeltRankNestedInput
   }
 
   export type BeltRankUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    disciplineId?: StringFieldUpdateOperationsInput | string
+    disciplineProgramId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
     studentRanks?: StudentRankUncheckedUpdateManyWithoutBeltRankNestedInput
   }
 
   export type BeltRankCreateManyInput = {
     id?: string
-    disciplineId: string
+    disciplineProgramId: string
     name: string
     order: number
     maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
   }
 
   export type BeltRankUpdateManyMutationInput = {
@@ -16662,14 +17960,18 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
   }
 
   export type BeltRankUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    disciplineId?: StringFieldUpdateOperationsInput | string
+    disciplineProgramId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
   }
 
   export type StudentRankCreateInput = {
@@ -17366,13 +18668,13 @@ export namespace Prisma {
     isActive?: SortOrder
   }
 
-  export type BeltRankListRelationFilter = {
-    every?: BeltRankWhereInput
-    some?: BeltRankWhereInput
-    none?: BeltRankWhereInput
+  export type DisciplineProgramListRelationFilter = {
+    every?: DisciplineProgramWhereInput
+    some?: DisciplineProgramWhereInput
+    none?: DisciplineProgramWhereInput
   }
 
-  export type BeltRankOrderByRelationAggregateInput = {
+  export type DisciplineProgramOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17394,6 +18696,82 @@ export namespace Prisma {
     description?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type DisciplineRelationFilter = {
+    is?: DisciplineWhereInput
+    isNot?: DisciplineWhereInput
+  }
+
+  export type BeltRankListRelationFilter = {
+    every?: BeltRankWhereInput
+    some?: BeltRankWhereInput
+    none?: BeltRankWhereInput
+  }
+
+  export type BeltRankOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DisciplineProgramCountOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+  }
+
+  export type DisciplineProgramAvgOrderByAggregateInput = {
+    minAge?: SortOrder
+    maxAge?: SortOrder
+  }
+
+  export type DisciplineProgramMaxOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+  }
+
+  export type DisciplineProgramMinOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+  }
+
+  export type DisciplineProgramSumOrderByAggregateInput = {
+    minAge?: SortOrder
+    maxAge?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -17405,43 +18783,53 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type DisciplineRelationFilter = {
-    is?: DisciplineWhereInput
-    isNot?: DisciplineWhereInput
+  export type DisciplineProgramRelationFilter = {
+    is?: DisciplineProgramWhereInput
+    isNot?: DisciplineProgramWhereInput
   }
 
   export type BeltRankCountOrderByAggregateInput = {
     id?: SortOrder
-    disciplineId?: SortOrder
+    disciplineProgramId?: SortOrder
     name?: SortOrder
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
   }
 
   export type BeltRankAvgOrderByAggregateInput = {
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
   }
 
   export type BeltRankMaxOrderByAggregateInput = {
     id?: SortOrder
-    disciplineId?: SortOrder
+    disciplineProgramId?: SortOrder
     name?: SortOrder
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
   }
 
   export type BeltRankMinOrderByAggregateInput = {
     id?: SortOrder
-    disciplineId?: SortOrder
+    disciplineProgramId?: SortOrder
     name?: SortOrder
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
   }
 
   export type BeltRankSumOrderByAggregateInput = {
     order?: SortOrder
     maxStripes?: SortOrder
+    minMonthsRequired?: SortOrder
+    minHoursRequired?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -18093,52 +19481,116 @@ export namespace Prisma {
     update?: XOR<XOR<FederationUpdateToOneWithWhereWithoutLicensesInput, FederationUpdateWithoutLicensesInput>, FederationUncheckedUpdateWithoutLicensesInput>
   }
 
-  export type BeltRankCreateNestedManyWithoutDisciplineInput = {
-    create?: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput> | BeltRankCreateWithoutDisciplineInput[] | BeltRankUncheckedCreateWithoutDisciplineInput[]
-    connectOrCreate?: BeltRankCreateOrConnectWithoutDisciplineInput | BeltRankCreateOrConnectWithoutDisciplineInput[]
-    createMany?: BeltRankCreateManyDisciplineInputEnvelope
-    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+  export type DisciplineProgramCreateNestedManyWithoutDisciplineInput = {
+    create?: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput> | DisciplineProgramCreateWithoutDisciplineInput[] | DisciplineProgramUncheckedCreateWithoutDisciplineInput[]
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutDisciplineInput | DisciplineProgramCreateOrConnectWithoutDisciplineInput[]
+    createMany?: DisciplineProgramCreateManyDisciplineInputEnvelope
+    connect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
   }
 
-  export type BeltRankUncheckedCreateNestedManyWithoutDisciplineInput = {
-    create?: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput> | BeltRankCreateWithoutDisciplineInput[] | BeltRankUncheckedCreateWithoutDisciplineInput[]
-    connectOrCreate?: BeltRankCreateOrConnectWithoutDisciplineInput | BeltRankCreateOrConnectWithoutDisciplineInput[]
-    createMany?: BeltRankCreateManyDisciplineInputEnvelope
-    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+  export type DisciplineProgramUncheckedCreateNestedManyWithoutDisciplineInput = {
+    create?: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput> | DisciplineProgramCreateWithoutDisciplineInput[] | DisciplineProgramUncheckedCreateWithoutDisciplineInput[]
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutDisciplineInput | DisciplineProgramCreateOrConnectWithoutDisciplineInput[]
+    createMany?: DisciplineProgramCreateManyDisciplineInputEnvelope
+    connect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
   }
 
-  export type BeltRankUpdateManyWithoutDisciplineNestedInput = {
-    create?: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput> | BeltRankCreateWithoutDisciplineInput[] | BeltRankUncheckedCreateWithoutDisciplineInput[]
-    connectOrCreate?: BeltRankCreateOrConnectWithoutDisciplineInput | BeltRankCreateOrConnectWithoutDisciplineInput[]
-    upsert?: BeltRankUpsertWithWhereUniqueWithoutDisciplineInput | BeltRankUpsertWithWhereUniqueWithoutDisciplineInput[]
-    createMany?: BeltRankCreateManyDisciplineInputEnvelope
-    set?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    disconnect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    delete?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    update?: BeltRankUpdateWithWhereUniqueWithoutDisciplineInput | BeltRankUpdateWithWhereUniqueWithoutDisciplineInput[]
-    updateMany?: BeltRankUpdateManyWithWhereWithoutDisciplineInput | BeltRankUpdateManyWithWhereWithoutDisciplineInput[]
-    deleteMany?: BeltRankScalarWhereInput | BeltRankScalarWhereInput[]
+  export type DisciplineProgramUpdateManyWithoutDisciplineNestedInput = {
+    create?: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput> | DisciplineProgramCreateWithoutDisciplineInput[] | DisciplineProgramUncheckedCreateWithoutDisciplineInput[]
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutDisciplineInput | DisciplineProgramCreateOrConnectWithoutDisciplineInput[]
+    upsert?: DisciplineProgramUpsertWithWhereUniqueWithoutDisciplineInput | DisciplineProgramUpsertWithWhereUniqueWithoutDisciplineInput[]
+    createMany?: DisciplineProgramCreateManyDisciplineInputEnvelope
+    set?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    disconnect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    delete?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    connect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    update?: DisciplineProgramUpdateWithWhereUniqueWithoutDisciplineInput | DisciplineProgramUpdateWithWhereUniqueWithoutDisciplineInput[]
+    updateMany?: DisciplineProgramUpdateManyWithWhereWithoutDisciplineInput | DisciplineProgramUpdateManyWithWhereWithoutDisciplineInput[]
+    deleteMany?: DisciplineProgramScalarWhereInput | DisciplineProgramScalarWhereInput[]
   }
 
-  export type BeltRankUncheckedUpdateManyWithoutDisciplineNestedInput = {
-    create?: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput> | BeltRankCreateWithoutDisciplineInput[] | BeltRankUncheckedCreateWithoutDisciplineInput[]
-    connectOrCreate?: BeltRankCreateOrConnectWithoutDisciplineInput | BeltRankCreateOrConnectWithoutDisciplineInput[]
-    upsert?: BeltRankUpsertWithWhereUniqueWithoutDisciplineInput | BeltRankUpsertWithWhereUniqueWithoutDisciplineInput[]
-    createMany?: BeltRankCreateManyDisciplineInputEnvelope
-    set?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    disconnect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    delete?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
-    update?: BeltRankUpdateWithWhereUniqueWithoutDisciplineInput | BeltRankUpdateWithWhereUniqueWithoutDisciplineInput[]
-    updateMany?: BeltRankUpdateManyWithWhereWithoutDisciplineInput | BeltRankUpdateManyWithWhereWithoutDisciplineInput[]
-    deleteMany?: BeltRankScalarWhereInput | BeltRankScalarWhereInput[]
+  export type DisciplineProgramUncheckedUpdateManyWithoutDisciplineNestedInput = {
+    create?: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput> | DisciplineProgramCreateWithoutDisciplineInput[] | DisciplineProgramUncheckedCreateWithoutDisciplineInput[]
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutDisciplineInput | DisciplineProgramCreateOrConnectWithoutDisciplineInput[]
+    upsert?: DisciplineProgramUpsertWithWhereUniqueWithoutDisciplineInput | DisciplineProgramUpsertWithWhereUniqueWithoutDisciplineInput[]
+    createMany?: DisciplineProgramCreateManyDisciplineInputEnvelope
+    set?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    disconnect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    delete?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    connect?: DisciplineProgramWhereUniqueInput | DisciplineProgramWhereUniqueInput[]
+    update?: DisciplineProgramUpdateWithWhereUniqueWithoutDisciplineInput | DisciplineProgramUpdateWithWhereUniqueWithoutDisciplineInput[]
+    updateMany?: DisciplineProgramUpdateManyWithWhereWithoutDisciplineInput | DisciplineProgramUpdateManyWithWhereWithoutDisciplineInput[]
+    deleteMany?: DisciplineProgramScalarWhereInput | DisciplineProgramScalarWhereInput[]
   }
 
-  export type DisciplineCreateNestedOneWithoutBeltsInput = {
-    create?: XOR<DisciplineCreateWithoutBeltsInput, DisciplineUncheckedCreateWithoutBeltsInput>
-    connectOrCreate?: DisciplineCreateOrConnectWithoutBeltsInput
+  export type DisciplineCreateNestedOneWithoutProgramsInput = {
+    create?: XOR<DisciplineCreateWithoutProgramsInput, DisciplineUncheckedCreateWithoutProgramsInput>
+    connectOrCreate?: DisciplineCreateOrConnectWithoutProgramsInput
     connect?: DisciplineWhereUniqueInput
+  }
+
+  export type BeltRankCreateNestedManyWithoutProgramInput = {
+    create?: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput> | BeltRankCreateWithoutProgramInput[] | BeltRankUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: BeltRankCreateOrConnectWithoutProgramInput | BeltRankCreateOrConnectWithoutProgramInput[]
+    createMany?: BeltRankCreateManyProgramInputEnvelope
+    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+  }
+
+  export type BeltRankUncheckedCreateNestedManyWithoutProgramInput = {
+    create?: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput> | BeltRankCreateWithoutProgramInput[] | BeltRankUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: BeltRankCreateOrConnectWithoutProgramInput | BeltRankCreateOrConnectWithoutProgramInput[]
+    createMany?: BeltRankCreateManyProgramInputEnvelope
+    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type DisciplineUpdateOneRequiredWithoutProgramsNestedInput = {
+    create?: XOR<DisciplineCreateWithoutProgramsInput, DisciplineUncheckedCreateWithoutProgramsInput>
+    connectOrCreate?: DisciplineCreateOrConnectWithoutProgramsInput
+    upsert?: DisciplineUpsertWithoutProgramsInput
+    connect?: DisciplineWhereUniqueInput
+    update?: XOR<XOR<DisciplineUpdateToOneWithWhereWithoutProgramsInput, DisciplineUpdateWithoutProgramsInput>, DisciplineUncheckedUpdateWithoutProgramsInput>
+  }
+
+  export type BeltRankUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput> | BeltRankCreateWithoutProgramInput[] | BeltRankUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: BeltRankCreateOrConnectWithoutProgramInput | BeltRankCreateOrConnectWithoutProgramInput[]
+    upsert?: BeltRankUpsertWithWhereUniqueWithoutProgramInput | BeltRankUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: BeltRankCreateManyProgramInputEnvelope
+    set?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    disconnect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    delete?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    update?: BeltRankUpdateWithWhereUniqueWithoutProgramInput | BeltRankUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: BeltRankUpdateManyWithWhereWithoutProgramInput | BeltRankUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: BeltRankScalarWhereInput | BeltRankScalarWhereInput[]
+  }
+
+  export type BeltRankUncheckedUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput> | BeltRankCreateWithoutProgramInput[] | BeltRankUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: BeltRankCreateOrConnectWithoutProgramInput | BeltRankCreateOrConnectWithoutProgramInput[]
+    upsert?: BeltRankUpsertWithWhereUniqueWithoutProgramInput | BeltRankUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: BeltRankCreateManyProgramInputEnvelope
+    set?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    disconnect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    delete?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    connect?: BeltRankWhereUniqueInput | BeltRankWhereUniqueInput[]
+    update?: BeltRankUpdateWithWhereUniqueWithoutProgramInput | BeltRankUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: BeltRankUpdateManyWithWhereWithoutProgramInput | BeltRankUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: BeltRankScalarWhereInput | BeltRankScalarWhereInput[]
+  }
+
+  export type DisciplineProgramCreateNestedOneWithoutBeltRanksInput = {
+    create?: XOR<DisciplineProgramCreateWithoutBeltRanksInput, DisciplineProgramUncheckedCreateWithoutBeltRanksInput>
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutBeltRanksInput
+    connect?: DisciplineProgramWhereUniqueInput
   }
 
   export type StudentRankCreateNestedManyWithoutBeltRankInput = {
@@ -18163,12 +19615,12 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type DisciplineUpdateOneRequiredWithoutBeltsNestedInput = {
-    create?: XOR<DisciplineCreateWithoutBeltsInput, DisciplineUncheckedCreateWithoutBeltsInput>
-    connectOrCreate?: DisciplineCreateOrConnectWithoutBeltsInput
-    upsert?: DisciplineUpsertWithoutBeltsInput
-    connect?: DisciplineWhereUniqueInput
-    update?: XOR<XOR<DisciplineUpdateToOneWithWhereWithoutBeltsInput, DisciplineUpdateWithoutBeltsInput>, DisciplineUncheckedUpdateWithoutBeltsInput>
+  export type DisciplineProgramUpdateOneRequiredWithoutBeltRanksNestedInput = {
+    create?: XOR<DisciplineProgramCreateWithoutBeltRanksInput, DisciplineProgramUncheckedCreateWithoutBeltRanksInput>
+    connectOrCreate?: DisciplineProgramCreateOrConnectWithoutBeltRanksInput
+    upsert?: DisciplineProgramUpsertWithoutBeltRanksInput
+    connect?: DisciplineProgramWhereUniqueInput
+    update?: XOR<XOR<DisciplineProgramUpdateToOneWithWhereWithoutBeltRanksInput, DisciplineProgramUpdateWithoutBeltRanksInput>, DisciplineProgramUncheckedUpdateWithoutBeltRanksInput>
   }
 
   export type StudentRankUpdateManyWithoutBeltRankNestedInput = {
@@ -18464,6 +19916,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPaymentMethodFilter<$PrismaModel>
     _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -19614,46 +21093,143 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
   }
 
-  export type BeltRankCreateWithoutDisciplineInput = {
+  export type DisciplineProgramCreateWithoutDisciplineInput = {
     id?: string
     name: string
-    order: number
-    maxStripes?: number
-    studentRanks?: StudentRankCreateNestedManyWithoutBeltRankInput
+    minAge?: number | null
+    maxAge?: number | null
+    beltRanks?: BeltRankCreateNestedManyWithoutProgramInput
   }
 
-  export type BeltRankUncheckedCreateWithoutDisciplineInput = {
+  export type DisciplineProgramUncheckedCreateWithoutDisciplineInput = {
     id?: string
     name: string
-    order: number
-    maxStripes?: number
-    studentRanks?: StudentRankUncheckedCreateNestedManyWithoutBeltRankInput
+    minAge?: number | null
+    maxAge?: number | null
+    beltRanks?: BeltRankUncheckedCreateNestedManyWithoutProgramInput
   }
 
-  export type BeltRankCreateOrConnectWithoutDisciplineInput = {
-    where: BeltRankWhereUniqueInput
-    create: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput>
+  export type DisciplineProgramCreateOrConnectWithoutDisciplineInput = {
+    where: DisciplineProgramWhereUniqueInput
+    create: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput>
   }
 
-  export type BeltRankCreateManyDisciplineInputEnvelope = {
-    data: BeltRankCreateManyDisciplineInput | BeltRankCreateManyDisciplineInput[]
+  export type DisciplineProgramCreateManyDisciplineInputEnvelope = {
+    data: DisciplineProgramCreateManyDisciplineInput | DisciplineProgramCreateManyDisciplineInput[]
     skipDuplicates?: boolean
   }
 
-  export type BeltRankUpsertWithWhereUniqueWithoutDisciplineInput = {
-    where: BeltRankWhereUniqueInput
-    update: XOR<BeltRankUpdateWithoutDisciplineInput, BeltRankUncheckedUpdateWithoutDisciplineInput>
-    create: XOR<BeltRankCreateWithoutDisciplineInput, BeltRankUncheckedCreateWithoutDisciplineInput>
+  export type DisciplineProgramUpsertWithWhereUniqueWithoutDisciplineInput = {
+    where: DisciplineProgramWhereUniqueInput
+    update: XOR<DisciplineProgramUpdateWithoutDisciplineInput, DisciplineProgramUncheckedUpdateWithoutDisciplineInput>
+    create: XOR<DisciplineProgramCreateWithoutDisciplineInput, DisciplineProgramUncheckedCreateWithoutDisciplineInput>
   }
 
-  export type BeltRankUpdateWithWhereUniqueWithoutDisciplineInput = {
-    where: BeltRankWhereUniqueInput
-    data: XOR<BeltRankUpdateWithoutDisciplineInput, BeltRankUncheckedUpdateWithoutDisciplineInput>
+  export type DisciplineProgramUpdateWithWhereUniqueWithoutDisciplineInput = {
+    where: DisciplineProgramWhereUniqueInput
+    data: XOR<DisciplineProgramUpdateWithoutDisciplineInput, DisciplineProgramUncheckedUpdateWithoutDisciplineInput>
   }
 
-  export type BeltRankUpdateManyWithWhereWithoutDisciplineInput = {
+  export type DisciplineProgramUpdateManyWithWhereWithoutDisciplineInput = {
+    where: DisciplineProgramScalarWhereInput
+    data: XOR<DisciplineProgramUpdateManyMutationInput, DisciplineProgramUncheckedUpdateManyWithoutDisciplineInput>
+  }
+
+  export type DisciplineProgramScalarWhereInput = {
+    AND?: DisciplineProgramScalarWhereInput | DisciplineProgramScalarWhereInput[]
+    OR?: DisciplineProgramScalarWhereInput[]
+    NOT?: DisciplineProgramScalarWhereInput | DisciplineProgramScalarWhereInput[]
+    id?: StringFilter<"DisciplineProgram"> | string
+    disciplineId?: StringFilter<"DisciplineProgram"> | string
+    name?: StringFilter<"DisciplineProgram"> | string
+    minAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+    maxAge?: IntNullableFilter<"DisciplineProgram"> | number | null
+  }
+
+  export type DisciplineCreateWithoutProgramsInput = {
+    id?: string
+    name: string
+    description?: string | null
+  }
+
+  export type DisciplineUncheckedCreateWithoutProgramsInput = {
+    id?: string
+    name: string
+    description?: string | null
+  }
+
+  export type DisciplineCreateOrConnectWithoutProgramsInput = {
+    where: DisciplineWhereUniqueInput
+    create: XOR<DisciplineCreateWithoutProgramsInput, DisciplineUncheckedCreateWithoutProgramsInput>
+  }
+
+  export type BeltRankCreateWithoutProgramInput = {
+    id?: string
+    name: string
+    order: number
+    maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
+    studentRanks?: StudentRankCreateNestedManyWithoutBeltRankInput
+  }
+
+  export type BeltRankUncheckedCreateWithoutProgramInput = {
+    id?: string
+    name: string
+    order: number
+    maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
+    studentRanks?: StudentRankUncheckedCreateNestedManyWithoutBeltRankInput
+  }
+
+  export type BeltRankCreateOrConnectWithoutProgramInput = {
+    where: BeltRankWhereUniqueInput
+    create: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput>
+  }
+
+  export type BeltRankCreateManyProgramInputEnvelope = {
+    data: BeltRankCreateManyProgramInput | BeltRankCreateManyProgramInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DisciplineUpsertWithoutProgramsInput = {
+    update: XOR<DisciplineUpdateWithoutProgramsInput, DisciplineUncheckedUpdateWithoutProgramsInput>
+    create: XOR<DisciplineCreateWithoutProgramsInput, DisciplineUncheckedCreateWithoutProgramsInput>
+    where?: DisciplineWhereInput
+  }
+
+  export type DisciplineUpdateToOneWithWhereWithoutProgramsInput = {
+    where?: DisciplineWhereInput
+    data: XOR<DisciplineUpdateWithoutProgramsInput, DisciplineUncheckedUpdateWithoutProgramsInput>
+  }
+
+  export type DisciplineUpdateWithoutProgramsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DisciplineUncheckedUpdateWithoutProgramsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BeltRankUpsertWithWhereUniqueWithoutProgramInput = {
+    where: BeltRankWhereUniqueInput
+    update: XOR<BeltRankUpdateWithoutProgramInput, BeltRankUncheckedUpdateWithoutProgramInput>
+    create: XOR<BeltRankCreateWithoutProgramInput, BeltRankUncheckedCreateWithoutProgramInput>
+  }
+
+  export type BeltRankUpdateWithWhereUniqueWithoutProgramInput = {
+    where: BeltRankWhereUniqueInput
+    data: XOR<BeltRankUpdateWithoutProgramInput, BeltRankUncheckedUpdateWithoutProgramInput>
+  }
+
+  export type BeltRankUpdateManyWithWhereWithoutProgramInput = {
     where: BeltRankScalarWhereInput
-    data: XOR<BeltRankUpdateManyMutationInput, BeltRankUncheckedUpdateManyWithoutDisciplineInput>
+    data: XOR<BeltRankUpdateManyMutationInput, BeltRankUncheckedUpdateManyWithoutProgramInput>
   }
 
   export type BeltRankScalarWhereInput = {
@@ -19661,27 +21237,33 @@ export namespace Prisma {
     OR?: BeltRankScalarWhereInput[]
     NOT?: BeltRankScalarWhereInput | BeltRankScalarWhereInput[]
     id?: StringFilter<"BeltRank"> | string
-    disciplineId?: StringFilter<"BeltRank"> | string
+    disciplineProgramId?: StringFilter<"BeltRank"> | string
     name?: StringFilter<"BeltRank"> | string
     order?: IntFilter<"BeltRank"> | number
     maxStripes?: IntFilter<"BeltRank"> | number
+    minMonthsRequired?: IntFilter<"BeltRank"> | number
+    minHoursRequired?: IntFilter<"BeltRank"> | number
   }
 
-  export type DisciplineCreateWithoutBeltsInput = {
+  export type DisciplineProgramCreateWithoutBeltRanksInput = {
     id?: string
     name: string
-    description?: string | null
+    minAge?: number | null
+    maxAge?: number | null
+    discipline: DisciplineCreateNestedOneWithoutProgramsInput
   }
 
-  export type DisciplineUncheckedCreateWithoutBeltsInput = {
+  export type DisciplineProgramUncheckedCreateWithoutBeltRanksInput = {
     id?: string
+    disciplineId: string
     name: string
-    description?: string | null
+    minAge?: number | null
+    maxAge?: number | null
   }
 
-  export type DisciplineCreateOrConnectWithoutBeltsInput = {
-    where: DisciplineWhereUniqueInput
-    create: XOR<DisciplineCreateWithoutBeltsInput, DisciplineUncheckedCreateWithoutBeltsInput>
+  export type DisciplineProgramCreateOrConnectWithoutBeltRanksInput = {
+    where: DisciplineProgramWhereUniqueInput
+    create: XOR<DisciplineProgramCreateWithoutBeltRanksInput, DisciplineProgramUncheckedCreateWithoutBeltRanksInput>
   }
 
   export type StudentRankCreateWithoutBeltRankInput = {
@@ -19712,27 +21294,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type DisciplineUpsertWithoutBeltsInput = {
-    update: XOR<DisciplineUpdateWithoutBeltsInput, DisciplineUncheckedUpdateWithoutBeltsInput>
-    create: XOR<DisciplineCreateWithoutBeltsInput, DisciplineUncheckedCreateWithoutBeltsInput>
-    where?: DisciplineWhereInput
+  export type DisciplineProgramUpsertWithoutBeltRanksInput = {
+    update: XOR<DisciplineProgramUpdateWithoutBeltRanksInput, DisciplineProgramUncheckedUpdateWithoutBeltRanksInput>
+    create: XOR<DisciplineProgramCreateWithoutBeltRanksInput, DisciplineProgramUncheckedCreateWithoutBeltRanksInput>
+    where?: DisciplineProgramWhereInput
   }
 
-  export type DisciplineUpdateToOneWithWhereWithoutBeltsInput = {
-    where?: DisciplineWhereInput
-    data: XOR<DisciplineUpdateWithoutBeltsInput, DisciplineUncheckedUpdateWithoutBeltsInput>
+  export type DisciplineProgramUpdateToOneWithWhereWithoutBeltRanksInput = {
+    where?: DisciplineProgramWhereInput
+    data: XOR<DisciplineProgramUpdateWithoutBeltRanksInput, DisciplineProgramUncheckedUpdateWithoutBeltRanksInput>
   }
 
-  export type DisciplineUpdateWithoutBeltsInput = {
+  export type DisciplineProgramUpdateWithoutBeltRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+    discipline?: DisciplineUpdateOneRequiredWithoutProgramsNestedInput
   }
 
-  export type DisciplineUncheckedUpdateWithoutBeltsInput = {
+  export type DisciplineProgramUncheckedUpdateWithoutBeltRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type StudentRankUpsertWithWhereUniqueWithoutBeltRankInput = {
@@ -19801,15 +21387,19 @@ export namespace Prisma {
     name: string
     order: number
     maxStripes?: number
-    discipline: DisciplineCreateNestedOneWithoutBeltsInput
+    minMonthsRequired?: number
+    minHoursRequired?: number
+    program: DisciplineProgramCreateNestedOneWithoutBeltRanksInput
   }
 
   export type BeltRankUncheckedCreateWithoutStudentRanksInput = {
     id?: string
-    disciplineId: string
+    disciplineProgramId: string
     name: string
     order: number
     maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
   }
 
   export type BeltRankCreateOrConnectWithoutStudentRanksInput = {
@@ -19884,15 +21474,19 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
-    discipline?: DisciplineUpdateOneRequiredWithoutBeltsNestedInput
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
+    program?: DisciplineProgramUpdateOneRequiredWithoutBeltRanksNestedInput
   }
 
   export type BeltRankUncheckedUpdateWithoutStudentRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
-    disciplineId?: StringFieldUpdateOperationsInput | string
+    disciplineProgramId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
   }
 
   export type StudentProfileCreateWithoutAttendancesInput = {
@@ -20279,34 +21873,72 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
-  export type BeltRankCreateManyDisciplineInput = {
+  export type DisciplineProgramCreateManyDisciplineInput = {
+    id?: string
+    name: string
+    minAge?: number | null
+    maxAge?: number | null
+  }
+
+  export type DisciplineProgramUpdateWithoutDisciplineInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+    beltRanks?: BeltRankUpdateManyWithoutProgramNestedInput
+  }
+
+  export type DisciplineProgramUncheckedUpdateWithoutDisciplineInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+    beltRanks?: BeltRankUncheckedUpdateManyWithoutProgramNestedInput
+  }
+
+  export type DisciplineProgramUncheckedUpdateManyWithoutDisciplineInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: NullableIntFieldUpdateOperationsInput | number | null
+    maxAge?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type BeltRankCreateManyProgramInput = {
     id?: string
     name: string
     order: number
     maxStripes?: number
+    minMonthsRequired?: number
+    minHoursRequired?: number
   }
 
-  export type BeltRankUpdateWithoutDisciplineInput = {
+  export type BeltRankUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
     studentRanks?: StudentRankUpdateManyWithoutBeltRankNestedInput
   }
 
-  export type BeltRankUncheckedUpdateWithoutDisciplineInput = {
+  export type BeltRankUncheckedUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
     studentRanks?: StudentRankUncheckedUpdateManyWithoutBeltRankNestedInput
   }
 
-  export type BeltRankUncheckedUpdateManyWithoutDisciplineInput = {
+  export type BeltRankUncheckedUpdateManyWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     order?: IntFieldUpdateOperationsInput | number
     maxStripes?: IntFieldUpdateOperationsInput | number
+    minMonthsRequired?: IntFieldUpdateOperationsInput | number
+    minHoursRequired?: IntFieldUpdateOperationsInput | number
   }
 
   export type StudentRankCreateManyBeltRankInput = {
@@ -20371,6 +22003,10 @@ export namespace Prisma {
      */
     export type DisciplineCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DisciplineCountOutputTypeDefaultArgs<ExtArgs>
     /**
+     * @deprecated Use DisciplineProgramCountOutputTypeDefaultArgs instead
+     */
+    export type DisciplineProgramCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DisciplineProgramCountOutputTypeDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use BeltRankCountOutputTypeDefaultArgs instead
      */
     export type BeltRankCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BeltRankCountOutputTypeDefaultArgs<ExtArgs>
@@ -20414,6 +22050,10 @@ export namespace Prisma {
      * @deprecated Use DisciplineDefaultArgs instead
      */
     export type DisciplineArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DisciplineDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DisciplineProgramDefaultArgs instead
+     */
+    export type DisciplineProgramArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DisciplineProgramDefaultArgs<ExtArgs>
     /**
      * @deprecated Use BeltRankDefaultArgs instead
      */
