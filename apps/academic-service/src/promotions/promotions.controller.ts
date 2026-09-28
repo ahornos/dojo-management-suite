@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, UseGuards, Req } from '@nestjs/common';
 import { PromotionsService } from './promotions.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -7,7 +7,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@dms/database/client';
 
 /**
- * Controller responsible for evaluating and executing martial arts promotions.
+ * Controller responsible for evaluating and executing martial arts promotions and rollbacks.
  * Protected by JWT authentication and Role-Based Access Control.
  */
 @ApiTags('Academic Promotions')
@@ -49,12 +49,25 @@ export class PromotionsController {
   ) {
     const user = req.user;
 
-    // Instructors can only propose promotions
     if (user.role === Role.INSTRUCTOR) {
       return this.promotionsService.proposePromotion(studentProfileId, user.userId);
     }
 
-    // Technical Directors and Admins can execute promotions directly
     return this.promotionsService.executePromotion(studentProfileId);
+  }
+
+  /**
+   * Reverts the last promotion or stripe awarded to a student in case of an administrative error.
+   * Strictly restricted to SUPER_ADMIN, ADMIN_STAFF, and SPORTS_TECHNICAL_DIRECTOR.
+   * 
+   * @param studentProfileId - The UUID of the student's profile.
+   * @returns The restored active rank state.
+   */
+  @Post('rollback/:studentProfileId')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR)
+  @ApiOperation({ summary: 'Rollback last promotion or stripe for a student' })
+  @ApiResponse({ status: 200, description: 'Promotion successfully rolled back.' })
+  async rollbackPromotion(@Param('studentProfileId') studentProfileId: string) {
+    return this.promotionsService.rollbackPromotion(studentProfileId);
   }
 }

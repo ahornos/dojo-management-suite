@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma.service';
 
 /**
  * Service responsible for evaluating martial arts promotion eligibility,
- * handling promotion workflows, and updating student belt and stripe records.
+ * handling promotion workflows, executing rank updates, and rolling back errors.
  */
 @Injectable()
 export class PromotionsService {
@@ -16,7 +16,6 @@ export class PromotionsService {
    * 
    * @param studentProfileId - UUID of the student profile.
    * @returns An evaluation report with eligibility status and current metrics.
-   * @throws NotFoundException if the student profile or active rank is not found.
    */
   async evaluatePromotionEligibility(studentProfileId: string) {
     const student = await this.prisma.studentProfile.findUnique({
@@ -50,17 +49,15 @@ export class PromotionsService {
 
     const beltCriteria = activeRank.beltRank;
 
-    // Calculate months spent in the current rank
     const now = new Date();
     const promotedAt = new Date(activeRank.promotedAt);
     const monthsInRank =
       (now.getFullYear() - promotedAt.getFullYear()) * 12 +
       (now.getMonth() - promotedAt.getMonth());
 
-    // Calculate total hours from valid attendances recorded after the last promotion
     const trainingHours = student.attendances.filter(
       (att) => new Date(att.date) >= promotedAt,
-    ).length; // Assuming each attendance record equals 1 training session/hour slot
+    ).length;
 
     const meetsMonths = monthsInRank >= beltCriteria.minMonthsRequired;
     const meetsHours = trainingHours >= beltCriteria.minHoursRequired;
@@ -89,7 +86,6 @@ export class PromotionsService {
 
   /**
    * Creates a pending promotion request proposed by an instructor.
-   * This workflow requires subsequent approval by a technical director or administrator.
    * 
    * @param studentProfileId - UUID of the student profile.
    * @param instructorId - UUID of the user proposing the promotion.
@@ -115,13 +111,9 @@ export class PromotionsService {
 
   /**
    * Executes a direct promotion for a student (Stripe or Belt rank transition).
-   * If the student has not reached max stripes, a stripe is awarded.
-   * If max stripes are reached, the student advances to the next belt rank in the program
-   * and resets accumulated hours.
    * 
    * @param studentProfileId - UUID of the student profile.
    * @returns The updated student rank record.
-   * @throws NotFoundException or BadRequestException if preconditions fail.
    */
   async executePromotion(studentProfileId: string) {
     const student = await this.prisma.studentProfile.findUnique({
@@ -155,7 +147,6 @@ export class PromotionsService {
     const currentBelt = activeRank.beltRank;
     const programBelts = currentBelt.program.beltRanks;
 
-    // Scenario A: Award a stripe if maximum stripes have not been reached yet
     if (activeRank.currentStripes < currentBelt.maxStripes) {
       return this.prisma.studentRank.update({
         where: { id: activeRank.id },
@@ -166,7 +157,6 @@ export class PromotionsService {
       });
     }
 
-    // Scenario B: Advance to the next Belt Rank in the program
     const nextBeltIndex = programBelts.findIndex((b) => b.id === currentBelt.id) + 1;
     
     if (nextBeltIndex >= programBelts.length) {
@@ -175,9 +165,7 @@ export class PromotionsService {
 
     const nextBelt = programBelts[nextBeltIndex];
 
-    // Perform atomic transaction: close old rank record and create/assign the new belt rank
     return this.prisma.$transaction(async (tx) => {
-      // Optional: you can archive or update history, here we create a fresh active StudentRank entry
       return tx.studentRank.create({
         data: {
           studentProfileId,
@@ -187,6 +175,61 @@ export class PromotionsService {
           promotedAt: new Date(),
           lastStripeAt: new Date(),
         },
+      });
+    });
+  }
+
+  /**
+   * Rolls back the last promotion or stripe awarded to a student.
+   * - If the active rank has accumulated stripes (> 0), it decrements one stripe.
+   * - If the active rank has 0 stripes, it removes the current rank entry to fall back to the previous belt history.
+   * 
+   * @param studentProfileId - UUID of the student profile.
+   * @returns The restored active rank record.
+   */
+  async rollbackPromotion(studentProfileId: string) {
+    const student = await this.prisma.studentProfile.findUnique({
+      where: { id: studentProfileId },
+      include: {
+        ranks: {
+          orderBy: { promotedAt: 'desc' },
+          take: 2, // Fetch current and previous rank records
+          include: { beltRank: true },
+        },
+      },
+    });
+
+    if (!student || !student.ranks[0]) {
+      throw new NotFoundException(`Active rank not found for student profile ID ${studentProfileId}.`);
+    }
+
+    const currentRank = student.ranks[0];
+
+    // Scenario A: If stripes were recently awarded, decrement a stripe
+    if (currentRank.currentStripes > 0) {
+      return this.prisma.studentRank.update({
+        where: { id: currentRank.id },
+        data: {
+          currentStripes: { decrement: 1 },
+        },
+      });
+    }
+
+    // Scenario B: If current rank has 0 stripes, it might be a recent belt promotion.
+    // Revert by deleting the latest rank entry so the previous rank becomes active again.
+    const previousRank = student.ranks[1];
+    if (!previousRank) {
+      throw new BadRequestException(`Cannot rollback further: student is at their initial rank record.`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.studentRank.delete({
+        where: { id: currentRank.id },
+      });
+
+      return tx.studentRank.findUnique({
+        where: { id: previousRank.id },
+        include: { beltRank: true },
       });
     });
   }

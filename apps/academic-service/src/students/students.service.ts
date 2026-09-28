@@ -34,7 +34,6 @@ export class StudentsService {
 
     const isStaff = [Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR].includes(requestUser.role);
     const isOwner = student.userId === requestUser.userId;
-    // Parent logic would check if requestUser.userId is in student.guardians
 
     if (!isStaff && !isOwner) {
       throw new ForbiddenException('You are not authorized to view this profile.');
@@ -53,11 +52,10 @@ export class StudentsService {
    * @param requestUser - The authenticated user requesting the update.
    */
   async updateProfile(id: string, updateData: any, requestUser: any) {
-    const student = await this.findOne(id, requestUser); // Will throw Forbidden if not authorized
+    const student = await this.findOne(id, requestUser);
 
     const isStaff = [Role.SUPER_ADMIN, Role.ADMIN_STAFF].includes(requestUser.role);
 
-    // If it's a student/parent, route changes to the approval workflow
     if (!isStaff) {
       return this.prisma.profileUpdateRequest.create({
         data: {
@@ -67,7 +65,6 @@ export class StudentsService {
       });
     }
 
-    // Direct update for authorized admin staff
     return this.prisma.studentProfile.update({
       where: { id: student.id },
       data: {
@@ -79,13 +76,36 @@ export class StudentsService {
   }
 
   /**
-   * Retrieves all students. Restricted to Staff roles only via controller.
+   * Retrieves all student profiles.
+   * Restricted to Staff roles only via controller.
    */
   async findAll() {
     return this.prisma.studentProfile.findMany({
       include: {
         user: { select: { firstName: true, lastName: true, email: true } },
       },
+    });
+  }
+
+  /**
+   * Deletes a student profile from the database.
+   * Restricted strictly to super administrators.
+   * 
+   * @param id - Student Profile UUID.
+   * @returns The deleted student profile record.
+   * @throws NotFoundException if the student profile does not exist.
+   */
+  async remove(id: string) {
+    const student = await this.prisma.studentProfile.findUnique({
+      where: { id },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student profile with ID ${id} not found.`);
+    }
+
+    return this.prisma.studentProfile.delete({
+      where: { id },
     });
   }
 }

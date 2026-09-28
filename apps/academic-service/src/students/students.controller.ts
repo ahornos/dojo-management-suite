@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -8,7 +8,7 @@ import { Role } from '@dms/database/client';
 
 /**
  * Controller for managing student profiles and personal data updates.
- * Implements data ownership and conditional approval workflows.
+ * Implements data ownership, conditional approval workflows, and administrative deletions.
  */
 @ApiTags('Student Management')
 @ApiBearerAuth()
@@ -33,7 +33,6 @@ export class StudentsController {
    * Accessible by staff or the owner of the profile.
    */
   @Get(':id')
-  // No @Roles decorator applied here to allow STUDENT and PARENT access to their own data.
   @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
   async findOne(@Param('id') id: string, @Req() req: any) {
     return this.studentsService.findOne(id, req.user);
@@ -43,10 +42,24 @@ export class StudentsController {
    * Updates student data. Staff bypasses approval, students generate a request.
    */
   @Patch(':id')
-  // No @Roles decorator applied here to allow STUDENT and PARENT to propose updates.
   @ApiOperation({ summary: 'Update profile or propose changes' })
   @ApiResponse({ status: 200, description: 'Profile updated or request created.' })
   async update(@Param('id') id: string, @Body() updateDto: any, @Req() req: any) {
     return this.studentsService.updateProfile(id, updateDto, req.user);
+  }
+
+  /**
+   * Deletes a student profile by its unique identifier.
+   * Strictly restricted to SUPER_ADMIN role for security and auditing purposes.
+   * 
+   * @param id - Student Profile UUID.
+   * @returns The deleted student profile record.
+   */
+  @Delete(':id')
+  @Roles(Role.SUPER_ADMIN)
+  @ApiOperation({ summary: 'Delete a student profile (Super Admin only)' })
+  @ApiResponse({ status: 200, description: 'Student profile successfully deleted.' })
+  async remove(@Param('id') id: string) {
+    return this.studentsService.remove(id);
   }
 }
