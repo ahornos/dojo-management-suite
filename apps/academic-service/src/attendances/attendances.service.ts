@@ -70,4 +70,22 @@ export class AttendancesService {
       },
     });
   }
+
+  /**
+   * Deletes an attendance record by its ID.
+   * @param id - Attendance record UUID
+   */
+  async remove(id: string) {
+    const attendance = await this.prisma.attendance.findUnique({
+      where: { id },
+    });
+
+    if (!attendance) {
+      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+    }
+
+    return this.prisma.attendance.delete({
+      where: { id },
+    });
+  }
 }

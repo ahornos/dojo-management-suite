@@ -7,7 +7,6 @@ describe('AttendancesService', () => {
   let service: AttendancesService;
   let prisma: PrismaService;
 
-  // Mock Prisma Service to isolate attendance unit tests
   const mockPrismaService = {
     studentProfile: {
       findUnique: jest.fn(),
@@ -15,6 +14,8 @@ describe('AttendancesService', () => {
     attendance: {
       create: jest.fn(),
       findMany: jest.fn(),
+      findUnique: jest.fn(),
+      delete: jest.fn(),
     },
   };
 
@@ -34,7 +35,6 @@ describe('AttendancesService', () => {
     jest.clearAllMocks();
   });
 
-  // Test suite initialization check
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
@@ -43,7 +43,6 @@ describe('AttendancesService', () => {
     it('should successfully register attendance if student profile exists', async () => {
       const dto = { studentProfileId: 'profile-uuid-1' };
 
-      // Ensure student profile validation passes successfully
       mockPrismaService.studentProfile.findUnique.mockResolvedValue({
         id: 'profile-uuid-1',
       });
@@ -52,14 +51,12 @@ describe('AttendancesService', () => {
         id: 'attendance-uuid-1',
         studentProfileId: 'profile-uuid-1',
         attendedAt: new Date(),
-        countedForRank: false,
       };
 
       mockPrismaService.attendance.create.mockResolvedValue(mockCreatedAttendance);
 
       const result = await service.create(dto);
 
-      // Verify profile lookup and attendance creation execution
       expect(prisma.studentProfile.findUnique).toHaveBeenCalledWith({
         where: { id: dto.studentProfileId },
       });
@@ -70,10 +67,8 @@ describe('AttendancesService', () => {
     it('should throw NotFoundException if student profile does not exist', async () => {
       const dto = { studentProfileId: 'non-existent-id' };
 
-      // Simulate missing student profile in database
       mockPrismaService.studentProfile.findUnique.mockResolvedValue(null);
 
-      // Verify that a NotFoundException is thrown and attendance is never created
       await expect(service.create(dto)).rejects.toThrow(NotFoundException);
       expect(prisma.attendance.create).not.toHaveBeenCalled();
     });
@@ -85,7 +80,6 @@ describe('AttendancesService', () => {
         { id: 'att-1', studentProfileId: 'profile-uuid-1' },
       ];
 
-      // Mock fetching all attendance records ordered by date
       mockPrismaService.attendance.findMany.mockResolvedValue(mockAttendances);
 
       const result = await service.findAll();
@@ -95,6 +89,35 @@ describe('AttendancesService', () => {
         orderBy: { attendedAt: 'desc' },
       });
       expect(result).toEqual(mockAttendances);
+    });
+  });
+
+  describe('remove', () => {
+    it('should successfully delete an attendance record', async () => {
+      const attendanceId = 'attendance-uuid-1';
+
+      mockPrismaService.attendance.findUnique.mockResolvedValue({
+        id: attendanceId,
+      });
+
+      mockPrismaService.attendance.delete.mockResolvedValue({ id: attendanceId });
+
+      const result = await service.remove(attendanceId);
+
+      expect(prisma.attendance.findUnique).toHaveBeenCalledWith({
+        where: { id: attendanceId },
+      });
+      expect(prisma.attendance.delete).toHaveBeenCalledWith({
+        where: { id: attendanceId },
+      });
+      expect(result).toEqual({ id: attendanceId });
+    });
+
+    it('should throw NotFoundException if attendance record does not exist', async () => {
+      mockPrismaService.attendance.findUnique.mockResolvedValue(null);
+
+      await expect(service.remove('non-existent')).rejects.toThrow(NotFoundException);
+      expect(prisma.attendance.delete).not.toHaveBeenCalled();
     });
   });
 });

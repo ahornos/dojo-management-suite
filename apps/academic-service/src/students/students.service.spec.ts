@@ -1,16 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudentsService } from './students.service';
 import { PrismaService } from '../prisma.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('StudentsService', () => {
   let service: StudentsService;
   let prisma: PrismaService;
 
-  // Mock Prisma Service to isolate unit tests from real database operations
   const mockPrismaService = {
     user: {
       create: jest.fn(),
       findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     },
     discipline: {
       findUnique: jest.fn(),
@@ -33,7 +36,6 @@ describe('StudentsService', () => {
     jest.clearAllMocks();
   });
 
-  // Test suite initialization check
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
@@ -60,12 +62,10 @@ describe('StudentsService', () => {
         },
       };
 
-      // Mock database response for user creation
       mockPrismaService.user.create.mockResolvedValue(mockCreatedUser);
 
       const result = await service.create(dto);
 
-      // Verify Prisma client method interactions and expected output
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockCreatedUser);
     });
@@ -77,17 +77,75 @@ describe('StudentsService', () => {
         { id: 'user-1', email: 'student1@example.com', role: 'STUDENT' },
       ];
 
-      // Mock database query for filtering users by student role
       mockPrismaService.user.findMany.mockResolvedValue(mockStudents);
 
       const result = await service.findAll();
 
-      // Verify that the query filters by role and includes relations
       expect(prisma.user.findMany).toHaveBeenCalledWith({
         where: { role: 'STUDENT' },
         include: expect.any(Object),
       });
       expect(result).toEqual(mockStudents);
+    });
+  });
+
+  describe('update', () => {
+    it('should successfully update an existing student', async () => {
+      const studentId = 'user-uuid-1';
+      const dto = { firstName: 'Jonathan' };
+
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: studentId,
+        role: 'STUDENT',
+      });
+
+      const mockUpdatedUser = { id: studentId, firstName: 'Jonathan', role: 'STUDENT' };
+      mockPrismaService.user.update.mockResolvedValue(mockUpdatedUser);
+
+      const result = await service.update(studentId, dto);
+
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: studentId },
+        include: { studentProfile: true },
+      });
+      expect(prisma.user.update).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockUpdatedUser);
+    });
+
+    it('should throw NotFoundException if student to update does not exist', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.update('non-existent', { firstName: 'Test' })).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('remove', () => {
+    it('should successfully delete an existing student', async () => {
+      const studentId = 'user-uuid-1';
+
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: studentId,
+        role: 'STUDENT',
+      });
+
+      mockPrismaService.user.delete.mockResolvedValue({ id: studentId });
+
+      const result = await service.remove(studentId);
+
+      expect(prisma.user.delete).toHaveBeenCalledWith({
+        where: { id: studentId },
+      });
+      expect(result).toEqual({ id: studentId });
+    });
+
+    it('should throw NotFoundException if student to delete does not exist', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.remove('non-existent')).rejects.toThrow(NotFoundException);
+      expect(prisma.user.delete).not.toHaveBeenCalled();
     });
   });
 });

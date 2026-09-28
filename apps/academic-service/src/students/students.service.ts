@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -12,8 +13,6 @@ export class StudentsService {
    * @returns The created user entity along with its student profile
    */
   async create(dto: CreateStudentDto) {
-    // Note: Discipline association is handled via BeltRanks / StudentRanks in this schema architecture.
-    // We create the user and their core student profile atomically.
     return this.prisma.user.create({
       data: {
         email: dto.email,
@@ -67,6 +66,62 @@ export class StudentsService {
           },
         },
       },
+    });
+  }
+
+  /**
+   * Updates an existing student's core data and profile details.
+   * @param id - User ID of the student
+   * @param dto - Data Transfer Object containing updated values
+   */
+  async update(id: string, dto: UpdateStudentDto) {
+    // Verify user/student existence
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { studentProfile: true },
+    });
+
+    if (!user || user.role !== 'STUDENT') {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        email: dto.email,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        studentProfile: {
+          update: {
+            phone: dto.phone,
+            address: dto.address,
+            city: dto.city,
+            postalCode: dto.postalCode,
+            status: dto.status,
+          },
+        },
+      },
+      include: {
+        studentProfile: true,
+      },
+    });
+  }
+
+  /**
+   * Removes a student and cascades deletion to their student profile.
+   * @param id - User ID of the student
+   */
+  async remove(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user || user.role !== 'STUDENT') {
+      throw new NotFoundException(`Student with ID ${id} not found`);
+    }
+
+    return this.prisma.user.delete({
+      where: { id },
     });
   }
 }
