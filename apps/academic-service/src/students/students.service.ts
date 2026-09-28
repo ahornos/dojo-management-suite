@@ -22,13 +22,39 @@ export class StudentsService {
         studentProfile: {
           create: {
             phone: dto.phone,
+            birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
             status: 'TRIAL',
+            // If guardian data is provided, connect or create the guardian relation
+            guardians: dto.guardian
+              ? {
+                  create: {
+                    relation: dto.guardian.relation || 'Legal Guardian',
+                    guardian: {
+                      connectOrCreate: {
+                        where: { dni: dto.guardian.dni },
+                        create: {
+                          dni: dto.guardian.dni,
+                          firstName: dto.guardian.firstName,
+                          lastName: dto.guardian.lastName,
+                          phone: dto.guardian.phone,
+                          email: dto.guardian.email,
+                        },
+                      },
+                    },
+                  },
+                }
+              : undefined,
           },
         },
       },
       include: {
         studentProfile: {
           include: {
+            guardians: {
+              include: {
+                guardian: true,
+              },
+            },
             ranks: {
               include: {
                 beltRank: {

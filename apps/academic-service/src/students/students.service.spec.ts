@@ -41,13 +41,21 @@ describe('StudentsService', () => {
   });
 
   describe('create', () => {
-    it('should successfully create a student and their profile', async () => {
+    it('should successfully create a student, their profile, and optional guardian', async () => {
       const dto = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
         phone: '+34600000000',
-        disciplineId: 'disc-uuid-1',
+        birthDate: '2012-05-15T00:00:00.000Z',
+        guardian: {
+          dni: '12345678X',
+          firstName: 'Jane',
+          lastName: 'Doe',
+          phone: '+34600111222',
+          email: 'parent@example.com',
+          relation: 'Mother',
+        },
       };
 
       const mockCreatedUser = {
@@ -59,6 +67,17 @@ describe('StudentsService', () => {
         studentProfile: {
           id: 'profile-uuid-1',
           phone: dto.phone,
+          birthDate: new Date(dto.birthDate),
+          guardians: [
+            {
+              relation: 'Mother',
+              guardian: {
+                dni: '12345678X',
+                firstName: 'Jane',
+                lastName: 'Doe',
+              },
+            },
+          ],
         },
       };
 
@@ -67,6 +86,17 @@ describe('StudentsService', () => {
       const result = await service.create(dto);
 
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
+      expect(prisma.user.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            studentProfile: expect.objectContaining({
+              create: expect.objectContaining({
+                guardians: expect.any(Object),
+              }),
+            }),
+          }),
+        }),
+      );
       expect(result).toEqual(mockCreatedUser);
     });
   });
