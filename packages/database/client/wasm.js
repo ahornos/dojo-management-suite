@@ -136,73 +136,23 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.StudentProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  dni: 'dni',
   birthDate: 'birthDate',
-  status: 'status',
   phone: 'phone',
   address: 'address',
-  city: 'city',
-  postalCode: 'postalCode',
-  hasBorrowedGi: 'hasBorrowedGi',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
 exports.Prisma.GuardianScalarFieldEnum = {
   id: 'id',
-  dni: 'dni',
-  firstName: 'firstName',
-  lastName: 'lastName',
-  phone: 'phone',
-  email: 'email'
+  userId: 'userId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.StudentGuardianScalarFieldEnum = {
-  studentId: 'studentId',
+  studentProfileId: 'studentProfileId',
   guardianId: 'guardianId',
-  relation: 'relation'
-};
-
-exports.Prisma.StatusHistoryScalarFieldEnum = {
-  id: 'id',
-  studentProfileId: 'studentProfileId',
-  status: 'status',
-  reason: 'reason',
-  changedAt: 'changedAt'
-};
-
-exports.Prisma.FeePlanScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  basePrice: 'basePrice',
-  isActive: 'isActive'
-};
-
-exports.Prisma.StudentSubscriptionScalarFieldEnum = {
-  id: 'id',
-  studentProfileId: 'studentProfileId',
-  feePlanId: 'feePlanId',
-  agreedPrice: 'agreedPrice',
-  paymentMethod: 'paymentMethod',
-  iban: 'iban',
-  accountHolderName: 'accountHolderName',
-  mandateReference: 'mandateReference',
-  mandateSignatureDate: 'mandateSignatureDate',
-  isActive: 'isActive'
-};
-
-exports.Prisma.FederationScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
-};
-
-exports.Prisma.StudentLicenseScalarFieldEnum = {
-  id: 'id',
-  studentProfileId: 'studentProfileId',
-  federationId: 'federationId',
-  academicYear: 'academicYear',
-  licenseNumber: 'licenseNumber',
-  isActive: 'isActive'
+  relationship: 'relationship'
 };
 
 exports.Prisma.DisciplineScalarFieldEnum = {
@@ -242,13 +192,67 @@ exports.Prisma.StudentRankScalarFieldEnum = {
 exports.Prisma.AttendanceScalarFieldEnum = {
   id: 'id',
   studentProfileId: 'studentProfileId',
-  attendedAt: 'attendedAt',
+  date: 'date',
   countedForRank: 'countedForRank'
+};
+
+exports.Prisma.ProfileUpdateRequestScalarFieldEnum = {
+  id: 'id',
+  studentProfileId: 'studentProfileId',
+  requestedChanges: 'requestedChanges',
+  status: 'status',
+  reviewedById: 'reviewedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PromotionRequestScalarFieldEnum = {
+  id: 'id',
+  studentProfileId: 'studentProfileId',
+  proposedBeltId: 'proposedBeltId',
+  proposedStripes: 'proposedStripes',
+  proposedById: 'proposedById',
+  approvedById: 'approvedById',
+  status: 'status',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FeePlanScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  monthlyPrice: 'monthlyPrice'
+};
+
+exports.Prisma.StudentSubscriptionScalarFieldEnum = {
+  id: 'id',
+  studentProfileId: 'studentProfileId',
+  feePlanId: 'feePlanId',
+  isActive: 'isActive',
+  mandateReference: 'mandateReference'
+};
+
+exports.Prisma.FederationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  country: 'country'
+};
+
+exports.Prisma.StudentLicenseScalarFieldEnum = {
+  id: 'id',
+  studentProfileId: 'studentProfileId',
+  federationId: 'federationId',
+  licenseNumber: 'licenseNumber',
+  validUntil: 'validUntil',
+  isActive: 'isActive'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -260,25 +264,25 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.Role = exports.$Enums.Role = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN_STAFF: 'ADMIN_STAFF',
+  SPORTS_TECHNICAL_DIRECTOR: 'SPORTS_TECHNICAL_DIRECTOR',
   INSTRUCTOR: 'INSTRUCTOR',
   STUDENT: 'STUDENT',
   PARENT: 'PARENT'
 };
 
-exports.StudentStatus = exports.$Enums.StudentStatus = {
-  TRIAL: 'TRIAL',
-  ACTIVE: 'ACTIVE',
-  PAUSED: 'PAUSED',
-  INACTIVE: 'INACTIVE'
-};
-
-exports.PaymentMethod = exports.$Enums.PaymentMethod = {
-  SEPA: 'SEPA',
-  CASH: 'CASH',
-  CARD: 'CARD'
+exports.RequestStatus = exports.$Enums.RequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
 };
 
 exports.Prisma.ModelName = {
@@ -286,16 +290,17 @@ exports.Prisma.ModelName = {
   StudentProfile: 'StudentProfile',
   Guardian: 'Guardian',
   StudentGuardian: 'StudentGuardian',
-  StatusHistory: 'StatusHistory',
-  FeePlan: 'FeePlan',
-  StudentSubscription: 'StudentSubscription',
-  Federation: 'Federation',
-  StudentLicense: 'StudentLicense',
   Discipline: 'Discipline',
   DisciplineProgram: 'DisciplineProgram',
   BeltRank: 'BeltRank',
   StudentRank: 'StudentRank',
-  Attendance: 'Attendance'
+  Attendance: 'Attendance',
+  ProfileUpdateRequest: 'ProfileUpdateRequest',
+  PromotionRequest: 'PromotionRequest',
+  FeePlan: 'FeePlan',
+  StudentSubscription: 'StudentSubscription',
+  Federation: 'Federation',
+  StudentLicense: 'StudentLicense'
 };
 
 /**

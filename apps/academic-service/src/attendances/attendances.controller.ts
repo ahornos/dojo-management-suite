@@ -1,10 +1,17 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { AttendancesService } from './attendances.service';
-import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@dms/database/client';
+
 
 @ApiTags('attendances')
 @Controller('attendances')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR)
 export class AttendancesController {
   constructor(private readonly attendancesService: AttendancesService) {}
 

@@ -1,7 +1,6 @@
 import { IsEmail, IsOptional, IsString, IsDateString, ValidateNested, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { StudentStatus } from '@dms/database/client';
 
 class CreateGuardianDto {
   @ApiProperty({ example: '12345678X' })
@@ -63,11 +62,6 @@ export class CreateStudentDto {
   @IsOptional()
   @IsString()
   postalCode?: string;
-
-  @ApiPropertyOptional({ enum: StudentStatus, example: 'ACTIVE' })
-  @IsOptional()
-  @IsEnum(StudentStatus)
-  status?: StudentStatus;
 
   @ApiPropertyOptional({ example: '2012-05-15T00:00:00.000Z', description: 'Birth date, useful to determine if student is a minor' })
   @IsOptional()

@@ -1,45 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import {ApiTags, ApiOperation, ApiResponse, ApiParam} from '@nestjs/swagger';
+import { Controller, Get, Patch, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { StudentsService } from './students.service';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@dms/database/client';
 
-@ApiTags('students')
+/**
+ * Controller for managing student profiles and personal data updates.
+ * Implements data ownership and conditional approval workflows.
+ */
+@ApiTags('Student Management')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('students')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Register a new student in the academy' })
-  @ApiResponse({ status: 201, description: 'Student successfully created with their academic profile.' })
-  @ApiResponse({ status: 400, description: 'Invalid input data or validation failure.' })
-  @ApiResponse({ status: 404, description: 'Specified discipline does not exist.' })
-  create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentsService.create(createStudentDto);
-  }
-
+  /**
+   * Retrieves all student profiles.
+   * Strictly limited to staff members. Students cannot access the directory.
+   */
   @Get()
-  @ApiOperation({ summary: 'Retrieve a list of all registered students' })
-  @ApiResponse({ status: 200, description: 'List of students successfully retrieved.' })
-  findAll() {
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR)
+  @ApiOperation({ summary: 'List all students (Staff only)' })
+  async findAll() {
     return this.studentsService.findAll();
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update student details by ID' })
-  @ApiParam({ name: 'id', description: 'Student User UUID' })
-  @ApiResponse({ status: 200, description: 'Student successfully updated.' })
-  @ApiResponse({ status: 404, description: 'Student not found.' })
-  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-    return this.studentsService.update(id, updateStudentDto);
+  /**
+   * Retrieves a specific student profile.
+   * Accessible by staff or the owner of the profile.
+   */
+  @Get(':id')
+  // No @Roles decorator applied here to allow STUDENT and PARENT access to their own data.
+  @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    return this.studentsService.findOne(id, req.user);
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a student by ID' })
-  @ApiParam({ name: 'id', description: 'Student User UUID' })
-  @ApiResponse({ status: 200, description: 'Student successfully deleted.' })
-  @ApiResponse({ status: 404, description: 'Student not found.' })
-  remove(@Param('id') id: string) {
-    return this.studentsService.remove(id);
+  /**
+   * Updates student data. Staff bypasses approval, students generate a request.
+   */
+  @Patch(':id')
+  // No @Roles decorator applied here to allow STUDENT and PARENT to propose updates.
+  @ApiOperation({ summary: 'Update profile or propose changes' })
+  @ApiResponse({ status: 200, description: 'Profile updated or request created.' })
+  async update(@Param('id') id: string, @Body() updateDto: any, @Req() req: any) {
+    return this.studentsService.updateProfile(id, updateDto, req.user);
   }
 }

@@ -2,45 +2,48 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 
+/**
+ * Service responsible for handling attendance business logic,
+ * tracking training hours, and counting towards grade hours (H.d.G.).
+ */
 @Injectable()
 export class AttendancesService {
   constructor(private prisma: PrismaService) {}
 
   /**
    * Registers a new attendance entry for audit purposes and optionally 
-   * counts it towards the student's active rank (H.d.G.) based on business rules.
-   * @param dto - Data Transfer Object containing the student profile ID
+   * counts it towards the student's active rank based on business rules.
+   * 
+   * @param dto - Data Transfer Object containing the student profile ID and optional timestamp
+   * @returns The newly created attendance record
    */
   async create(dto: CreateAttendanceDto) {
     // 1. Verify that the student profile exists
-    const studentProfile = await this.prisma.studentProfile.findUnique({
+    const student = await this.prisma.studentProfile.findUnique({
       where: { id: dto.studentProfileId },
       include: {
         ranks: {
-          where: {
-            // Assuming we look for the active rank or we can fetch ranks to find the current one
-          },
           include: { beltRank: true },
         },
       },
     });
 
-    if (!studentProfile) {
+    if (!student) {
       throw new NotFoundException(`Student profile with ID ${dto.studentProfileId} not found`);
     }
 
-    // 2. Determine today's date boundaries to check daily rank rules (e.g. 1 per day rule)
+    // 2. Determine today's date boundaries to check daily rank rules
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Check if an attendance already counted for rank today for this student
+    // Check if an attendance already counted for rank today for this student profile
     const existingRankAttendanceToday = await this.prisma.attendance.findFirst({
       where: {
         studentProfileId: dto.studentProfileId,
-        attendedAt: {
+        date: {
           gte: startOfDay,
           lte: endOfDay,
         },
@@ -48,8 +51,7 @@ export class AttendancesService {
       },
     });
 
-    // Rule: Count for rank only if there isn't already one counted today 
-    // (configurable policy: can be adjusted or bypassed if multiple classes per day are allowed for rank)
+    // Rule: Count for rank only if there isn't already one counted today
     const shouldCountForRank = !existingRankAttendanceToday;
 
     // 3. Perform atomic transaction: create attendance and update rank hours if applicable
@@ -58,13 +60,13 @@ export class AttendancesService {
       const attendance = await tx.attendance.create({
         data: {
           studentProfileId: dto.studentProfileId,
+          date: dto.attendedAt ? new Date(dto.attendedAt) : undefined,
           countedForRank: shouldCountForRank,
         },
       });
 
       // If eligible for rank progression, find active rank and increment accumulated hours
       if (shouldCountForRank) {
-        // Find the active student rank (usually the latest or one marked as current)
         const activeRank = await tx.studentRank.findFirst({
           where: { studentProfileId: dto.studentProfileId },
           orderBy: { promotedAt: 'desc' },
@@ -88,11 +90,13 @@ export class AttendancesService {
 
   /**
    * Retrieves all attendance records ordered by date descending.
+   * 
+   * @returns Array of attendance records including student and user details
    */
   async findAll() {
     return this.prisma.attendance.findMany({
       include: {
-        studentProfile: {
+        student: {
           include: {
             user: {
               select: { firstName: true, lastName: true, email: true },
@@ -100,13 +104,15 @@ export class AttendancesService {
           },
         },
       },
-      orderBy: { attendedAt: 'desc' },
+      orderBy: { date: 'desc' },
     });
   }
 
   /**
    * Deletes an attendance record by its ID.
+   * 
    * @param id - Attendance record UUID
+   * @returns The deleted attendance record
    */
   async remove(id: string) {
     const attendance = await this.prisma.attendance.findUnique({
@@ -124,12 +130,14 @@ export class AttendancesService {
 
   /**
    * Retrieves all attendance records for a specific student profile.
+   * 
    * @param studentProfileId - Student profile UUID
+   * @returns Array of attendance records for the specified student
    */
   async findByStudent(studentProfileId: string) {
     return this.prisma.attendance.findMany({
       where: { studentProfileId },
-      orderBy: { attendedAt: 'desc' },
+      orderBy: { date: 'desc' },
     });
   }
 }

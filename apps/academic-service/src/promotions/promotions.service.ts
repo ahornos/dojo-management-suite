@@ -1,129 +1,193 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 
+/**
+ * Service responsible for evaluating martial arts promotion eligibility,
+ * handling promotion workflows, and updating student belt and stripe records.
+ */
 @Injectable()
 export class PromotionsService {
   constructor(private prisma: PrismaService) {}
 
   /**
-   * Evaluates if a student is eligible for a stripe (grade) promotion or a belt promotion.
-   * @param studentProfileId - Student profile UUID
+   * Evaluates whether a student is eligible for a stripe or belt promotion
+   * by comparing their accumulated training hours and months in rank against
+   * the requirements defined in their current belt rank.
+   * 
+   * @param studentProfileId - UUID of the student profile.
+   * @returns An evaluation report with eligibility status and current metrics.
+   * @throws NotFoundException if the student profile or active rank is not found.
    */
   async evaluatePromotionEligibility(studentProfileId: string) {
-    const studentProfile = await this.prisma.studentProfile.findUnique({
+    const student = await this.prisma.studentProfile.findUnique({
       where: { id: studentProfileId },
       include: {
         ranks: {
           orderBy: { promotedAt: 'desc' },
           take: 1,
           include: {
-            beltRank: true,
+            beltRank: {
+              include: {
+                program: true,
+              },
+            },
+          },
+        },
+        attendances: {
+          where: { countedForRank: true },
+        },
+      },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student profile with ID ${studentProfileId} not found.`);
+    }
+
+    const activeRank = student.ranks[0];
+    if (!activeRank) {
+      throw new BadRequestException(`Student has no active belt rank assigned.`);
+    }
+
+    const beltCriteria = activeRank.beltRank;
+
+    // Calculate months spent in the current rank
+    const now = new Date();
+    const promotedAt = new Date(activeRank.promotedAt);
+    const monthsInRank =
+      (now.getFullYear() - promotedAt.getFullYear()) * 12 +
+      (now.getMonth() - promotedAt.getMonth());
+
+    // Calculate total hours from valid attendances recorded after the last promotion
+    const trainingHours = student.attendances.filter(
+      (att) => new Date(att.date) >= promotedAt,
+    ).length; // Assuming each attendance record equals 1 training session/hour slot
+
+    const meetsMonths = monthsInRank >= beltCriteria.minMonthsRequired;
+    const meetsHours = trainingHours >= beltCriteria.minHoursRequired;
+    const isEligible = meetsMonths && meetsHours;
+
+    return {
+      studentProfileId,
+      currentBelt: beltCriteria.name,
+      currentStripes: activeRank.currentStripes,
+      maxStripes: beltCriteria.maxStripes,
+      requirements: {
+        minMonthsRequired: beltCriteria.minMonthsRequired,
+        minHoursRequired: beltCriteria.minHoursRequired,
+      },
+      currentMetrics: {
+        monthsInRank,
+        accumulatedHours: trainingHours,
+      },
+      eligibility: {
+        meetsMonths,
+        meetsHours,
+        isEligible,
+      },
+    };
+  }
+
+  /**
+   * Creates a pending promotion request proposed by an instructor.
+   * This workflow requires subsequent approval by a technical director or administrator.
+   * 
+   * @param studentProfileId - UUID of the student profile.
+   * @param instructorId - UUID of the user proposing the promotion.
+   * @returns The created PromotionRequest record.
+   */
+  async proposePromotion(studentProfileId: string, instructorId: string) {
+    const student = await this.prisma.studentProfile.findUnique({
+      where: { id: studentProfileId },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student profile with ID ${studentProfileId} not found.`);
+    }
+
+    return this.prisma.promotionRequest.create({
+      data: {
+        studentProfileId,
+        proposedById: instructorId,
+        status: 'PENDING',
+      },
+    });
+  }
+
+  /**
+   * Executes a direct promotion for a student (Stripe or Belt rank transition).
+   * If the student has not reached max stripes, a stripe is awarded.
+   * If max stripes are reached, the student advances to the next belt rank in the program
+   * and resets accumulated hours.
+   * 
+   * @param studentProfileId - UUID of the student profile.
+   * @returns The updated student rank record.
+   * @throws NotFoundException or BadRequestException if preconditions fail.
+   */
+  async executePromotion(studentProfileId: string) {
+    const student = await this.prisma.studentProfile.findUnique({
+      where: { id: studentProfileId },
+      include: {
+        ranks: {
+          orderBy: { promotedAt: 'desc' },
+          take: 1,
+          include: {
+            beltRank: {
+              include: {
+                program: {
+                  include: {
+                    beltRanks: {
+                      orderBy: { order: 'asc' },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
     });
 
-    if (!studentProfile) {
-      throw new NotFoundException(`Student profile with ID ${studentProfileId} not found`);
+    if (!student || !student.ranks[0]) {
+      throw new NotFoundException(`Active rank not found for student profile ID ${studentProfileId}.`);
     }
 
-    const ranks = (studentProfile as any).ranks || [];
-    const activeRank = ranks[0];
-    
-    if (!activeRank) {
-      throw new BadRequestException(`Student does not have an active belt rank assigned`);
-    }
-
+    const activeRank = student.ranks[0];
     const currentBelt = activeRank.beltRank;
+    const programBelts = currentBelt.program.beltRanks;
 
-    // Calculate time elapsed in months since last promotion or stripe
-    const lastPromotionDate = activeRank.lastStripeAt || activeRank.promotedAt;
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - lastPromotionDate.getTime());
-    const diffMonths = diffTime / (1000 * 60 * 60 * 24 * 30.44);
-
-    const hasEnoughHours = activeRank.accumulatedHours >= currentBelt.minHoursRequired;
-    const hasEnoughTime = diffMonths >= currentBelt.minMonthsRequired;
-
-    const canPromoteStripe = 
-      currentBelt.maxStripes > 0 && 
-      activeRank.currentStripes < currentBelt.maxStripes && 
-      hasEnoughHours && 
-      hasEnoughTime;
-
-    return {
-      studentProfileId,
-      currentBelt: currentBelt.name,
-      currentStripes: activeRank.currentStripes,
-      maxStripes: currentBelt.maxStripes,
-      accumulatedHours: activeRank.accumulatedHours,
-      requiredHours: currentBelt.minHoursRequired,
-      elapsedMonths: parseFloat(diffMonths.toFixed(1)),
-      requiredMonths: currentBelt.minMonthsRequired,
-      isEligibleForStripe: canPromoteStripe,
-      isEligibleForBeltPromotion: hasEnoughHours && hasEnoughTime && (!canPromoteStripe || activeRank.currentStripes === currentBelt.maxStripes),
-    };
-  }
-
-  /**
-   * Promotes a student to the next stripe or transitions to the next belt rank.
-   * @param studentProfileId - Student profile UUID
-   */
-  async promoteStudent(studentProfileId: string) {
-    const eligibility = await this.evaluatePromotionEligibility(studentProfileId);
-
-    if (!eligibility.isEligibleForStripe && !eligibility.isEligibleForBeltPromotion) {
-      throw new BadRequestException(`Student does not meet the requirements for promotion yet.`);
-    }
-
-    const activeRank = await this.prisma.studentRank.findFirst({
-      where: { studentProfileId },
-      orderBy: { promotedAt: 'desc' },
-      include: { 
-        beltRank: true, 
-      },
-    });
-
-    if (!activeRank || !activeRank.beltRank) {
-      throw new NotFoundException(`Active rank or belt details not found for student`);
-    }
-
-    // Scenario A: Grant a new stripe if max stripes not reached
-    if (eligibility.isEligibleForStripe) {
+    // Scenario A: Award a stripe if maximum stripes have not been reached yet
+    if (activeRank.currentStripes < currentBelt.maxStripes) {
       return this.prisma.studentRank.update({
         where: { id: activeRank.id },
         data: {
           currentStripes: { increment: 1 },
           lastStripeAt: new Date(),
-          accumulatedHours: 0,
         },
       });
     }
 
-    // Scenario B: Promote to the next Belt Rank using the active client field (disciplineId)
-    const nextBelt = await this.prisma.beltRank.findFirst({
-      where: {
-        disciplineProgramId: activeRank.beltRank.disciplineProgramId,
-      },
-      orderBy: { order: 'asc' },
-    });
-
-    if (!nextBelt) {
-      throw new BadRequestException(`No higher belt rank configured. Student is at peak rank.`);
+    // Scenario B: Advance to the next Belt Rank in the program
+    const nextBeltIndex = programBelts.findIndex((b) => b.id === currentBelt.id) + 1;
+    
+    if (nextBeltIndex >= programBelts.length) {
+      throw new BadRequestException(`Student is already at the highest belt rank of the program.`);
     }
 
+    const nextBelt = programBelts[nextBeltIndex];
+
+    // Perform atomic transaction: close old rank record and create/assign the new belt rank
     return this.prisma.$transaction(async (tx) => {
-      const newRank = await tx.studentRank.create({
+      // Optional: you can archive or update history, here we create a fresh active StudentRank entry
+      return tx.studentRank.create({
         data: {
           studentProfileId,
           beltRankId: nextBelt.id,
           currentStripes: 0,
           accumulatedHours: 0,
           promotedAt: new Date(),
+          lastStripeAt: new Date(),
         },
       });
-
-      return newRank;
     });
   }
 }

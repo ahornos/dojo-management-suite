@@ -1,7 +1,13 @@
 import { IsUUID, IsOptional, IsDateString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
+/**
+ * Data Transfer Object for creating an attendance record.
+ */
 export class CreateAttendanceDto {
+  /**
+   * Unique identifier of the student profile attending the class.
+   */
   @ApiProperty({ 
     example: '123e4567-e89b-12d3-a456-426614174000', 
     description: 'Unique identifier of the student profile attending the class' 
@@ -9,6 +15,9 @@ export class CreateAttendanceDto {
   @IsUUID()
   studentProfileId: string;
 
+  /**
+   * Optional timestamp of the attendance. Defaults to current time if omitted.
+   */
   @ApiPropertyOptional({ 
     example: '2026-09-28T18:00:00.000Z', 
     description: 'Optional timestamp of the attendance. Defaults to current time if omitted.' 
