@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DisciplinesService } from './disciplines.service';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * Unit tests for DisciplinesService managing martial arts disciplines and belt structures.
