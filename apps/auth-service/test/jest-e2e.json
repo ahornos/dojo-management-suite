@@ -1,0 +1,16 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(@nestjs/jwt))"
+  ],
+  "moduleNameMapper": {
+    "^@dms/database(.*)$": "<rootDir>/../../../packages/database$1",
+    "^@nestjs/jwt$": "<rootDir>/../src/auth/__mocks__/@nestjs/jwt.ts"
+  }
+}
