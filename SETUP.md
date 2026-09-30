@@ -67,6 +67,7 @@ pnpm --filter financial-service test:e2e
 Once all tests pass successfully, the microservices are fully operational:
 
 | Microservice       | Internal Port | External Mapping | Swagger Documentation URL |
+|---                 | ---           |---               |--- 
 | API Gateway        |	3000	     | 3000	            | -                         |
 | Auth Service       |	3000	     | 3001	            | [http://localhost:3001/api/docs](http://localhost:3001/api/docs) |
 | Academic Service   |	3000	     | 3002	            | [http://localhost:3002/api/docs](http://localhost:3002/api/docs) |
