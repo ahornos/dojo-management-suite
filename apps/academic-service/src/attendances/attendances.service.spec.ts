@@ -4,7 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
 /**
- * Unit tests for AttendancesService managing class attendance logs and rank hour increments.
+ * @group unit
+ * @description Unit tests for AttendancesService managing class attendance logs and rank hour increments.
  */
 describe('AttendancesService', () => {
   let service: AttendancesService;
@@ -18,7 +19,12 @@ describe('AttendancesService', () => {
       findFirst: jest.fn(),
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: 'attendance-uuid', ...dto.data })),
       delete: jest.fn(),
+    },
+    studentRank: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'rank-uuid', currentHours: 5 }),
+      update: jest.fn().mockResolvedValue({ id: 'rank-uuid', accumulatedHours: 6 }), // <-- Añadido el método update faltante
     },
     $transaction: jest.fn((callback) => callback(mockPrisma)),
   };
@@ -46,6 +52,27 @@ describe('AttendancesService', () => {
       await expect(
         service.create({ studentProfileId: 'invalid-profile-id' }),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should successfully log attendance if student profile exists', async () => {
+      mockPrisma.studentProfile.findUnique.mockResolvedValue({ id: 'valid-profile-id' });
+      mockPrisma.attendance.findFirst.mockResolvedValue(null); // No duplicate attendance on same day
+
+      const result = await service.create({ studentProfileId: 'valid-profile-id' });
+
+      expect(result).toHaveProperty('id', 'attendance-uuid');
+      expect(mockPrisma.attendance.create).toHaveBeenCalled();
+      expect(mockPrisma.studentRank.update).toHaveBeenCalled(); // Verifica que también actualiza las horas del rango
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return an array of attendance logs', async () => {
+      const mockLogs = [{ id: '1', studentProfileId: 'valid-profile-id', date: new Date() }];
+      mockPrisma.attendance.findMany.mockResolvedValue(mockLogs);
+
+      const result = await service.findAll();
+      expect(result).toEqual(mockLogs);
     });
   });
 });

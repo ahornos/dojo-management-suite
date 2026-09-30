@@ -3,7 +3,8 @@ import { DisciplinesService } from './disciplines.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
- * Unit tests for DisciplinesService managing martial arts disciplines and belt structures.
+ * @group unit
+ * @description Unit tests for DisciplinesService managing martial arts disciplines and belt structures.
  */
 describe('DisciplinesService', () => {
   let service: DisciplinesService;

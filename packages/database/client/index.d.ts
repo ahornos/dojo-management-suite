@@ -69,15 +69,55 @@ export type ProfileUpdateRequest = $Result.DefaultSelection<Prisma.$ProfileUpdat
  */
 export type PromotionRequest = $Result.DefaultSelection<Prisma.$PromotionRequestPayload>
 /**
- * Model FeePlan
- * 
+ * Model FeeTier
+ * Base fee tiers configured for the academy (e.g., Bronze, Silver, Gold, Child).
  */
-export type FeePlan = $Result.DefaultSelection<Prisma.$FeePlanPayload>
+export type FeeTier = $Result.DefaultSelection<Prisma.$FeeTierPayload>
+/**
+ * Model StudentFee
+ * Custom or historical fee assignments mapped specifically to a student profile.
+ */
+export type StudentFee = $Result.DefaultSelection<Prisma.$StudentFeePayload>
+/**
+ * Model Promotion
+ * Discount rules and special promotional campaigns.
+ */
+export type Promotion = $Result.DefaultSelection<Prisma.$PromotionPayload>
+/**
+ * Model StudentPromotion
+ * Mapping of active promotions assigned to student profiles.
+ */
+export type StudentPromotion = $Result.DefaultSelection<Prisma.$StudentPromotionPayload>
 /**
  * Model StudentSubscription
- * 
+ * Subscription tracking linking students to fee tiers.
  */
 export type StudentSubscription = $Result.DefaultSelection<Prisma.$StudentSubscriptionPayload>
+/**
+ * Model CashRegisterSession
+ * Represents a daily cash register session managed by administrative staff.
+ */
+export type CashRegisterSession = $Result.DefaultSelection<Prisma.$CashRegisterSessionPayload>
+/**
+ * Model CashTransaction
+ * Represents an individual income or expense entry within a cash session.
+ */
+export type CashTransaction = $Result.DefaultSelection<Prisma.$CashTransactionPayload>
+/**
+ * Model BankMandate
+ * Represents a SEPA direct debit bank mandate signed by a student or guardian.
+ */
+export type BankMandate = $Result.DefaultSelection<Prisma.$BankMandatePayload>
+/**
+ * Model RemittanceBatch
+ * Represents a generated SEPA XML batch file submitted to the bank.
+ */
+export type RemittanceBatch = $Result.DefaultSelection<Prisma.$RemittanceBatchPayload>
+/**
+ * Model RemittanceItem
+ * Represents an individual collection item inside a SEPA remittance batch.
+ */
+export type RemittanceItem = $Result.DefaultSelection<Prisma.$RemittanceItemPayload>
 /**
  * Model Federation
  * 
@@ -113,6 +153,81 @@ export const RequestStatus: {
 
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
 
+
+export const PromotionType: {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED_DISCOUNT: 'FIXED_DISCOUNT',
+  FREE_PERIOD: 'FREE_PERIOD'
+};
+
+export type PromotionType = (typeof PromotionType)[keyof typeof PromotionType]
+
+
+export const PromotionCategory: {
+  FAMILY: 'FAMILY',
+  SECURITY_FORCES: 'SECURITY_FORCES',
+  TEMPORARY: 'TEMPORARY'
+};
+
+export type PromotionCategory = (typeof PromotionCategory)[keyof typeof PromotionCategory]
+
+
+export const CashSessionStatus: {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  RECONCILED: 'RECONCILED'
+};
+
+export type CashSessionStatus = (typeof CashSessionStatus)[keyof typeof CashSessionStatus]
+
+
+export const CashMovementType: {
+  INCOME: 'INCOME',
+  EXPENSE: 'EXPENSE'
+};
+
+export type CashMovementType = (typeof CashMovementType)[keyof typeof CashMovementType]
+
+
+export const CashCategory: {
+  MEMBERSHIP_PAYMENT: 'MEMBERSHIP_PAYMENT',
+  EXAM_FEE: 'EXAM_FEE',
+  MERCHANDISE_SALE: 'MERCHANDISE_SALE',
+  OTHER_INCOME: 'OTHER_INCOME',
+  OPERATIONAL_EXPENSE: 'OPERATIONAL_EXPENSE'
+};
+
+export type CashCategory = (typeof CashCategory)[keyof typeof CashCategory]
+
+
+export const PaymentMethod: {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  BANK_TRANSFER: 'BANK_TRANSFER'
+};
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const RemittanceStatus: {
+  DRAFT: 'DRAFT',
+  GENERATED: 'GENERATED',
+  SUBMITTED: 'SUBMITTED',
+  SETTLED: 'SETTLED',
+  REJECTED: 'REJECTED'
+};
+
+export type RemittanceStatus = (typeof RemittanceStatus)[keyof typeof RemittanceStatus]
+
+
+export const RemittanceItemStatus: {
+  PENDING: 'PENDING',
+  SETTLED: 'SETTLED',
+  RETURNED: 'RETURNED'
+};
+
+export type RemittanceItemStatus = (typeof RemittanceItemStatus)[keyof typeof RemittanceItemStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -122,6 +237,38 @@ export const Role: typeof $Enums.Role
 export type RequestStatus = $Enums.RequestStatus
 
 export const RequestStatus: typeof $Enums.RequestStatus
+
+export type PromotionType = $Enums.PromotionType
+
+export const PromotionType: typeof $Enums.PromotionType
+
+export type PromotionCategory = $Enums.PromotionCategory
+
+export const PromotionCategory: typeof $Enums.PromotionCategory
+
+export type CashSessionStatus = $Enums.CashSessionStatus
+
+export const CashSessionStatus: typeof $Enums.CashSessionStatus
+
+export type CashMovementType = $Enums.CashMovementType
+
+export const CashMovementType: typeof $Enums.CashMovementType
+
+export type CashCategory = $Enums.CashCategory
+
+export const CashCategory: typeof $Enums.CashCategory
+
+export type PaymentMethod = $Enums.PaymentMethod
+
+export const PaymentMethod: typeof $Enums.PaymentMethod
+
+export type RemittanceStatus = $Enums.RemittanceStatus
+
+export const RemittanceStatus: typeof $Enums.RemittanceStatus
+
+export type RemittanceItemStatus = $Enums.RemittanceItemStatus
+
+export const RemittanceItemStatus: typeof $Enums.RemittanceItemStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -357,14 +504,44 @@ export class PrismaClient<
   get promotionRequest(): Prisma.PromotionRequestDelegate<ExtArgs>;
 
   /**
-   * `prisma.feePlan`: Exposes CRUD operations for the **FeePlan** model.
+   * `prisma.feeTier`: Exposes CRUD operations for the **FeeTier** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more FeePlans
-    * const feePlans = await prisma.feePlan.findMany()
+    * // Fetch zero or more FeeTiers
+    * const feeTiers = await prisma.feeTier.findMany()
     * ```
     */
-  get feePlan(): Prisma.FeePlanDelegate<ExtArgs>;
+  get feeTier(): Prisma.FeeTierDelegate<ExtArgs>;
+
+  /**
+   * `prisma.studentFee`: Exposes CRUD operations for the **StudentFee** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StudentFees
+    * const studentFees = await prisma.studentFee.findMany()
+    * ```
+    */
+  get studentFee(): Prisma.StudentFeeDelegate<ExtArgs>;
+
+  /**
+   * `prisma.promotion`: Exposes CRUD operations for the **Promotion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Promotions
+    * const promotions = await prisma.promotion.findMany()
+    * ```
+    */
+  get promotion(): Prisma.PromotionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.studentPromotion`: Exposes CRUD operations for the **StudentPromotion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StudentPromotions
+    * const studentPromotions = await prisma.studentPromotion.findMany()
+    * ```
+    */
+  get studentPromotion(): Prisma.StudentPromotionDelegate<ExtArgs>;
 
   /**
    * `prisma.studentSubscription`: Exposes CRUD operations for the **StudentSubscription** model.
@@ -375,6 +552,56 @@ export class PrismaClient<
     * ```
     */
   get studentSubscription(): Prisma.StudentSubscriptionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.cashRegisterSession`: Exposes CRUD operations for the **CashRegisterSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CashRegisterSessions
+    * const cashRegisterSessions = await prisma.cashRegisterSession.findMany()
+    * ```
+    */
+  get cashRegisterSession(): Prisma.CashRegisterSessionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.cashTransaction`: Exposes CRUD operations for the **CashTransaction** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CashTransactions
+    * const cashTransactions = await prisma.cashTransaction.findMany()
+    * ```
+    */
+  get cashTransaction(): Prisma.CashTransactionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.bankMandate`: Exposes CRUD operations for the **BankMandate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BankMandates
+    * const bankMandates = await prisma.bankMandate.findMany()
+    * ```
+    */
+  get bankMandate(): Prisma.BankMandateDelegate<ExtArgs>;
+
+  /**
+   * `prisma.remittanceBatch`: Exposes CRUD operations for the **RemittanceBatch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RemittanceBatches
+    * const remittanceBatches = await prisma.remittanceBatch.findMany()
+    * ```
+    */
+  get remittanceBatch(): Prisma.RemittanceBatchDelegate<ExtArgs>;
+
+  /**
+   * `prisma.remittanceItem`: Exposes CRUD operations for the **RemittanceItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RemittanceItems
+    * const remittanceItems = await prisma.remittanceItem.findMany()
+    * ```
+    */
+  get remittanceItem(): Prisma.RemittanceItemDelegate<ExtArgs>;
 
   /**
    * `prisma.federation`: Exposes CRUD operations for the **Federation** model.
@@ -847,8 +1074,16 @@ export namespace Prisma {
     Attendance: 'Attendance',
     ProfileUpdateRequest: 'ProfileUpdateRequest',
     PromotionRequest: 'PromotionRequest',
-    FeePlan: 'FeePlan',
+    FeeTier: 'FeeTier',
+    StudentFee: 'StudentFee',
+    Promotion: 'Promotion',
+    StudentPromotion: 'StudentPromotion',
     StudentSubscription: 'StudentSubscription',
+    CashRegisterSession: 'CashRegisterSession',
+    CashTransaction: 'CashTransaction',
+    BankMandate: 'BankMandate',
+    RemittanceBatch: 'RemittanceBatch',
+    RemittanceItem: 'RemittanceItem',
     Federation: 'Federation',
     StudentLicense: 'StudentLicense'
   };
@@ -866,7 +1101,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "promotionRequest" | "feePlan" | "studentSubscription" | "federation" | "studentLicense"
+      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "promotionRequest" | "feeTier" | "studentFee" | "promotion" | "studentPromotion" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1640,73 +1875,283 @@ export namespace Prisma {
           }
         }
       }
-      FeePlan: {
-        payload: Prisma.$FeePlanPayload<ExtArgs>
-        fields: Prisma.FeePlanFieldRefs
+      FeeTier: {
+        payload: Prisma.$FeeTierPayload<ExtArgs>
+        fields: Prisma.FeeTierFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.FeePlanFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload> | null
+            args: Prisma.FeeTierFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.FeePlanFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           findFirst: {
-            args: Prisma.FeePlanFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload> | null
+            args: Prisma.FeeTierFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.FeePlanFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           findMany: {
-            args: Prisma.FeePlanFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>[]
+            args: Prisma.FeeTierFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>[]
           }
           create: {
-            args: Prisma.FeePlanCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           createMany: {
-            args: Prisma.FeePlanCreateManyArgs<ExtArgs>
+            args: Prisma.FeeTierCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.FeePlanCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>[]
+            args: Prisma.FeeTierCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>[]
           }
           delete: {
-            args: Prisma.FeePlanDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           update: {
-            args: Prisma.FeePlanUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           deleteMany: {
-            args: Prisma.FeePlanDeleteManyArgs<ExtArgs>
+            args: Prisma.FeeTierDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.FeePlanUpdateManyArgs<ExtArgs>
+            args: Prisma.FeeTierUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           upsert: {
-            args: Prisma.FeePlanUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$FeePlanPayload>
+            args: Prisma.FeeTierUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeeTierPayload>
           }
           aggregate: {
-            args: Prisma.FeePlanAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateFeePlan>
+            args: Prisma.FeeTierAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeeTier>
           }
           groupBy: {
-            args: Prisma.FeePlanGroupByArgs<ExtArgs>
-            result: $Utils.Optional<FeePlanGroupByOutputType>[]
+            args: Prisma.FeeTierGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeeTierGroupByOutputType>[]
           }
           count: {
-            args: Prisma.FeePlanCountArgs<ExtArgs>
-            result: $Utils.Optional<FeePlanCountAggregateOutputType> | number
+            args: Prisma.FeeTierCountArgs<ExtArgs>
+            result: $Utils.Optional<FeeTierCountAggregateOutputType> | number
+          }
+        }
+      }
+      StudentFee: {
+        payload: Prisma.$StudentFeePayload<ExtArgs>
+        fields: Prisma.StudentFeeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StudentFeeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StudentFeeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          findFirst: {
+            args: Prisma.StudentFeeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StudentFeeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          findMany: {
+            args: Prisma.StudentFeeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>[]
+          }
+          create: {
+            args: Prisma.StudentFeeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          createMany: {
+            args: Prisma.StudentFeeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StudentFeeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>[]
+          }
+          delete: {
+            args: Prisma.StudentFeeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          update: {
+            args: Prisma.StudentFeeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          deleteMany: {
+            args: Prisma.StudentFeeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StudentFeeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.StudentFeeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentFeePayload>
+          }
+          aggregate: {
+            args: Prisma.StudentFeeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStudentFee>
+          }
+          groupBy: {
+            args: Prisma.StudentFeeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StudentFeeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StudentFeeCountArgs<ExtArgs>
+            result: $Utils.Optional<StudentFeeCountAggregateOutputType> | number
+          }
+        }
+      }
+      Promotion: {
+        payload: Prisma.$PromotionPayload<ExtArgs>
+        fields: Prisma.PromotionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PromotionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PromotionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          findFirst: {
+            args: Prisma.PromotionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PromotionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          findMany: {
+            args: Prisma.PromotionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>[]
+          }
+          create: {
+            args: Prisma.PromotionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          createMany: {
+            args: Prisma.PromotionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PromotionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>[]
+          }
+          delete: {
+            args: Prisma.PromotionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          update: {
+            args: Prisma.PromotionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          deleteMany: {
+            args: Prisma.PromotionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PromotionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.PromotionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+          }
+          aggregate: {
+            args: Prisma.PromotionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePromotion>
+          }
+          groupBy: {
+            args: Prisma.PromotionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PromotionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PromotionCountArgs<ExtArgs>
+            result: $Utils.Optional<PromotionCountAggregateOutputType> | number
+          }
+        }
+      }
+      StudentPromotion: {
+        payload: Prisma.$StudentPromotionPayload<ExtArgs>
+        fields: Prisma.StudentPromotionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StudentPromotionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StudentPromotionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          findFirst: {
+            args: Prisma.StudentPromotionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StudentPromotionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          findMany: {
+            args: Prisma.StudentPromotionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>[]
+          }
+          create: {
+            args: Prisma.StudentPromotionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          createMany: {
+            args: Prisma.StudentPromotionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StudentPromotionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>[]
+          }
+          delete: {
+            args: Prisma.StudentPromotionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          update: {
+            args: Prisma.StudentPromotionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          deleteMany: {
+            args: Prisma.StudentPromotionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StudentPromotionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.StudentPromotionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+          }
+          aggregate: {
+            args: Prisma.StudentPromotionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStudentPromotion>
+          }
+          groupBy: {
+            args: Prisma.StudentPromotionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StudentPromotionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StudentPromotionCountArgs<ExtArgs>
+            result: $Utils.Optional<StudentPromotionCountAggregateOutputType> | number
           }
         }
       }
@@ -1777,6 +2222,356 @@ export namespace Prisma {
           count: {
             args: Prisma.StudentSubscriptionCountArgs<ExtArgs>
             result: $Utils.Optional<StudentSubscriptionCountAggregateOutputType> | number
+          }
+        }
+      }
+      CashRegisterSession: {
+        payload: Prisma.$CashRegisterSessionPayload<ExtArgs>
+        fields: Prisma.CashRegisterSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CashRegisterSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CashRegisterSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.CashRegisterSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CashRegisterSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          findMany: {
+            args: Prisma.CashRegisterSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>[]
+          }
+          create: {
+            args: Prisma.CashRegisterSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          createMany: {
+            args: Prisma.CashRegisterSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CashRegisterSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.CashRegisterSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          update: {
+            args: Prisma.CashRegisterSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.CashRegisterSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CashRegisterSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CashRegisterSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashRegisterSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.CashRegisterSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCashRegisterSession>
+          }
+          groupBy: {
+            args: Prisma.CashRegisterSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CashRegisterSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CashRegisterSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<CashRegisterSessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      CashTransaction: {
+        payload: Prisma.$CashTransactionPayload<ExtArgs>
+        fields: Prisma.CashTransactionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CashTransactionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CashTransactionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          findFirst: {
+            args: Prisma.CashTransactionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CashTransactionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          findMany: {
+            args: Prisma.CashTransactionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>[]
+          }
+          create: {
+            args: Prisma.CashTransactionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          createMany: {
+            args: Prisma.CashTransactionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CashTransactionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>[]
+          }
+          delete: {
+            args: Prisma.CashTransactionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          update: {
+            args: Prisma.CashTransactionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          deleteMany: {
+            args: Prisma.CashTransactionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CashTransactionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CashTransactionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CashTransactionPayload>
+          }
+          aggregate: {
+            args: Prisma.CashTransactionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCashTransaction>
+          }
+          groupBy: {
+            args: Prisma.CashTransactionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CashTransactionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CashTransactionCountArgs<ExtArgs>
+            result: $Utils.Optional<CashTransactionCountAggregateOutputType> | number
+          }
+        }
+      }
+      BankMandate: {
+        payload: Prisma.$BankMandatePayload<ExtArgs>
+        fields: Prisma.BankMandateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BankMandateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BankMandateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          findFirst: {
+            args: Prisma.BankMandateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BankMandateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          findMany: {
+            args: Prisma.BankMandateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>[]
+          }
+          create: {
+            args: Prisma.BankMandateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          createMany: {
+            args: Prisma.BankMandateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BankMandateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>[]
+          }
+          delete: {
+            args: Prisma.BankMandateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          update: {
+            args: Prisma.BankMandateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          deleteMany: {
+            args: Prisma.BankMandateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BankMandateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.BankMandateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BankMandatePayload>
+          }
+          aggregate: {
+            args: Prisma.BankMandateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBankMandate>
+          }
+          groupBy: {
+            args: Prisma.BankMandateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BankMandateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BankMandateCountArgs<ExtArgs>
+            result: $Utils.Optional<BankMandateCountAggregateOutputType> | number
+          }
+        }
+      }
+      RemittanceBatch: {
+        payload: Prisma.$RemittanceBatchPayload<ExtArgs>
+        fields: Prisma.RemittanceBatchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RemittanceBatchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RemittanceBatchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          findFirst: {
+            args: Prisma.RemittanceBatchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RemittanceBatchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          findMany: {
+            args: Prisma.RemittanceBatchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>[]
+          }
+          create: {
+            args: Prisma.RemittanceBatchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          createMany: {
+            args: Prisma.RemittanceBatchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RemittanceBatchCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>[]
+          }
+          delete: {
+            args: Prisma.RemittanceBatchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          update: {
+            args: Prisma.RemittanceBatchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          deleteMany: {
+            args: Prisma.RemittanceBatchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RemittanceBatchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.RemittanceBatchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceBatchPayload>
+          }
+          aggregate: {
+            args: Prisma.RemittanceBatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRemittanceBatch>
+          }
+          groupBy: {
+            args: Prisma.RemittanceBatchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RemittanceBatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RemittanceBatchCountArgs<ExtArgs>
+            result: $Utils.Optional<RemittanceBatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      RemittanceItem: {
+        payload: Prisma.$RemittanceItemPayload<ExtArgs>
+        fields: Prisma.RemittanceItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.RemittanceItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.RemittanceItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          findFirst: {
+            args: Prisma.RemittanceItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.RemittanceItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          findMany: {
+            args: Prisma.RemittanceItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>[]
+          }
+          create: {
+            args: Prisma.RemittanceItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          createMany: {
+            args: Prisma.RemittanceItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.RemittanceItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>[]
+          }
+          delete: {
+            args: Prisma.RemittanceItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          update: {
+            args: Prisma.RemittanceItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.RemittanceItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.RemittanceItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.RemittanceItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RemittanceItemPayload>
+          }
+          aggregate: {
+            args: Prisma.RemittanceItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRemittanceItem>
+          }
+          groupBy: {
+            args: Prisma.RemittanceItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RemittanceItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.RemittanceItemCountArgs<ExtArgs>
+            result: $Utils.Optional<RemittanceItemCountAggregateOutputType> | number
           }
         }
       }
@@ -2137,6 +2932,9 @@ export namespace Prisma {
     promotionRequests: number
     subscriptions: number
     licenses: number
+    studentFees: number
+    studentPromotions: number
+    bankMandates: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2147,6 +2945,9 @@ export namespace Prisma {
     promotionRequests?: boolean | StudentProfileCountOutputTypeCountPromotionRequestsArgs
     subscriptions?: boolean | StudentProfileCountOutputTypeCountSubscriptionsArgs
     licenses?: boolean | StudentProfileCountOutputTypeCountLicensesArgs
+    studentFees?: boolean | StudentProfileCountOutputTypeCountStudentFeesArgs
+    studentPromotions?: boolean | StudentProfileCountOutputTypeCountStudentPromotionsArgs
+    bankMandates?: boolean | StudentProfileCountOutputTypeCountBankMandatesArgs
   }
 
   // Custom InputTypes
@@ -2207,6 +3008,27 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountLicensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: StudentLicenseWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountStudentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentFeeWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountStudentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentPromotionWhereInput
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountBankMandatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BankMandateWhereInput
   }
 
 
@@ -2335,33 +3157,166 @@ export namespace Prisma {
 
 
   /**
-   * Count Type FeePlanCountOutputType
+   * Count Type FeeTierCountOutputType
    */
 
-  export type FeePlanCountOutputType = {
+  export type FeeTierCountOutputType = {
+    studentFees: number
     subscriptions: number
   }
 
-  export type FeePlanCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    subscriptions?: boolean | FeePlanCountOutputTypeCountSubscriptionsArgs
+  export type FeeTierCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentFees?: boolean | FeeTierCountOutputTypeCountStudentFeesArgs
+    subscriptions?: boolean | FeeTierCountOutputTypeCountSubscriptionsArgs
   }
 
   // Custom InputTypes
   /**
-   * FeePlanCountOutputType without action
+   * FeeTierCountOutputType without action
    */
-  export type FeePlanCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlanCountOutputType
+     * Select specific fields to fetch from the FeeTierCountOutputType
      */
-    select?: FeePlanCountOutputTypeSelect<ExtArgs> | null
+    select?: FeeTierCountOutputTypeSelect<ExtArgs> | null
   }
 
   /**
-   * FeePlanCountOutputType without action
+   * FeeTierCountOutputType without action
    */
-  export type FeePlanCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierCountOutputTypeCountStudentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentFeeWhereInput
+  }
+
+  /**
+   * FeeTierCountOutputType without action
+   */
+  export type FeeTierCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: StudentSubscriptionWhereInput
+  }
+
+
+  /**
+   * Count Type PromotionCountOutputType
+   */
+
+  export type PromotionCountOutputType = {
+    studentPromotions: number
+  }
+
+  export type PromotionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentPromotions?: boolean | PromotionCountOutputTypeCountStudentPromotionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PromotionCountOutputType without action
+   */
+  export type PromotionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PromotionCountOutputType
+     */
+    select?: PromotionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PromotionCountOutputType without action
+   */
+  export type PromotionCountOutputTypeCountStudentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentPromotionWhereInput
+  }
+
+
+  /**
+   * Count Type CashRegisterSessionCountOutputType
+   */
+
+  export type CashRegisterSessionCountOutputType = {
+    transactions: number
+  }
+
+  export type CashRegisterSessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    transactions?: boolean | CashRegisterSessionCountOutputTypeCountTransactionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CashRegisterSessionCountOutputType without action
+   */
+  export type CashRegisterSessionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSessionCountOutputType
+     */
+    select?: CashRegisterSessionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CashRegisterSessionCountOutputType without action
+   */
+  export type CashRegisterSessionCountOutputTypeCountTransactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CashTransactionWhereInput
+  }
+
+
+  /**
+   * Count Type BankMandateCountOutputType
+   */
+
+  export type BankMandateCountOutputType = {
+    remittanceItems: number
+  }
+
+  export type BankMandateCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    remittanceItems?: boolean | BankMandateCountOutputTypeCountRemittanceItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BankMandateCountOutputType without action
+   */
+  export type BankMandateCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandateCountOutputType
+     */
+    select?: BankMandateCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BankMandateCountOutputType without action
+   */
+  export type BankMandateCountOutputTypeCountRemittanceItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RemittanceItemWhereInput
+  }
+
+
+  /**
+   * Count Type RemittanceBatchCountOutputType
+   */
+
+  export type RemittanceBatchCountOutputType = {
+    items: number
+  }
+
+  export type RemittanceBatchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | RemittanceBatchCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * RemittanceBatchCountOutputType without action
+   */
+  export type RemittanceBatchCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatchCountOutputType
+     */
+    select?: RemittanceBatchCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * RemittanceBatchCountOutputType without action
+   */
+  export type RemittanceBatchCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RemittanceItemWhereInput
   }
 
 
@@ -3658,6 +4613,9 @@ export namespace Prisma {
     promotionRequests?: boolean | StudentProfile$promotionRequestsArgs<ExtArgs>
     subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
     licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
+    studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
+    studentPromotions?: boolean | StudentProfile$studentPromotionsArgs<ExtArgs>
+    bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
@@ -3691,6 +4649,9 @@ export namespace Prisma {
     promotionRequests?: boolean | StudentProfile$promotionRequestsArgs<ExtArgs>
     subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
     licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
+    studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
+    studentPromotions?: boolean | StudentProfile$studentPromotionsArgs<ExtArgs>
+    bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3708,6 +4669,9 @@ export namespace Prisma {
       promotionRequests: Prisma.$PromotionRequestPayload<ExtArgs>[]
       subscriptions: Prisma.$StudentSubscriptionPayload<ExtArgs>[]
       licenses: Prisma.$StudentLicensePayload<ExtArgs>[]
+      studentFees: Prisma.$StudentFeePayload<ExtArgs>[]
+      studentPromotions: Prisma.$StudentPromotionPayload<ExtArgs>[]
+      bankMandates: Prisma.$BankMandatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4089,6 +5053,9 @@ export namespace Prisma {
     promotionRequests<T extends StudentProfile$promotionRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$promotionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findMany"> | Null>
     subscriptions<T extends StudentProfile$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
     licenses<T extends StudentProfile$licensesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findMany"> | Null>
+    studentFees<T extends StudentProfile$studentFeesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findMany"> | Null>
+    studentPromotions<T extends StudentProfile$studentPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany"> | Null>
+    bankMandates<T extends StudentProfile$bankMandatesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$bankMandatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4580,6 +5547,66 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.studentFees
+   */
+  export type StudentProfile$studentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    where?: StudentFeeWhereInput
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    cursor?: StudentFeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.studentPromotions
+   */
+  export type StudentProfile$studentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    where?: StudentPromotionWhereInput
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    cursor?: StudentPromotionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+  }
+
+  /**
+   * StudentProfile.bankMandates
+   */
+  export type StudentProfile$bankMandatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    where?: BankMandateWhereInput
+    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
+    cursor?: BankMandateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BankMandateScalarFieldEnum | BankMandateScalarFieldEnum[]
   }
 
   /**
@@ -13324,348 +14351,405 @@ export namespace Prisma {
 
 
   /**
-   * Model FeePlan
+   * Model FeeTier
    */
 
-  export type AggregateFeePlan = {
-    _count: FeePlanCountAggregateOutputType | null
-    _avg: FeePlanAvgAggregateOutputType | null
-    _sum: FeePlanSumAggregateOutputType | null
-    _min: FeePlanMinAggregateOutputType | null
-    _max: FeePlanMaxAggregateOutputType | null
+  export type AggregateFeeTier = {
+    _count: FeeTierCountAggregateOutputType | null
+    _avg: FeeTierAvgAggregateOutputType | null
+    _sum: FeeTierSumAggregateOutputType | null
+    _min: FeeTierMinAggregateOutputType | null
+    _max: FeeTierMaxAggregateOutputType | null
   }
 
-  export type FeePlanAvgAggregateOutputType = {
-    monthlyPrice: number | null
+  export type FeeTierAvgAggregateOutputType = {
+    baseAmount: Decimal | null
   }
 
-  export type FeePlanSumAggregateOutputType = {
-    monthlyPrice: number | null
+  export type FeeTierSumAggregateOutputType = {
+    baseAmount: Decimal | null
   }
 
-  export type FeePlanMinAggregateOutputType = {
+  export type FeeTierMinAggregateOutputType = {
     id: string | null
     name: string | null
-    monthlyPrice: number | null
+    description: string | null
+    baseAmount: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
-  export type FeePlanMaxAggregateOutputType = {
+  export type FeeTierMaxAggregateOutputType = {
     id: string | null
     name: string | null
-    monthlyPrice: number | null
+    description: string | null
+    baseAmount: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
-  export type FeePlanCountAggregateOutputType = {
+  export type FeeTierCountAggregateOutputType = {
     id: number
     name: number
-    monthlyPrice: number
+    description: number
+    baseAmount: number
+    criteria: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
-  export type FeePlanAvgAggregateInputType = {
-    monthlyPrice?: true
+  export type FeeTierAvgAggregateInputType = {
+    baseAmount?: true
   }
 
-  export type FeePlanSumAggregateInputType = {
-    monthlyPrice?: true
+  export type FeeTierSumAggregateInputType = {
+    baseAmount?: true
   }
 
-  export type FeePlanMinAggregateInputType = {
+  export type FeeTierMinAggregateInputType = {
     id?: true
     name?: true
-    monthlyPrice?: true
+    description?: true
+    baseAmount?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
-  export type FeePlanMaxAggregateInputType = {
+  export type FeeTierMaxAggregateInputType = {
     id?: true
     name?: true
-    monthlyPrice?: true
+    description?: true
+    baseAmount?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
-  export type FeePlanCountAggregateInputType = {
+  export type FeeTierCountAggregateInputType = {
     id?: true
     name?: true
-    monthlyPrice?: true
+    description?: true
+    baseAmount?: true
+    criteria?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
-  export type FeePlanAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which FeePlan to aggregate.
+     * Filter which FeeTier to aggregate.
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of FeePlans to fetch.
+     * Determine the order of FeeTiers to fetch.
      */
-    orderBy?: FeePlanOrderByWithRelationInput | FeePlanOrderByWithRelationInput[]
+    orderBy?: FeeTierOrderByWithRelationInput | FeeTierOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: FeePlanWhereUniqueInput
+    cursor?: FeeTierWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` FeePlans from the position of the cursor.
+     * Take `±n` FeeTiers from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` FeePlans.
+     * Skip the first `n` FeeTiers.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned FeePlans
+     * Count returned FeeTiers
     **/
-    _count?: true | FeePlanCountAggregateInputType
+    _count?: true | FeeTierCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to average
     **/
-    _avg?: FeePlanAvgAggregateInputType
+    _avg?: FeeTierAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to sum
     **/
-    _sum?: FeePlanSumAggregateInputType
+    _sum?: FeeTierSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: FeePlanMinAggregateInputType
+    _min?: FeeTierMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: FeePlanMaxAggregateInputType
+    _max?: FeeTierMaxAggregateInputType
   }
 
-  export type GetFeePlanAggregateType<T extends FeePlanAggregateArgs> = {
-        [P in keyof T & keyof AggregateFeePlan]: P extends '_count' | 'count'
+  export type GetFeeTierAggregateType<T extends FeeTierAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeeTier]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateFeePlan[P]>
-      : GetScalarType<T[P], AggregateFeePlan[P]>
+        : GetScalarType<T[P], AggregateFeeTier[P]>
+      : GetScalarType<T[P], AggregateFeeTier[P]>
   }
 
 
 
 
-  export type FeePlanGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: FeePlanWhereInput
-    orderBy?: FeePlanOrderByWithAggregationInput | FeePlanOrderByWithAggregationInput[]
-    by: FeePlanScalarFieldEnum[] | FeePlanScalarFieldEnum
-    having?: FeePlanScalarWhereWithAggregatesInput
+  export type FeeTierGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeeTierWhereInput
+    orderBy?: FeeTierOrderByWithAggregationInput | FeeTierOrderByWithAggregationInput[]
+    by: FeeTierScalarFieldEnum[] | FeeTierScalarFieldEnum
+    having?: FeeTierScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: FeePlanCountAggregateInputType | true
-    _avg?: FeePlanAvgAggregateInputType
-    _sum?: FeePlanSumAggregateInputType
-    _min?: FeePlanMinAggregateInputType
-    _max?: FeePlanMaxAggregateInputType
+    _count?: FeeTierCountAggregateInputType | true
+    _avg?: FeeTierAvgAggregateInputType
+    _sum?: FeeTierSumAggregateInputType
+    _min?: FeeTierMinAggregateInputType
+    _max?: FeeTierMaxAggregateInputType
   }
 
-  export type FeePlanGroupByOutputType = {
+  export type FeeTierGroupByOutputType = {
     id: string
     name: string
-    monthlyPrice: number
-    _count: FeePlanCountAggregateOutputType | null
-    _avg: FeePlanAvgAggregateOutputType | null
-    _sum: FeePlanSumAggregateOutputType | null
-    _min: FeePlanMinAggregateOutputType | null
-    _max: FeePlanMaxAggregateOutputType | null
+    description: string | null
+    baseAmount: Decimal
+    criteria: JsonValue | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: FeeTierCountAggregateOutputType | null
+    _avg: FeeTierAvgAggregateOutputType | null
+    _sum: FeeTierSumAggregateOutputType | null
+    _min: FeeTierMinAggregateOutputType | null
+    _max: FeeTierMaxAggregateOutputType | null
   }
 
-  type GetFeePlanGroupByPayload<T extends FeePlanGroupByArgs> = Prisma.PrismaPromise<
+  type GetFeeTierGroupByPayload<T extends FeeTierGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<FeePlanGroupByOutputType, T['by']> &
+      PickEnumerable<FeeTierGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof FeePlanGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof FeeTierGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], FeePlanGroupByOutputType[P]>
-            : GetScalarType<T[P], FeePlanGroupByOutputType[P]>
+              : GetScalarType<T[P], FeeTierGroupByOutputType[P]>
+            : GetScalarType<T[P], FeeTierGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type FeePlanSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type FeeTierSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    monthlyPrice?: boolean
-    subscriptions?: boolean | FeePlan$subscriptionsArgs<ExtArgs>
-    _count?: boolean | FeePlanCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["feePlan"]>
+    description?: boolean
+    baseAmount?: boolean
+    criteria?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    studentFees?: boolean | FeeTier$studentFeesArgs<ExtArgs>
+    subscriptions?: boolean | FeeTier$subscriptionsArgs<ExtArgs>
+    _count?: boolean | FeeTierCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feeTier"]>
 
-  export type FeePlanSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type FeeTierSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    monthlyPrice?: boolean
-  }, ExtArgs["result"]["feePlan"]>
+    description?: boolean
+    baseAmount?: boolean
+    criteria?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["feeTier"]>
 
-  export type FeePlanSelectScalar = {
+  export type FeeTierSelectScalar = {
     id?: boolean
     name?: boolean
-    monthlyPrice?: boolean
+    description?: boolean
+    baseAmount?: boolean
+    criteria?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type FeePlanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    subscriptions?: boolean | FeePlan$subscriptionsArgs<ExtArgs>
-    _count?: boolean | FeePlanCountOutputTypeDefaultArgs<ExtArgs>
+  export type FeeTierInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentFees?: boolean | FeeTier$studentFeesArgs<ExtArgs>
+    subscriptions?: boolean | FeeTier$subscriptionsArgs<ExtArgs>
+    _count?: boolean | FeeTierCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type FeePlanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type FeeTierIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
-  export type $FeePlanPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "FeePlan"
+  export type $FeeTierPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FeeTier"
     objects: {
+      studentFees: Prisma.$StudentFeePayload<ExtArgs>[]
       subscriptions: Prisma.$StudentSubscriptionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-      monthlyPrice: number
-    }, ExtArgs["result"]["feePlan"]>
+      description: string | null
+      baseAmount: Prisma.Decimal
+      /**
+       * Criteria like training hours, age ranges, etc.
+       */
+      criteria: Prisma.JsonValue | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["feeTier"]>
     composites: {}
   }
 
-  type FeePlanGetPayload<S extends boolean | null | undefined | FeePlanDefaultArgs> = $Result.GetResult<Prisma.$FeePlanPayload, S>
+  type FeeTierGetPayload<S extends boolean | null | undefined | FeeTierDefaultArgs> = $Result.GetResult<Prisma.$FeeTierPayload, S>
 
-  type FeePlanCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<FeePlanFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: FeePlanCountAggregateInputType | true
+  type FeeTierCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FeeTierFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FeeTierCountAggregateInputType | true
     }
 
-  export interface FeePlanDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeePlan'], meta: { name: 'FeePlan' } }
+  export interface FeeTierDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeeTier'], meta: { name: 'FeeTier' } }
     /**
-     * Find zero or one FeePlan that matches the filter.
-     * @param {FeePlanFindUniqueArgs} args - Arguments to find a FeePlan
+     * Find zero or one FeeTier that matches the filter.
+     * @param {FeeTierFindUniqueArgs} args - Arguments to find a FeeTier
      * @example
-     * // Get one FeePlan
-     * const feePlan = await prisma.feePlan.findUnique({
+     * // Get one FeeTier
+     * const feeTier = await prisma.feeTier.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends FeePlanFindUniqueArgs>(args: SelectSubset<T, FeePlanFindUniqueArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends FeeTierFindUniqueArgs>(args: SelectSubset<T, FeeTierFindUniqueArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
 
     /**
-     * Find one FeePlan that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one FeeTier that matches the filter or throw an error with `error.code='P2025'` 
      * if no matches were found.
-     * @param {FeePlanFindUniqueOrThrowArgs} args - Arguments to find a FeePlan
+     * @param {FeeTierFindUniqueOrThrowArgs} args - Arguments to find a FeeTier
      * @example
-     * // Get one FeePlan
-     * const feePlan = await prisma.feePlan.findUniqueOrThrow({
+     * // Get one FeeTier
+     * const feeTier = await prisma.feeTier.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends FeePlanFindUniqueOrThrowArgs>(args: SelectSubset<T, FeePlanFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends FeeTierFindUniqueOrThrowArgs>(args: SelectSubset<T, FeeTierFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
 
     /**
-     * Find the first FeePlan that matches the filter.
+     * Find the first FeeTier that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanFindFirstArgs} args - Arguments to find a FeePlan
+     * @param {FeeTierFindFirstArgs} args - Arguments to find a FeeTier
      * @example
-     * // Get one FeePlan
-     * const feePlan = await prisma.feePlan.findFirst({
+     * // Get one FeeTier
+     * const feeTier = await prisma.feeTier.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends FeePlanFindFirstArgs>(args?: SelectSubset<T, FeePlanFindFirstArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends FeeTierFindFirstArgs>(args?: SelectSubset<T, FeeTierFindFirstArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
 
     /**
-     * Find the first FeePlan that matches the filter or
+     * Find the first FeeTier that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanFindFirstOrThrowArgs} args - Arguments to find a FeePlan
+     * @param {FeeTierFindFirstOrThrowArgs} args - Arguments to find a FeeTier
      * @example
-     * // Get one FeePlan
-     * const feePlan = await prisma.feePlan.findFirstOrThrow({
+     * // Get one FeeTier
+     * const feeTier = await prisma.feeTier.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends FeePlanFindFirstOrThrowArgs>(args?: SelectSubset<T, FeePlanFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends FeeTierFindFirstOrThrowArgs>(args?: SelectSubset<T, FeeTierFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
 
     /**
-     * Find zero or more FeePlans that matches the filter.
+     * Find zero or more FeeTiers that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {FeeTierFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all FeePlans
-     * const feePlans = await prisma.feePlan.findMany()
+     * // Get all FeeTiers
+     * const feeTiers = await prisma.feeTier.findMany()
      * 
-     * // Get first 10 FeePlans
-     * const feePlans = await prisma.feePlan.findMany({ take: 10 })
+     * // Get first 10 FeeTiers
+     * const feeTiers = await prisma.feeTier.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const feePlanWithIdOnly = await prisma.feePlan.findMany({ select: { id: true } })
+     * const feeTierWithIdOnly = await prisma.feeTier.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends FeePlanFindManyArgs>(args?: SelectSubset<T, FeePlanFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends FeeTierFindManyArgs>(args?: SelectSubset<T, FeeTierFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findMany">>
 
     /**
-     * Create a FeePlan.
-     * @param {FeePlanCreateArgs} args - Arguments to create a FeePlan.
+     * Create a FeeTier.
+     * @param {FeeTierCreateArgs} args - Arguments to create a FeeTier.
      * @example
-     * // Create one FeePlan
-     * const FeePlan = await prisma.feePlan.create({
+     * // Create one FeeTier
+     * const FeeTier = await prisma.feeTier.create({
      *   data: {
-     *     // ... data to create a FeePlan
+     *     // ... data to create a FeeTier
      *   }
      * })
      * 
      */
-    create<T extends FeePlanCreateArgs>(args: SelectSubset<T, FeePlanCreateArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends FeeTierCreateArgs>(args: SelectSubset<T, FeeTierCreateArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "create">, never, ExtArgs>
 
     /**
-     * Create many FeePlans.
-     * @param {FeePlanCreateManyArgs} args - Arguments to create many FeePlans.
+     * Create many FeeTiers.
+     * @param {FeeTierCreateManyArgs} args - Arguments to create many FeeTiers.
      * @example
-     * // Create many FeePlans
-     * const feePlan = await prisma.feePlan.createMany({
+     * // Create many FeeTiers
+     * const feeTier = await prisma.feeTier.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends FeePlanCreateManyArgs>(args?: SelectSubset<T, FeePlanCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends FeeTierCreateManyArgs>(args?: SelectSubset<T, FeeTierCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many FeePlans and returns the data saved in the database.
-     * @param {FeePlanCreateManyAndReturnArgs} args - Arguments to create many FeePlans.
+     * Create many FeeTiers and returns the data saved in the database.
+     * @param {FeeTierCreateManyAndReturnArgs} args - Arguments to create many FeeTiers.
      * @example
-     * // Create many FeePlans
-     * const feePlan = await prisma.feePlan.createManyAndReturn({
+     * // Create many FeeTiers
+     * const feeTier = await prisma.feeTier.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many FeePlans and only return the `id`
-     * const feePlanWithIdOnly = await prisma.feePlan.createManyAndReturn({ 
+     * // Create many FeeTiers and only return the `id`
+     * const feeTierWithIdOnly = await prisma.feeTier.createManyAndReturn({ 
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -13675,28 +14759,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends FeePlanCreateManyAndReturnArgs>(args?: SelectSubset<T, FeePlanCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends FeeTierCreateManyAndReturnArgs>(args?: SelectSubset<T, FeeTierCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "createManyAndReturn">>
 
     /**
-     * Delete a FeePlan.
-     * @param {FeePlanDeleteArgs} args - Arguments to delete one FeePlan.
+     * Delete a FeeTier.
+     * @param {FeeTierDeleteArgs} args - Arguments to delete one FeeTier.
      * @example
-     * // Delete one FeePlan
-     * const FeePlan = await prisma.feePlan.delete({
+     * // Delete one FeeTier
+     * const FeeTier = await prisma.feeTier.delete({
      *   where: {
-     *     // ... filter to delete one FeePlan
+     *     // ... filter to delete one FeeTier
      *   }
      * })
      * 
      */
-    delete<T extends FeePlanDeleteArgs>(args: SelectSubset<T, FeePlanDeleteArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends FeeTierDeleteArgs>(args: SelectSubset<T, FeeTierDeleteArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "delete">, never, ExtArgs>
 
     /**
-     * Update one FeePlan.
-     * @param {FeePlanUpdateArgs} args - Arguments to update one FeePlan.
+     * Update one FeeTier.
+     * @param {FeeTierUpdateArgs} args - Arguments to update one FeeTier.
      * @example
-     * // Update one FeePlan
-     * const feePlan = await prisma.feePlan.update({
+     * // Update one FeeTier
+     * const feeTier = await prisma.feeTier.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13706,30 +14790,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends FeePlanUpdateArgs>(args: SelectSubset<T, FeePlanUpdateArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends FeeTierUpdateArgs>(args: SelectSubset<T, FeeTierUpdateArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "update">, never, ExtArgs>
 
     /**
-     * Delete zero or more FeePlans.
-     * @param {FeePlanDeleteManyArgs} args - Arguments to filter FeePlans to delete.
+     * Delete zero or more FeeTiers.
+     * @param {FeeTierDeleteManyArgs} args - Arguments to filter FeeTiers to delete.
      * @example
-     * // Delete a few FeePlans
-     * const { count } = await prisma.feePlan.deleteMany({
+     * // Delete a few FeeTiers
+     * const { count } = await prisma.feeTier.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends FeePlanDeleteManyArgs>(args?: SelectSubset<T, FeePlanDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends FeeTierDeleteManyArgs>(args?: SelectSubset<T, FeeTierDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more FeePlans.
+     * Update zero or more FeeTiers.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {FeeTierUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many FeePlans
-     * const feePlan = await prisma.feePlan.updateMany({
+     * // Update many FeeTiers
+     * const feeTier = await prisma.feeTier.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13739,56 +14823,56 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends FeePlanUpdateManyArgs>(args: SelectSubset<T, FeePlanUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends FeeTierUpdateManyArgs>(args: SelectSubset<T, FeeTierUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one FeePlan.
-     * @param {FeePlanUpsertArgs} args - Arguments to update or create a FeePlan.
+     * Create or update one FeeTier.
+     * @param {FeeTierUpsertArgs} args - Arguments to update or create a FeeTier.
      * @example
-     * // Update or create a FeePlan
-     * const feePlan = await prisma.feePlan.upsert({
+     * // Update or create a FeeTier
+     * const feeTier = await prisma.feeTier.upsert({
      *   create: {
-     *     // ... data to create a FeePlan
+     *     // ... data to create a FeeTier
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the FeePlan we want to update
+     *     // ... the filter for the FeeTier we want to update
      *   }
      * })
      */
-    upsert<T extends FeePlanUpsertArgs>(args: SelectSubset<T, FeePlanUpsertArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends FeeTierUpsertArgs>(args: SelectSubset<T, FeeTierUpsertArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
 
 
     /**
-     * Count the number of FeePlans.
+     * Count the number of FeeTiers.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanCountArgs} args - Arguments to filter FeePlans to count.
+     * @param {FeeTierCountArgs} args - Arguments to filter FeeTiers to count.
      * @example
-     * // Count the number of FeePlans
-     * const count = await prisma.feePlan.count({
+     * // Count the number of FeeTiers
+     * const count = await prisma.feeTier.count({
      *   where: {
-     *     // ... the filter for the FeePlans we want to count
+     *     // ... the filter for the FeeTiers we want to count
      *   }
      * })
     **/
-    count<T extends FeePlanCountArgs>(
-      args?: Subset<T, FeePlanCountArgs>,
+    count<T extends FeeTierCountArgs>(
+      args?: Subset<T, FeeTierCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], FeePlanCountAggregateOutputType>
+          : GetScalarType<T['select'], FeeTierCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a FeePlan.
+     * Allows you to perform aggregations operations on a FeeTier.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {FeeTierAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -13808,13 +14892,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends FeePlanAggregateArgs>(args: Subset<T, FeePlanAggregateArgs>): Prisma.PrismaPromise<GetFeePlanAggregateType<T>>
+    aggregate<T extends FeeTierAggregateArgs>(args: Subset<T, FeeTierAggregateArgs>): Prisma.PrismaPromise<GetFeeTierAggregateType<T>>
 
     /**
-     * Group by FeePlan.
+     * Group by FeeTier.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {FeePlanGroupByArgs} args - Group by arguments.
+     * @param {FeeTierGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -13829,14 +14913,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends FeePlanGroupByArgs,
+      T extends FeeTierGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: FeePlanGroupByArgs['orderBy'] }
-        : { orderBy?: FeePlanGroupByArgs['orderBy'] },
+        ? { orderBy: FeeTierGroupByArgs['orderBy'] }
+        : { orderBy?: FeeTierGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -13885,22 +14969,23 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, FeePlanGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeePlanGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, FeeTierGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeeTierGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the FeePlan model
+   * Fields of the FeeTier model
    */
-  readonly fields: FeePlanFieldRefs;
+  readonly fields: FeeTierFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for FeePlan.
+   * The delegate class that acts as a "Promise-like" for FeeTier.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__FeePlanClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__FeeTierClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    subscriptions<T extends FeePlan$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, FeePlan$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
+    studentFees<T extends FeeTier$studentFeesArgs<ExtArgs> = {}>(args?: Subset<T, FeeTier$studentFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findMany"> | Null>
+    subscriptions<T extends FeeTier$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, FeeTier$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13927,329 +15012,354 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the FeePlan model
+   * Fields of the FeeTier model
    */ 
-  interface FeePlanFieldRefs {
-    readonly id: FieldRef<"FeePlan", 'String'>
-    readonly name: FieldRef<"FeePlan", 'String'>
-    readonly monthlyPrice: FieldRef<"FeePlan", 'Float'>
+  interface FeeTierFieldRefs {
+    readonly id: FieldRef<"FeeTier", 'String'>
+    readonly name: FieldRef<"FeeTier", 'String'>
+    readonly description: FieldRef<"FeeTier", 'String'>
+    readonly baseAmount: FieldRef<"FeeTier", 'Decimal'>
+    readonly criteria: FieldRef<"FeeTier", 'Json'>
+    readonly isActive: FieldRef<"FeeTier", 'Boolean'>
+    readonly createdAt: FieldRef<"FeeTier", 'DateTime'>
+    readonly updatedAt: FieldRef<"FeeTier", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * FeePlan findUnique
+   * FeeTier findUnique
    */
-  export type FeePlanFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter, which FeePlan to fetch.
+     * Filter, which FeeTier to fetch.
      */
-    where: FeePlanWhereUniqueInput
+    where: FeeTierWhereUniqueInput
   }
 
   /**
-   * FeePlan findUniqueOrThrow
+   * FeeTier findUniqueOrThrow
    */
-  export type FeePlanFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter, which FeePlan to fetch.
+     * Filter, which FeeTier to fetch.
      */
-    where: FeePlanWhereUniqueInput
+    where: FeeTierWhereUniqueInput
   }
 
   /**
-   * FeePlan findFirst
+   * FeeTier findFirst
    */
-  export type FeePlanFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter, which FeePlan to fetch.
+     * Filter, which FeeTier to fetch.
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of FeePlans to fetch.
+     * Determine the order of FeeTiers to fetch.
      */
-    orderBy?: FeePlanOrderByWithRelationInput | FeePlanOrderByWithRelationInput[]
+    orderBy?: FeeTierOrderByWithRelationInput | FeeTierOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for FeePlans.
+     * Sets the position for searching for FeeTiers.
      */
-    cursor?: FeePlanWhereUniqueInput
+    cursor?: FeeTierWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` FeePlans from the position of the cursor.
+     * Take `±n` FeeTiers from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` FeePlans.
+     * Skip the first `n` FeeTiers.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of FeePlans.
+     * Filter by unique combinations of FeeTiers.
      */
-    distinct?: FeePlanScalarFieldEnum | FeePlanScalarFieldEnum[]
+    distinct?: FeeTierScalarFieldEnum | FeeTierScalarFieldEnum[]
   }
 
   /**
-   * FeePlan findFirstOrThrow
+   * FeeTier findFirstOrThrow
    */
-  export type FeePlanFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter, which FeePlan to fetch.
+     * Filter, which FeeTier to fetch.
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of FeePlans to fetch.
+     * Determine the order of FeeTiers to fetch.
      */
-    orderBy?: FeePlanOrderByWithRelationInput | FeePlanOrderByWithRelationInput[]
+    orderBy?: FeeTierOrderByWithRelationInput | FeeTierOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for FeePlans.
+     * Sets the position for searching for FeeTiers.
      */
-    cursor?: FeePlanWhereUniqueInput
+    cursor?: FeeTierWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` FeePlans from the position of the cursor.
+     * Take `±n` FeeTiers from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` FeePlans.
+     * Skip the first `n` FeeTiers.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of FeePlans.
+     * Filter by unique combinations of FeeTiers.
      */
-    distinct?: FeePlanScalarFieldEnum | FeePlanScalarFieldEnum[]
+    distinct?: FeeTierScalarFieldEnum | FeeTierScalarFieldEnum[]
   }
 
   /**
-   * FeePlan findMany
+   * FeeTier findMany
    */
-  export type FeePlanFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter, which FeePlans to fetch.
+     * Filter, which FeeTiers to fetch.
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of FeePlans to fetch.
+     * Determine the order of FeeTiers to fetch.
      */
-    orderBy?: FeePlanOrderByWithRelationInput | FeePlanOrderByWithRelationInput[]
+    orderBy?: FeeTierOrderByWithRelationInput | FeeTierOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing FeePlans.
+     * Sets the position for listing FeeTiers.
      */
-    cursor?: FeePlanWhereUniqueInput
+    cursor?: FeeTierWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` FeePlans from the position of the cursor.
+     * Take `±n` FeeTiers from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` FeePlans.
+     * Skip the first `n` FeeTiers.
      */
     skip?: number
-    distinct?: FeePlanScalarFieldEnum | FeePlanScalarFieldEnum[]
+    distinct?: FeeTierScalarFieldEnum | FeeTierScalarFieldEnum[]
   }
 
   /**
-   * FeePlan create
+   * FeeTier create
    */
-  export type FeePlanCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * The data needed to create a FeePlan.
+     * The data needed to create a FeeTier.
      */
-    data: XOR<FeePlanCreateInput, FeePlanUncheckedCreateInput>
+    data: XOR<FeeTierCreateInput, FeeTierUncheckedCreateInput>
   }
 
   /**
-   * FeePlan createMany
+   * FeeTier createMany
    */
-  export type FeePlanCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many FeePlans.
+     * The data used to create many FeeTiers.
      */
-    data: FeePlanCreateManyInput | FeePlanCreateManyInput[]
+    data: FeeTierCreateManyInput | FeeTierCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * FeePlan createManyAndReturn
+   * FeeTier createManyAndReturn
    */
-  export type FeePlanCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelectCreateManyAndReturn<ExtArgs> | null
+    select?: FeeTierSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * The data used to create many FeePlans.
+     * The data used to create many FeeTiers.
      */
-    data: FeePlanCreateManyInput | FeePlanCreateManyInput[]
+    data: FeeTierCreateManyInput | FeeTierCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * FeePlan update
+   * FeeTier update
    */
-  export type FeePlanUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * The data needed to update a FeePlan.
+     * The data needed to update a FeeTier.
      */
-    data: XOR<FeePlanUpdateInput, FeePlanUncheckedUpdateInput>
+    data: XOR<FeeTierUpdateInput, FeeTierUncheckedUpdateInput>
     /**
-     * Choose, which FeePlan to update.
+     * Choose, which FeeTier to update.
      */
-    where: FeePlanWhereUniqueInput
+    where: FeeTierWhereUniqueInput
   }
 
   /**
-   * FeePlan updateMany
+   * FeeTier updateMany
    */
-  export type FeePlanUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update FeePlans.
+     * The data used to update FeeTiers.
      */
-    data: XOR<FeePlanUpdateManyMutationInput, FeePlanUncheckedUpdateManyInput>
+    data: XOR<FeeTierUpdateManyMutationInput, FeeTierUncheckedUpdateManyInput>
     /**
-     * Filter which FeePlans to update
+     * Filter which FeeTiers to update
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
   }
 
   /**
-   * FeePlan upsert
+   * FeeTier upsert
    */
-  export type FeePlanUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * The filter to search for the FeePlan to update in case it exists.
+     * The filter to search for the FeeTier to update in case it exists.
      */
-    where: FeePlanWhereUniqueInput
+    where: FeeTierWhereUniqueInput
     /**
-     * In case the FeePlan found by the `where` argument doesn't exist, create a new FeePlan with this data.
+     * In case the FeeTier found by the `where` argument doesn't exist, create a new FeeTier with this data.
      */
-    create: XOR<FeePlanCreateInput, FeePlanUncheckedCreateInput>
+    create: XOR<FeeTierCreateInput, FeeTierUncheckedCreateInput>
     /**
-     * In case the FeePlan was found with the provided `where` argument, update it with this data.
+     * In case the FeeTier was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<FeePlanUpdateInput, FeePlanUncheckedUpdateInput>
+    update: XOR<FeeTierUpdateInput, FeeTierUncheckedUpdateInput>
   }
 
   /**
-   * FeePlan delete
+   * FeeTier delete
    */
-  export type FeePlanDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
     /**
-     * Filter which FeePlan to delete.
+     * Filter which FeeTier to delete.
      */
-    where: FeePlanWhereUniqueInput
+    where: FeeTierWhereUniqueInput
   }
 
   /**
-   * FeePlan deleteMany
+   * FeeTier deleteMany
    */
-  export type FeePlanDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which FeePlans to delete
+     * Filter which FeeTiers to delete
      */
-    where?: FeePlanWhereInput
+    where?: FeeTierWhereInput
   }
 
   /**
-   * FeePlan.subscriptions
+   * FeeTier.studentFees
    */
-  export type FeePlan$subscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTier$studentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    where?: StudentFeeWhereInput
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    cursor?: StudentFeeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
+  }
+
+  /**
+   * FeeTier.subscriptions
+   */
+  export type FeeTier$subscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the StudentSubscription
      */
@@ -14267,17 +15377,3064 @@ export namespace Prisma {
   }
 
   /**
-   * FeePlan without action
+   * FeeTier without action
    */
-  export type FeePlanDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FeeTierDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the FeePlan
+     * Select specific fields to fetch from the FeeTier
      */
-    select?: FeePlanSelect<ExtArgs> | null
+    select?: FeeTierSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: FeePlanInclude<ExtArgs> | null
+    include?: FeeTierInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StudentFee
+   */
+
+  export type AggregateStudentFee = {
+    _count: StudentFeeCountAggregateOutputType | null
+    _avg: StudentFeeAvgAggregateOutputType | null
+    _sum: StudentFeeSumAggregateOutputType | null
+    _min: StudentFeeMinAggregateOutputType | null
+    _max: StudentFeeMaxAggregateOutputType | null
+  }
+
+  export type StudentFeeAvgAggregateOutputType = {
+    customAmount: Decimal | null
+  }
+
+  export type StudentFeeSumAggregateOutputType = {
+    customAmount: Decimal | null
+  }
+
+  export type StudentFeeMinAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    feeTierId: string | null
+    customAmount: Decimal | null
+    ipcApplied: boolean | null
+    effectiveFrom: Date | null
+    effectiveTo: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StudentFeeMaxAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    feeTierId: string | null
+    customAmount: Decimal | null
+    ipcApplied: boolean | null
+    effectiveFrom: Date | null
+    effectiveTo: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StudentFeeCountAggregateOutputType = {
+    id: number
+    studentProfileId: number
+    feeTierId: number
+    customAmount: number
+    ipcApplied: number
+    effectiveFrom: number
+    effectiveTo: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type StudentFeeAvgAggregateInputType = {
+    customAmount?: true
+  }
+
+  export type StudentFeeSumAggregateInputType = {
+    customAmount?: true
+  }
+
+  export type StudentFeeMinAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    feeTierId?: true
+    customAmount?: true
+    ipcApplied?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StudentFeeMaxAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    feeTierId?: true
+    customAmount?: true
+    ipcApplied?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StudentFeeCountAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    feeTierId?: true
+    customAmount?: true
+    ipcApplied?: true
+    effectiveFrom?: true
+    effectiveTo?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type StudentFeeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentFee to aggregate.
+     */
+    where?: StudentFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentFees to fetch.
+     */
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StudentFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StudentFees
+    **/
+    _count?: true | StudentFeeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: StudentFeeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: StudentFeeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StudentFeeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StudentFeeMaxAggregateInputType
+  }
+
+  export type GetStudentFeeAggregateType<T extends StudentFeeAggregateArgs> = {
+        [P in keyof T & keyof AggregateStudentFee]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStudentFee[P]>
+      : GetScalarType<T[P], AggregateStudentFee[P]>
+  }
+
+
+
+
+  export type StudentFeeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentFeeWhereInput
+    orderBy?: StudentFeeOrderByWithAggregationInput | StudentFeeOrderByWithAggregationInput[]
+    by: StudentFeeScalarFieldEnum[] | StudentFeeScalarFieldEnum
+    having?: StudentFeeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StudentFeeCountAggregateInputType | true
+    _avg?: StudentFeeAvgAggregateInputType
+    _sum?: StudentFeeSumAggregateInputType
+    _min?: StudentFeeMinAggregateInputType
+    _max?: StudentFeeMaxAggregateInputType
+  }
+
+  export type StudentFeeGroupByOutputType = {
+    id: string
+    studentProfileId: string
+    feeTierId: string | null
+    customAmount: Decimal | null
+    ipcApplied: boolean
+    effectiveFrom: Date
+    effectiveTo: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: StudentFeeCountAggregateOutputType | null
+    _avg: StudentFeeAvgAggregateOutputType | null
+    _sum: StudentFeeSumAggregateOutputType | null
+    _min: StudentFeeMinAggregateOutputType | null
+    _max: StudentFeeMaxAggregateOutputType | null
+  }
+
+  type GetStudentFeeGroupByPayload<T extends StudentFeeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StudentFeeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StudentFeeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StudentFeeGroupByOutputType[P]>
+            : GetScalarType<T[P], StudentFeeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StudentFeeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    feeTierId?: boolean
+    customAmount?: boolean
+    ipcApplied?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
+  }, ExtArgs["result"]["studentFee"]>
+
+  export type StudentFeeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    feeTierId?: boolean
+    customAmount?: boolean
+    ipcApplied?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
+  }, ExtArgs["result"]["studentFee"]>
+
+  export type StudentFeeSelectScalar = {
+    id?: boolean
+    studentProfileId?: boolean
+    feeTierId?: boolean
+    customAmount?: boolean
+    ipcApplied?: boolean
+    effectiveFrom?: boolean
+    effectiveTo?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type StudentFeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
+  }
+  export type StudentFeeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
+  }
+
+  export type $StudentFeePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StudentFee"
+    objects: {
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+      feeTier: Prisma.$FeeTierPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentProfileId: string
+      feeTierId: string | null
+      /**
+       * Specific agreed historical or custom amount
+       */
+      customAmount: Prisma.Decimal | null
+      ipcApplied: boolean
+      effectiveFrom: Date
+      effectiveTo: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["studentFee"]>
+    composites: {}
+  }
+
+  type StudentFeeGetPayload<S extends boolean | null | undefined | StudentFeeDefaultArgs> = $Result.GetResult<Prisma.$StudentFeePayload, S>
+
+  type StudentFeeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StudentFeeFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StudentFeeCountAggregateInputType | true
+    }
+
+  export interface StudentFeeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentFee'], meta: { name: 'StudentFee' } }
+    /**
+     * Find zero or one StudentFee that matches the filter.
+     * @param {StudentFeeFindUniqueArgs} args - Arguments to find a StudentFee
+     * @example
+     * // Get one StudentFee
+     * const studentFee = await prisma.studentFee.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StudentFeeFindUniqueArgs>(args: SelectSubset<T, StudentFeeFindUniqueArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one StudentFee that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {StudentFeeFindUniqueOrThrowArgs} args - Arguments to find a StudentFee
+     * @example
+     * // Get one StudentFee
+     * const studentFee = await prisma.studentFee.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StudentFeeFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentFeeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first StudentFee that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeFindFirstArgs} args - Arguments to find a StudentFee
+     * @example
+     * // Get one StudentFee
+     * const studentFee = await prisma.studentFee.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StudentFeeFindFirstArgs>(args?: SelectSubset<T, StudentFeeFindFirstArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first StudentFee that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeFindFirstOrThrowArgs} args - Arguments to find a StudentFee
+     * @example
+     * // Get one StudentFee
+     * const studentFee = await prisma.studentFee.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StudentFeeFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentFeeFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more StudentFees that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StudentFees
+     * const studentFees = await prisma.studentFee.findMany()
+     * 
+     * // Get first 10 StudentFees
+     * const studentFees = await prisma.studentFee.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const studentFeeWithIdOnly = await prisma.studentFee.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StudentFeeFindManyArgs>(args?: SelectSubset<T, StudentFeeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a StudentFee.
+     * @param {StudentFeeCreateArgs} args - Arguments to create a StudentFee.
+     * @example
+     * // Create one StudentFee
+     * const StudentFee = await prisma.studentFee.create({
+     *   data: {
+     *     // ... data to create a StudentFee
+     *   }
+     * })
+     * 
+     */
+    create<T extends StudentFeeCreateArgs>(args: SelectSubset<T, StudentFeeCreateArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many StudentFees.
+     * @param {StudentFeeCreateManyArgs} args - Arguments to create many StudentFees.
+     * @example
+     * // Create many StudentFees
+     * const studentFee = await prisma.studentFee.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StudentFeeCreateManyArgs>(args?: SelectSubset<T, StudentFeeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StudentFees and returns the data saved in the database.
+     * @param {StudentFeeCreateManyAndReturnArgs} args - Arguments to create many StudentFees.
+     * @example
+     * // Create many StudentFees
+     * const studentFee = await prisma.studentFee.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StudentFees and only return the `id`
+     * const studentFeeWithIdOnly = await prisma.studentFee.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StudentFeeCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentFeeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a StudentFee.
+     * @param {StudentFeeDeleteArgs} args - Arguments to delete one StudentFee.
+     * @example
+     * // Delete one StudentFee
+     * const StudentFee = await prisma.studentFee.delete({
+     *   where: {
+     *     // ... filter to delete one StudentFee
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StudentFeeDeleteArgs>(args: SelectSubset<T, StudentFeeDeleteArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one StudentFee.
+     * @param {StudentFeeUpdateArgs} args - Arguments to update one StudentFee.
+     * @example
+     * // Update one StudentFee
+     * const studentFee = await prisma.studentFee.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StudentFeeUpdateArgs>(args: SelectSubset<T, StudentFeeUpdateArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more StudentFees.
+     * @param {StudentFeeDeleteManyArgs} args - Arguments to filter StudentFees to delete.
+     * @example
+     * // Delete a few StudentFees
+     * const { count } = await prisma.studentFee.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StudentFeeDeleteManyArgs>(args?: SelectSubset<T, StudentFeeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StudentFees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StudentFees
+     * const studentFee = await prisma.studentFee.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StudentFeeUpdateManyArgs>(args: SelectSubset<T, StudentFeeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one StudentFee.
+     * @param {StudentFeeUpsertArgs} args - Arguments to update or create a StudentFee.
+     * @example
+     * // Update or create a StudentFee
+     * const studentFee = await prisma.studentFee.upsert({
+     *   create: {
+     *     // ... data to create a StudentFee
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StudentFee we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StudentFeeUpsertArgs>(args: SelectSubset<T, StudentFeeUpsertArgs<ExtArgs>>): Prisma__StudentFeeClient<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of StudentFees.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeCountArgs} args - Arguments to filter StudentFees to count.
+     * @example
+     * // Count the number of StudentFees
+     * const count = await prisma.studentFee.count({
+     *   where: {
+     *     // ... the filter for the StudentFees we want to count
+     *   }
+     * })
+    **/
+    count<T extends StudentFeeCountArgs>(
+      args?: Subset<T, StudentFeeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StudentFeeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StudentFee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StudentFeeAggregateArgs>(args: Subset<T, StudentFeeAggregateArgs>): Prisma.PrismaPromise<GetStudentFeeAggregateType<T>>
+
+    /**
+     * Group by StudentFee.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentFeeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StudentFeeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StudentFeeGroupByArgs['orderBy'] }
+        : { orderBy?: StudentFeeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StudentFeeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentFeeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StudentFee model
+   */
+  readonly fields: StudentFeeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StudentFee.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StudentFeeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    feeTier<T extends StudentFee$feeTierArgs<ExtArgs> = {}>(args?: Subset<T, StudentFee$feeTierArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StudentFee model
+   */ 
+  interface StudentFeeFieldRefs {
+    readonly id: FieldRef<"StudentFee", 'String'>
+    readonly studentProfileId: FieldRef<"StudentFee", 'String'>
+    readonly feeTierId: FieldRef<"StudentFee", 'String'>
+    readonly customAmount: FieldRef<"StudentFee", 'Decimal'>
+    readonly ipcApplied: FieldRef<"StudentFee", 'Boolean'>
+    readonly effectiveFrom: FieldRef<"StudentFee", 'DateTime'>
+    readonly effectiveTo: FieldRef<"StudentFee", 'DateTime'>
+    readonly createdAt: FieldRef<"StudentFee", 'DateTime'>
+    readonly updatedAt: FieldRef<"StudentFee", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StudentFee findUnique
+   */
+  export type StudentFeeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentFee to fetch.
+     */
+    where: StudentFeeWhereUniqueInput
+  }
+
+  /**
+   * StudentFee findUniqueOrThrow
+   */
+  export type StudentFeeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentFee to fetch.
+     */
+    where: StudentFeeWhereUniqueInput
+  }
+
+  /**
+   * StudentFee findFirst
+   */
+  export type StudentFeeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentFee to fetch.
+     */
+    where?: StudentFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentFees to fetch.
+     */
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentFees.
+     */
+    cursor?: StudentFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentFees.
+     */
+    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
+  }
+
+  /**
+   * StudentFee findFirstOrThrow
+   */
+  export type StudentFeeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentFee to fetch.
+     */
+    where?: StudentFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentFees to fetch.
+     */
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentFees.
+     */
+    cursor?: StudentFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentFees.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentFees.
+     */
+    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
+  }
+
+  /**
+   * StudentFee findMany
+   */
+  export type StudentFeeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentFees to fetch.
+     */
+    where?: StudentFeeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentFees to fetch.
+     */
+    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StudentFees.
+     */
+    cursor?: StudentFeeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentFees from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentFees.
+     */
+    skip?: number
+    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
+  }
+
+  /**
+   * StudentFee create
+   */
+  export type StudentFeeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StudentFee.
+     */
+    data: XOR<StudentFeeCreateInput, StudentFeeUncheckedCreateInput>
+  }
+
+  /**
+   * StudentFee createMany
+   */
+  export type StudentFeeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StudentFees.
+     */
+    data: StudentFeeCreateManyInput | StudentFeeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StudentFee createManyAndReturn
+   */
+  export type StudentFeeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many StudentFees.
+     */
+    data: StudentFeeCreateManyInput | StudentFeeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StudentFee update
+   */
+  export type StudentFeeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StudentFee.
+     */
+    data: XOR<StudentFeeUpdateInput, StudentFeeUncheckedUpdateInput>
+    /**
+     * Choose, which StudentFee to update.
+     */
+    where: StudentFeeWhereUniqueInput
+  }
+
+  /**
+   * StudentFee updateMany
+   */
+  export type StudentFeeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StudentFees.
+     */
+    data: XOR<StudentFeeUpdateManyMutationInput, StudentFeeUncheckedUpdateManyInput>
+    /**
+     * Filter which StudentFees to update
+     */
+    where?: StudentFeeWhereInput
+  }
+
+  /**
+   * StudentFee upsert
+   */
+  export type StudentFeeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StudentFee to update in case it exists.
+     */
+    where: StudentFeeWhereUniqueInput
+    /**
+     * In case the StudentFee found by the `where` argument doesn't exist, create a new StudentFee with this data.
+     */
+    create: XOR<StudentFeeCreateInput, StudentFeeUncheckedCreateInput>
+    /**
+     * In case the StudentFee was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StudentFeeUpdateInput, StudentFeeUncheckedUpdateInput>
+  }
+
+  /**
+   * StudentFee delete
+   */
+  export type StudentFeeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+    /**
+     * Filter which StudentFee to delete.
+     */
+    where: StudentFeeWhereUniqueInput
+  }
+
+  /**
+   * StudentFee deleteMany
+   */
+  export type StudentFeeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentFees to delete
+     */
+    where?: StudentFeeWhereInput
+  }
+
+  /**
+   * StudentFee.feeTier
+   */
+  export type StudentFee$feeTierArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeeTier
+     */
+    select?: FeeTierSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeeTierInclude<ExtArgs> | null
+    where?: FeeTierWhereInput
+  }
+
+  /**
+   * StudentFee without action
+   */
+  export type StudentFeeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentFee
+     */
+    select?: StudentFeeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentFeeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Promotion
+   */
+
+  export type AggregatePromotion = {
+    _count: PromotionCountAggregateOutputType | null
+    _avg: PromotionAvgAggregateOutputType | null
+    _sum: PromotionSumAggregateOutputType | null
+    _min: PromotionMinAggregateOutputType | null
+    _max: PromotionMaxAggregateOutputType | null
+  }
+
+  export type PromotionAvgAggregateOutputType = {
+    value: Decimal | null
+  }
+
+  export type PromotionSumAggregateOutputType = {
+    value: Decimal | null
+  }
+
+  export type PromotionMinAggregateOutputType = {
+    id: string | null
+    code: string | null
+    name: string | null
+    description: string | null
+    type: $Enums.PromotionType | null
+    category: $Enums.PromotionCategory | null
+    value: Decimal | null
+    startDate: Date | null
+    endDate: Date | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PromotionMaxAggregateOutputType = {
+    id: string | null
+    code: string | null
+    name: string | null
+    description: string | null
+    type: $Enums.PromotionType | null
+    category: $Enums.PromotionCategory | null
+    value: Decimal | null
+    startDate: Date | null
+    endDate: Date | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PromotionCountAggregateOutputType = {
+    id: number
+    code: number
+    name: number
+    description: number
+    type: number
+    category: number
+    value: number
+    startDate: number
+    endDate: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PromotionAvgAggregateInputType = {
+    value?: true
+  }
+
+  export type PromotionSumAggregateInputType = {
+    value?: true
+  }
+
+  export type PromotionMinAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    description?: true
+    type?: true
+    category?: true
+    value?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PromotionMaxAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    description?: true
+    type?: true
+    category?: true
+    value?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PromotionCountAggregateInputType = {
+    id?: true
+    code?: true
+    name?: true
+    description?: true
+    type?: true
+    category?: true
+    value?: true
+    startDate?: true
+    endDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PromotionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Promotion to aggregate.
+     */
+    where?: PromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Promotions to fetch.
+     */
+    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Promotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Promotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Promotions
+    **/
+    _count?: true | PromotionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PromotionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PromotionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PromotionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PromotionMaxAggregateInputType
+  }
+
+  export type GetPromotionAggregateType<T extends PromotionAggregateArgs> = {
+        [P in keyof T & keyof AggregatePromotion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePromotion[P]>
+      : GetScalarType<T[P], AggregatePromotion[P]>
+  }
+
+
+
+
+  export type PromotionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PromotionWhereInput
+    orderBy?: PromotionOrderByWithAggregationInput | PromotionOrderByWithAggregationInput[]
+    by: PromotionScalarFieldEnum[] | PromotionScalarFieldEnum
+    having?: PromotionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PromotionCountAggregateInputType | true
+    _avg?: PromotionAvgAggregateInputType
+    _sum?: PromotionSumAggregateInputType
+    _min?: PromotionMinAggregateInputType
+    _max?: PromotionMaxAggregateInputType
+  }
+
+  export type PromotionGroupByOutputType = {
+    id: string
+    code: string
+    name: string
+    description: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value: Decimal | null
+    startDate: Date | null
+    endDate: Date | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: PromotionCountAggregateOutputType | null
+    _avg: PromotionAvgAggregateOutputType | null
+    _sum: PromotionSumAggregateOutputType | null
+    _min: PromotionMinAggregateOutputType | null
+    _max: PromotionMaxAggregateOutputType | null
+  }
+
+  type GetPromotionGroupByPayload<T extends PromotionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PromotionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PromotionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PromotionGroupByOutputType[P]>
+            : GetScalarType<T[P], PromotionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PromotionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    type?: boolean
+    category?: boolean
+    value?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    studentPromotions?: boolean | Promotion$studentPromotionsArgs<ExtArgs>
+    _count?: boolean | PromotionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["promotion"]>
+
+  export type PromotionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    type?: boolean
+    category?: boolean
+    value?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["promotion"]>
+
+  export type PromotionSelectScalar = {
+    id?: boolean
+    code?: boolean
+    name?: boolean
+    description?: boolean
+    type?: boolean
+    category?: boolean
+    value?: boolean
+    startDate?: boolean
+    endDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PromotionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentPromotions?: boolean | Promotion$studentPromotionsArgs<ExtArgs>
+    _count?: boolean | PromotionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PromotionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $PromotionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Promotion"
+    objects: {
+      studentPromotions: Prisma.$StudentPromotionPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      code: string
+      name: string
+      description: string | null
+      type: $Enums.PromotionType
+      category: $Enums.PromotionCategory
+      /**
+       * Percentage value or fixed discount amount
+       */
+      value: Prisma.Decimal | null
+      startDate: Date | null
+      endDate: Date | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["promotion"]>
+    composites: {}
+  }
+
+  type PromotionGetPayload<S extends boolean | null | undefined | PromotionDefaultArgs> = $Result.GetResult<Prisma.$PromotionPayload, S>
+
+  type PromotionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<PromotionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: PromotionCountAggregateInputType | true
+    }
+
+  export interface PromotionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Promotion'], meta: { name: 'Promotion' } }
+    /**
+     * Find zero or one Promotion that matches the filter.
+     * @param {PromotionFindUniqueArgs} args - Arguments to find a Promotion
+     * @example
+     * // Get one Promotion
+     * const promotion = await prisma.promotion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PromotionFindUniqueArgs>(args: SelectSubset<T, PromotionFindUniqueArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one Promotion that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {PromotionFindUniqueOrThrowArgs} args - Arguments to find a Promotion
+     * @example
+     * // Get one Promotion
+     * const promotion = await prisma.promotion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PromotionFindUniqueOrThrowArgs>(args: SelectSubset<T, PromotionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first Promotion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionFindFirstArgs} args - Arguments to find a Promotion
+     * @example
+     * // Get one Promotion
+     * const promotion = await prisma.promotion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PromotionFindFirstArgs>(args?: SelectSubset<T, PromotionFindFirstArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first Promotion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionFindFirstOrThrowArgs} args - Arguments to find a Promotion
+     * @example
+     * // Get one Promotion
+     * const promotion = await prisma.promotion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PromotionFindFirstOrThrowArgs>(args?: SelectSubset<T, PromotionFindFirstOrThrowArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more Promotions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Promotions
+     * const promotions = await prisma.promotion.findMany()
+     * 
+     * // Get first 10 Promotions
+     * const promotions = await prisma.promotion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const promotionWithIdOnly = await prisma.promotion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PromotionFindManyArgs>(args?: SelectSubset<T, PromotionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a Promotion.
+     * @param {PromotionCreateArgs} args - Arguments to create a Promotion.
+     * @example
+     * // Create one Promotion
+     * const Promotion = await prisma.promotion.create({
+     *   data: {
+     *     // ... data to create a Promotion
+     *   }
+     * })
+     * 
+     */
+    create<T extends PromotionCreateArgs>(args: SelectSubset<T, PromotionCreateArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many Promotions.
+     * @param {PromotionCreateManyArgs} args - Arguments to create many Promotions.
+     * @example
+     * // Create many Promotions
+     * const promotion = await prisma.promotion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PromotionCreateManyArgs>(args?: SelectSubset<T, PromotionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Promotions and returns the data saved in the database.
+     * @param {PromotionCreateManyAndReturnArgs} args - Arguments to create many Promotions.
+     * @example
+     * // Create many Promotions
+     * const promotion = await prisma.promotion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Promotions and only return the `id`
+     * const promotionWithIdOnly = await prisma.promotion.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PromotionCreateManyAndReturnArgs>(args?: SelectSubset<T, PromotionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a Promotion.
+     * @param {PromotionDeleteArgs} args - Arguments to delete one Promotion.
+     * @example
+     * // Delete one Promotion
+     * const Promotion = await prisma.promotion.delete({
+     *   where: {
+     *     // ... filter to delete one Promotion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PromotionDeleteArgs>(args: SelectSubset<T, PromotionDeleteArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one Promotion.
+     * @param {PromotionUpdateArgs} args - Arguments to update one Promotion.
+     * @example
+     * // Update one Promotion
+     * const promotion = await prisma.promotion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PromotionUpdateArgs>(args: SelectSubset<T, PromotionUpdateArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more Promotions.
+     * @param {PromotionDeleteManyArgs} args - Arguments to filter Promotions to delete.
+     * @example
+     * // Delete a few Promotions
+     * const { count } = await prisma.promotion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PromotionDeleteManyArgs>(args?: SelectSubset<T, PromotionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Promotions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Promotions
+     * const promotion = await prisma.promotion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PromotionUpdateManyArgs>(args: SelectSubset<T, PromotionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Promotion.
+     * @param {PromotionUpsertArgs} args - Arguments to update or create a Promotion.
+     * @example
+     * // Update or create a Promotion
+     * const promotion = await prisma.promotion.upsert({
+     *   create: {
+     *     // ... data to create a Promotion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Promotion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PromotionUpsertArgs>(args: SelectSubset<T, PromotionUpsertArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of Promotions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionCountArgs} args - Arguments to filter Promotions to count.
+     * @example
+     * // Count the number of Promotions
+     * const count = await prisma.promotion.count({
+     *   where: {
+     *     // ... the filter for the Promotions we want to count
+     *   }
+     * })
+    **/
+    count<T extends PromotionCountArgs>(
+      args?: Subset<T, PromotionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PromotionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Promotion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PromotionAggregateArgs>(args: Subset<T, PromotionAggregateArgs>): Prisma.PrismaPromise<GetPromotionAggregateType<T>>
+
+    /**
+     * Group by Promotion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PromotionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PromotionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PromotionGroupByArgs['orderBy'] }
+        : { orderBy?: PromotionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PromotionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPromotionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Promotion model
+   */
+  readonly fields: PromotionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Promotion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PromotionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    studentPromotions<T extends Promotion$studentPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, Promotion$studentPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Promotion model
+   */ 
+  interface PromotionFieldRefs {
+    readonly id: FieldRef<"Promotion", 'String'>
+    readonly code: FieldRef<"Promotion", 'String'>
+    readonly name: FieldRef<"Promotion", 'String'>
+    readonly description: FieldRef<"Promotion", 'String'>
+    readonly type: FieldRef<"Promotion", 'PromotionType'>
+    readonly category: FieldRef<"Promotion", 'PromotionCategory'>
+    readonly value: FieldRef<"Promotion", 'Decimal'>
+    readonly startDate: FieldRef<"Promotion", 'DateTime'>
+    readonly endDate: FieldRef<"Promotion", 'DateTime'>
+    readonly isActive: FieldRef<"Promotion", 'Boolean'>
+    readonly createdAt: FieldRef<"Promotion", 'DateTime'>
+    readonly updatedAt: FieldRef<"Promotion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Promotion findUnique
+   */
+  export type PromotionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which Promotion to fetch.
+     */
+    where: PromotionWhereUniqueInput
+  }
+
+  /**
+   * Promotion findUniqueOrThrow
+   */
+  export type PromotionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which Promotion to fetch.
+     */
+    where: PromotionWhereUniqueInput
+  }
+
+  /**
+   * Promotion findFirst
+   */
+  export type PromotionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which Promotion to fetch.
+     */
+    where?: PromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Promotions to fetch.
+     */
+    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Promotions.
+     */
+    cursor?: PromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Promotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Promotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Promotions.
+     */
+    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+  }
+
+  /**
+   * Promotion findFirstOrThrow
+   */
+  export type PromotionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which Promotion to fetch.
+     */
+    where?: PromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Promotions to fetch.
+     */
+    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Promotions.
+     */
+    cursor?: PromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Promotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Promotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Promotions.
+     */
+    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+  }
+
+  /**
+   * Promotion findMany
+   */
+  export type PromotionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which Promotions to fetch.
+     */
+    where?: PromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Promotions to fetch.
+     */
+    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Promotions.
+     */
+    cursor?: PromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Promotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Promotions.
+     */
+    skip?: number
+    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+  }
+
+  /**
+   * Promotion create
+   */
+  export type PromotionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Promotion.
+     */
+    data: XOR<PromotionCreateInput, PromotionUncheckedCreateInput>
+  }
+
+  /**
+   * Promotion createMany
+   */
+  export type PromotionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Promotions.
+     */
+    data: PromotionCreateManyInput | PromotionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Promotion createManyAndReturn
+   */
+  export type PromotionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many Promotions.
+     */
+    data: PromotionCreateManyInput | PromotionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Promotion update
+   */
+  export type PromotionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Promotion.
+     */
+    data: XOR<PromotionUpdateInput, PromotionUncheckedUpdateInput>
+    /**
+     * Choose, which Promotion to update.
+     */
+    where: PromotionWhereUniqueInput
+  }
+
+  /**
+   * Promotion updateMany
+   */
+  export type PromotionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Promotions.
+     */
+    data: XOR<PromotionUpdateManyMutationInput, PromotionUncheckedUpdateManyInput>
+    /**
+     * Filter which Promotions to update
+     */
+    where?: PromotionWhereInput
+  }
+
+  /**
+   * Promotion upsert
+   */
+  export type PromotionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Promotion to update in case it exists.
+     */
+    where: PromotionWhereUniqueInput
+    /**
+     * In case the Promotion found by the `where` argument doesn't exist, create a new Promotion with this data.
+     */
+    create: XOR<PromotionCreateInput, PromotionUncheckedCreateInput>
+    /**
+     * In case the Promotion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PromotionUpdateInput, PromotionUncheckedUpdateInput>
+  }
+
+  /**
+   * Promotion delete
+   */
+  export type PromotionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+    /**
+     * Filter which Promotion to delete.
+     */
+    where: PromotionWhereUniqueInput
+  }
+
+  /**
+   * Promotion deleteMany
+   */
+  export type PromotionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Promotions to delete
+     */
+    where?: PromotionWhereInput
+  }
+
+  /**
+   * Promotion.studentPromotions
+   */
+  export type Promotion$studentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    where?: StudentPromotionWhereInput
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    cursor?: StudentPromotionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+  }
+
+  /**
+   * Promotion without action
+   */
+  export type PromotionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Promotion
+     */
+    select?: PromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PromotionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StudentPromotion
+   */
+
+  export type AggregateStudentPromotion = {
+    _count: StudentPromotionCountAggregateOutputType | null
+    _min: StudentPromotionMinAggregateOutputType | null
+    _max: StudentPromotionMaxAggregateOutputType | null
+  }
+
+  export type StudentPromotionMinAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    promotionId: string | null
+    assignedAt: Date | null
+    expiresAt: Date | null
+  }
+
+  export type StudentPromotionMaxAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    promotionId: string | null
+    assignedAt: Date | null
+    expiresAt: Date | null
+  }
+
+  export type StudentPromotionCountAggregateOutputType = {
+    id: number
+    studentProfileId: number
+    promotionId: number
+    assignedAt: number
+    expiresAt: number
+    _all: number
+  }
+
+
+  export type StudentPromotionMinAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    promotionId?: true
+    assignedAt?: true
+    expiresAt?: true
+  }
+
+  export type StudentPromotionMaxAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    promotionId?: true
+    assignedAt?: true
+    expiresAt?: true
+  }
+
+  export type StudentPromotionCountAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    promotionId?: true
+    assignedAt?: true
+    expiresAt?: true
+    _all?: true
+  }
+
+  export type StudentPromotionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentPromotion to aggregate.
+     */
+    where?: StudentPromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentPromotions to fetch.
+     */
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StudentPromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentPromotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentPromotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StudentPromotions
+    **/
+    _count?: true | StudentPromotionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StudentPromotionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StudentPromotionMaxAggregateInputType
+  }
+
+  export type GetStudentPromotionAggregateType<T extends StudentPromotionAggregateArgs> = {
+        [P in keyof T & keyof AggregateStudentPromotion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStudentPromotion[P]>
+      : GetScalarType<T[P], AggregateStudentPromotion[P]>
+  }
+
+
+
+
+  export type StudentPromotionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentPromotionWhereInput
+    orderBy?: StudentPromotionOrderByWithAggregationInput | StudentPromotionOrderByWithAggregationInput[]
+    by: StudentPromotionScalarFieldEnum[] | StudentPromotionScalarFieldEnum
+    having?: StudentPromotionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StudentPromotionCountAggregateInputType | true
+    _min?: StudentPromotionMinAggregateInputType
+    _max?: StudentPromotionMaxAggregateInputType
+  }
+
+  export type StudentPromotionGroupByOutputType = {
+    id: string
+    studentProfileId: string
+    promotionId: string
+    assignedAt: Date
+    expiresAt: Date | null
+    _count: StudentPromotionCountAggregateOutputType | null
+    _min: StudentPromotionMinAggregateOutputType | null
+    _max: StudentPromotionMaxAggregateOutputType | null
+  }
+
+  type GetStudentPromotionGroupByPayload<T extends StudentPromotionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StudentPromotionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StudentPromotionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StudentPromotionGroupByOutputType[P]>
+            : GetScalarType<T[P], StudentPromotionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StudentPromotionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    promotionId?: boolean
+    assignedAt?: boolean
+    expiresAt?: boolean
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["studentPromotion"]>
+
+  export type StudentPromotionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    promotionId?: boolean
+    assignedAt?: boolean
+    expiresAt?: boolean
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["studentPromotion"]>
+
+  export type StudentPromotionSelectScalar = {
+    id?: boolean
+    studentProfileId?: boolean
+    promotionId?: boolean
+    assignedAt?: boolean
+    expiresAt?: boolean
+  }
+
+  export type StudentPromotionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+  }
+  export type StudentPromotionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+  }
+
+  export type $StudentPromotionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StudentPromotion"
+    objects: {
+      studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
+      promotion: Prisma.$PromotionPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentProfileId: string
+      promotionId: string
+      assignedAt: Date
+      expiresAt: Date | null
+    }, ExtArgs["result"]["studentPromotion"]>
+    composites: {}
+  }
+
+  type StudentPromotionGetPayload<S extends boolean | null | undefined | StudentPromotionDefaultArgs> = $Result.GetResult<Prisma.$StudentPromotionPayload, S>
+
+  type StudentPromotionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StudentPromotionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StudentPromotionCountAggregateInputType | true
+    }
+
+  export interface StudentPromotionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentPromotion'], meta: { name: 'StudentPromotion' } }
+    /**
+     * Find zero or one StudentPromotion that matches the filter.
+     * @param {StudentPromotionFindUniqueArgs} args - Arguments to find a StudentPromotion
+     * @example
+     * // Get one StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StudentPromotionFindUniqueArgs>(args: SelectSubset<T, StudentPromotionFindUniqueArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one StudentPromotion that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {StudentPromotionFindUniqueOrThrowArgs} args - Arguments to find a StudentPromotion
+     * @example
+     * // Get one StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StudentPromotionFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentPromotionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first StudentPromotion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionFindFirstArgs} args - Arguments to find a StudentPromotion
+     * @example
+     * // Get one StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StudentPromotionFindFirstArgs>(args?: SelectSubset<T, StudentPromotionFindFirstArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first StudentPromotion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionFindFirstOrThrowArgs} args - Arguments to find a StudentPromotion
+     * @example
+     * // Get one StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StudentPromotionFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentPromotionFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more StudentPromotions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StudentPromotions
+     * const studentPromotions = await prisma.studentPromotion.findMany()
+     * 
+     * // Get first 10 StudentPromotions
+     * const studentPromotions = await prisma.studentPromotion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const studentPromotionWithIdOnly = await prisma.studentPromotion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StudentPromotionFindManyArgs>(args?: SelectSubset<T, StudentPromotionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a StudentPromotion.
+     * @param {StudentPromotionCreateArgs} args - Arguments to create a StudentPromotion.
+     * @example
+     * // Create one StudentPromotion
+     * const StudentPromotion = await prisma.studentPromotion.create({
+     *   data: {
+     *     // ... data to create a StudentPromotion
+     *   }
+     * })
+     * 
+     */
+    create<T extends StudentPromotionCreateArgs>(args: SelectSubset<T, StudentPromotionCreateArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many StudentPromotions.
+     * @param {StudentPromotionCreateManyArgs} args - Arguments to create many StudentPromotions.
+     * @example
+     * // Create many StudentPromotions
+     * const studentPromotion = await prisma.studentPromotion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StudentPromotionCreateManyArgs>(args?: SelectSubset<T, StudentPromotionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StudentPromotions and returns the data saved in the database.
+     * @param {StudentPromotionCreateManyAndReturnArgs} args - Arguments to create many StudentPromotions.
+     * @example
+     * // Create many StudentPromotions
+     * const studentPromotion = await prisma.studentPromotion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StudentPromotions and only return the `id`
+     * const studentPromotionWithIdOnly = await prisma.studentPromotion.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StudentPromotionCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentPromotionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a StudentPromotion.
+     * @param {StudentPromotionDeleteArgs} args - Arguments to delete one StudentPromotion.
+     * @example
+     * // Delete one StudentPromotion
+     * const StudentPromotion = await prisma.studentPromotion.delete({
+     *   where: {
+     *     // ... filter to delete one StudentPromotion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StudentPromotionDeleteArgs>(args: SelectSubset<T, StudentPromotionDeleteArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one StudentPromotion.
+     * @param {StudentPromotionUpdateArgs} args - Arguments to update one StudentPromotion.
+     * @example
+     * // Update one StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StudentPromotionUpdateArgs>(args: SelectSubset<T, StudentPromotionUpdateArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more StudentPromotions.
+     * @param {StudentPromotionDeleteManyArgs} args - Arguments to filter StudentPromotions to delete.
+     * @example
+     * // Delete a few StudentPromotions
+     * const { count } = await prisma.studentPromotion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StudentPromotionDeleteManyArgs>(args?: SelectSubset<T, StudentPromotionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StudentPromotions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StudentPromotions
+     * const studentPromotion = await prisma.studentPromotion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StudentPromotionUpdateManyArgs>(args: SelectSubset<T, StudentPromotionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one StudentPromotion.
+     * @param {StudentPromotionUpsertArgs} args - Arguments to update or create a StudentPromotion.
+     * @example
+     * // Update or create a StudentPromotion
+     * const studentPromotion = await prisma.studentPromotion.upsert({
+     *   create: {
+     *     // ... data to create a StudentPromotion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StudentPromotion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StudentPromotionUpsertArgs>(args: SelectSubset<T, StudentPromotionUpsertArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of StudentPromotions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionCountArgs} args - Arguments to filter StudentPromotions to count.
+     * @example
+     * // Count the number of StudentPromotions
+     * const count = await prisma.studentPromotion.count({
+     *   where: {
+     *     // ... the filter for the StudentPromotions we want to count
+     *   }
+     * })
+    **/
+    count<T extends StudentPromotionCountArgs>(
+      args?: Subset<T, StudentPromotionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StudentPromotionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StudentPromotion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StudentPromotionAggregateArgs>(args: Subset<T, StudentPromotionAggregateArgs>): Prisma.PrismaPromise<GetStudentPromotionAggregateType<T>>
+
+    /**
+     * Group by StudentPromotion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentPromotionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StudentPromotionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StudentPromotionGroupByArgs['orderBy'] }
+        : { orderBy?: StudentPromotionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StudentPromotionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentPromotionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StudentPromotion model
+   */
+  readonly fields: StudentPromotionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StudentPromotion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StudentPromotionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    promotion<T extends PromotionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PromotionDefaultArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StudentPromotion model
+   */ 
+  interface StudentPromotionFieldRefs {
+    readonly id: FieldRef<"StudentPromotion", 'String'>
+    readonly studentProfileId: FieldRef<"StudentPromotion", 'String'>
+    readonly promotionId: FieldRef<"StudentPromotion", 'String'>
+    readonly assignedAt: FieldRef<"StudentPromotion", 'DateTime'>
+    readonly expiresAt: FieldRef<"StudentPromotion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StudentPromotion findUnique
+   */
+  export type StudentPromotionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentPromotion to fetch.
+     */
+    where: StudentPromotionWhereUniqueInput
+  }
+
+  /**
+   * StudentPromotion findUniqueOrThrow
+   */
+  export type StudentPromotionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentPromotion to fetch.
+     */
+    where: StudentPromotionWhereUniqueInput
+  }
+
+  /**
+   * StudentPromotion findFirst
+   */
+  export type StudentPromotionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentPromotion to fetch.
+     */
+    where?: StudentPromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentPromotions to fetch.
+     */
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentPromotions.
+     */
+    cursor?: StudentPromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentPromotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentPromotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentPromotions.
+     */
+    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+  }
+
+  /**
+   * StudentPromotion findFirstOrThrow
+   */
+  export type StudentPromotionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentPromotion to fetch.
+     */
+    where?: StudentPromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentPromotions to fetch.
+     */
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentPromotions.
+     */
+    cursor?: StudentPromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentPromotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentPromotions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentPromotions.
+     */
+    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+  }
+
+  /**
+   * StudentPromotion findMany
+   */
+  export type StudentPromotionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentPromotions to fetch.
+     */
+    where?: StudentPromotionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentPromotions to fetch.
+     */
+    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StudentPromotions.
+     */
+    cursor?: StudentPromotionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentPromotions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentPromotions.
+     */
+    skip?: number
+    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+  }
+
+  /**
+   * StudentPromotion create
+   */
+  export type StudentPromotionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StudentPromotion.
+     */
+    data: XOR<StudentPromotionCreateInput, StudentPromotionUncheckedCreateInput>
+  }
+
+  /**
+   * StudentPromotion createMany
+   */
+  export type StudentPromotionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StudentPromotions.
+     */
+    data: StudentPromotionCreateManyInput | StudentPromotionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StudentPromotion createManyAndReturn
+   */
+  export type StudentPromotionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many StudentPromotions.
+     */
+    data: StudentPromotionCreateManyInput | StudentPromotionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StudentPromotion update
+   */
+  export type StudentPromotionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StudentPromotion.
+     */
+    data: XOR<StudentPromotionUpdateInput, StudentPromotionUncheckedUpdateInput>
+    /**
+     * Choose, which StudentPromotion to update.
+     */
+    where: StudentPromotionWhereUniqueInput
+  }
+
+  /**
+   * StudentPromotion updateMany
+   */
+  export type StudentPromotionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StudentPromotions.
+     */
+    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyInput>
+    /**
+     * Filter which StudentPromotions to update
+     */
+    where?: StudentPromotionWhereInput
+  }
+
+  /**
+   * StudentPromotion upsert
+   */
+  export type StudentPromotionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StudentPromotion to update in case it exists.
+     */
+    where: StudentPromotionWhereUniqueInput
+    /**
+     * In case the StudentPromotion found by the `where` argument doesn't exist, create a new StudentPromotion with this data.
+     */
+    create: XOR<StudentPromotionCreateInput, StudentPromotionUncheckedCreateInput>
+    /**
+     * In case the StudentPromotion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StudentPromotionUpdateInput, StudentPromotionUncheckedUpdateInput>
+  }
+
+  /**
+   * StudentPromotion delete
+   */
+  export type StudentPromotionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
+    /**
+     * Filter which StudentPromotion to delete.
+     */
+    where: StudentPromotionWhereUniqueInput
+  }
+
+  /**
+   * StudentPromotion deleteMany
+   */
+  export type StudentPromotionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentPromotions to delete
+     */
+    where?: StudentPromotionWhereInput
+  }
+
+  /**
+   * StudentPromotion without action
+   */
+  export type StudentPromotionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentPromotion
+     */
+    select?: StudentPromotionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentPromotionInclude<ExtArgs> | null
   }
 
 
@@ -14294,25 +18451,22 @@ export namespace Prisma {
   export type StudentSubscriptionMinAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
-    feePlanId: string | null
+    feeTierId: string | null
     isActive: boolean | null
-    mandateReference: string | null
   }
 
   export type StudentSubscriptionMaxAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
-    feePlanId: string | null
+    feeTierId: string | null
     isActive: boolean | null
-    mandateReference: string | null
   }
 
   export type StudentSubscriptionCountAggregateOutputType = {
     id: number
     studentProfileId: number
-    feePlanId: number
+    feeTierId: number
     isActive: number
-    mandateReference: number
     _all: number
   }
 
@@ -14320,25 +18474,22 @@ export namespace Prisma {
   export type StudentSubscriptionMinAggregateInputType = {
     id?: true
     studentProfileId?: true
-    feePlanId?: true
+    feeTierId?: true
     isActive?: true
-    mandateReference?: true
   }
 
   export type StudentSubscriptionMaxAggregateInputType = {
     id?: true
     studentProfileId?: true
-    feePlanId?: true
+    feeTierId?: true
     isActive?: true
-    mandateReference?: true
   }
 
   export type StudentSubscriptionCountAggregateInputType = {
     id?: true
     studentProfileId?: true
-    feePlanId?: true
+    feeTierId?: true
     isActive?: true
-    mandateReference?: true
     _all?: true
   }
 
@@ -14417,9 +18568,8 @@ export namespace Prisma {
   export type StudentSubscriptionGroupByOutputType = {
     id: string
     studentProfileId: string
-    feePlanId: string
+    feeTierId: string
     isActive: boolean
-    mandateReference: string | null
     _count: StudentSubscriptionCountAggregateOutputType | null
     _min: StudentSubscriptionMinAggregateOutputType | null
     _max: StudentSubscriptionMaxAggregateOutputType | null
@@ -14442,52 +18592,48 @@ export namespace Prisma {
   export type StudentSubscriptionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
-    feePlanId?: boolean
+    feeTierId?: boolean
     isActive?: boolean
-    mandateReference?: boolean
     student?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    feePlan?: boolean | FeePlanDefaultArgs<ExtArgs>
+    feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentSubscription"]>
 
   export type StudentSubscriptionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
-    feePlanId?: boolean
+    feeTierId?: boolean
     isActive?: boolean
-    mandateReference?: boolean
     student?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    feePlan?: boolean | FeePlanDefaultArgs<ExtArgs>
+    feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentSubscription"]>
 
   export type StudentSubscriptionSelectScalar = {
     id?: boolean
     studentProfileId?: boolean
-    feePlanId?: boolean
+    feeTierId?: boolean
     isActive?: boolean
-    mandateReference?: boolean
   }
 
   export type StudentSubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     student?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    feePlan?: boolean | FeePlanDefaultArgs<ExtArgs>
+    feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }
   export type StudentSubscriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     student?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    feePlan?: boolean | FeePlanDefaultArgs<ExtArgs>
+    feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }
 
   export type $StudentSubscriptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentSubscription"
     objects: {
       student: Prisma.$StudentProfilePayload<ExtArgs>
-      feePlan: Prisma.$FeePlanPayload<ExtArgs>
+      feeTier: Prisma.$FeeTierPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       studentProfileId: string
-      feePlanId: string
+      feeTierId: string
       isActive: boolean
-      mandateReference: string | null
     }, ExtArgs["result"]["studentSubscription"]>
     composites: {}
   }
@@ -14853,7 +18999,7 @@ export namespace Prisma {
   export interface Prisma__StudentSubscriptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    feePlan<T extends FeePlanDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FeePlanDefaultArgs<ExtArgs>>): Prisma__FeePlanClient<$Result.GetResult<Prisma.$FeePlanPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    feeTier<T extends FeeTierDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FeeTierDefaultArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14885,9 +19031,8 @@ export namespace Prisma {
   interface StudentSubscriptionFieldRefs {
     readonly id: FieldRef<"StudentSubscription", 'String'>
     readonly studentProfileId: FieldRef<"StudentSubscription", 'String'>
-    readonly feePlanId: FieldRef<"StudentSubscription", 'String'>
+    readonly feeTierId: FieldRef<"StudentSubscription", 'String'>
     readonly isActive: FieldRef<"StudentSubscription", 'Boolean'>
-    readonly mandateReference: FieldRef<"StudentSubscription", 'String'>
   }
     
 
@@ -15217,6 +19362,5242 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StudentSubscriptionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CashRegisterSession
+   */
+
+  export type AggregateCashRegisterSession = {
+    _count: CashRegisterSessionCountAggregateOutputType | null
+    _avg: CashRegisterSessionAvgAggregateOutputType | null
+    _sum: CashRegisterSessionSumAggregateOutputType | null
+    _min: CashRegisterSessionMinAggregateOutputType | null
+    _max: CashRegisterSessionMaxAggregateOutputType | null
+  }
+
+  export type CashRegisterSessionAvgAggregateOutputType = {
+    initialBalance: Decimal | null
+    expectedClosingBalance: Decimal | null
+    actualClosingBalance: Decimal | null
+    discrepancy: Decimal | null
+  }
+
+  export type CashRegisterSessionSumAggregateOutputType = {
+    initialBalance: Decimal | null
+    expectedClosingBalance: Decimal | null
+    actualClosingBalance: Decimal | null
+    discrepancy: Decimal | null
+  }
+
+  export type CashRegisterSessionMinAggregateOutputType = {
+    id: string | null
+    openedById: string | null
+    closedById: string | null
+    openingDate: Date | null
+    closingDate: Date | null
+    initialBalance: Decimal | null
+    expectedClosingBalance: Decimal | null
+    actualClosingBalance: Decimal | null
+    discrepancy: Decimal | null
+    status: $Enums.CashSessionStatus | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CashRegisterSessionMaxAggregateOutputType = {
+    id: string | null
+    openedById: string | null
+    closedById: string | null
+    openingDate: Date | null
+    closingDate: Date | null
+    initialBalance: Decimal | null
+    expectedClosingBalance: Decimal | null
+    actualClosingBalance: Decimal | null
+    discrepancy: Decimal | null
+    status: $Enums.CashSessionStatus | null
+    notes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CashRegisterSessionCountAggregateOutputType = {
+    id: number
+    openedById: number
+    closedById: number
+    openingDate: number
+    closingDate: number
+    initialBalance: number
+    expectedClosingBalance: number
+    actualClosingBalance: number
+    discrepancy: number
+    status: number
+    notes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CashRegisterSessionAvgAggregateInputType = {
+    initialBalance?: true
+    expectedClosingBalance?: true
+    actualClosingBalance?: true
+    discrepancy?: true
+  }
+
+  export type CashRegisterSessionSumAggregateInputType = {
+    initialBalance?: true
+    expectedClosingBalance?: true
+    actualClosingBalance?: true
+    discrepancy?: true
+  }
+
+  export type CashRegisterSessionMinAggregateInputType = {
+    id?: true
+    openedById?: true
+    closedById?: true
+    openingDate?: true
+    closingDate?: true
+    initialBalance?: true
+    expectedClosingBalance?: true
+    actualClosingBalance?: true
+    discrepancy?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CashRegisterSessionMaxAggregateInputType = {
+    id?: true
+    openedById?: true
+    closedById?: true
+    openingDate?: true
+    closingDate?: true
+    initialBalance?: true
+    expectedClosingBalance?: true
+    actualClosingBalance?: true
+    discrepancy?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CashRegisterSessionCountAggregateInputType = {
+    id?: true
+    openedById?: true
+    closedById?: true
+    openingDate?: true
+    closingDate?: true
+    initialBalance?: true
+    expectedClosingBalance?: true
+    actualClosingBalance?: true
+    discrepancy?: true
+    status?: true
+    notes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CashRegisterSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CashRegisterSession to aggregate.
+     */
+    where?: CashRegisterSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashRegisterSessions to fetch.
+     */
+    orderBy?: CashRegisterSessionOrderByWithRelationInput | CashRegisterSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CashRegisterSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashRegisterSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashRegisterSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CashRegisterSessions
+    **/
+    _count?: true | CashRegisterSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CashRegisterSessionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CashRegisterSessionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CashRegisterSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CashRegisterSessionMaxAggregateInputType
+  }
+
+  export type GetCashRegisterSessionAggregateType<T extends CashRegisterSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateCashRegisterSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCashRegisterSession[P]>
+      : GetScalarType<T[P], AggregateCashRegisterSession[P]>
+  }
+
+
+
+
+  export type CashRegisterSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CashRegisterSessionWhereInput
+    orderBy?: CashRegisterSessionOrderByWithAggregationInput | CashRegisterSessionOrderByWithAggregationInput[]
+    by: CashRegisterSessionScalarFieldEnum[] | CashRegisterSessionScalarFieldEnum
+    having?: CashRegisterSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CashRegisterSessionCountAggregateInputType | true
+    _avg?: CashRegisterSessionAvgAggregateInputType
+    _sum?: CashRegisterSessionSumAggregateInputType
+    _min?: CashRegisterSessionMinAggregateInputType
+    _max?: CashRegisterSessionMaxAggregateInputType
+  }
+
+  export type CashRegisterSessionGroupByOutputType = {
+    id: string
+    openedById: string
+    closedById: string | null
+    openingDate: Date
+    closingDate: Date | null
+    initialBalance: Decimal
+    expectedClosingBalance: Decimal | null
+    actualClosingBalance: Decimal | null
+    discrepancy: Decimal | null
+    status: $Enums.CashSessionStatus
+    notes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: CashRegisterSessionCountAggregateOutputType | null
+    _avg: CashRegisterSessionAvgAggregateOutputType | null
+    _sum: CashRegisterSessionSumAggregateOutputType | null
+    _min: CashRegisterSessionMinAggregateOutputType | null
+    _max: CashRegisterSessionMaxAggregateOutputType | null
+  }
+
+  type GetCashRegisterSessionGroupByPayload<T extends CashRegisterSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CashRegisterSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CashRegisterSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CashRegisterSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], CashRegisterSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CashRegisterSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    openedById?: boolean
+    closedById?: boolean
+    openingDate?: boolean
+    closingDate?: boolean
+    initialBalance?: boolean
+    expectedClosingBalance?: boolean
+    actualClosingBalance?: boolean
+    discrepancy?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    transactions?: boolean | CashRegisterSession$transactionsArgs<ExtArgs>
+    _count?: boolean | CashRegisterSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["cashRegisterSession"]>
+
+  export type CashRegisterSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    openedById?: boolean
+    closedById?: boolean
+    openingDate?: boolean
+    closingDate?: boolean
+    initialBalance?: boolean
+    expectedClosingBalance?: boolean
+    actualClosingBalance?: boolean
+    discrepancy?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["cashRegisterSession"]>
+
+  export type CashRegisterSessionSelectScalar = {
+    id?: boolean
+    openedById?: boolean
+    closedById?: boolean
+    openingDate?: boolean
+    closingDate?: boolean
+    initialBalance?: boolean
+    expectedClosingBalance?: boolean
+    actualClosingBalance?: boolean
+    discrepancy?: boolean
+    status?: boolean
+    notes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CashRegisterSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    transactions?: boolean | CashRegisterSession$transactionsArgs<ExtArgs>
+    _count?: boolean | CashRegisterSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type CashRegisterSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $CashRegisterSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CashRegisterSession"
+    objects: {
+      transactions: Prisma.$CashTransactionPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * User ID of the staff member who opened the register
+       */
+      openedById: string
+      /**
+       * User ID of the staff member who closed the register
+       */
+      closedById: string | null
+      openingDate: Date
+      closingDate: Date | null
+      /**
+       * Starting cash amount in the register
+       */
+      initialBalance: Prisma.Decimal
+      /**
+       * Calculated expected cash at close
+       */
+      expectedClosingBalance: Prisma.Decimal | null
+      /**
+       * Real physical counted cash at close
+       */
+      actualClosingBalance: Prisma.Decimal | null
+      /**
+       * Difference between expected and actual
+       */
+      discrepancy: Prisma.Decimal | null
+      status: $Enums.CashSessionStatus
+      notes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["cashRegisterSession"]>
+    composites: {}
+  }
+
+  type CashRegisterSessionGetPayload<S extends boolean | null | undefined | CashRegisterSessionDefaultArgs> = $Result.GetResult<Prisma.$CashRegisterSessionPayload, S>
+
+  type CashRegisterSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<CashRegisterSessionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: CashRegisterSessionCountAggregateInputType | true
+    }
+
+  export interface CashRegisterSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CashRegisterSession'], meta: { name: 'CashRegisterSession' } }
+    /**
+     * Find zero or one CashRegisterSession that matches the filter.
+     * @param {CashRegisterSessionFindUniqueArgs} args - Arguments to find a CashRegisterSession
+     * @example
+     * // Get one CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CashRegisterSessionFindUniqueArgs>(args: SelectSubset<T, CashRegisterSessionFindUniqueArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one CashRegisterSession that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {CashRegisterSessionFindUniqueOrThrowArgs} args - Arguments to find a CashRegisterSession
+     * @example
+     * // Get one CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CashRegisterSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, CashRegisterSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first CashRegisterSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionFindFirstArgs} args - Arguments to find a CashRegisterSession
+     * @example
+     * // Get one CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CashRegisterSessionFindFirstArgs>(args?: SelectSubset<T, CashRegisterSessionFindFirstArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first CashRegisterSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionFindFirstOrThrowArgs} args - Arguments to find a CashRegisterSession
+     * @example
+     * // Get one CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CashRegisterSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, CashRegisterSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more CashRegisterSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CashRegisterSessions
+     * const cashRegisterSessions = await prisma.cashRegisterSession.findMany()
+     * 
+     * // Get first 10 CashRegisterSessions
+     * const cashRegisterSessions = await prisma.cashRegisterSession.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const cashRegisterSessionWithIdOnly = await prisma.cashRegisterSession.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CashRegisterSessionFindManyArgs>(args?: SelectSubset<T, CashRegisterSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a CashRegisterSession.
+     * @param {CashRegisterSessionCreateArgs} args - Arguments to create a CashRegisterSession.
+     * @example
+     * // Create one CashRegisterSession
+     * const CashRegisterSession = await prisma.cashRegisterSession.create({
+     *   data: {
+     *     // ... data to create a CashRegisterSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends CashRegisterSessionCreateArgs>(args: SelectSubset<T, CashRegisterSessionCreateArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many CashRegisterSessions.
+     * @param {CashRegisterSessionCreateManyArgs} args - Arguments to create many CashRegisterSessions.
+     * @example
+     * // Create many CashRegisterSessions
+     * const cashRegisterSession = await prisma.cashRegisterSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CashRegisterSessionCreateManyArgs>(args?: SelectSubset<T, CashRegisterSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CashRegisterSessions and returns the data saved in the database.
+     * @param {CashRegisterSessionCreateManyAndReturnArgs} args - Arguments to create many CashRegisterSessions.
+     * @example
+     * // Create many CashRegisterSessions
+     * const cashRegisterSession = await prisma.cashRegisterSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CashRegisterSessions and only return the `id`
+     * const cashRegisterSessionWithIdOnly = await prisma.cashRegisterSession.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CashRegisterSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, CashRegisterSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a CashRegisterSession.
+     * @param {CashRegisterSessionDeleteArgs} args - Arguments to delete one CashRegisterSession.
+     * @example
+     * // Delete one CashRegisterSession
+     * const CashRegisterSession = await prisma.cashRegisterSession.delete({
+     *   where: {
+     *     // ... filter to delete one CashRegisterSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CashRegisterSessionDeleteArgs>(args: SelectSubset<T, CashRegisterSessionDeleteArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one CashRegisterSession.
+     * @param {CashRegisterSessionUpdateArgs} args - Arguments to update one CashRegisterSession.
+     * @example
+     * // Update one CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CashRegisterSessionUpdateArgs>(args: SelectSubset<T, CashRegisterSessionUpdateArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more CashRegisterSessions.
+     * @param {CashRegisterSessionDeleteManyArgs} args - Arguments to filter CashRegisterSessions to delete.
+     * @example
+     * // Delete a few CashRegisterSessions
+     * const { count } = await prisma.cashRegisterSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CashRegisterSessionDeleteManyArgs>(args?: SelectSubset<T, CashRegisterSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CashRegisterSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CashRegisterSessions
+     * const cashRegisterSession = await prisma.cashRegisterSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CashRegisterSessionUpdateManyArgs>(args: SelectSubset<T, CashRegisterSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CashRegisterSession.
+     * @param {CashRegisterSessionUpsertArgs} args - Arguments to update or create a CashRegisterSession.
+     * @example
+     * // Update or create a CashRegisterSession
+     * const cashRegisterSession = await prisma.cashRegisterSession.upsert({
+     *   create: {
+     *     // ... data to create a CashRegisterSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CashRegisterSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CashRegisterSessionUpsertArgs>(args: SelectSubset<T, CashRegisterSessionUpsertArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of CashRegisterSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionCountArgs} args - Arguments to filter CashRegisterSessions to count.
+     * @example
+     * // Count the number of CashRegisterSessions
+     * const count = await prisma.cashRegisterSession.count({
+     *   where: {
+     *     // ... the filter for the CashRegisterSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends CashRegisterSessionCountArgs>(
+      args?: Subset<T, CashRegisterSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CashRegisterSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CashRegisterSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CashRegisterSessionAggregateArgs>(args: Subset<T, CashRegisterSessionAggregateArgs>): Prisma.PrismaPromise<GetCashRegisterSessionAggregateType<T>>
+
+    /**
+     * Group by CashRegisterSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashRegisterSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CashRegisterSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CashRegisterSessionGroupByArgs['orderBy'] }
+        : { orderBy?: CashRegisterSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CashRegisterSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCashRegisterSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CashRegisterSession model
+   */
+  readonly fields: CashRegisterSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CashRegisterSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CashRegisterSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    transactions<T extends CashRegisterSession$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, CashRegisterSession$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CashRegisterSession model
+   */ 
+  interface CashRegisterSessionFieldRefs {
+    readonly id: FieldRef<"CashRegisterSession", 'String'>
+    readonly openedById: FieldRef<"CashRegisterSession", 'String'>
+    readonly closedById: FieldRef<"CashRegisterSession", 'String'>
+    readonly openingDate: FieldRef<"CashRegisterSession", 'DateTime'>
+    readonly closingDate: FieldRef<"CashRegisterSession", 'DateTime'>
+    readonly initialBalance: FieldRef<"CashRegisterSession", 'Decimal'>
+    readonly expectedClosingBalance: FieldRef<"CashRegisterSession", 'Decimal'>
+    readonly actualClosingBalance: FieldRef<"CashRegisterSession", 'Decimal'>
+    readonly discrepancy: FieldRef<"CashRegisterSession", 'Decimal'>
+    readonly status: FieldRef<"CashRegisterSession", 'CashSessionStatus'>
+    readonly notes: FieldRef<"CashRegisterSession", 'String'>
+    readonly createdAt: FieldRef<"CashRegisterSession", 'DateTime'>
+    readonly updatedAt: FieldRef<"CashRegisterSession", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CashRegisterSession findUnique
+   */
+  export type CashRegisterSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashRegisterSession to fetch.
+     */
+    where: CashRegisterSessionWhereUniqueInput
+  }
+
+  /**
+   * CashRegisterSession findUniqueOrThrow
+   */
+  export type CashRegisterSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashRegisterSession to fetch.
+     */
+    where: CashRegisterSessionWhereUniqueInput
+  }
+
+  /**
+   * CashRegisterSession findFirst
+   */
+  export type CashRegisterSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashRegisterSession to fetch.
+     */
+    where?: CashRegisterSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashRegisterSessions to fetch.
+     */
+    orderBy?: CashRegisterSessionOrderByWithRelationInput | CashRegisterSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CashRegisterSessions.
+     */
+    cursor?: CashRegisterSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashRegisterSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashRegisterSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CashRegisterSessions.
+     */
+    distinct?: CashRegisterSessionScalarFieldEnum | CashRegisterSessionScalarFieldEnum[]
+  }
+
+  /**
+   * CashRegisterSession findFirstOrThrow
+   */
+  export type CashRegisterSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashRegisterSession to fetch.
+     */
+    where?: CashRegisterSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashRegisterSessions to fetch.
+     */
+    orderBy?: CashRegisterSessionOrderByWithRelationInput | CashRegisterSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CashRegisterSessions.
+     */
+    cursor?: CashRegisterSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashRegisterSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashRegisterSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CashRegisterSessions.
+     */
+    distinct?: CashRegisterSessionScalarFieldEnum | CashRegisterSessionScalarFieldEnum[]
+  }
+
+  /**
+   * CashRegisterSession findMany
+   */
+  export type CashRegisterSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashRegisterSessions to fetch.
+     */
+    where?: CashRegisterSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashRegisterSessions to fetch.
+     */
+    orderBy?: CashRegisterSessionOrderByWithRelationInput | CashRegisterSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CashRegisterSessions.
+     */
+    cursor?: CashRegisterSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashRegisterSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashRegisterSessions.
+     */
+    skip?: number
+    distinct?: CashRegisterSessionScalarFieldEnum | CashRegisterSessionScalarFieldEnum[]
+  }
+
+  /**
+   * CashRegisterSession create
+   */
+  export type CashRegisterSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CashRegisterSession.
+     */
+    data: XOR<CashRegisterSessionCreateInput, CashRegisterSessionUncheckedCreateInput>
+  }
+
+  /**
+   * CashRegisterSession createMany
+   */
+  export type CashRegisterSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CashRegisterSessions.
+     */
+    data: CashRegisterSessionCreateManyInput | CashRegisterSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CashRegisterSession createManyAndReturn
+   */
+  export type CashRegisterSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many CashRegisterSessions.
+     */
+    data: CashRegisterSessionCreateManyInput | CashRegisterSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CashRegisterSession update
+   */
+  export type CashRegisterSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CashRegisterSession.
+     */
+    data: XOR<CashRegisterSessionUpdateInput, CashRegisterSessionUncheckedUpdateInput>
+    /**
+     * Choose, which CashRegisterSession to update.
+     */
+    where: CashRegisterSessionWhereUniqueInput
+  }
+
+  /**
+   * CashRegisterSession updateMany
+   */
+  export type CashRegisterSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CashRegisterSessions.
+     */
+    data: XOR<CashRegisterSessionUpdateManyMutationInput, CashRegisterSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which CashRegisterSessions to update
+     */
+    where?: CashRegisterSessionWhereInput
+  }
+
+  /**
+   * CashRegisterSession upsert
+   */
+  export type CashRegisterSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CashRegisterSession to update in case it exists.
+     */
+    where: CashRegisterSessionWhereUniqueInput
+    /**
+     * In case the CashRegisterSession found by the `where` argument doesn't exist, create a new CashRegisterSession with this data.
+     */
+    create: XOR<CashRegisterSessionCreateInput, CashRegisterSessionUncheckedCreateInput>
+    /**
+     * In case the CashRegisterSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CashRegisterSessionUpdateInput, CashRegisterSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * CashRegisterSession delete
+   */
+  export type CashRegisterSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+    /**
+     * Filter which CashRegisterSession to delete.
+     */
+    where: CashRegisterSessionWhereUniqueInput
+  }
+
+  /**
+   * CashRegisterSession deleteMany
+   */
+  export type CashRegisterSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CashRegisterSessions to delete
+     */
+    where?: CashRegisterSessionWhereInput
+  }
+
+  /**
+   * CashRegisterSession.transactions
+   */
+  export type CashRegisterSession$transactionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    where?: CashTransactionWhereInput
+    orderBy?: CashTransactionOrderByWithRelationInput | CashTransactionOrderByWithRelationInput[]
+    cursor?: CashTransactionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CashTransactionScalarFieldEnum | CashTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CashRegisterSession without action
+   */
+  export type CashRegisterSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashRegisterSession
+     */
+    select?: CashRegisterSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashRegisterSessionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CashTransaction
+   */
+
+  export type AggregateCashTransaction = {
+    _count: CashTransactionCountAggregateOutputType | null
+    _avg: CashTransactionAvgAggregateOutputType | null
+    _sum: CashTransactionSumAggregateOutputType | null
+    _min: CashTransactionMinAggregateOutputType | null
+    _max: CashTransactionMaxAggregateOutputType | null
+  }
+
+  export type CashTransactionAvgAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type CashTransactionSumAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type CashTransactionMinAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    studentProfileId: string | null
+    type: $Enums.CashMovementType | null
+    category: $Enums.CashCategory | null
+    paymentMethod: $Enums.PaymentMethod | null
+    amount: Decimal | null
+    description: string | null
+    recordedById: string | null
+    createdAt: Date | null
+  }
+
+  export type CashTransactionMaxAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    studentProfileId: string | null
+    type: $Enums.CashMovementType | null
+    category: $Enums.CashCategory | null
+    paymentMethod: $Enums.PaymentMethod | null
+    amount: Decimal | null
+    description: string | null
+    recordedById: string | null
+    createdAt: Date | null
+  }
+
+  export type CashTransactionCountAggregateOutputType = {
+    id: number
+    sessionId: number
+    studentProfileId: number
+    type: number
+    category: number
+    paymentMethod: number
+    amount: number
+    description: number
+    recordedById: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type CashTransactionAvgAggregateInputType = {
+    amount?: true
+  }
+
+  export type CashTransactionSumAggregateInputType = {
+    amount?: true
+  }
+
+  export type CashTransactionMinAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    type?: true
+    category?: true
+    paymentMethod?: true
+    amount?: true
+    description?: true
+    recordedById?: true
+    createdAt?: true
+  }
+
+  export type CashTransactionMaxAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    type?: true
+    category?: true
+    paymentMethod?: true
+    amount?: true
+    description?: true
+    recordedById?: true
+    createdAt?: true
+  }
+
+  export type CashTransactionCountAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    type?: true
+    category?: true
+    paymentMethod?: true
+    amount?: true
+    description?: true
+    recordedById?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type CashTransactionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CashTransaction to aggregate.
+     */
+    where?: CashTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashTransactions to fetch.
+     */
+    orderBy?: CashTransactionOrderByWithRelationInput | CashTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CashTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CashTransactions
+    **/
+    _count?: true | CashTransactionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CashTransactionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CashTransactionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CashTransactionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CashTransactionMaxAggregateInputType
+  }
+
+  export type GetCashTransactionAggregateType<T extends CashTransactionAggregateArgs> = {
+        [P in keyof T & keyof AggregateCashTransaction]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCashTransaction[P]>
+      : GetScalarType<T[P], AggregateCashTransaction[P]>
+  }
+
+
+
+
+  export type CashTransactionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CashTransactionWhereInput
+    orderBy?: CashTransactionOrderByWithAggregationInput | CashTransactionOrderByWithAggregationInput[]
+    by: CashTransactionScalarFieldEnum[] | CashTransactionScalarFieldEnum
+    having?: CashTransactionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CashTransactionCountAggregateInputType | true
+    _avg?: CashTransactionAvgAggregateInputType
+    _sum?: CashTransactionSumAggregateInputType
+    _min?: CashTransactionMinAggregateInputType
+    _max?: CashTransactionMaxAggregateInputType
+  }
+
+  export type CashTransactionGroupByOutputType = {
+    id: string
+    sessionId: string
+    studentProfileId: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal
+    description: string
+    recordedById: string
+    createdAt: Date
+    _count: CashTransactionCountAggregateOutputType | null
+    _avg: CashTransactionAvgAggregateOutputType | null
+    _sum: CashTransactionSumAggregateOutputType | null
+    _min: CashTransactionMinAggregateOutputType | null
+    _max: CashTransactionMaxAggregateOutputType | null
+  }
+
+  type GetCashTransactionGroupByPayload<T extends CashTransactionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CashTransactionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CashTransactionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CashTransactionGroupByOutputType[P]>
+            : GetScalarType<T[P], CashTransactionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CashTransactionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    type?: boolean
+    category?: boolean
+    paymentMethod?: boolean
+    amount?: boolean
+    description?: boolean
+    recordedById?: boolean
+    createdAt?: boolean
+    session?: boolean | CashRegisterSessionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["cashTransaction"]>
+
+  export type CashTransactionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    type?: boolean
+    category?: boolean
+    paymentMethod?: boolean
+    amount?: boolean
+    description?: boolean
+    recordedById?: boolean
+    createdAt?: boolean
+    session?: boolean | CashRegisterSessionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["cashTransaction"]>
+
+  export type CashTransactionSelectScalar = {
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    type?: boolean
+    category?: boolean
+    paymentMethod?: boolean
+    amount?: boolean
+    description?: boolean
+    recordedById?: boolean
+    createdAt?: boolean
+  }
+
+  export type CashTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | CashRegisterSessionDefaultArgs<ExtArgs>
+  }
+  export type CashTransactionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | CashRegisterSessionDefaultArgs<ExtArgs>
+  }
+
+  export type $CashTransactionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CashTransaction"
+    objects: {
+      session: Prisma.$CashRegisterSessionPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sessionId: string
+      /**
+       * Optional link if transaction is associated with a student
+       */
+      studentProfileId: string | null
+      type: $Enums.CashMovementType
+      category: $Enums.CashCategory
+      paymentMethod: $Enums.PaymentMethod
+      amount: Prisma.Decimal
+      description: string
+      /**
+       * User ID of the staff member who registered the transaction
+       */
+      recordedById: string
+      createdAt: Date
+    }, ExtArgs["result"]["cashTransaction"]>
+    composites: {}
+  }
+
+  type CashTransactionGetPayload<S extends boolean | null | undefined | CashTransactionDefaultArgs> = $Result.GetResult<Prisma.$CashTransactionPayload, S>
+
+  type CashTransactionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<CashTransactionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: CashTransactionCountAggregateInputType | true
+    }
+
+  export interface CashTransactionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CashTransaction'], meta: { name: 'CashTransaction' } }
+    /**
+     * Find zero or one CashTransaction that matches the filter.
+     * @param {CashTransactionFindUniqueArgs} args - Arguments to find a CashTransaction
+     * @example
+     * // Get one CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CashTransactionFindUniqueArgs>(args: SelectSubset<T, CashTransactionFindUniqueArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one CashTransaction that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {CashTransactionFindUniqueOrThrowArgs} args - Arguments to find a CashTransaction
+     * @example
+     * // Get one CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CashTransactionFindUniqueOrThrowArgs>(args: SelectSubset<T, CashTransactionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first CashTransaction that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionFindFirstArgs} args - Arguments to find a CashTransaction
+     * @example
+     * // Get one CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CashTransactionFindFirstArgs>(args?: SelectSubset<T, CashTransactionFindFirstArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first CashTransaction that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionFindFirstOrThrowArgs} args - Arguments to find a CashTransaction
+     * @example
+     * // Get one CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CashTransactionFindFirstOrThrowArgs>(args?: SelectSubset<T, CashTransactionFindFirstOrThrowArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more CashTransactions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CashTransactions
+     * const cashTransactions = await prisma.cashTransaction.findMany()
+     * 
+     * // Get first 10 CashTransactions
+     * const cashTransactions = await prisma.cashTransaction.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const cashTransactionWithIdOnly = await prisma.cashTransaction.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CashTransactionFindManyArgs>(args?: SelectSubset<T, CashTransactionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a CashTransaction.
+     * @param {CashTransactionCreateArgs} args - Arguments to create a CashTransaction.
+     * @example
+     * // Create one CashTransaction
+     * const CashTransaction = await prisma.cashTransaction.create({
+     *   data: {
+     *     // ... data to create a CashTransaction
+     *   }
+     * })
+     * 
+     */
+    create<T extends CashTransactionCreateArgs>(args: SelectSubset<T, CashTransactionCreateArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many CashTransactions.
+     * @param {CashTransactionCreateManyArgs} args - Arguments to create many CashTransactions.
+     * @example
+     * // Create many CashTransactions
+     * const cashTransaction = await prisma.cashTransaction.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CashTransactionCreateManyArgs>(args?: SelectSubset<T, CashTransactionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CashTransactions and returns the data saved in the database.
+     * @param {CashTransactionCreateManyAndReturnArgs} args - Arguments to create many CashTransactions.
+     * @example
+     * // Create many CashTransactions
+     * const cashTransaction = await prisma.cashTransaction.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CashTransactions and only return the `id`
+     * const cashTransactionWithIdOnly = await prisma.cashTransaction.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CashTransactionCreateManyAndReturnArgs>(args?: SelectSubset<T, CashTransactionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a CashTransaction.
+     * @param {CashTransactionDeleteArgs} args - Arguments to delete one CashTransaction.
+     * @example
+     * // Delete one CashTransaction
+     * const CashTransaction = await prisma.cashTransaction.delete({
+     *   where: {
+     *     // ... filter to delete one CashTransaction
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CashTransactionDeleteArgs>(args: SelectSubset<T, CashTransactionDeleteArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one CashTransaction.
+     * @param {CashTransactionUpdateArgs} args - Arguments to update one CashTransaction.
+     * @example
+     * // Update one CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CashTransactionUpdateArgs>(args: SelectSubset<T, CashTransactionUpdateArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more CashTransactions.
+     * @param {CashTransactionDeleteManyArgs} args - Arguments to filter CashTransactions to delete.
+     * @example
+     * // Delete a few CashTransactions
+     * const { count } = await prisma.cashTransaction.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CashTransactionDeleteManyArgs>(args?: SelectSubset<T, CashTransactionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CashTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CashTransactions
+     * const cashTransaction = await prisma.cashTransaction.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CashTransactionUpdateManyArgs>(args: SelectSubset<T, CashTransactionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CashTransaction.
+     * @param {CashTransactionUpsertArgs} args - Arguments to update or create a CashTransaction.
+     * @example
+     * // Update or create a CashTransaction
+     * const cashTransaction = await prisma.cashTransaction.upsert({
+     *   create: {
+     *     // ... data to create a CashTransaction
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CashTransaction we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CashTransactionUpsertArgs>(args: SelectSubset<T, CashTransactionUpsertArgs<ExtArgs>>): Prisma__CashTransactionClient<$Result.GetResult<Prisma.$CashTransactionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of CashTransactions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionCountArgs} args - Arguments to filter CashTransactions to count.
+     * @example
+     * // Count the number of CashTransactions
+     * const count = await prisma.cashTransaction.count({
+     *   where: {
+     *     // ... the filter for the CashTransactions we want to count
+     *   }
+     * })
+    **/
+    count<T extends CashTransactionCountArgs>(
+      args?: Subset<T, CashTransactionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CashTransactionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CashTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CashTransactionAggregateArgs>(args: Subset<T, CashTransactionAggregateArgs>): Prisma.PrismaPromise<GetCashTransactionAggregateType<T>>
+
+    /**
+     * Group by CashTransaction.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CashTransactionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CashTransactionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CashTransactionGroupByArgs['orderBy'] }
+        : { orderBy?: CashTransactionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CashTransactionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCashTransactionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CashTransaction model
+   */
+  readonly fields: CashTransactionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CashTransaction.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CashTransactionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    session<T extends CashRegisterSessionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CashRegisterSessionDefaultArgs<ExtArgs>>): Prisma__CashRegisterSessionClient<$Result.GetResult<Prisma.$CashRegisterSessionPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CashTransaction model
+   */ 
+  interface CashTransactionFieldRefs {
+    readonly id: FieldRef<"CashTransaction", 'String'>
+    readonly sessionId: FieldRef<"CashTransaction", 'String'>
+    readonly studentProfileId: FieldRef<"CashTransaction", 'String'>
+    readonly type: FieldRef<"CashTransaction", 'CashMovementType'>
+    readonly category: FieldRef<"CashTransaction", 'CashCategory'>
+    readonly paymentMethod: FieldRef<"CashTransaction", 'PaymentMethod'>
+    readonly amount: FieldRef<"CashTransaction", 'Decimal'>
+    readonly description: FieldRef<"CashTransaction", 'String'>
+    readonly recordedById: FieldRef<"CashTransaction", 'String'>
+    readonly createdAt: FieldRef<"CashTransaction", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CashTransaction findUnique
+   */
+  export type CashTransactionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashTransaction to fetch.
+     */
+    where: CashTransactionWhereUniqueInput
+  }
+
+  /**
+   * CashTransaction findUniqueOrThrow
+   */
+  export type CashTransactionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashTransaction to fetch.
+     */
+    where: CashTransactionWhereUniqueInput
+  }
+
+  /**
+   * CashTransaction findFirst
+   */
+  export type CashTransactionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashTransaction to fetch.
+     */
+    where?: CashTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashTransactions to fetch.
+     */
+    orderBy?: CashTransactionOrderByWithRelationInput | CashTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CashTransactions.
+     */
+    cursor?: CashTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CashTransactions.
+     */
+    distinct?: CashTransactionScalarFieldEnum | CashTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CashTransaction findFirstOrThrow
+   */
+  export type CashTransactionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashTransaction to fetch.
+     */
+    where?: CashTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashTransactions to fetch.
+     */
+    orderBy?: CashTransactionOrderByWithRelationInput | CashTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CashTransactions.
+     */
+    cursor?: CashTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashTransactions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CashTransactions.
+     */
+    distinct?: CashTransactionScalarFieldEnum | CashTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CashTransaction findMany
+   */
+  export type CashTransactionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter, which CashTransactions to fetch.
+     */
+    where?: CashTransactionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CashTransactions to fetch.
+     */
+    orderBy?: CashTransactionOrderByWithRelationInput | CashTransactionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CashTransactions.
+     */
+    cursor?: CashTransactionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CashTransactions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CashTransactions.
+     */
+    skip?: number
+    distinct?: CashTransactionScalarFieldEnum | CashTransactionScalarFieldEnum[]
+  }
+
+  /**
+   * CashTransaction create
+   */
+  export type CashTransactionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CashTransaction.
+     */
+    data: XOR<CashTransactionCreateInput, CashTransactionUncheckedCreateInput>
+  }
+
+  /**
+   * CashTransaction createMany
+   */
+  export type CashTransactionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CashTransactions.
+     */
+    data: CashTransactionCreateManyInput | CashTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CashTransaction createManyAndReturn
+   */
+  export type CashTransactionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many CashTransactions.
+     */
+    data: CashTransactionCreateManyInput | CashTransactionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CashTransaction update
+   */
+  export type CashTransactionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CashTransaction.
+     */
+    data: XOR<CashTransactionUpdateInput, CashTransactionUncheckedUpdateInput>
+    /**
+     * Choose, which CashTransaction to update.
+     */
+    where: CashTransactionWhereUniqueInput
+  }
+
+  /**
+   * CashTransaction updateMany
+   */
+  export type CashTransactionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CashTransactions.
+     */
+    data: XOR<CashTransactionUpdateManyMutationInput, CashTransactionUncheckedUpdateManyInput>
+    /**
+     * Filter which CashTransactions to update
+     */
+    where?: CashTransactionWhereInput
+  }
+
+  /**
+   * CashTransaction upsert
+   */
+  export type CashTransactionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CashTransaction to update in case it exists.
+     */
+    where: CashTransactionWhereUniqueInput
+    /**
+     * In case the CashTransaction found by the `where` argument doesn't exist, create a new CashTransaction with this data.
+     */
+    create: XOR<CashTransactionCreateInput, CashTransactionUncheckedCreateInput>
+    /**
+     * In case the CashTransaction was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CashTransactionUpdateInput, CashTransactionUncheckedUpdateInput>
+  }
+
+  /**
+   * CashTransaction delete
+   */
+  export type CashTransactionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+    /**
+     * Filter which CashTransaction to delete.
+     */
+    where: CashTransactionWhereUniqueInput
+  }
+
+  /**
+   * CashTransaction deleteMany
+   */
+  export type CashTransactionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CashTransactions to delete
+     */
+    where?: CashTransactionWhereInput
+  }
+
+  /**
+   * CashTransaction without action
+   */
+  export type CashTransactionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CashTransaction
+     */
+    select?: CashTransactionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CashTransactionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BankMandate
+   */
+
+  export type AggregateBankMandate = {
+    _count: BankMandateCountAggregateOutputType | null
+    _min: BankMandateMinAggregateOutputType | null
+    _max: BankMandateMaxAggregateOutputType | null
+  }
+
+  export type BankMandateMinAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    iban: string | null
+    bic: string | null
+    mandateReference: string | null
+    signatureDate: Date | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BankMandateMaxAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    iban: string | null
+    bic: string | null
+    mandateReference: string | null
+    signatureDate: Date | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BankMandateCountAggregateOutputType = {
+    id: number
+    studentProfileId: number
+    iban: number
+    bic: number
+    mandateReference: number
+    signatureDate: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BankMandateMinAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    iban?: true
+    bic?: true
+    mandateReference?: true
+    signatureDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BankMandateMaxAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    iban?: true
+    bic?: true
+    mandateReference?: true
+    signatureDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BankMandateCountAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    iban?: true
+    bic?: true
+    mandateReference?: true
+    signatureDate?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BankMandateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BankMandate to aggregate.
+     */
+    where?: BankMandateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankMandates to fetch.
+     */
+    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BankMandateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankMandates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankMandates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BankMandates
+    **/
+    _count?: true | BankMandateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BankMandateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BankMandateMaxAggregateInputType
+  }
+
+  export type GetBankMandateAggregateType<T extends BankMandateAggregateArgs> = {
+        [P in keyof T & keyof AggregateBankMandate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBankMandate[P]>
+      : GetScalarType<T[P], AggregateBankMandate[P]>
+  }
+
+
+
+
+  export type BankMandateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BankMandateWhereInput
+    orderBy?: BankMandateOrderByWithAggregationInput | BankMandateOrderByWithAggregationInput[]
+    by: BankMandateScalarFieldEnum[] | BankMandateScalarFieldEnum
+    having?: BankMandateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BankMandateCountAggregateInputType | true
+    _min?: BankMandateMinAggregateInputType
+    _max?: BankMandateMaxAggregateInputType
+  }
+
+  export type BankMandateGroupByOutputType = {
+    id: string
+    studentProfileId: string
+    iban: string
+    bic: string | null
+    mandateReference: string
+    signatureDate: Date
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: BankMandateCountAggregateOutputType | null
+    _min: BankMandateMinAggregateOutputType | null
+    _max: BankMandateMaxAggregateOutputType | null
+  }
+
+  type GetBankMandateGroupByPayload<T extends BankMandateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BankMandateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BankMandateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BankMandateGroupByOutputType[P]>
+            : GetScalarType<T[P], BankMandateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BankMandateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    iban?: boolean
+    bic?: boolean
+    mandateReference?: boolean
+    signatureDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    remittanceItems?: boolean | BankMandate$remittanceItemsArgs<ExtArgs>
+    _count?: boolean | BankMandateCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bankMandate"]>
+
+  export type BankMandateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    iban?: boolean
+    bic?: boolean
+    mandateReference?: boolean
+    signatureDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bankMandate"]>
+
+  export type BankMandateSelectScalar = {
+    id?: boolean
+    studentProfileId?: boolean
+    iban?: boolean
+    bic?: boolean
+    mandateReference?: boolean
+    signatureDate?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BankMandateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    remittanceItems?: boolean | BankMandate$remittanceItemsArgs<ExtArgs>
+    _count?: boolean | BankMandateCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type BankMandateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  }
+
+  export type $BankMandatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BankMandate"
+    objects: {
+      student: Prisma.$StudentProfilePayload<ExtArgs>
+      remittanceItems: Prisma.$RemittanceItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentProfileId: string
+      /**
+       * Debtor IBAN account number
+       */
+      iban: string
+      /**
+       * BIC / SWIFT code of the debtor bank
+       */
+      bic: string | null
+      /**
+       * Unique mandate reference code required by SEPA
+       */
+      mandateReference: string
+      /**
+       * Date when the mandate was signed
+       */
+      signatureDate: Date
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["bankMandate"]>
+    composites: {}
+  }
+
+  type BankMandateGetPayload<S extends boolean | null | undefined | BankMandateDefaultArgs> = $Result.GetResult<Prisma.$BankMandatePayload, S>
+
+  type BankMandateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<BankMandateFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: BankMandateCountAggregateInputType | true
+    }
+
+  export interface BankMandateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BankMandate'], meta: { name: 'BankMandate' } }
+    /**
+     * Find zero or one BankMandate that matches the filter.
+     * @param {BankMandateFindUniqueArgs} args - Arguments to find a BankMandate
+     * @example
+     * // Get one BankMandate
+     * const bankMandate = await prisma.bankMandate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BankMandateFindUniqueArgs>(args: SelectSubset<T, BankMandateFindUniqueArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one BankMandate that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {BankMandateFindUniqueOrThrowArgs} args - Arguments to find a BankMandate
+     * @example
+     * // Get one BankMandate
+     * const bankMandate = await prisma.bankMandate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BankMandateFindUniqueOrThrowArgs>(args: SelectSubset<T, BankMandateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first BankMandate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateFindFirstArgs} args - Arguments to find a BankMandate
+     * @example
+     * // Get one BankMandate
+     * const bankMandate = await prisma.bankMandate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BankMandateFindFirstArgs>(args?: SelectSubset<T, BankMandateFindFirstArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first BankMandate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateFindFirstOrThrowArgs} args - Arguments to find a BankMandate
+     * @example
+     * // Get one BankMandate
+     * const bankMandate = await prisma.bankMandate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BankMandateFindFirstOrThrowArgs>(args?: SelectSubset<T, BankMandateFindFirstOrThrowArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more BankMandates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BankMandates
+     * const bankMandates = await prisma.bankMandate.findMany()
+     * 
+     * // Get first 10 BankMandates
+     * const bankMandates = await prisma.bankMandate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const bankMandateWithIdOnly = await prisma.bankMandate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BankMandateFindManyArgs>(args?: SelectSubset<T, BankMandateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a BankMandate.
+     * @param {BankMandateCreateArgs} args - Arguments to create a BankMandate.
+     * @example
+     * // Create one BankMandate
+     * const BankMandate = await prisma.bankMandate.create({
+     *   data: {
+     *     // ... data to create a BankMandate
+     *   }
+     * })
+     * 
+     */
+    create<T extends BankMandateCreateArgs>(args: SelectSubset<T, BankMandateCreateArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many BankMandates.
+     * @param {BankMandateCreateManyArgs} args - Arguments to create many BankMandates.
+     * @example
+     * // Create many BankMandates
+     * const bankMandate = await prisma.bankMandate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BankMandateCreateManyArgs>(args?: SelectSubset<T, BankMandateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BankMandates and returns the data saved in the database.
+     * @param {BankMandateCreateManyAndReturnArgs} args - Arguments to create many BankMandates.
+     * @example
+     * // Create many BankMandates
+     * const bankMandate = await prisma.bankMandate.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BankMandates and only return the `id`
+     * const bankMandateWithIdOnly = await prisma.bankMandate.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BankMandateCreateManyAndReturnArgs>(args?: SelectSubset<T, BankMandateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a BankMandate.
+     * @param {BankMandateDeleteArgs} args - Arguments to delete one BankMandate.
+     * @example
+     * // Delete one BankMandate
+     * const BankMandate = await prisma.bankMandate.delete({
+     *   where: {
+     *     // ... filter to delete one BankMandate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BankMandateDeleteArgs>(args: SelectSubset<T, BankMandateDeleteArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one BankMandate.
+     * @param {BankMandateUpdateArgs} args - Arguments to update one BankMandate.
+     * @example
+     * // Update one BankMandate
+     * const bankMandate = await prisma.bankMandate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BankMandateUpdateArgs>(args: SelectSubset<T, BankMandateUpdateArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more BankMandates.
+     * @param {BankMandateDeleteManyArgs} args - Arguments to filter BankMandates to delete.
+     * @example
+     * // Delete a few BankMandates
+     * const { count } = await prisma.bankMandate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BankMandateDeleteManyArgs>(args?: SelectSubset<T, BankMandateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BankMandates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BankMandates
+     * const bankMandate = await prisma.bankMandate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BankMandateUpdateManyArgs>(args: SelectSubset<T, BankMandateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one BankMandate.
+     * @param {BankMandateUpsertArgs} args - Arguments to update or create a BankMandate.
+     * @example
+     * // Update or create a BankMandate
+     * const bankMandate = await prisma.bankMandate.upsert({
+     *   create: {
+     *     // ... data to create a BankMandate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BankMandate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BankMandateUpsertArgs>(args: SelectSubset<T, BankMandateUpsertArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of BankMandates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateCountArgs} args - Arguments to filter BankMandates to count.
+     * @example
+     * // Count the number of BankMandates
+     * const count = await prisma.bankMandate.count({
+     *   where: {
+     *     // ... the filter for the BankMandates we want to count
+     *   }
+     * })
+    **/
+    count<T extends BankMandateCountArgs>(
+      args?: Subset<T, BankMandateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BankMandateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BankMandate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BankMandateAggregateArgs>(args: Subset<T, BankMandateAggregateArgs>): Prisma.PrismaPromise<GetBankMandateAggregateType<T>>
+
+    /**
+     * Group by BankMandate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BankMandateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BankMandateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BankMandateGroupByArgs['orderBy'] }
+        : { orderBy?: BankMandateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BankMandateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBankMandateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BankMandate model
+   */
+  readonly fields: BankMandateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BankMandate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BankMandateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    remittanceItems<T extends BankMandate$remittanceItemsArgs<ExtArgs> = {}>(args?: Subset<T, BankMandate$remittanceItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BankMandate model
+   */ 
+  interface BankMandateFieldRefs {
+    readonly id: FieldRef<"BankMandate", 'String'>
+    readonly studentProfileId: FieldRef<"BankMandate", 'String'>
+    readonly iban: FieldRef<"BankMandate", 'String'>
+    readonly bic: FieldRef<"BankMandate", 'String'>
+    readonly mandateReference: FieldRef<"BankMandate", 'String'>
+    readonly signatureDate: FieldRef<"BankMandate", 'DateTime'>
+    readonly isActive: FieldRef<"BankMandate", 'Boolean'>
+    readonly createdAt: FieldRef<"BankMandate", 'DateTime'>
+    readonly updatedAt: FieldRef<"BankMandate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BankMandate findUnique
+   */
+  export type BankMandateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter, which BankMandate to fetch.
+     */
+    where: BankMandateWhereUniqueInput
+  }
+
+  /**
+   * BankMandate findUniqueOrThrow
+   */
+  export type BankMandateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter, which BankMandate to fetch.
+     */
+    where: BankMandateWhereUniqueInput
+  }
+
+  /**
+   * BankMandate findFirst
+   */
+  export type BankMandateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter, which BankMandate to fetch.
+     */
+    where?: BankMandateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankMandates to fetch.
+     */
+    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BankMandates.
+     */
+    cursor?: BankMandateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankMandates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankMandates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankMandates.
+     */
+    distinct?: BankMandateScalarFieldEnum | BankMandateScalarFieldEnum[]
+  }
+
+  /**
+   * BankMandate findFirstOrThrow
+   */
+  export type BankMandateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter, which BankMandate to fetch.
+     */
+    where?: BankMandateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankMandates to fetch.
+     */
+    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BankMandates.
+     */
+    cursor?: BankMandateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankMandates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankMandates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BankMandates.
+     */
+    distinct?: BankMandateScalarFieldEnum | BankMandateScalarFieldEnum[]
+  }
+
+  /**
+   * BankMandate findMany
+   */
+  export type BankMandateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter, which BankMandates to fetch.
+     */
+    where?: BankMandateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BankMandates to fetch.
+     */
+    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BankMandates.
+     */
+    cursor?: BankMandateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BankMandates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BankMandates.
+     */
+    skip?: number
+    distinct?: BankMandateScalarFieldEnum | BankMandateScalarFieldEnum[]
+  }
+
+  /**
+   * BankMandate create
+   */
+  export type BankMandateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BankMandate.
+     */
+    data: XOR<BankMandateCreateInput, BankMandateUncheckedCreateInput>
+  }
+
+  /**
+   * BankMandate createMany
+   */
+  export type BankMandateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BankMandates.
+     */
+    data: BankMandateCreateManyInput | BankMandateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BankMandate createManyAndReturn
+   */
+  export type BankMandateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many BankMandates.
+     */
+    data: BankMandateCreateManyInput | BankMandateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BankMandate update
+   */
+  export type BankMandateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BankMandate.
+     */
+    data: XOR<BankMandateUpdateInput, BankMandateUncheckedUpdateInput>
+    /**
+     * Choose, which BankMandate to update.
+     */
+    where: BankMandateWhereUniqueInput
+  }
+
+  /**
+   * BankMandate updateMany
+   */
+  export type BankMandateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BankMandates.
+     */
+    data: XOR<BankMandateUpdateManyMutationInput, BankMandateUncheckedUpdateManyInput>
+    /**
+     * Filter which BankMandates to update
+     */
+    where?: BankMandateWhereInput
+  }
+
+  /**
+   * BankMandate upsert
+   */
+  export type BankMandateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BankMandate to update in case it exists.
+     */
+    where: BankMandateWhereUniqueInput
+    /**
+     * In case the BankMandate found by the `where` argument doesn't exist, create a new BankMandate with this data.
+     */
+    create: XOR<BankMandateCreateInput, BankMandateUncheckedCreateInput>
+    /**
+     * In case the BankMandate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BankMandateUpdateInput, BankMandateUncheckedUpdateInput>
+  }
+
+  /**
+   * BankMandate delete
+   */
+  export type BankMandateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+    /**
+     * Filter which BankMandate to delete.
+     */
+    where: BankMandateWhereUniqueInput
+  }
+
+  /**
+   * BankMandate deleteMany
+   */
+  export type BankMandateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BankMandates to delete
+     */
+    where?: BankMandateWhereInput
+  }
+
+  /**
+   * BankMandate.remittanceItems
+   */
+  export type BankMandate$remittanceItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    where?: RemittanceItemWhereInput
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    cursor?: RemittanceItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RemittanceItemScalarFieldEnum | RemittanceItemScalarFieldEnum[]
+  }
+
+  /**
+   * BankMandate without action
+   */
+  export type BankMandateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BankMandate
+     */
+    select?: BankMandateSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BankMandateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RemittanceBatch
+   */
+
+  export type AggregateRemittanceBatch = {
+    _count: RemittanceBatchCountAggregateOutputType | null
+    _avg: RemittanceBatchAvgAggregateOutputType | null
+    _sum: RemittanceBatchSumAggregateOutputType | null
+    _min: RemittanceBatchMinAggregateOutputType | null
+    _max: RemittanceBatchMaxAggregateOutputType | null
+  }
+
+  export type RemittanceBatchAvgAggregateOutputType = {
+    totalAmount: Decimal | null
+    totalItems: number | null
+  }
+
+  export type RemittanceBatchSumAggregateOutputType = {
+    totalAmount: Decimal | null
+    totalItems: number | null
+  }
+
+  export type RemittanceBatchMinAggregateOutputType = {
+    id: string | null
+    batchReference: string | null
+    executionDate: Date | null
+    totalAmount: Decimal | null
+    totalItems: number | null
+    status: $Enums.RemittanceStatus | null
+    generatedById: string | null
+    filePath: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RemittanceBatchMaxAggregateOutputType = {
+    id: string | null
+    batchReference: string | null
+    executionDate: Date | null
+    totalAmount: Decimal | null
+    totalItems: number | null
+    status: $Enums.RemittanceStatus | null
+    generatedById: string | null
+    filePath: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RemittanceBatchCountAggregateOutputType = {
+    id: number
+    batchReference: number
+    executionDate: number
+    totalAmount: number
+    totalItems: number
+    status: number
+    generatedById: number
+    filePath: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RemittanceBatchAvgAggregateInputType = {
+    totalAmount?: true
+    totalItems?: true
+  }
+
+  export type RemittanceBatchSumAggregateInputType = {
+    totalAmount?: true
+    totalItems?: true
+  }
+
+  export type RemittanceBatchMinAggregateInputType = {
+    id?: true
+    batchReference?: true
+    executionDate?: true
+    totalAmount?: true
+    totalItems?: true
+    status?: true
+    generatedById?: true
+    filePath?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RemittanceBatchMaxAggregateInputType = {
+    id?: true
+    batchReference?: true
+    executionDate?: true
+    totalAmount?: true
+    totalItems?: true
+    status?: true
+    generatedById?: true
+    filePath?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RemittanceBatchCountAggregateInputType = {
+    id?: true
+    batchReference?: true
+    executionDate?: true
+    totalAmount?: true
+    totalItems?: true
+    status?: true
+    generatedById?: true
+    filePath?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RemittanceBatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RemittanceBatch to aggregate.
+     */
+    where?: RemittanceBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceBatches to fetch.
+     */
+    orderBy?: RemittanceBatchOrderByWithRelationInput | RemittanceBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RemittanceBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RemittanceBatches
+    **/
+    _count?: true | RemittanceBatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RemittanceBatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RemittanceBatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RemittanceBatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RemittanceBatchMaxAggregateInputType
+  }
+
+  export type GetRemittanceBatchAggregateType<T extends RemittanceBatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateRemittanceBatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRemittanceBatch[P]>
+      : GetScalarType<T[P], AggregateRemittanceBatch[P]>
+  }
+
+
+
+
+  export type RemittanceBatchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RemittanceBatchWhereInput
+    orderBy?: RemittanceBatchOrderByWithAggregationInput | RemittanceBatchOrderByWithAggregationInput[]
+    by: RemittanceBatchScalarFieldEnum[] | RemittanceBatchScalarFieldEnum
+    having?: RemittanceBatchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RemittanceBatchCountAggregateInputType | true
+    _avg?: RemittanceBatchAvgAggregateInputType
+    _sum?: RemittanceBatchSumAggregateInputType
+    _min?: RemittanceBatchMinAggregateInputType
+    _max?: RemittanceBatchMaxAggregateInputType
+  }
+
+  export type RemittanceBatchGroupByOutputType = {
+    id: string
+    batchReference: string
+    executionDate: Date
+    totalAmount: Decimal
+    totalItems: number
+    status: $Enums.RemittanceStatus
+    generatedById: string
+    filePath: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: RemittanceBatchCountAggregateOutputType | null
+    _avg: RemittanceBatchAvgAggregateOutputType | null
+    _sum: RemittanceBatchSumAggregateOutputType | null
+    _min: RemittanceBatchMinAggregateOutputType | null
+    _max: RemittanceBatchMaxAggregateOutputType | null
+  }
+
+  type GetRemittanceBatchGroupByPayload<T extends RemittanceBatchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RemittanceBatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RemittanceBatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RemittanceBatchGroupByOutputType[P]>
+            : GetScalarType<T[P], RemittanceBatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RemittanceBatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchReference?: boolean
+    executionDate?: boolean
+    totalAmount?: boolean
+    totalItems?: boolean
+    status?: boolean
+    generatedById?: boolean
+    filePath?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    items?: boolean | RemittanceBatch$itemsArgs<ExtArgs>
+    _count?: boolean | RemittanceBatchCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["remittanceBatch"]>
+
+  export type RemittanceBatchSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchReference?: boolean
+    executionDate?: boolean
+    totalAmount?: boolean
+    totalItems?: boolean
+    status?: boolean
+    generatedById?: boolean
+    filePath?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["remittanceBatch"]>
+
+  export type RemittanceBatchSelectScalar = {
+    id?: boolean
+    batchReference?: boolean
+    executionDate?: boolean
+    totalAmount?: boolean
+    totalItems?: boolean
+    status?: boolean
+    generatedById?: boolean
+    filePath?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RemittanceBatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | RemittanceBatch$itemsArgs<ExtArgs>
+    _count?: boolean | RemittanceBatchCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type RemittanceBatchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $RemittanceBatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RemittanceBatch"
+    objects: {
+      items: Prisma.$RemittanceItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * Unique reference for the remittance batch
+       */
+      batchReference: string
+      /**
+       * Planned execution date for bank collection
+       */
+      executionDate: Date
+      /**
+       * Total sum of all items in the batch
+       */
+      totalAmount: Prisma.Decimal
+      /**
+       * Total number of direct debit items
+       */
+      totalItems: number
+      status: $Enums.RemittanceStatus
+      /**
+       * User ID of the staff member who generated the file
+       */
+      generatedById: string
+      /**
+       * Storage path of the generated SEPA XML file
+       */
+      filePath: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["remittanceBatch"]>
+    composites: {}
+  }
+
+  type RemittanceBatchGetPayload<S extends boolean | null | undefined | RemittanceBatchDefaultArgs> = $Result.GetResult<Prisma.$RemittanceBatchPayload, S>
+
+  type RemittanceBatchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<RemittanceBatchFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: RemittanceBatchCountAggregateInputType | true
+    }
+
+  export interface RemittanceBatchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RemittanceBatch'], meta: { name: 'RemittanceBatch' } }
+    /**
+     * Find zero or one RemittanceBatch that matches the filter.
+     * @param {RemittanceBatchFindUniqueArgs} args - Arguments to find a RemittanceBatch
+     * @example
+     * // Get one RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RemittanceBatchFindUniqueArgs>(args: SelectSubset<T, RemittanceBatchFindUniqueArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one RemittanceBatch that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {RemittanceBatchFindUniqueOrThrowArgs} args - Arguments to find a RemittanceBatch
+     * @example
+     * // Get one RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RemittanceBatchFindUniqueOrThrowArgs>(args: SelectSubset<T, RemittanceBatchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first RemittanceBatch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchFindFirstArgs} args - Arguments to find a RemittanceBatch
+     * @example
+     * // Get one RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RemittanceBatchFindFirstArgs>(args?: SelectSubset<T, RemittanceBatchFindFirstArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first RemittanceBatch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchFindFirstOrThrowArgs} args - Arguments to find a RemittanceBatch
+     * @example
+     * // Get one RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RemittanceBatchFindFirstOrThrowArgs>(args?: SelectSubset<T, RemittanceBatchFindFirstOrThrowArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more RemittanceBatches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RemittanceBatches
+     * const remittanceBatches = await prisma.remittanceBatch.findMany()
+     * 
+     * // Get first 10 RemittanceBatches
+     * const remittanceBatches = await prisma.remittanceBatch.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const remittanceBatchWithIdOnly = await prisma.remittanceBatch.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RemittanceBatchFindManyArgs>(args?: SelectSubset<T, RemittanceBatchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a RemittanceBatch.
+     * @param {RemittanceBatchCreateArgs} args - Arguments to create a RemittanceBatch.
+     * @example
+     * // Create one RemittanceBatch
+     * const RemittanceBatch = await prisma.remittanceBatch.create({
+     *   data: {
+     *     // ... data to create a RemittanceBatch
+     *   }
+     * })
+     * 
+     */
+    create<T extends RemittanceBatchCreateArgs>(args: SelectSubset<T, RemittanceBatchCreateArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many RemittanceBatches.
+     * @param {RemittanceBatchCreateManyArgs} args - Arguments to create many RemittanceBatches.
+     * @example
+     * // Create many RemittanceBatches
+     * const remittanceBatch = await prisma.remittanceBatch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RemittanceBatchCreateManyArgs>(args?: SelectSubset<T, RemittanceBatchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RemittanceBatches and returns the data saved in the database.
+     * @param {RemittanceBatchCreateManyAndReturnArgs} args - Arguments to create many RemittanceBatches.
+     * @example
+     * // Create many RemittanceBatches
+     * const remittanceBatch = await prisma.remittanceBatch.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RemittanceBatches and only return the `id`
+     * const remittanceBatchWithIdOnly = await prisma.remittanceBatch.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RemittanceBatchCreateManyAndReturnArgs>(args?: SelectSubset<T, RemittanceBatchCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a RemittanceBatch.
+     * @param {RemittanceBatchDeleteArgs} args - Arguments to delete one RemittanceBatch.
+     * @example
+     * // Delete one RemittanceBatch
+     * const RemittanceBatch = await prisma.remittanceBatch.delete({
+     *   where: {
+     *     // ... filter to delete one RemittanceBatch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RemittanceBatchDeleteArgs>(args: SelectSubset<T, RemittanceBatchDeleteArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one RemittanceBatch.
+     * @param {RemittanceBatchUpdateArgs} args - Arguments to update one RemittanceBatch.
+     * @example
+     * // Update one RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RemittanceBatchUpdateArgs>(args: SelectSubset<T, RemittanceBatchUpdateArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more RemittanceBatches.
+     * @param {RemittanceBatchDeleteManyArgs} args - Arguments to filter RemittanceBatches to delete.
+     * @example
+     * // Delete a few RemittanceBatches
+     * const { count } = await prisma.remittanceBatch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RemittanceBatchDeleteManyArgs>(args?: SelectSubset<T, RemittanceBatchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RemittanceBatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RemittanceBatches
+     * const remittanceBatch = await prisma.remittanceBatch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RemittanceBatchUpdateManyArgs>(args: SelectSubset<T, RemittanceBatchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one RemittanceBatch.
+     * @param {RemittanceBatchUpsertArgs} args - Arguments to update or create a RemittanceBatch.
+     * @example
+     * // Update or create a RemittanceBatch
+     * const remittanceBatch = await prisma.remittanceBatch.upsert({
+     *   create: {
+     *     // ... data to create a RemittanceBatch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RemittanceBatch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RemittanceBatchUpsertArgs>(args: SelectSubset<T, RemittanceBatchUpsertArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of RemittanceBatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchCountArgs} args - Arguments to filter RemittanceBatches to count.
+     * @example
+     * // Count the number of RemittanceBatches
+     * const count = await prisma.remittanceBatch.count({
+     *   where: {
+     *     // ... the filter for the RemittanceBatches we want to count
+     *   }
+     * })
+    **/
+    count<T extends RemittanceBatchCountArgs>(
+      args?: Subset<T, RemittanceBatchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RemittanceBatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RemittanceBatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RemittanceBatchAggregateArgs>(args: Subset<T, RemittanceBatchAggregateArgs>): Prisma.PrismaPromise<GetRemittanceBatchAggregateType<T>>
+
+    /**
+     * Group by RemittanceBatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceBatchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RemittanceBatchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RemittanceBatchGroupByArgs['orderBy'] }
+        : { orderBy?: RemittanceBatchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RemittanceBatchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRemittanceBatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RemittanceBatch model
+   */
+  readonly fields: RemittanceBatchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RemittanceBatch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RemittanceBatchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    items<T extends RemittanceBatch$itemsArgs<ExtArgs> = {}>(args?: Subset<T, RemittanceBatch$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RemittanceBatch model
+   */ 
+  interface RemittanceBatchFieldRefs {
+    readonly id: FieldRef<"RemittanceBatch", 'String'>
+    readonly batchReference: FieldRef<"RemittanceBatch", 'String'>
+    readonly executionDate: FieldRef<"RemittanceBatch", 'DateTime'>
+    readonly totalAmount: FieldRef<"RemittanceBatch", 'Decimal'>
+    readonly totalItems: FieldRef<"RemittanceBatch", 'Int'>
+    readonly status: FieldRef<"RemittanceBatch", 'RemittanceStatus'>
+    readonly generatedById: FieldRef<"RemittanceBatch", 'String'>
+    readonly filePath: FieldRef<"RemittanceBatch", 'String'>
+    readonly createdAt: FieldRef<"RemittanceBatch", 'DateTime'>
+    readonly updatedAt: FieldRef<"RemittanceBatch", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RemittanceBatch findUnique
+   */
+  export type RemittanceBatchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceBatch to fetch.
+     */
+    where: RemittanceBatchWhereUniqueInput
+  }
+
+  /**
+   * RemittanceBatch findUniqueOrThrow
+   */
+  export type RemittanceBatchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceBatch to fetch.
+     */
+    where: RemittanceBatchWhereUniqueInput
+  }
+
+  /**
+   * RemittanceBatch findFirst
+   */
+  export type RemittanceBatchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceBatch to fetch.
+     */
+    where?: RemittanceBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceBatches to fetch.
+     */
+    orderBy?: RemittanceBatchOrderByWithRelationInput | RemittanceBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RemittanceBatches.
+     */
+    cursor?: RemittanceBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RemittanceBatches.
+     */
+    distinct?: RemittanceBatchScalarFieldEnum | RemittanceBatchScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceBatch findFirstOrThrow
+   */
+  export type RemittanceBatchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceBatch to fetch.
+     */
+    where?: RemittanceBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceBatches to fetch.
+     */
+    orderBy?: RemittanceBatchOrderByWithRelationInput | RemittanceBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RemittanceBatches.
+     */
+    cursor?: RemittanceBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RemittanceBatches.
+     */
+    distinct?: RemittanceBatchScalarFieldEnum | RemittanceBatchScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceBatch findMany
+   */
+  export type RemittanceBatchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceBatches to fetch.
+     */
+    where?: RemittanceBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceBatches to fetch.
+     */
+    orderBy?: RemittanceBatchOrderByWithRelationInput | RemittanceBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RemittanceBatches.
+     */
+    cursor?: RemittanceBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceBatches.
+     */
+    skip?: number
+    distinct?: RemittanceBatchScalarFieldEnum | RemittanceBatchScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceBatch create
+   */
+  export type RemittanceBatchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RemittanceBatch.
+     */
+    data: XOR<RemittanceBatchCreateInput, RemittanceBatchUncheckedCreateInput>
+  }
+
+  /**
+   * RemittanceBatch createMany
+   */
+  export type RemittanceBatchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RemittanceBatches.
+     */
+    data: RemittanceBatchCreateManyInput | RemittanceBatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RemittanceBatch createManyAndReturn
+   */
+  export type RemittanceBatchCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many RemittanceBatches.
+     */
+    data: RemittanceBatchCreateManyInput | RemittanceBatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RemittanceBatch update
+   */
+  export type RemittanceBatchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RemittanceBatch.
+     */
+    data: XOR<RemittanceBatchUpdateInput, RemittanceBatchUncheckedUpdateInput>
+    /**
+     * Choose, which RemittanceBatch to update.
+     */
+    where: RemittanceBatchWhereUniqueInput
+  }
+
+  /**
+   * RemittanceBatch updateMany
+   */
+  export type RemittanceBatchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RemittanceBatches.
+     */
+    data: XOR<RemittanceBatchUpdateManyMutationInput, RemittanceBatchUncheckedUpdateManyInput>
+    /**
+     * Filter which RemittanceBatches to update
+     */
+    where?: RemittanceBatchWhereInput
+  }
+
+  /**
+   * RemittanceBatch upsert
+   */
+  export type RemittanceBatchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RemittanceBatch to update in case it exists.
+     */
+    where: RemittanceBatchWhereUniqueInput
+    /**
+     * In case the RemittanceBatch found by the `where` argument doesn't exist, create a new RemittanceBatch with this data.
+     */
+    create: XOR<RemittanceBatchCreateInput, RemittanceBatchUncheckedCreateInput>
+    /**
+     * In case the RemittanceBatch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RemittanceBatchUpdateInput, RemittanceBatchUncheckedUpdateInput>
+  }
+
+  /**
+   * RemittanceBatch delete
+   */
+  export type RemittanceBatchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+    /**
+     * Filter which RemittanceBatch to delete.
+     */
+    where: RemittanceBatchWhereUniqueInput
+  }
+
+  /**
+   * RemittanceBatch deleteMany
+   */
+  export type RemittanceBatchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RemittanceBatches to delete
+     */
+    where?: RemittanceBatchWhereInput
+  }
+
+  /**
+   * RemittanceBatch.items
+   */
+  export type RemittanceBatch$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    where?: RemittanceItemWhereInput
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    cursor?: RemittanceItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RemittanceItemScalarFieldEnum | RemittanceItemScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceBatch without action
+   */
+  export type RemittanceBatchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceBatch
+     */
+    select?: RemittanceBatchSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceBatchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model RemittanceItem
+   */
+
+  export type AggregateRemittanceItem = {
+    _count: RemittanceItemCountAggregateOutputType | null
+    _avg: RemittanceItemAvgAggregateOutputType | null
+    _sum: RemittanceItemSumAggregateOutputType | null
+    _min: RemittanceItemMinAggregateOutputType | null
+    _max: RemittanceItemMaxAggregateOutputType | null
+  }
+
+  export type RemittanceItemAvgAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type RemittanceItemSumAggregateOutputType = {
+    amount: Decimal | null
+  }
+
+  export type RemittanceItemMinAggregateOutputType = {
+    id: string | null
+    batchId: string | null
+    mandateId: string | null
+    amount: Decimal | null
+    status: $Enums.RemittanceItemStatus | null
+    returnReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RemittanceItemMaxAggregateOutputType = {
+    id: string | null
+    batchId: string | null
+    mandateId: string | null
+    amount: Decimal | null
+    status: $Enums.RemittanceItemStatus | null
+    returnReason: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type RemittanceItemCountAggregateOutputType = {
+    id: number
+    batchId: number
+    mandateId: number
+    amount: number
+    status: number
+    returnReason: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type RemittanceItemAvgAggregateInputType = {
+    amount?: true
+  }
+
+  export type RemittanceItemSumAggregateInputType = {
+    amount?: true
+  }
+
+  export type RemittanceItemMinAggregateInputType = {
+    id?: true
+    batchId?: true
+    mandateId?: true
+    amount?: true
+    status?: true
+    returnReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RemittanceItemMaxAggregateInputType = {
+    id?: true
+    batchId?: true
+    mandateId?: true
+    amount?: true
+    status?: true
+    returnReason?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type RemittanceItemCountAggregateInputType = {
+    id?: true
+    batchId?: true
+    mandateId?: true
+    amount?: true
+    status?: true
+    returnReason?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type RemittanceItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RemittanceItem to aggregate.
+     */
+    where?: RemittanceItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceItems to fetch.
+     */
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: RemittanceItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned RemittanceItems
+    **/
+    _count?: true | RemittanceItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: RemittanceItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: RemittanceItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: RemittanceItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: RemittanceItemMaxAggregateInputType
+  }
+
+  export type GetRemittanceItemAggregateType<T extends RemittanceItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateRemittanceItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateRemittanceItem[P]>
+      : GetScalarType<T[P], AggregateRemittanceItem[P]>
+  }
+
+
+
+
+  export type RemittanceItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RemittanceItemWhereInput
+    orderBy?: RemittanceItemOrderByWithAggregationInput | RemittanceItemOrderByWithAggregationInput[]
+    by: RemittanceItemScalarFieldEnum[] | RemittanceItemScalarFieldEnum
+    having?: RemittanceItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: RemittanceItemCountAggregateInputType | true
+    _avg?: RemittanceItemAvgAggregateInputType
+    _sum?: RemittanceItemSumAggregateInputType
+    _min?: RemittanceItemMinAggregateInputType
+    _max?: RemittanceItemMaxAggregateInputType
+  }
+
+  export type RemittanceItemGroupByOutputType = {
+    id: string
+    batchId: string
+    mandateId: string
+    amount: Decimal
+    status: $Enums.RemittanceItemStatus
+    returnReason: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: RemittanceItemCountAggregateOutputType | null
+    _avg: RemittanceItemAvgAggregateOutputType | null
+    _sum: RemittanceItemSumAggregateOutputType | null
+    _min: RemittanceItemMinAggregateOutputType | null
+    _max: RemittanceItemMaxAggregateOutputType | null
+  }
+
+  type GetRemittanceItemGroupByPayload<T extends RemittanceItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<RemittanceItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof RemittanceItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], RemittanceItemGroupByOutputType[P]>
+            : GetScalarType<T[P], RemittanceItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type RemittanceItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchId?: boolean
+    mandateId?: boolean
+    amount?: boolean
+    status?: boolean
+    returnReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | RemittanceBatchDefaultArgs<ExtArgs>
+    mandate?: boolean | BankMandateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["remittanceItem"]>
+
+  export type RemittanceItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchId?: boolean
+    mandateId?: boolean
+    amount?: boolean
+    status?: boolean
+    returnReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | RemittanceBatchDefaultArgs<ExtArgs>
+    mandate?: boolean | BankMandateDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["remittanceItem"]>
+
+  export type RemittanceItemSelectScalar = {
+    id?: boolean
+    batchId?: boolean
+    mandateId?: boolean
+    amount?: boolean
+    status?: boolean
+    returnReason?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type RemittanceItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | RemittanceBatchDefaultArgs<ExtArgs>
+    mandate?: boolean | BankMandateDefaultArgs<ExtArgs>
+  }
+  export type RemittanceItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | RemittanceBatchDefaultArgs<ExtArgs>
+    mandate?: boolean | BankMandateDefaultArgs<ExtArgs>
+  }
+
+  export type $RemittanceItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "RemittanceItem"
+    objects: {
+      batch: Prisma.$RemittanceBatchPayload<ExtArgs>
+      mandate: Prisma.$BankMandatePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      batchId: string
+      mandateId: string
+      amount: Prisma.Decimal
+      status: $Enums.RemittanceItemStatus
+      /**
+       * Reason code if payment is returned/rejected by the bank
+       */
+      returnReason: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["remittanceItem"]>
+    composites: {}
+  }
+
+  type RemittanceItemGetPayload<S extends boolean | null | undefined | RemittanceItemDefaultArgs> = $Result.GetResult<Prisma.$RemittanceItemPayload, S>
+
+  type RemittanceItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<RemittanceItemFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: RemittanceItemCountAggregateInputType | true
+    }
+
+  export interface RemittanceItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RemittanceItem'], meta: { name: 'RemittanceItem' } }
+    /**
+     * Find zero or one RemittanceItem that matches the filter.
+     * @param {RemittanceItemFindUniqueArgs} args - Arguments to find a RemittanceItem
+     * @example
+     * // Get one RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends RemittanceItemFindUniqueArgs>(args: SelectSubset<T, RemittanceItemFindUniqueArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one RemittanceItem that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {RemittanceItemFindUniqueOrThrowArgs} args - Arguments to find a RemittanceItem
+     * @example
+     * // Get one RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends RemittanceItemFindUniqueOrThrowArgs>(args: SelectSubset<T, RemittanceItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first RemittanceItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemFindFirstArgs} args - Arguments to find a RemittanceItem
+     * @example
+     * // Get one RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends RemittanceItemFindFirstArgs>(args?: SelectSubset<T, RemittanceItemFindFirstArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first RemittanceItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemFindFirstOrThrowArgs} args - Arguments to find a RemittanceItem
+     * @example
+     * // Get one RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends RemittanceItemFindFirstOrThrowArgs>(args?: SelectSubset<T, RemittanceItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more RemittanceItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all RemittanceItems
+     * const remittanceItems = await prisma.remittanceItem.findMany()
+     * 
+     * // Get first 10 RemittanceItems
+     * const remittanceItems = await prisma.remittanceItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const remittanceItemWithIdOnly = await prisma.remittanceItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends RemittanceItemFindManyArgs>(args?: SelectSubset<T, RemittanceItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a RemittanceItem.
+     * @param {RemittanceItemCreateArgs} args - Arguments to create a RemittanceItem.
+     * @example
+     * // Create one RemittanceItem
+     * const RemittanceItem = await prisma.remittanceItem.create({
+     *   data: {
+     *     // ... data to create a RemittanceItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends RemittanceItemCreateArgs>(args: SelectSubset<T, RemittanceItemCreateArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many RemittanceItems.
+     * @param {RemittanceItemCreateManyArgs} args - Arguments to create many RemittanceItems.
+     * @example
+     * // Create many RemittanceItems
+     * const remittanceItem = await prisma.remittanceItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends RemittanceItemCreateManyArgs>(args?: SelectSubset<T, RemittanceItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many RemittanceItems and returns the data saved in the database.
+     * @param {RemittanceItemCreateManyAndReturnArgs} args - Arguments to create many RemittanceItems.
+     * @example
+     * // Create many RemittanceItems
+     * const remittanceItem = await prisma.remittanceItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many RemittanceItems and only return the `id`
+     * const remittanceItemWithIdOnly = await prisma.remittanceItem.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends RemittanceItemCreateManyAndReturnArgs>(args?: SelectSubset<T, RemittanceItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a RemittanceItem.
+     * @param {RemittanceItemDeleteArgs} args - Arguments to delete one RemittanceItem.
+     * @example
+     * // Delete one RemittanceItem
+     * const RemittanceItem = await prisma.remittanceItem.delete({
+     *   where: {
+     *     // ... filter to delete one RemittanceItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends RemittanceItemDeleteArgs>(args: SelectSubset<T, RemittanceItemDeleteArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one RemittanceItem.
+     * @param {RemittanceItemUpdateArgs} args - Arguments to update one RemittanceItem.
+     * @example
+     * // Update one RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends RemittanceItemUpdateArgs>(args: SelectSubset<T, RemittanceItemUpdateArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more RemittanceItems.
+     * @param {RemittanceItemDeleteManyArgs} args - Arguments to filter RemittanceItems to delete.
+     * @example
+     * // Delete a few RemittanceItems
+     * const { count } = await prisma.remittanceItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends RemittanceItemDeleteManyArgs>(args?: SelectSubset<T, RemittanceItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more RemittanceItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many RemittanceItems
+     * const remittanceItem = await prisma.remittanceItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends RemittanceItemUpdateManyArgs>(args: SelectSubset<T, RemittanceItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one RemittanceItem.
+     * @param {RemittanceItemUpsertArgs} args - Arguments to update or create a RemittanceItem.
+     * @example
+     * // Update or create a RemittanceItem
+     * const remittanceItem = await prisma.remittanceItem.upsert({
+     *   create: {
+     *     // ... data to create a RemittanceItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the RemittanceItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends RemittanceItemUpsertArgs>(args: SelectSubset<T, RemittanceItemUpsertArgs<ExtArgs>>): Prisma__RemittanceItemClient<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of RemittanceItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemCountArgs} args - Arguments to filter RemittanceItems to count.
+     * @example
+     * // Count the number of RemittanceItems
+     * const count = await prisma.remittanceItem.count({
+     *   where: {
+     *     // ... the filter for the RemittanceItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends RemittanceItemCountArgs>(
+      args?: Subset<T, RemittanceItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], RemittanceItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a RemittanceItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends RemittanceItemAggregateArgs>(args: Subset<T, RemittanceItemAggregateArgs>): Prisma.PrismaPromise<GetRemittanceItemAggregateType<T>>
+
+    /**
+     * Group by RemittanceItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {RemittanceItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends RemittanceItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: RemittanceItemGroupByArgs['orderBy'] }
+        : { orderBy?: RemittanceItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, RemittanceItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRemittanceItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the RemittanceItem model
+   */
+  readonly fields: RemittanceItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for RemittanceItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__RemittanceItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    batch<T extends RemittanceBatchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RemittanceBatchDefaultArgs<ExtArgs>>): Prisma__RemittanceBatchClient<$Result.GetResult<Prisma.$RemittanceBatchPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    mandate<T extends BankMandateDefaultArgs<ExtArgs> = {}>(args?: Subset<T, BankMandateDefaultArgs<ExtArgs>>): Prisma__BankMandateClient<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the RemittanceItem model
+   */ 
+  interface RemittanceItemFieldRefs {
+    readonly id: FieldRef<"RemittanceItem", 'String'>
+    readonly batchId: FieldRef<"RemittanceItem", 'String'>
+    readonly mandateId: FieldRef<"RemittanceItem", 'String'>
+    readonly amount: FieldRef<"RemittanceItem", 'Decimal'>
+    readonly status: FieldRef<"RemittanceItem", 'RemittanceItemStatus'>
+    readonly returnReason: FieldRef<"RemittanceItem", 'String'>
+    readonly createdAt: FieldRef<"RemittanceItem", 'DateTime'>
+    readonly updatedAt: FieldRef<"RemittanceItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * RemittanceItem findUnique
+   */
+  export type RemittanceItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceItem to fetch.
+     */
+    where: RemittanceItemWhereUniqueInput
+  }
+
+  /**
+   * RemittanceItem findUniqueOrThrow
+   */
+  export type RemittanceItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceItem to fetch.
+     */
+    where: RemittanceItemWhereUniqueInput
+  }
+
+  /**
+   * RemittanceItem findFirst
+   */
+  export type RemittanceItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceItem to fetch.
+     */
+    where?: RemittanceItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceItems to fetch.
+     */
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RemittanceItems.
+     */
+    cursor?: RemittanceItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RemittanceItems.
+     */
+    distinct?: RemittanceItemScalarFieldEnum | RemittanceItemScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceItem findFirstOrThrow
+   */
+  export type RemittanceItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceItem to fetch.
+     */
+    where?: RemittanceItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceItems to fetch.
+     */
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for RemittanceItems.
+     */
+    cursor?: RemittanceItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of RemittanceItems.
+     */
+    distinct?: RemittanceItemScalarFieldEnum | RemittanceItemScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceItem findMany
+   */
+  export type RemittanceItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter, which RemittanceItems to fetch.
+     */
+    where?: RemittanceItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of RemittanceItems to fetch.
+     */
+    orderBy?: RemittanceItemOrderByWithRelationInput | RemittanceItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing RemittanceItems.
+     */
+    cursor?: RemittanceItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` RemittanceItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` RemittanceItems.
+     */
+    skip?: number
+    distinct?: RemittanceItemScalarFieldEnum | RemittanceItemScalarFieldEnum[]
+  }
+
+  /**
+   * RemittanceItem create
+   */
+  export type RemittanceItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a RemittanceItem.
+     */
+    data: XOR<RemittanceItemCreateInput, RemittanceItemUncheckedCreateInput>
+  }
+
+  /**
+   * RemittanceItem createMany
+   */
+  export type RemittanceItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many RemittanceItems.
+     */
+    data: RemittanceItemCreateManyInput | RemittanceItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * RemittanceItem createManyAndReturn
+   */
+  export type RemittanceItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many RemittanceItems.
+     */
+    data: RemittanceItemCreateManyInput | RemittanceItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * RemittanceItem update
+   */
+  export type RemittanceItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a RemittanceItem.
+     */
+    data: XOR<RemittanceItemUpdateInput, RemittanceItemUncheckedUpdateInput>
+    /**
+     * Choose, which RemittanceItem to update.
+     */
+    where: RemittanceItemWhereUniqueInput
+  }
+
+  /**
+   * RemittanceItem updateMany
+   */
+  export type RemittanceItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update RemittanceItems.
+     */
+    data: XOR<RemittanceItemUpdateManyMutationInput, RemittanceItemUncheckedUpdateManyInput>
+    /**
+     * Filter which RemittanceItems to update
+     */
+    where?: RemittanceItemWhereInput
+  }
+
+  /**
+   * RemittanceItem upsert
+   */
+  export type RemittanceItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the RemittanceItem to update in case it exists.
+     */
+    where: RemittanceItemWhereUniqueInput
+    /**
+     * In case the RemittanceItem found by the `where` argument doesn't exist, create a new RemittanceItem with this data.
+     */
+    create: XOR<RemittanceItemCreateInput, RemittanceItemUncheckedCreateInput>
+    /**
+     * In case the RemittanceItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<RemittanceItemUpdateInput, RemittanceItemUncheckedUpdateInput>
+  }
+
+  /**
+   * RemittanceItem delete
+   */
+  export type RemittanceItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
+    /**
+     * Filter which RemittanceItem to delete.
+     */
+    where: RemittanceItemWhereUniqueInput
+  }
+
+  /**
+   * RemittanceItem deleteMany
+   */
+  export type RemittanceItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which RemittanceItems to delete
+     */
+    where?: RemittanceItemWhereInput
+  }
+
+  /**
+   * RemittanceItem without action
+   */
+  export type RemittanceItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RemittanceItem
+     */
+    select?: RemittanceItemSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RemittanceItemInclude<ExtArgs> | null
   }
 
 
@@ -17237,24 +26618,152 @@ export namespace Prisma {
   export type PromotionRequestScalarFieldEnum = (typeof PromotionRequestScalarFieldEnum)[keyof typeof PromotionRequestScalarFieldEnum]
 
 
-  export const FeePlanScalarFieldEnum: {
+  export const FeeTierScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    monthlyPrice: 'monthlyPrice'
+    description: 'description',
+    baseAmount: 'baseAmount',
+    criteria: 'criteria',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
-  export type FeePlanScalarFieldEnum = (typeof FeePlanScalarFieldEnum)[keyof typeof FeePlanScalarFieldEnum]
+  export type FeeTierScalarFieldEnum = (typeof FeeTierScalarFieldEnum)[keyof typeof FeeTierScalarFieldEnum]
+
+
+  export const StudentFeeScalarFieldEnum: {
+    id: 'id',
+    studentProfileId: 'studentProfileId',
+    feeTierId: 'feeTierId',
+    customAmount: 'customAmount',
+    ipcApplied: 'ipcApplied',
+    effectiveFrom: 'effectiveFrom',
+    effectiveTo: 'effectiveTo',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type StudentFeeScalarFieldEnum = (typeof StudentFeeScalarFieldEnum)[keyof typeof StudentFeeScalarFieldEnum]
+
+
+  export const PromotionScalarFieldEnum: {
+    id: 'id',
+    code: 'code',
+    name: 'name',
+    description: 'description',
+    type: 'type',
+    category: 'category',
+    value: 'value',
+    startDate: 'startDate',
+    endDate: 'endDate',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PromotionScalarFieldEnum = (typeof PromotionScalarFieldEnum)[keyof typeof PromotionScalarFieldEnum]
+
+
+  export const StudentPromotionScalarFieldEnum: {
+    id: 'id',
+    studentProfileId: 'studentProfileId',
+    promotionId: 'promotionId',
+    assignedAt: 'assignedAt',
+    expiresAt: 'expiresAt'
+  };
+
+  export type StudentPromotionScalarFieldEnum = (typeof StudentPromotionScalarFieldEnum)[keyof typeof StudentPromotionScalarFieldEnum]
 
 
   export const StudentSubscriptionScalarFieldEnum: {
     id: 'id',
     studentProfileId: 'studentProfileId',
-    feePlanId: 'feePlanId',
-    isActive: 'isActive',
-    mandateReference: 'mandateReference'
+    feeTierId: 'feeTierId',
+    isActive: 'isActive'
   };
 
   export type StudentSubscriptionScalarFieldEnum = (typeof StudentSubscriptionScalarFieldEnum)[keyof typeof StudentSubscriptionScalarFieldEnum]
+
+
+  export const CashRegisterSessionScalarFieldEnum: {
+    id: 'id',
+    openedById: 'openedById',
+    closedById: 'closedById',
+    openingDate: 'openingDate',
+    closingDate: 'closingDate',
+    initialBalance: 'initialBalance',
+    expectedClosingBalance: 'expectedClosingBalance',
+    actualClosingBalance: 'actualClosingBalance',
+    discrepancy: 'discrepancy',
+    status: 'status',
+    notes: 'notes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CashRegisterSessionScalarFieldEnum = (typeof CashRegisterSessionScalarFieldEnum)[keyof typeof CashRegisterSessionScalarFieldEnum]
+
+
+  export const CashTransactionScalarFieldEnum: {
+    id: 'id',
+    sessionId: 'sessionId',
+    studentProfileId: 'studentProfileId',
+    type: 'type',
+    category: 'category',
+    paymentMethod: 'paymentMethod',
+    amount: 'amount',
+    description: 'description',
+    recordedById: 'recordedById',
+    createdAt: 'createdAt'
+  };
+
+  export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldEnum)[keyof typeof CashTransactionScalarFieldEnum]
+
+
+  export const BankMandateScalarFieldEnum: {
+    id: 'id',
+    studentProfileId: 'studentProfileId',
+    iban: 'iban',
+    bic: 'bic',
+    mandateReference: 'mandateReference',
+    signatureDate: 'signatureDate',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BankMandateScalarFieldEnum = (typeof BankMandateScalarFieldEnum)[keyof typeof BankMandateScalarFieldEnum]
+
+
+  export const RemittanceBatchScalarFieldEnum: {
+    id: 'id',
+    batchReference: 'batchReference',
+    executionDate: 'executionDate',
+    totalAmount: 'totalAmount',
+    totalItems: 'totalItems',
+    status: 'status',
+    generatedById: 'generatedById',
+    filePath: 'filePath',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RemittanceBatchScalarFieldEnum = (typeof RemittanceBatchScalarFieldEnum)[keyof typeof RemittanceBatchScalarFieldEnum]
+
+
+  export const RemittanceItemScalarFieldEnum: {
+    id: 'id',
+    batchId: 'batchId',
+    mandateId: 'mandateId',
+    amount: 'amount',
+    status: 'status',
+    returnReason: 'returnReason',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type RemittanceItemScalarFieldEnum = (typeof RemittanceItemScalarFieldEnum)[keyof typeof RemittanceItemScalarFieldEnum]
 
 
   export const FederationScalarFieldEnum: {
@@ -17291,6 +26800,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -17404,6 +26921,132 @@ export namespace Prisma {
    * Reference to a field of type 'RequestStatus[]'
    */
   export type ListEnumRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RequestStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal'
+   */
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal[]'
+   */
+  export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PromotionType'
+   */
+  export type EnumPromotionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'PromotionType[]'
+   */
+  export type ListEnumPromotionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PromotionCategory'
+   */
+  export type EnumPromotionCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'PromotionCategory[]'
+   */
+  export type ListEnumPromotionCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashSessionStatus'
+   */
+  export type EnumCashSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashSessionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashSessionStatus[]'
+   */
+  export type ListEnumCashSessionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashSessionStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashMovementType'
+   */
+  export type EnumCashMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashMovementType'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashMovementType[]'
+   */
+  export type ListEnumCashMovementTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashMovementType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashCategory'
+   */
+  export type EnumCashCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'CashCategory[]'
+   */
+  export type ListEnumCashCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CashCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentMethod'
+   */
+  export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'PaymentMethod[]'
+   */
+  export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RemittanceStatus'
+   */
+  export type EnumRemittanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RemittanceStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'RemittanceStatus[]'
+   */
+  export type ListEnumRemittanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RemittanceStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RemittanceItemStatus'
+   */
+  export type EnumRemittanceItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RemittanceItemStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'RemittanceItemStatus[]'
+   */
+  export type ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RemittanceItemStatus[]'>
     
 
 
@@ -17525,6 +27168,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
     licenses?: StudentLicenseListRelationFilter
+    studentFees?: StudentFeeListRelationFilter
+    studentPromotions?: StudentPromotionListRelationFilter
+    bankMandates?: BankMandateListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
@@ -17543,6 +27189,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestOrderByRelationAggregateInput
     subscriptions?: StudentSubscriptionOrderByRelationAggregateInput
     licenses?: StudentLicenseOrderByRelationAggregateInput
+    studentFees?: StudentFeeOrderByRelationAggregateInput
+    studentPromotions?: StudentPromotionOrderByRelationAggregateInput
+    bankMandates?: BankMandateOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -17564,6 +27213,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
     licenses?: StudentLicenseListRelationFilter
+    studentFees?: StudentFeeListRelationFilter
+    studentPromotions?: StudentPromotionListRelationFilter
+    bankMandates?: BankMandateListRelationFilter
   }, "id" | "userId">
 
   export type StudentProfileOrderByWithAggregationInput = {
@@ -18130,51 +27782,310 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"PromotionRequest"> | Date | string
   }
 
-  export type FeePlanWhereInput = {
-    AND?: FeePlanWhereInput | FeePlanWhereInput[]
-    OR?: FeePlanWhereInput[]
-    NOT?: FeePlanWhereInput | FeePlanWhereInput[]
-    id?: StringFilter<"FeePlan"> | string
-    name?: StringFilter<"FeePlan"> | string
-    monthlyPrice?: FloatFilter<"FeePlan"> | number
+  export type FeeTierWhereInput = {
+    AND?: FeeTierWhereInput | FeeTierWhereInput[]
+    OR?: FeeTierWhereInput[]
+    NOT?: FeeTierWhereInput | FeeTierWhereInput[]
+    id?: StringFilter<"FeeTier"> | string
+    name?: StringFilter<"FeeTier"> | string
+    description?: StringNullableFilter<"FeeTier"> | string | null
+    baseAmount?: DecimalFilter<"FeeTier"> | Decimal | DecimalJsLike | number | string
+    criteria?: JsonNullableFilter<"FeeTier">
+    isActive?: BoolFilter<"FeeTier"> | boolean
+    createdAt?: DateTimeFilter<"FeeTier"> | Date | string
+    updatedAt?: DateTimeFilter<"FeeTier"> | Date | string
+    studentFees?: StudentFeeListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
   }
 
-  export type FeePlanOrderByWithRelationInput = {
+  export type FeeTierOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    monthlyPrice?: SortOrder
+    description?: SortOrderInput | SortOrder
+    baseAmount?: SortOrder
+    criteria?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    studentFees?: StudentFeeOrderByRelationAggregateInput
     subscriptions?: StudentSubscriptionOrderByRelationAggregateInput
   }
 
-  export type FeePlanWhereUniqueInput = Prisma.AtLeast<{
+  export type FeeTierWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    AND?: FeePlanWhereInput | FeePlanWhereInput[]
-    OR?: FeePlanWhereInput[]
-    NOT?: FeePlanWhereInput | FeePlanWhereInput[]
-    name?: StringFilter<"FeePlan"> | string
-    monthlyPrice?: FloatFilter<"FeePlan"> | number
+    name?: string
+    AND?: FeeTierWhereInput | FeeTierWhereInput[]
+    OR?: FeeTierWhereInput[]
+    NOT?: FeeTierWhereInput | FeeTierWhereInput[]
+    description?: StringNullableFilter<"FeeTier"> | string | null
+    baseAmount?: DecimalFilter<"FeeTier"> | Decimal | DecimalJsLike | number | string
+    criteria?: JsonNullableFilter<"FeeTier">
+    isActive?: BoolFilter<"FeeTier"> | boolean
+    createdAt?: DateTimeFilter<"FeeTier"> | Date | string
+    updatedAt?: DateTimeFilter<"FeeTier"> | Date | string
+    studentFees?: StudentFeeListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
-  }, "id">
+  }, "id" | "name">
 
-  export type FeePlanOrderByWithAggregationInput = {
+  export type FeeTierOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    monthlyPrice?: SortOrder
-    _count?: FeePlanCountOrderByAggregateInput
-    _avg?: FeePlanAvgOrderByAggregateInput
-    _max?: FeePlanMaxOrderByAggregateInput
-    _min?: FeePlanMinOrderByAggregateInput
-    _sum?: FeePlanSumOrderByAggregateInput
+    description?: SortOrderInput | SortOrder
+    baseAmount?: SortOrder
+    criteria?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FeeTierCountOrderByAggregateInput
+    _avg?: FeeTierAvgOrderByAggregateInput
+    _max?: FeeTierMaxOrderByAggregateInput
+    _min?: FeeTierMinOrderByAggregateInput
+    _sum?: FeeTierSumOrderByAggregateInput
   }
 
-  export type FeePlanScalarWhereWithAggregatesInput = {
-    AND?: FeePlanScalarWhereWithAggregatesInput | FeePlanScalarWhereWithAggregatesInput[]
-    OR?: FeePlanScalarWhereWithAggregatesInput[]
-    NOT?: FeePlanScalarWhereWithAggregatesInput | FeePlanScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"FeePlan"> | string
-    name?: StringWithAggregatesFilter<"FeePlan"> | string
-    monthlyPrice?: FloatWithAggregatesFilter<"FeePlan"> | number
+  export type FeeTierScalarWhereWithAggregatesInput = {
+    AND?: FeeTierScalarWhereWithAggregatesInput | FeeTierScalarWhereWithAggregatesInput[]
+    OR?: FeeTierScalarWhereWithAggregatesInput[]
+    NOT?: FeeTierScalarWhereWithAggregatesInput | FeeTierScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FeeTier"> | string
+    name?: StringWithAggregatesFilter<"FeeTier"> | string
+    description?: StringNullableWithAggregatesFilter<"FeeTier"> | string | null
+    baseAmount?: DecimalWithAggregatesFilter<"FeeTier"> | Decimal | DecimalJsLike | number | string
+    criteria?: JsonNullableWithAggregatesFilter<"FeeTier">
+    isActive?: BoolWithAggregatesFilter<"FeeTier"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"FeeTier"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FeeTier"> | Date | string
+  }
+
+  export type StudentFeeWhereInput = {
+    AND?: StudentFeeWhereInput | StudentFeeWhereInput[]
+    OR?: StudentFeeWhereInput[]
+    NOT?: StudentFeeWhereInput | StudentFeeWhereInput[]
+    id?: StringFilter<"StudentFee"> | string
+    studentProfileId?: StringFilter<"StudentFee"> | string
+    feeTierId?: StringNullableFilter<"StudentFee"> | string | null
+    customAmount?: DecimalNullableFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFilter<"StudentFee"> | boolean
+    effectiveFrom?: DateTimeFilter<"StudentFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
+    createdAt?: DateTimeFilter<"StudentFee"> | Date | string
+    updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
+    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    feeTier?: XOR<FeeTierNullableRelationFilter, FeeTierWhereInput> | null
+  }
+
+  export type StudentFeeOrderByWithRelationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    feeTierId?: SortOrderInput | SortOrder
+    customAmount?: SortOrderInput | SortOrder
+    ipcApplied?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    student?: StudentProfileOrderByWithRelationInput
+    feeTier?: FeeTierOrderByWithRelationInput
+  }
+
+  export type StudentFeeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: StudentFeeWhereInput | StudentFeeWhereInput[]
+    OR?: StudentFeeWhereInput[]
+    NOT?: StudentFeeWhereInput | StudentFeeWhereInput[]
+    studentProfileId?: StringFilter<"StudentFee"> | string
+    feeTierId?: StringNullableFilter<"StudentFee"> | string | null
+    customAmount?: DecimalNullableFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFilter<"StudentFee"> | boolean
+    effectiveFrom?: DateTimeFilter<"StudentFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
+    createdAt?: DateTimeFilter<"StudentFee"> | Date | string
+    updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
+    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    feeTier?: XOR<FeeTierNullableRelationFilter, FeeTierWhereInput> | null
+  }, "id">
+
+  export type StudentFeeOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    feeTierId?: SortOrderInput | SortOrder
+    customAmount?: SortOrderInput | SortOrder
+    ipcApplied?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: StudentFeeCountOrderByAggregateInput
+    _avg?: StudentFeeAvgOrderByAggregateInput
+    _max?: StudentFeeMaxOrderByAggregateInput
+    _min?: StudentFeeMinOrderByAggregateInput
+    _sum?: StudentFeeSumOrderByAggregateInput
+  }
+
+  export type StudentFeeScalarWhereWithAggregatesInput = {
+    AND?: StudentFeeScalarWhereWithAggregatesInput | StudentFeeScalarWhereWithAggregatesInput[]
+    OR?: StudentFeeScalarWhereWithAggregatesInput[]
+    NOT?: StudentFeeScalarWhereWithAggregatesInput | StudentFeeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StudentFee"> | string
+    studentProfileId?: StringWithAggregatesFilter<"StudentFee"> | string
+    feeTierId?: StringNullableWithAggregatesFilter<"StudentFee"> | string | null
+    customAmount?: DecimalNullableWithAggregatesFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolWithAggregatesFilter<"StudentFee"> | boolean
+    effectiveFrom?: DateTimeWithAggregatesFilter<"StudentFee"> | Date | string
+    effectiveTo?: DateTimeNullableWithAggregatesFilter<"StudentFee"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"StudentFee"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"StudentFee"> | Date | string
+  }
+
+  export type PromotionWhereInput = {
+    AND?: PromotionWhereInput | PromotionWhereInput[]
+    OR?: PromotionWhereInput[]
+    NOT?: PromotionWhereInput | PromotionWhereInput[]
+    id?: StringFilter<"Promotion"> | string
+    code?: StringFilter<"Promotion"> | string
+    name?: StringFilter<"Promotion"> | string
+    description?: StringNullableFilter<"Promotion"> | string | null
+    type?: EnumPromotionTypeFilter<"Promotion"> | $Enums.PromotionType
+    category?: EnumPromotionCategoryFilter<"Promotion"> | $Enums.PromotionCategory
+    value?: DecimalNullableFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
+    isActive?: BoolFilter<"Promotion"> | boolean
+    createdAt?: DateTimeFilter<"Promotion"> | Date | string
+    updatedAt?: DateTimeFilter<"Promotion"> | Date | string
+    studentPromotions?: StudentPromotionListRelationFilter
+  }
+
+  export type PromotionOrderByWithRelationInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    value?: SortOrderInput | SortOrder
+    startDate?: SortOrderInput | SortOrder
+    endDate?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    studentPromotions?: StudentPromotionOrderByRelationAggregateInput
+  }
+
+  export type PromotionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    code?: string
+    AND?: PromotionWhereInput | PromotionWhereInput[]
+    OR?: PromotionWhereInput[]
+    NOT?: PromotionWhereInput | PromotionWhereInput[]
+    name?: StringFilter<"Promotion"> | string
+    description?: StringNullableFilter<"Promotion"> | string | null
+    type?: EnumPromotionTypeFilter<"Promotion"> | $Enums.PromotionType
+    category?: EnumPromotionCategoryFilter<"Promotion"> | $Enums.PromotionCategory
+    value?: DecimalNullableFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
+    isActive?: BoolFilter<"Promotion"> | boolean
+    createdAt?: DateTimeFilter<"Promotion"> | Date | string
+    updatedAt?: DateTimeFilter<"Promotion"> | Date | string
+    studentPromotions?: StudentPromotionListRelationFilter
+  }, "id" | "code">
+
+  export type PromotionOrderByWithAggregationInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrderInput | SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    value?: SortOrderInput | SortOrder
+    startDate?: SortOrderInput | SortOrder
+    endDate?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PromotionCountOrderByAggregateInput
+    _avg?: PromotionAvgOrderByAggregateInput
+    _max?: PromotionMaxOrderByAggregateInput
+    _min?: PromotionMinOrderByAggregateInput
+    _sum?: PromotionSumOrderByAggregateInput
+  }
+
+  export type PromotionScalarWhereWithAggregatesInput = {
+    AND?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
+    OR?: PromotionScalarWhereWithAggregatesInput[]
+    NOT?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Promotion"> | string
+    code?: StringWithAggregatesFilter<"Promotion"> | string
+    name?: StringWithAggregatesFilter<"Promotion"> | string
+    description?: StringNullableWithAggregatesFilter<"Promotion"> | string | null
+    type?: EnumPromotionTypeWithAggregatesFilter<"Promotion"> | $Enums.PromotionType
+    category?: EnumPromotionCategoryWithAggregatesFilter<"Promotion"> | $Enums.PromotionCategory
+    value?: DecimalNullableWithAggregatesFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableWithAggregatesFilter<"Promotion"> | Date | string | null
+    endDate?: DateTimeNullableWithAggregatesFilter<"Promotion"> | Date | string | null
+    isActive?: BoolWithAggregatesFilter<"Promotion"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
+  }
+
+  export type StudentPromotionWhereInput = {
+    AND?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
+    OR?: StudentPromotionWhereInput[]
+    NOT?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
+    id?: StringFilter<"StudentPromotion"> | string
+    studentProfileId?: StringFilter<"StudentPromotion"> | string
+    promotionId?: StringFilter<"StudentPromotion"> | string
+    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    promotion?: XOR<PromotionRelationFilter, PromotionWhereInput>
+  }
+
+  export type StudentPromotionOrderByWithRelationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    promotionId?: SortOrder
+    assignedAt?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    studentProfile?: StudentProfileOrderByWithRelationInput
+    promotion?: PromotionOrderByWithRelationInput
+  }
+
+  export type StudentPromotionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    studentProfileId_promotionId?: StudentPromotionStudentProfileIdPromotionIdCompoundUniqueInput
+    AND?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
+    OR?: StudentPromotionWhereInput[]
+    NOT?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
+    studentProfileId?: StringFilter<"StudentPromotion"> | string
+    promotionId?: StringFilter<"StudentPromotion"> | string
+    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    promotion?: XOR<PromotionRelationFilter, PromotionWhereInput>
+  }, "id" | "studentProfileId_promotionId">
+
+  export type StudentPromotionOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    promotionId?: SortOrder
+    assignedAt?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    _count?: StudentPromotionCountOrderByAggregateInput
+    _max?: StudentPromotionMaxOrderByAggregateInput
+    _min?: StudentPromotionMinOrderByAggregateInput
+  }
+
+  export type StudentPromotionScalarWhereWithAggregatesInput = {
+    AND?: StudentPromotionScalarWhereWithAggregatesInput | StudentPromotionScalarWhereWithAggregatesInput[]
+    OR?: StudentPromotionScalarWhereWithAggregatesInput[]
+    NOT?: StudentPromotionScalarWhereWithAggregatesInput | StudentPromotionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StudentPromotion"> | string
+    studentProfileId?: StringWithAggregatesFilter<"StudentPromotion"> | string
+    promotionId?: StringWithAggregatesFilter<"StudentPromotion"> | string
+    assignedAt?: DateTimeWithAggregatesFilter<"StudentPromotion"> | Date | string
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"StudentPromotion"> | Date | string | null
   }
 
   export type StudentSubscriptionWhereInput = {
@@ -18183,21 +28094,19 @@ export namespace Prisma {
     NOT?: StudentSubscriptionWhereInput | StudentSubscriptionWhereInput[]
     id?: StringFilter<"StudentSubscription"> | string
     studentProfileId?: StringFilter<"StudentSubscription"> | string
-    feePlanId?: StringFilter<"StudentSubscription"> | string
+    feeTierId?: StringFilter<"StudentSubscription"> | string
     isActive?: BoolFilter<"StudentSubscription"> | boolean
-    mandateReference?: StringNullableFilter<"StudentSubscription"> | string | null
     student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    feePlan?: XOR<FeePlanRelationFilter, FeePlanWhereInput>
+    feeTier?: XOR<FeeTierRelationFilter, FeeTierWhereInput>
   }
 
   export type StudentSubscriptionOrderByWithRelationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    feePlanId?: SortOrder
+    feeTierId?: SortOrder
     isActive?: SortOrder
-    mandateReference?: SortOrderInput | SortOrder
     student?: StudentProfileOrderByWithRelationInput
-    feePlan?: FeePlanOrderByWithRelationInput
+    feeTier?: FeeTierOrderByWithRelationInput
   }
 
   export type StudentSubscriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -18206,19 +28115,17 @@ export namespace Prisma {
     OR?: StudentSubscriptionWhereInput[]
     NOT?: StudentSubscriptionWhereInput | StudentSubscriptionWhereInput[]
     studentProfileId?: StringFilter<"StudentSubscription"> | string
-    feePlanId?: StringFilter<"StudentSubscription"> | string
+    feeTierId?: StringFilter<"StudentSubscription"> | string
     isActive?: BoolFilter<"StudentSubscription"> | boolean
-    mandateReference?: StringNullableFilter<"StudentSubscription"> | string | null
     student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    feePlan?: XOR<FeePlanRelationFilter, FeePlanWhereInput>
+    feeTier?: XOR<FeeTierRelationFilter, FeeTierWhereInput>
   }, "id">
 
   export type StudentSubscriptionOrderByWithAggregationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    feePlanId?: SortOrder
+    feeTierId?: SortOrder
     isActive?: SortOrder
-    mandateReference?: SortOrderInput | SortOrder
     _count?: StudentSubscriptionCountOrderByAggregateInput
     _max?: StudentSubscriptionMaxOrderByAggregateInput
     _min?: StudentSubscriptionMinOrderByAggregateInput
@@ -18230,9 +28137,422 @@ export namespace Prisma {
     NOT?: StudentSubscriptionScalarWhereWithAggregatesInput | StudentSubscriptionScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StudentSubscription"> | string
     studentProfileId?: StringWithAggregatesFilter<"StudentSubscription"> | string
-    feePlanId?: StringWithAggregatesFilter<"StudentSubscription"> | string
+    feeTierId?: StringWithAggregatesFilter<"StudentSubscription"> | string
     isActive?: BoolWithAggregatesFilter<"StudentSubscription"> | boolean
-    mandateReference?: StringNullableWithAggregatesFilter<"StudentSubscription"> | string | null
+  }
+
+  export type CashRegisterSessionWhereInput = {
+    AND?: CashRegisterSessionWhereInput | CashRegisterSessionWhereInput[]
+    OR?: CashRegisterSessionWhereInput[]
+    NOT?: CashRegisterSessionWhereInput | CashRegisterSessionWhereInput[]
+    id?: StringFilter<"CashRegisterSession"> | string
+    openedById?: StringFilter<"CashRegisterSession"> | string
+    closedById?: StringNullableFilter<"CashRegisterSession"> | string | null
+    openingDate?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    closingDate?: DateTimeNullableFilter<"CashRegisterSession"> | Date | string | null
+    initialBalance?: DecimalFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFilter<"CashRegisterSession"> | $Enums.CashSessionStatus
+    notes?: StringNullableFilter<"CashRegisterSession"> | string | null
+    createdAt?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    updatedAt?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    transactions?: CashTransactionListRelationFilter
+  }
+
+  export type CashRegisterSessionOrderByWithRelationInput = {
+    id?: SortOrder
+    openedById?: SortOrder
+    closedById?: SortOrderInput | SortOrder
+    openingDate?: SortOrder
+    closingDate?: SortOrderInput | SortOrder
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrderInput | SortOrder
+    actualClosingBalance?: SortOrderInput | SortOrder
+    discrepancy?: SortOrderInput | SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    transactions?: CashTransactionOrderByRelationAggregateInput
+  }
+
+  export type CashRegisterSessionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CashRegisterSessionWhereInput | CashRegisterSessionWhereInput[]
+    OR?: CashRegisterSessionWhereInput[]
+    NOT?: CashRegisterSessionWhereInput | CashRegisterSessionWhereInput[]
+    openedById?: StringFilter<"CashRegisterSession"> | string
+    closedById?: StringNullableFilter<"CashRegisterSession"> | string | null
+    openingDate?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    closingDate?: DateTimeNullableFilter<"CashRegisterSession"> | Date | string | null
+    initialBalance?: DecimalFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: DecimalNullableFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFilter<"CashRegisterSession"> | $Enums.CashSessionStatus
+    notes?: StringNullableFilter<"CashRegisterSession"> | string | null
+    createdAt?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    updatedAt?: DateTimeFilter<"CashRegisterSession"> | Date | string
+    transactions?: CashTransactionListRelationFilter
+  }, "id">
+
+  export type CashRegisterSessionOrderByWithAggregationInput = {
+    id?: SortOrder
+    openedById?: SortOrder
+    closedById?: SortOrderInput | SortOrder
+    openingDate?: SortOrder
+    closingDate?: SortOrderInput | SortOrder
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrderInput | SortOrder
+    actualClosingBalance?: SortOrderInput | SortOrder
+    discrepancy?: SortOrderInput | SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CashRegisterSessionCountOrderByAggregateInput
+    _avg?: CashRegisterSessionAvgOrderByAggregateInput
+    _max?: CashRegisterSessionMaxOrderByAggregateInput
+    _min?: CashRegisterSessionMinOrderByAggregateInput
+    _sum?: CashRegisterSessionSumOrderByAggregateInput
+  }
+
+  export type CashRegisterSessionScalarWhereWithAggregatesInput = {
+    AND?: CashRegisterSessionScalarWhereWithAggregatesInput | CashRegisterSessionScalarWhereWithAggregatesInput[]
+    OR?: CashRegisterSessionScalarWhereWithAggregatesInput[]
+    NOT?: CashRegisterSessionScalarWhereWithAggregatesInput | CashRegisterSessionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CashRegisterSession"> | string
+    openedById?: StringWithAggregatesFilter<"CashRegisterSession"> | string
+    closedById?: StringNullableWithAggregatesFilter<"CashRegisterSession"> | string | null
+    openingDate?: DateTimeWithAggregatesFilter<"CashRegisterSession"> | Date | string
+    closingDate?: DateTimeNullableWithAggregatesFilter<"CashRegisterSession"> | Date | string | null
+    initialBalance?: DecimalWithAggregatesFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: DecimalNullableWithAggregatesFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: DecimalNullableWithAggregatesFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: DecimalNullableWithAggregatesFilter<"CashRegisterSession"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusWithAggregatesFilter<"CashRegisterSession"> | $Enums.CashSessionStatus
+    notes?: StringNullableWithAggregatesFilter<"CashRegisterSession"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"CashRegisterSession"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CashRegisterSession"> | Date | string
+  }
+
+  export type CashTransactionWhereInput = {
+    AND?: CashTransactionWhereInput | CashTransactionWhereInput[]
+    OR?: CashTransactionWhereInput[]
+    NOT?: CashTransactionWhereInput | CashTransactionWhereInput[]
+    id?: StringFilter<"CashTransaction"> | string
+    sessionId?: StringFilter<"CashTransaction"> | string
+    studentProfileId?: StringNullableFilter<"CashTransaction"> | string | null
+    type?: EnumCashMovementTypeFilter<"CashTransaction"> | $Enums.CashMovementType
+    category?: EnumCashCategoryFilter<"CashTransaction"> | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFilter<"CashTransaction"> | $Enums.PaymentMethod
+    amount?: DecimalFilter<"CashTransaction"> | Decimal | DecimalJsLike | number | string
+    description?: StringFilter<"CashTransaction"> | string
+    recordedById?: StringFilter<"CashTransaction"> | string
+    createdAt?: DateTimeFilter<"CashTransaction"> | Date | string
+    session?: XOR<CashRegisterSessionRelationFilter, CashRegisterSessionWhereInput>
+  }
+
+  export type CashTransactionOrderByWithRelationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    paymentMethod?: SortOrder
+    amount?: SortOrder
+    description?: SortOrder
+    recordedById?: SortOrder
+    createdAt?: SortOrder
+    session?: CashRegisterSessionOrderByWithRelationInput
+  }
+
+  export type CashTransactionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CashTransactionWhereInput | CashTransactionWhereInput[]
+    OR?: CashTransactionWhereInput[]
+    NOT?: CashTransactionWhereInput | CashTransactionWhereInput[]
+    sessionId?: StringFilter<"CashTransaction"> | string
+    studentProfileId?: StringNullableFilter<"CashTransaction"> | string | null
+    type?: EnumCashMovementTypeFilter<"CashTransaction"> | $Enums.CashMovementType
+    category?: EnumCashCategoryFilter<"CashTransaction"> | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFilter<"CashTransaction"> | $Enums.PaymentMethod
+    amount?: DecimalFilter<"CashTransaction"> | Decimal | DecimalJsLike | number | string
+    description?: StringFilter<"CashTransaction"> | string
+    recordedById?: StringFilter<"CashTransaction"> | string
+    createdAt?: DateTimeFilter<"CashTransaction"> | Date | string
+    session?: XOR<CashRegisterSessionRelationFilter, CashRegisterSessionWhereInput>
+  }, "id">
+
+  export type CashTransactionOrderByWithAggregationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    paymentMethod?: SortOrder
+    amount?: SortOrder
+    description?: SortOrder
+    recordedById?: SortOrder
+    createdAt?: SortOrder
+    _count?: CashTransactionCountOrderByAggregateInput
+    _avg?: CashTransactionAvgOrderByAggregateInput
+    _max?: CashTransactionMaxOrderByAggregateInput
+    _min?: CashTransactionMinOrderByAggregateInput
+    _sum?: CashTransactionSumOrderByAggregateInput
+  }
+
+  export type CashTransactionScalarWhereWithAggregatesInput = {
+    AND?: CashTransactionScalarWhereWithAggregatesInput | CashTransactionScalarWhereWithAggregatesInput[]
+    OR?: CashTransactionScalarWhereWithAggregatesInput[]
+    NOT?: CashTransactionScalarWhereWithAggregatesInput | CashTransactionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CashTransaction"> | string
+    sessionId?: StringWithAggregatesFilter<"CashTransaction"> | string
+    studentProfileId?: StringNullableWithAggregatesFilter<"CashTransaction"> | string | null
+    type?: EnumCashMovementTypeWithAggregatesFilter<"CashTransaction"> | $Enums.CashMovementType
+    category?: EnumCashCategoryWithAggregatesFilter<"CashTransaction"> | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodWithAggregatesFilter<"CashTransaction"> | $Enums.PaymentMethod
+    amount?: DecimalWithAggregatesFilter<"CashTransaction"> | Decimal | DecimalJsLike | number | string
+    description?: StringWithAggregatesFilter<"CashTransaction"> | string
+    recordedById?: StringWithAggregatesFilter<"CashTransaction"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"CashTransaction"> | Date | string
+  }
+
+  export type BankMandateWhereInput = {
+    AND?: BankMandateWhereInput | BankMandateWhereInput[]
+    OR?: BankMandateWhereInput[]
+    NOT?: BankMandateWhereInput | BankMandateWhereInput[]
+    id?: StringFilter<"BankMandate"> | string
+    studentProfileId?: StringFilter<"BankMandate"> | string
+    iban?: StringFilter<"BankMandate"> | string
+    bic?: StringNullableFilter<"BankMandate"> | string | null
+    mandateReference?: StringFilter<"BankMandate"> | string
+    signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
+    isActive?: BoolFilter<"BankMandate"> | boolean
+    createdAt?: DateTimeFilter<"BankMandate"> | Date | string
+    updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
+    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    remittanceItems?: RemittanceItemListRelationFilter
+  }
+
+  export type BankMandateOrderByWithRelationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrderInput | SortOrder
+    mandateReference?: SortOrder
+    signatureDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    student?: StudentProfileOrderByWithRelationInput
+    remittanceItems?: RemittanceItemOrderByRelationAggregateInput
+  }
+
+  export type BankMandateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    mandateReference?: string
+    AND?: BankMandateWhereInput | BankMandateWhereInput[]
+    OR?: BankMandateWhereInput[]
+    NOT?: BankMandateWhereInput | BankMandateWhereInput[]
+    studentProfileId?: StringFilter<"BankMandate"> | string
+    iban?: StringFilter<"BankMandate"> | string
+    bic?: StringNullableFilter<"BankMandate"> | string | null
+    signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
+    isActive?: BoolFilter<"BankMandate"> | boolean
+    createdAt?: DateTimeFilter<"BankMandate"> | Date | string
+    updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
+    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    remittanceItems?: RemittanceItemListRelationFilter
+  }, "id" | "mandateReference">
+
+  export type BankMandateOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrderInput | SortOrder
+    mandateReference?: SortOrder
+    signatureDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BankMandateCountOrderByAggregateInput
+    _max?: BankMandateMaxOrderByAggregateInput
+    _min?: BankMandateMinOrderByAggregateInput
+  }
+
+  export type BankMandateScalarWhereWithAggregatesInput = {
+    AND?: BankMandateScalarWhereWithAggregatesInput | BankMandateScalarWhereWithAggregatesInput[]
+    OR?: BankMandateScalarWhereWithAggregatesInput[]
+    NOT?: BankMandateScalarWhereWithAggregatesInput | BankMandateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BankMandate"> | string
+    studentProfileId?: StringWithAggregatesFilter<"BankMandate"> | string
+    iban?: StringWithAggregatesFilter<"BankMandate"> | string
+    bic?: StringNullableWithAggregatesFilter<"BankMandate"> | string | null
+    mandateReference?: StringWithAggregatesFilter<"BankMandate"> | string
+    signatureDate?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
+    isActive?: BoolWithAggregatesFilter<"BankMandate"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
+  }
+
+  export type RemittanceBatchWhereInput = {
+    AND?: RemittanceBatchWhereInput | RemittanceBatchWhereInput[]
+    OR?: RemittanceBatchWhereInput[]
+    NOT?: RemittanceBatchWhereInput | RemittanceBatchWhereInput[]
+    id?: StringFilter<"RemittanceBatch"> | string
+    batchReference?: StringFilter<"RemittanceBatch"> | string
+    executionDate?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    totalAmount?: DecimalFilter<"RemittanceBatch"> | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFilter<"RemittanceBatch"> | number
+    status?: EnumRemittanceStatusFilter<"RemittanceBatch"> | $Enums.RemittanceStatus
+    generatedById?: StringFilter<"RemittanceBatch"> | string
+    filePath?: StringNullableFilter<"RemittanceBatch"> | string | null
+    createdAt?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    updatedAt?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    items?: RemittanceItemListRelationFilter
+  }
+
+  export type RemittanceBatchOrderByWithRelationInput = {
+    id?: SortOrder
+    batchReference?: SortOrder
+    executionDate?: SortOrder
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+    status?: SortOrder
+    generatedById?: SortOrder
+    filePath?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    items?: RemittanceItemOrderByRelationAggregateInput
+  }
+
+  export type RemittanceBatchWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    batchReference?: string
+    AND?: RemittanceBatchWhereInput | RemittanceBatchWhereInput[]
+    OR?: RemittanceBatchWhereInput[]
+    NOT?: RemittanceBatchWhereInput | RemittanceBatchWhereInput[]
+    executionDate?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    totalAmount?: DecimalFilter<"RemittanceBatch"> | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFilter<"RemittanceBatch"> | number
+    status?: EnumRemittanceStatusFilter<"RemittanceBatch"> | $Enums.RemittanceStatus
+    generatedById?: StringFilter<"RemittanceBatch"> | string
+    filePath?: StringNullableFilter<"RemittanceBatch"> | string | null
+    createdAt?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    updatedAt?: DateTimeFilter<"RemittanceBatch"> | Date | string
+    items?: RemittanceItemListRelationFilter
+  }, "id" | "batchReference">
+
+  export type RemittanceBatchOrderByWithAggregationInput = {
+    id?: SortOrder
+    batchReference?: SortOrder
+    executionDate?: SortOrder
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+    status?: SortOrder
+    generatedById?: SortOrder
+    filePath?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RemittanceBatchCountOrderByAggregateInput
+    _avg?: RemittanceBatchAvgOrderByAggregateInput
+    _max?: RemittanceBatchMaxOrderByAggregateInput
+    _min?: RemittanceBatchMinOrderByAggregateInput
+    _sum?: RemittanceBatchSumOrderByAggregateInput
+  }
+
+  export type RemittanceBatchScalarWhereWithAggregatesInput = {
+    AND?: RemittanceBatchScalarWhereWithAggregatesInput | RemittanceBatchScalarWhereWithAggregatesInput[]
+    OR?: RemittanceBatchScalarWhereWithAggregatesInput[]
+    NOT?: RemittanceBatchScalarWhereWithAggregatesInput | RemittanceBatchScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RemittanceBatch"> | string
+    batchReference?: StringWithAggregatesFilter<"RemittanceBatch"> | string
+    executionDate?: DateTimeWithAggregatesFilter<"RemittanceBatch"> | Date | string
+    totalAmount?: DecimalWithAggregatesFilter<"RemittanceBatch"> | Decimal | DecimalJsLike | number | string
+    totalItems?: IntWithAggregatesFilter<"RemittanceBatch"> | number
+    status?: EnumRemittanceStatusWithAggregatesFilter<"RemittanceBatch"> | $Enums.RemittanceStatus
+    generatedById?: StringWithAggregatesFilter<"RemittanceBatch"> | string
+    filePath?: StringNullableWithAggregatesFilter<"RemittanceBatch"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"RemittanceBatch"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RemittanceBatch"> | Date | string
+  }
+
+  export type RemittanceItemWhereInput = {
+    AND?: RemittanceItemWhereInput | RemittanceItemWhereInput[]
+    OR?: RemittanceItemWhereInput[]
+    NOT?: RemittanceItemWhereInput | RemittanceItemWhereInput[]
+    id?: StringFilter<"RemittanceItem"> | string
+    batchId?: StringFilter<"RemittanceItem"> | string
+    mandateId?: StringFilter<"RemittanceItem"> | string
+    amount?: DecimalFilter<"RemittanceItem"> | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFilter<"RemittanceItem"> | $Enums.RemittanceItemStatus
+    returnReason?: StringNullableFilter<"RemittanceItem"> | string | null
+    createdAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+    updatedAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+    batch?: XOR<RemittanceBatchRelationFilter, RemittanceBatchWhereInput>
+    mandate?: XOR<BankMandateRelationFilter, BankMandateWhereInput>
+  }
+
+  export type RemittanceItemOrderByWithRelationInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    mandateId?: SortOrder
+    amount?: SortOrder
+    status?: SortOrder
+    returnReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    batch?: RemittanceBatchOrderByWithRelationInput
+    mandate?: BankMandateOrderByWithRelationInput
+  }
+
+  export type RemittanceItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: RemittanceItemWhereInput | RemittanceItemWhereInput[]
+    OR?: RemittanceItemWhereInput[]
+    NOT?: RemittanceItemWhereInput | RemittanceItemWhereInput[]
+    batchId?: StringFilter<"RemittanceItem"> | string
+    mandateId?: StringFilter<"RemittanceItem"> | string
+    amount?: DecimalFilter<"RemittanceItem"> | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFilter<"RemittanceItem"> | $Enums.RemittanceItemStatus
+    returnReason?: StringNullableFilter<"RemittanceItem"> | string | null
+    createdAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+    updatedAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+    batch?: XOR<RemittanceBatchRelationFilter, RemittanceBatchWhereInput>
+    mandate?: XOR<BankMandateRelationFilter, BankMandateWhereInput>
+  }, "id">
+
+  export type RemittanceItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    mandateId?: SortOrder
+    amount?: SortOrder
+    status?: SortOrder
+    returnReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: RemittanceItemCountOrderByAggregateInput
+    _avg?: RemittanceItemAvgOrderByAggregateInput
+    _max?: RemittanceItemMaxOrderByAggregateInput
+    _min?: RemittanceItemMinOrderByAggregateInput
+    _sum?: RemittanceItemSumOrderByAggregateInput
+  }
+
+  export type RemittanceItemScalarWhereWithAggregatesInput = {
+    AND?: RemittanceItemScalarWhereWithAggregatesInput | RemittanceItemScalarWhereWithAggregatesInput[]
+    OR?: RemittanceItemScalarWhereWithAggregatesInput[]
+    NOT?: RemittanceItemScalarWhereWithAggregatesInput | RemittanceItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"RemittanceItem"> | string
+    batchId?: StringWithAggregatesFilter<"RemittanceItem"> | string
+    mandateId?: StringWithAggregatesFilter<"RemittanceItem"> | string
+    amount?: DecimalWithAggregatesFilter<"RemittanceItem"> | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusWithAggregatesFilter<"RemittanceItem"> | $Enums.RemittanceItemStatus
+    returnReason?: StringNullableWithAggregatesFilter<"RemittanceItem"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"RemittanceItem"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"RemittanceItem"> | Date | string
   }
 
   export type FederationWhereInput = {
@@ -18455,6 +28775,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
@@ -18472,6 +28795,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
@@ -18489,6 +28815,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
@@ -18506,6 +28835,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
@@ -19058,104 +29390,844 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type FeePlanCreateInput = {
+  export type FeeTierCreateInput = {
     id?: string
     name: string
-    monthlyPrice: number
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutFeePlanInput
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentFees?: StudentFeeCreateNestedManyWithoutFeeTierInput
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutFeeTierInput
   }
 
-  export type FeePlanUncheckedCreateInput = {
+  export type FeeTierUncheckedCreateInput = {
     id?: string
     name: string
-    monthlyPrice: number
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutFeePlanInput
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutFeeTierInput
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutFeeTierInput
   }
 
-  export type FeePlanUpdateInput = {
+  export type FeeTierUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
-    subscriptions?: StudentSubscriptionUpdateManyWithoutFeePlanNestedInput
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentFees?: StudentFeeUpdateManyWithoutFeeTierNestedInput
+    subscriptions?: StudentSubscriptionUpdateManyWithoutFeeTierNestedInput
   }
 
-  export type FeePlanUncheckedUpdateInput = {
+  export type FeeTierUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutFeePlanNestedInput
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutFeeTierNestedInput
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutFeeTierNestedInput
   }
 
-  export type FeePlanCreateManyInput = {
+  export type FeeTierCreateManyInput = {
     id?: string
     name: string
-    monthlyPrice: number
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type FeePlanUpdateManyMutationInput = {
+  export type FeeTierUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type FeePlanUncheckedUpdateManyInput = {
+  export type FeeTierUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentFeeCreateInput = {
+    id?: string
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutStudentFeesInput
+    feeTier?: FeeTierCreateNestedOneWithoutStudentFeesInput
+  }
+
+  export type StudentFeeUncheckedCreateInput = {
+    id?: string
+    studentProfileId: string
+    feeTierId?: string | null
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StudentFeeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput
+    feeTier?: FeeTierUpdateOneWithoutStudentFeesNestedInput
+  }
+
+  export type StudentFeeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentFeeCreateManyInput = {
+    id?: string
+    studentProfileId: string
+    feeTierId?: string | null
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StudentFeeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentFeeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PromotionCreateInput = {
+    id?: string
+    code: string
+    name: string
+    description?: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value?: Decimal | DecimalJsLike | number | string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutPromotionInput
+  }
+
+  export type PromotionUncheckedCreateInput = {
+    id?: string
+    code: string
+    name: string
+    description?: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value?: Decimal | DecimalJsLike | number | string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutPromotionInput
+  }
+
+  export type PromotionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentPromotions?: StudentPromotionUpdateManyWithoutPromotionNestedInput
+  }
+
+  export type PromotionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutPromotionNestedInput
+  }
+
+  export type PromotionCreateManyInput = {
+    id?: string
+    code: string
+    name: string
+    description?: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value?: Decimal | DecimalJsLike | number | string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PromotionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PromotionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentPromotionCreateInput = {
+    id?: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+    studentProfile: StudentProfileCreateNestedOneWithoutStudentPromotionsInput
+    promotion: PromotionCreateNestedOneWithoutStudentPromotionsInput
+  }
+
+  export type StudentPromotionUncheckedCreateInput = {
+    id?: string
+    studentProfileId: string
+    promotionId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type StudentPromotionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput
+    promotion?: PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput
+  }
+
+  export type StudentPromotionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    promotionId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type StudentPromotionCreateManyInput = {
+    id?: string
+    studentProfileId: string
+    promotionId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type StudentPromotionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type StudentPromotionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    promotionId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type StudentSubscriptionCreateInput = {
     id?: string
     isActive?: boolean
-    mandateReference?: string | null
     student: StudentProfileCreateNestedOneWithoutSubscriptionsInput
-    feePlan: FeePlanCreateNestedOneWithoutSubscriptionsInput
+    feeTier: FeeTierCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type StudentSubscriptionUncheckedCreateInput = {
     id?: string
     studentProfileId: string
-    feePlanId: string
+    feeTierId: string
     isActive?: boolean
-    mandateReference?: string | null
   }
 
   export type StudentSubscriptionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
     student?: StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput
-    feePlan?: FeePlanUpdateOneRequiredWithoutSubscriptionsNestedInput
+    feeTier?: FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
   export type StudentSubscriptionUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
-    feePlanId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StudentSubscriptionCreateManyInput = {
     id?: string
     studentProfileId: string
-    feePlanId: string
+    feeTierId: string
     isActive?: boolean
-    mandateReference?: string | null
   }
 
   export type StudentSubscriptionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StudentSubscriptionUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
-    feePlanId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type CashRegisterSessionCreateInput = {
+    id?: string
+    openedById: string
+    closedById?: string | null
+    openingDate?: Date | string
+    closingDate?: Date | string | null
+    initialBalance: Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    discrepancy?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.CashSessionStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transactions?: CashTransactionCreateNestedManyWithoutSessionInput
+  }
+
+  export type CashRegisterSessionUncheckedCreateInput = {
+    id?: string
+    openedById: string
+    closedById?: string | null
+    openingDate?: Date | string
+    closingDate?: Date | string | null
+    initialBalance: Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    discrepancy?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.CashSessionStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    transactions?: CashTransactionUncheckedCreateNestedManyWithoutSessionInput
+  }
+
+  export type CashRegisterSessionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: CashTransactionUpdateManyWithoutSessionNestedInput
+  }
+
+  export type CashRegisterSessionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    transactions?: CashTransactionUncheckedUpdateManyWithoutSessionNestedInput
+  }
+
+  export type CashRegisterSessionCreateManyInput = {
+    id?: string
+    openedById: string
+    closedById?: string | null
+    openingDate?: Date | string
+    closingDate?: Date | string | null
+    initialBalance: Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    discrepancy?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.CashSessionStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CashRegisterSessionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashRegisterSessionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashTransactionCreateInput = {
+    id?: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+    session: CashRegisterSessionCreateNestedOneWithoutTransactionsInput
+  }
+
+  export type CashTransactionUncheckedCreateInput = {
+    id?: string
+    sessionId: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+  }
+
+  export type CashTransactionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    session?: CashRegisterSessionUpdateOneRequiredWithoutTransactionsNestedInput
+  }
+
+  export type CashTransactionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashTransactionCreateManyInput = {
+    id?: string
+    sessionId: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+  }
+
+  export type CashTransactionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashTransactionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankMandateCreateInput = {
+    id?: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutBankMandatesInput
+    remittanceItems?: RemittanceItemCreateNestedManyWithoutMandateInput
+  }
+
+  export type BankMandateUncheckedCreateInput = {
+    id?: string
+    studentProfileId: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    remittanceItems?: RemittanceItemUncheckedCreateNestedManyWithoutMandateInput
+  }
+
+  export type BankMandateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput
+    remittanceItems?: RemittanceItemUpdateManyWithoutMandateNestedInput
+  }
+
+  export type BankMandateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remittanceItems?: RemittanceItemUncheckedUpdateManyWithoutMandateNestedInput
+  }
+
+  export type BankMandateCreateManyInput = {
+    id?: string
+    studentProfileId: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankMandateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankMandateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceBatchCreateInput = {
+    id?: string
+    batchReference: string
+    executionDate: Date | string
+    totalAmount: Decimal | DecimalJsLike | number | string
+    totalItems: number
+    status?: $Enums.RemittanceStatus
+    generatedById: string
+    filePath?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: RemittanceItemCreateNestedManyWithoutBatchInput
+  }
+
+  export type RemittanceBatchUncheckedCreateInput = {
+    id?: string
+    batchReference: string
+    executionDate: Date | string
+    totalAmount: Decimal | DecimalJsLike | number | string
+    totalItems: number
+    status?: $Enums.RemittanceStatus
+    generatedById: string
+    filePath?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: RemittanceItemUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type RemittanceBatchUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: RemittanceItemUpdateManyWithoutBatchNestedInput
+  }
+
+  export type RemittanceBatchUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: RemittanceItemUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type RemittanceBatchCreateManyInput = {
+    id?: string
+    batchReference: string
+    executionDate: Date | string
+    totalAmount: Decimal | DecimalJsLike | number | string
+    totalItems: number
+    status?: $Enums.RemittanceStatus
+    generatedById: string
+    filePath?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceBatchUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceBatchUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemCreateInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: RemittanceBatchCreateNestedOneWithoutItemsInput
+    mandate: BankMandateCreateNestedOneWithoutRemittanceItemsInput
+  }
+
+  export type RemittanceItemUncheckedCreateInput = {
+    id?: string
+    batchId: string
+    mandateId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: RemittanceBatchUpdateOneRequiredWithoutItemsNestedInput
+    mandate?: BankMandateUpdateOneRequiredWithoutRemittanceItemsNestedInput
+  }
+
+  export type RemittanceItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    mandateId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemCreateManyInput = {
+    id?: string
+    batchId: string
+    mandateId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    mandateId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FederationCreateInput = {
@@ -19464,6 +30536,24 @@ export namespace Prisma {
     none?: StudentLicenseWhereInput
   }
 
+  export type StudentFeeListRelationFilter = {
+    every?: StudentFeeWhereInput
+    some?: StudentFeeWhereInput
+    none?: StudentFeeWhereInput
+  }
+
+  export type StudentPromotionListRelationFilter = {
+    every?: StudentPromotionWhereInput
+    some?: StudentPromotionWhereInput
+    none?: StudentPromotionWhereInput
+  }
+
+  export type BankMandateListRelationFilter = {
+    every?: BankMandateWhereInput
+    some?: BankMandateWhereInput
+    none?: BankMandateWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -19486,6 +30576,18 @@ export namespace Prisma {
   }
 
   export type StudentLicenseOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StudentFeeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StudentPromotionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BankMandateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -19999,86 +31101,712 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+  export type JsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type FeePlanCountOrderByAggregateInput = {
+  export type FeeTierCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    monthlyPrice?: SortOrder
+    description?: SortOrder
+    baseAmount?: SortOrder
+    criteria?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type FeePlanAvgOrderByAggregateInput = {
-    monthlyPrice?: SortOrder
+  export type FeeTierAvgOrderByAggregateInput = {
+    baseAmount?: SortOrder
   }
 
-  export type FeePlanMaxOrderByAggregateInput = {
+  export type FeeTierMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    monthlyPrice?: SortOrder
+    description?: SortOrder
+    baseAmount?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type FeePlanMinOrderByAggregateInput = {
+  export type FeeTierMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    monthlyPrice?: SortOrder
+    description?: SortOrder
+    baseAmount?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type FeePlanSumOrderByAggregateInput = {
-    monthlyPrice?: SortOrder
+  export type FeeTierSumOrderByAggregateInput = {
+    baseAmount?: SortOrder
   }
 
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
     _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
-  export type FeePlanRelationFilter = {
-    is?: FeePlanWhereInput
-    isNot?: FeePlanWhereInput
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type FeeTierNullableRelationFilter = {
+    is?: FeeTierWhereInput | null
+    isNot?: FeeTierWhereInput | null
+  }
+
+  export type StudentFeeCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    feeTierId?: SortOrder
+    customAmount?: SortOrder
+    ipcApplied?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StudentFeeAvgOrderByAggregateInput = {
+    customAmount?: SortOrder
+  }
+
+  export type StudentFeeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    feeTierId?: SortOrder
+    customAmount?: SortOrder
+    ipcApplied?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StudentFeeMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    feeTierId?: SortOrder
+    customAmount?: SortOrder
+    ipcApplied?: SortOrder
+    effectiveFrom?: SortOrder
+    effectiveTo?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StudentFeeSumOrderByAggregateInput = {
+    customAmount?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type EnumPromotionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionTypeFilter<$PrismaModel> | $Enums.PromotionType
+  }
+
+  export type EnumPromotionCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionCategoryFilter<$PrismaModel> | $Enums.PromotionCategory
+  }
+
+  export type PromotionCountOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    value?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PromotionAvgOrderByAggregateInput = {
+    value?: SortOrder
+  }
+
+  export type PromotionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    value?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PromotionMinOrderByAggregateInput = {
+    id?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    value?: SortOrder
+    startDate?: SortOrder
+    endDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PromotionSumOrderByAggregateInput = {
+    value?: SortOrder
+  }
+
+  export type EnumPromotionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel> | $Enums.PromotionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPromotionTypeFilter<$PrismaModel>
+    _max?: NestedEnumPromotionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumPromotionCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel> | $Enums.PromotionCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+    _max?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+  }
+
+  export type PromotionRelationFilter = {
+    is?: PromotionWhereInput
+    isNot?: PromotionWhereInput
+  }
+
+  export type StudentPromotionStudentProfileIdPromotionIdCompoundUniqueInput = {
+    studentProfileId: string
+    promotionId: string
+  }
+
+  export type StudentPromotionCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    promotionId?: SortOrder
+    assignedAt?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type StudentPromotionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    promotionId?: SortOrder
+    assignedAt?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type StudentPromotionMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    promotionId?: SortOrder
+    assignedAt?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type FeeTierRelationFilter = {
+    is?: FeeTierWhereInput
+    isNot?: FeeTierWhereInput
   }
 
   export type StudentSubscriptionCountOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    feePlanId?: SortOrder
+    feeTierId?: SortOrder
     isActive?: SortOrder
-    mandateReference?: SortOrder
   }
 
   export type StudentSubscriptionMaxOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    feePlanId?: SortOrder
+    feeTierId?: SortOrder
     isActive?: SortOrder
-    mandateReference?: SortOrder
   }
 
   export type StudentSubscriptionMinOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    feePlanId?: SortOrder
+    feeTierId?: SortOrder
     isActive?: SortOrder
+  }
+
+  export type EnumCashSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashSessionStatus | EnumCashSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashSessionStatusFilter<$PrismaModel> | $Enums.CashSessionStatus
+  }
+
+  export type CashTransactionListRelationFilter = {
+    every?: CashTransactionWhereInput
+    some?: CashTransactionWhereInput
+    none?: CashTransactionWhereInput
+  }
+
+  export type CashTransactionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CashRegisterSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    openedById?: SortOrder
+    closedById?: SortOrder
+    openingDate?: SortOrder
+    closingDate?: SortOrder
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrder
+    actualClosingBalance?: SortOrder
+    discrepancy?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CashRegisterSessionAvgOrderByAggregateInput = {
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrder
+    actualClosingBalance?: SortOrder
+    discrepancy?: SortOrder
+  }
+
+  export type CashRegisterSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    openedById?: SortOrder
+    closedById?: SortOrder
+    openingDate?: SortOrder
+    closingDate?: SortOrder
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrder
+    actualClosingBalance?: SortOrder
+    discrepancy?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CashRegisterSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    openedById?: SortOrder
+    closedById?: SortOrder
+    openingDate?: SortOrder
+    closingDate?: SortOrder
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrder
+    actualClosingBalance?: SortOrder
+    discrepancy?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CashRegisterSessionSumOrderByAggregateInput = {
+    initialBalance?: SortOrder
+    expectedClosingBalance?: SortOrder
+    actualClosingBalance?: SortOrder
+    discrepancy?: SortOrder
+  }
+
+  export type EnumCashSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashSessionStatus | EnumCashSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CashSessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumCashSessionStatusFilter<$PrismaModel>
+  }
+
+  export type EnumCashMovementTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashMovementType | EnumCashMovementTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashMovementTypeFilter<$PrismaModel> | $Enums.CashMovementType
+  }
+
+  export type EnumCashCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashCategory | EnumCashCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashCategoryFilter<$PrismaModel> | $Enums.CashCategory
+  }
+
+  export type EnumPaymentMethodFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentMethodFilter<$PrismaModel> | $Enums.PaymentMethod
+  }
+
+  export type CashRegisterSessionRelationFilter = {
+    is?: CashRegisterSessionWhereInput
+    isNot?: CashRegisterSessionWhereInput
+  }
+
+  export type CashTransactionCountOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    paymentMethod?: SortOrder
+    amount?: SortOrder
+    description?: SortOrder
+    recordedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CashTransactionAvgOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type CashTransactionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    paymentMethod?: SortOrder
+    amount?: SortOrder
+    description?: SortOrder
+    recordedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CashTransactionMinOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    type?: SortOrder
+    category?: SortOrder
+    paymentMethod?: SortOrder
+    amount?: SortOrder
+    description?: SortOrder
+    recordedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type CashTransactionSumOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type EnumCashMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashMovementType | EnumCashMovementTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashMovementTypeWithAggregatesFilter<$PrismaModel> | $Enums.CashMovementType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashMovementTypeFilter<$PrismaModel>
+    _max?: NestedEnumCashMovementTypeFilter<$PrismaModel>
+  }
+
+  export type EnumCashCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashCategory | EnumCashCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashCategoryWithAggregatesFilter<$PrismaModel> | $Enums.CashCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashCategoryFilter<$PrismaModel>
+    _max?: NestedEnumCashCategoryFilter<$PrismaModel>
+  }
+
+  export type EnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentMethodWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
+  }
+
+  export type RemittanceItemListRelationFilter = {
+    every?: RemittanceItemWhereInput
+    some?: RemittanceItemWhereInput
+    none?: RemittanceItemWhereInput
+  }
+
+  export type RemittanceItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type BankMandateCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
     mandateReference?: SortOrder
+    signatureDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BankMandateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
+    mandateReference?: SortOrder
+    signatureDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BankMandateMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
+    mandateReference?: SortOrder
+    signatureDate?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumRemittanceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceStatus | EnumRemittanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceStatusFilter<$PrismaModel> | $Enums.RemittanceStatus
+  }
+
+  export type RemittanceBatchCountOrderByAggregateInput = {
+    id?: SortOrder
+    batchReference?: SortOrder
+    executionDate?: SortOrder
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+    status?: SortOrder
+    generatedById?: SortOrder
+    filePath?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceBatchAvgOrderByAggregateInput = {
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+  }
+
+  export type RemittanceBatchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    batchReference?: SortOrder
+    executionDate?: SortOrder
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+    status?: SortOrder
+    generatedById?: SortOrder
+    filePath?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceBatchMinOrderByAggregateInput = {
+    id?: SortOrder
+    batchReference?: SortOrder
+    executionDate?: SortOrder
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+    status?: SortOrder
+    generatedById?: SortOrder
+    filePath?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceBatchSumOrderByAggregateInput = {
+    totalAmount?: SortOrder
+    totalItems?: SortOrder
+  }
+
+  export type EnumRemittanceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceStatus | EnumRemittanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceStatusWithAggregatesFilter<$PrismaModel> | $Enums.RemittanceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRemittanceStatusFilter<$PrismaModel>
+    _max?: NestedEnumRemittanceStatusFilter<$PrismaModel>
+  }
+
+  export type EnumRemittanceItemStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceItemStatus | EnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceItemStatusFilter<$PrismaModel> | $Enums.RemittanceItemStatus
+  }
+
+  export type RemittanceBatchRelationFilter = {
+    is?: RemittanceBatchWhereInput
+    isNot?: RemittanceBatchWhereInput
+  }
+
+  export type BankMandateRelationFilter = {
+    is?: BankMandateWhereInput
+    isNot?: BankMandateWhereInput
+  }
+
+  export type RemittanceItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    mandateId?: SortOrder
+    amount?: SortOrder
+    status?: SortOrder
+    returnReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceItemAvgOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type RemittanceItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    mandateId?: SortOrder
+    amount?: SortOrder
+    status?: SortOrder
+    returnReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    batchId?: SortOrder
+    mandateId?: SortOrder
+    amount?: SortOrder
+    status?: SortOrder
+    returnReason?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type RemittanceItemSumOrderByAggregateInput = {
+    amount?: SortOrder
+  }
+
+  export type EnumRemittanceItemStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceItemStatus | EnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceItemStatusWithAggregatesFilter<$PrismaModel> | $Enums.RemittanceItemStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
+    _max?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
   }
 
   export type FederationCountOrderByAggregateInput = {
@@ -20388,6 +32116,27 @@ export namespace Prisma {
     connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
   }
 
+  export type StudentFeeCreateNestedManyWithoutStudentInput = {
+    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
+    createMany?: StudentFeeCreateManyStudentInputEnvelope
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+  }
+
+  export type StudentPromotionCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  }
+
+  export type BankMandateCreateNestedManyWithoutStudentInput = {
+    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
+    createMany?: BankMandateCreateManyStudentInputEnvelope
+    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+  }
+
   export type StudentGuardianUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<StudentGuardianCreateWithoutStudentInput, StudentGuardianUncheckedCreateWithoutStudentInput> | StudentGuardianCreateWithoutStudentInput[] | StudentGuardianUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: StudentGuardianCreateOrConnectWithoutStudentInput | StudentGuardianCreateOrConnectWithoutStudentInput[]
@@ -20435,6 +32184,27 @@ export namespace Prisma {
     connectOrCreate?: StudentLicenseCreateOrConnectWithoutStudentInput | StudentLicenseCreateOrConnectWithoutStudentInput[]
     createMany?: StudentLicenseCreateManyStudentInputEnvelope
     connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
+  }
+
+  export type StudentFeeUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
+    createMany?: StudentFeeCreateManyStudentInputEnvelope
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+  }
+
+  export type StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  }
+
+  export type BankMandateUncheckedCreateNestedManyWithoutStudentInput = {
+    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
+    createMany?: BankMandateCreateManyStudentInputEnvelope
+    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -20551,6 +32321,48 @@ export namespace Prisma {
     deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
   }
 
+  export type StudentFeeUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
+    upsert?: StudentFeeUpsertWithWhereUniqueWithoutStudentInput | StudentFeeUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: StudentFeeCreateManyStudentInputEnvelope
+    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    update?: StudentFeeUpdateWithWhereUniqueWithoutStudentInput | StudentFeeUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: StudentFeeUpdateManyWithWhereWithoutStudentInput | StudentFeeUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+  }
+
+  export type StudentPromotionUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
+    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    update?: StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput | StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  }
+
+  export type BankMandateUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
+    upsert?: BankMandateUpsertWithWhereUniqueWithoutStudentInput | BankMandateUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: BankMandateCreateManyStudentInputEnvelope
+    set?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    disconnect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    delete?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    update?: BankMandateUpdateWithWhereUniqueWithoutStudentInput | BankMandateUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: BankMandateUpdateManyWithWhereWithoutStudentInput | BankMandateUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
+  }
+
   export type StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<StudentGuardianCreateWithoutStudentInput, StudentGuardianUncheckedCreateWithoutStudentInput> | StudentGuardianCreateWithoutStudentInput[] | StudentGuardianUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: StudentGuardianCreateOrConnectWithoutStudentInput | StudentGuardianCreateOrConnectWithoutStudentInput[]
@@ -20647,6 +32459,48 @@ export namespace Prisma {
     update?: StudentLicenseUpdateWithWhereUniqueWithoutStudentInput | StudentLicenseUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: StudentLicenseUpdateManyWithWhereWithoutStudentInput | StudentLicenseUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
+  }
+
+  export type StudentFeeUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
+    upsert?: StudentFeeUpsertWithWhereUniqueWithoutStudentInput | StudentFeeUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: StudentFeeCreateManyStudentInputEnvelope
+    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    update?: StudentFeeUpdateWithWhereUniqueWithoutStudentInput | StudentFeeUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: StudentFeeUpdateManyWithWhereWithoutStudentInput | StudentFeeUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+  }
+
+  export type StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
+    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    update?: StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput | StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  }
+
+  export type BankMandateUncheckedUpdateManyWithoutStudentNestedInput = {
+    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
+    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
+    upsert?: BankMandateUpsertWithWhereUniqueWithoutStudentInput | BankMandateUpsertWithWhereUniqueWithoutStudentInput[]
+    createMany?: BankMandateCreateManyStudentInputEnvelope
+    set?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    disconnect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    delete?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+    update?: BankMandateUpdateWithWhereUniqueWithoutStudentInput | BankMandateUpdateWithWhereUniqueWithoutStudentInput[]
+    updateMany?: BankMandateUpdateManyWithWhereWithoutStudentInput | BankMandateUpdateManyWithWhereWithoutStudentInput[]
+    deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutGuardianProfileInput = {
@@ -21027,54 +32881,212 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovedPromotionsInput, UserUpdateWithoutApprovedPromotionsInput>, UserUncheckedUpdateWithoutApprovedPromotionsInput>
   }
 
-  export type StudentSubscriptionCreateNestedManyWithoutFeePlanInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput> | StudentSubscriptionCreateWithoutFeePlanInput[] | StudentSubscriptionUncheckedCreateWithoutFeePlanInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeePlanInput | StudentSubscriptionCreateOrConnectWithoutFeePlanInput[]
-    createMany?: StudentSubscriptionCreateManyFeePlanInputEnvelope
+  export type StudentFeeCreateNestedManyWithoutFeeTierInput = {
+    create?: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput> | StudentFeeCreateWithoutFeeTierInput[] | StudentFeeUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutFeeTierInput | StudentFeeCreateOrConnectWithoutFeeTierInput[]
+    createMany?: StudentFeeCreateManyFeeTierInputEnvelope
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+  }
+
+  export type StudentSubscriptionCreateNestedManyWithoutFeeTierInput = {
+    create?: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput> | StudentSubscriptionCreateWithoutFeeTierInput[] | StudentSubscriptionUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeeTierInput | StudentSubscriptionCreateOrConnectWithoutFeeTierInput[]
+    createMany?: StudentSubscriptionCreateManyFeeTierInputEnvelope
     connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
   }
 
-  export type StudentSubscriptionUncheckedCreateNestedManyWithoutFeePlanInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput> | StudentSubscriptionCreateWithoutFeePlanInput[] | StudentSubscriptionUncheckedCreateWithoutFeePlanInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeePlanInput | StudentSubscriptionCreateOrConnectWithoutFeePlanInput[]
-    createMany?: StudentSubscriptionCreateManyFeePlanInputEnvelope
+  export type StudentFeeUncheckedCreateNestedManyWithoutFeeTierInput = {
+    create?: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput> | StudentFeeCreateWithoutFeeTierInput[] | StudentFeeUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutFeeTierInput | StudentFeeCreateOrConnectWithoutFeeTierInput[]
+    createMany?: StudentFeeCreateManyFeeTierInputEnvelope
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+  }
+
+  export type StudentSubscriptionUncheckedCreateNestedManyWithoutFeeTierInput = {
+    create?: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput> | StudentSubscriptionCreateWithoutFeeTierInput[] | StudentSubscriptionUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeeTierInput | StudentSubscriptionCreateOrConnectWithoutFeeTierInput[]
+    createMany?: StudentSubscriptionCreateManyFeeTierInputEnvelope
     connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
   }
 
-  export type FloatFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
   }
 
-  export type StudentSubscriptionUpdateManyWithoutFeePlanNestedInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput> | StudentSubscriptionCreateWithoutFeePlanInput[] | StudentSubscriptionUncheckedCreateWithoutFeePlanInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeePlanInput | StudentSubscriptionCreateOrConnectWithoutFeePlanInput[]
-    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutFeePlanInput | StudentSubscriptionUpsertWithWhereUniqueWithoutFeePlanInput[]
-    createMany?: StudentSubscriptionCreateManyFeePlanInputEnvelope
+  export type StudentFeeUpdateManyWithoutFeeTierNestedInput = {
+    create?: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput> | StudentFeeCreateWithoutFeeTierInput[] | StudentFeeUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutFeeTierInput | StudentFeeCreateOrConnectWithoutFeeTierInput[]
+    upsert?: StudentFeeUpsertWithWhereUniqueWithoutFeeTierInput | StudentFeeUpsertWithWhereUniqueWithoutFeeTierInput[]
+    createMany?: StudentFeeCreateManyFeeTierInputEnvelope
+    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    update?: StudentFeeUpdateWithWhereUniqueWithoutFeeTierInput | StudentFeeUpdateWithWhereUniqueWithoutFeeTierInput[]
+    updateMany?: StudentFeeUpdateManyWithWhereWithoutFeeTierInput | StudentFeeUpdateManyWithWhereWithoutFeeTierInput[]
+    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+  }
+
+  export type StudentSubscriptionUpdateManyWithoutFeeTierNestedInput = {
+    create?: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput> | StudentSubscriptionCreateWithoutFeeTierInput[] | StudentSubscriptionUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeeTierInput | StudentSubscriptionCreateOrConnectWithoutFeeTierInput[]
+    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput | StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput[]
+    createMany?: StudentSubscriptionCreateManyFeeTierInputEnvelope
     set?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     disconnect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     delete?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutFeePlanInput | StudentSubscriptionUpdateWithWhereUniqueWithoutFeePlanInput[]
-    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutFeePlanInput | StudentSubscriptionUpdateManyWithWhereWithoutFeePlanInput[]
+    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutFeeTierInput | StudentSubscriptionUpdateWithWhereUniqueWithoutFeeTierInput[]
+    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutFeeTierInput | StudentSubscriptionUpdateManyWithWhereWithoutFeeTierInput[]
     deleteMany?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
   }
 
-  export type StudentSubscriptionUncheckedUpdateManyWithoutFeePlanNestedInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput> | StudentSubscriptionCreateWithoutFeePlanInput[] | StudentSubscriptionUncheckedCreateWithoutFeePlanInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeePlanInput | StudentSubscriptionCreateOrConnectWithoutFeePlanInput[]
-    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutFeePlanInput | StudentSubscriptionUpsertWithWhereUniqueWithoutFeePlanInput[]
-    createMany?: StudentSubscriptionCreateManyFeePlanInputEnvelope
+  export type StudentFeeUncheckedUpdateManyWithoutFeeTierNestedInput = {
+    create?: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput> | StudentFeeCreateWithoutFeeTierInput[] | StudentFeeUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentFeeCreateOrConnectWithoutFeeTierInput | StudentFeeCreateOrConnectWithoutFeeTierInput[]
+    upsert?: StudentFeeUpsertWithWhereUniqueWithoutFeeTierInput | StudentFeeUpsertWithWhereUniqueWithoutFeeTierInput[]
+    createMany?: StudentFeeCreateManyFeeTierInputEnvelope
+    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
+    update?: StudentFeeUpdateWithWhereUniqueWithoutFeeTierInput | StudentFeeUpdateWithWhereUniqueWithoutFeeTierInput[]
+    updateMany?: StudentFeeUpdateManyWithWhereWithoutFeeTierInput | StudentFeeUpdateManyWithWhereWithoutFeeTierInput[]
+    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+  }
+
+  export type StudentSubscriptionUncheckedUpdateManyWithoutFeeTierNestedInput = {
+    create?: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput> | StudentSubscriptionCreateWithoutFeeTierInput[] | StudentSubscriptionUncheckedCreateWithoutFeeTierInput[]
+    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutFeeTierInput | StudentSubscriptionCreateOrConnectWithoutFeeTierInput[]
+    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput | StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput[]
+    createMany?: StudentSubscriptionCreateManyFeeTierInputEnvelope
     set?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     disconnect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     delete?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
     connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutFeePlanInput | StudentSubscriptionUpdateWithWhereUniqueWithoutFeePlanInput[]
-    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutFeePlanInput | StudentSubscriptionUpdateManyWithWhereWithoutFeePlanInput[]
+    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutFeeTierInput | StudentSubscriptionUpdateWithWhereUniqueWithoutFeeTierInput[]
+    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutFeeTierInput | StudentSubscriptionUpdateManyWithWhereWithoutFeeTierInput[]
     deleteMany?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
+  }
+
+  export type StudentProfileCreateNestedOneWithoutStudentFeesInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentFeesInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type FeeTierCreateNestedOneWithoutStudentFeesInput = {
+    create?: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
+    connectOrCreate?: FeeTierCreateOrConnectWithoutStudentFeesInput
+    connect?: FeeTierWhereUniqueInput
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentFeesInput
+    upsert?: StudentProfileUpsertWithoutStudentFeesInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentFeesInput, StudentProfileUpdateWithoutStudentFeesInput>, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
+  }
+
+  export type FeeTierUpdateOneWithoutStudentFeesNestedInput = {
+    create?: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
+    connectOrCreate?: FeeTierCreateOrConnectWithoutStudentFeesInput
+    upsert?: FeeTierUpsertWithoutStudentFeesInput
+    disconnect?: FeeTierWhereInput | boolean
+    delete?: FeeTierWhereInput | boolean
+    connect?: FeeTierWhereUniqueInput
+    update?: XOR<XOR<FeeTierUpdateToOneWithWhereWithoutStudentFeesInput, FeeTierUpdateWithoutStudentFeesInput>, FeeTierUncheckedUpdateWithoutStudentFeesInput>
+  }
+
+  export type StudentPromotionCreateNestedManyWithoutPromotionInput = {
+    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
+    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  }
+
+  export type StudentPromotionUncheckedCreateNestedManyWithoutPromotionInput = {
+    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
+    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  }
+
+  export type EnumPromotionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.PromotionType
+  }
+
+  export type EnumPromotionCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.PromotionCategory
+  }
+
+  export type StudentPromotionUpdateManyWithoutPromotionNestedInput = {
+    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
+    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput | StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput[]
+    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
+    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    update?: StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput | StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput[]
+    updateMany?: StudentPromotionUpdateManyWithWhereWithoutPromotionInput | StudentPromotionUpdateManyWithWhereWithoutPromotionInput[]
+    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  }
+
+  export type StudentPromotionUncheckedUpdateManyWithoutPromotionNestedInput = {
+    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
+    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
+    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput | StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput[]
+    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
+    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+    update?: StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput | StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput[]
+    updateMany?: StudentPromotionUpdateManyWithWhereWithoutPromotionInput | StudentPromotionUpdateManyWithWhereWithoutPromotionInput[]
+    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  }
+
+  export type StudentProfileCreateNestedOneWithoutStudentPromotionsInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentPromotionsInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type PromotionCreateNestedOneWithoutStudentPromotionsInput = {
+    create?: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
+    connectOrCreate?: PromotionCreateOrConnectWithoutStudentPromotionsInput
+    connect?: PromotionWhereUniqueInput
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentPromotionsInput
+    upsert?: StudentProfileUpsertWithoutStudentPromotionsInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentPromotionsInput, StudentProfileUpdateWithoutStudentPromotionsInput>, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
+  }
+
+  export type PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput = {
+    create?: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
+    connectOrCreate?: PromotionCreateOrConnectWithoutStudentPromotionsInput
+    upsert?: PromotionUpsertWithoutStudentPromotionsInput
+    connect?: PromotionWhereUniqueInput
+    update?: XOR<XOR<PromotionUpdateToOneWithWhereWithoutStudentPromotionsInput, PromotionUpdateWithoutStudentPromotionsInput>, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
   }
 
   export type StudentProfileCreateNestedOneWithoutSubscriptionsInput = {
@@ -21083,10 +33095,10 @@ export namespace Prisma {
     connect?: StudentProfileWhereUniqueInput
   }
 
-  export type FeePlanCreateNestedOneWithoutSubscriptionsInput = {
-    create?: XOR<FeePlanCreateWithoutSubscriptionsInput, FeePlanUncheckedCreateWithoutSubscriptionsInput>
-    connectOrCreate?: FeePlanCreateOrConnectWithoutSubscriptionsInput
-    connect?: FeePlanWhereUniqueInput
+  export type FeeTierCreateNestedOneWithoutSubscriptionsInput = {
+    create?: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
+    connectOrCreate?: FeeTierCreateOrConnectWithoutSubscriptionsInput
+    connect?: FeeTierWhereUniqueInput
   }
 
   export type StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput = {
@@ -21097,12 +33109,218 @@ export namespace Prisma {
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutSubscriptionsInput, StudentProfileUpdateWithoutSubscriptionsInput>, StudentProfileUncheckedUpdateWithoutSubscriptionsInput>
   }
 
-  export type FeePlanUpdateOneRequiredWithoutSubscriptionsNestedInput = {
-    create?: XOR<FeePlanCreateWithoutSubscriptionsInput, FeePlanUncheckedCreateWithoutSubscriptionsInput>
-    connectOrCreate?: FeePlanCreateOrConnectWithoutSubscriptionsInput
-    upsert?: FeePlanUpsertWithoutSubscriptionsInput
-    connect?: FeePlanWhereUniqueInput
-    update?: XOR<XOR<FeePlanUpdateToOneWithWhereWithoutSubscriptionsInput, FeePlanUpdateWithoutSubscriptionsInput>, FeePlanUncheckedUpdateWithoutSubscriptionsInput>
+  export type FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput = {
+    create?: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
+    connectOrCreate?: FeeTierCreateOrConnectWithoutSubscriptionsInput
+    upsert?: FeeTierUpsertWithoutSubscriptionsInput
+    connect?: FeeTierWhereUniqueInput
+    update?: XOR<XOR<FeeTierUpdateToOneWithWhereWithoutSubscriptionsInput, FeeTierUpdateWithoutSubscriptionsInput>, FeeTierUncheckedUpdateWithoutSubscriptionsInput>
+  }
+
+  export type CashTransactionCreateNestedManyWithoutSessionInput = {
+    create?: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput> | CashTransactionCreateWithoutSessionInput[] | CashTransactionUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: CashTransactionCreateOrConnectWithoutSessionInput | CashTransactionCreateOrConnectWithoutSessionInput[]
+    createMany?: CashTransactionCreateManySessionInputEnvelope
+    connect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+  }
+
+  export type CashTransactionUncheckedCreateNestedManyWithoutSessionInput = {
+    create?: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput> | CashTransactionCreateWithoutSessionInput[] | CashTransactionUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: CashTransactionCreateOrConnectWithoutSessionInput | CashTransactionCreateOrConnectWithoutSessionInput[]
+    createMany?: CashTransactionCreateManySessionInputEnvelope
+    connect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+  }
+
+  export type EnumCashSessionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.CashSessionStatus
+  }
+
+  export type CashTransactionUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput> | CashTransactionCreateWithoutSessionInput[] | CashTransactionUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: CashTransactionCreateOrConnectWithoutSessionInput | CashTransactionCreateOrConnectWithoutSessionInput[]
+    upsert?: CashTransactionUpsertWithWhereUniqueWithoutSessionInput | CashTransactionUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: CashTransactionCreateManySessionInputEnvelope
+    set?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    disconnect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    delete?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    connect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    update?: CashTransactionUpdateWithWhereUniqueWithoutSessionInput | CashTransactionUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: CashTransactionUpdateManyWithWhereWithoutSessionInput | CashTransactionUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: CashTransactionScalarWhereInput | CashTransactionScalarWhereInput[]
+  }
+
+  export type CashTransactionUncheckedUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput> | CashTransactionCreateWithoutSessionInput[] | CashTransactionUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: CashTransactionCreateOrConnectWithoutSessionInput | CashTransactionCreateOrConnectWithoutSessionInput[]
+    upsert?: CashTransactionUpsertWithWhereUniqueWithoutSessionInput | CashTransactionUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: CashTransactionCreateManySessionInputEnvelope
+    set?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    disconnect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    delete?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    connect?: CashTransactionWhereUniqueInput | CashTransactionWhereUniqueInput[]
+    update?: CashTransactionUpdateWithWhereUniqueWithoutSessionInput | CashTransactionUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: CashTransactionUpdateManyWithWhereWithoutSessionInput | CashTransactionUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: CashTransactionScalarWhereInput | CashTransactionScalarWhereInput[]
+  }
+
+  export type CashRegisterSessionCreateNestedOneWithoutTransactionsInput = {
+    create?: XOR<CashRegisterSessionCreateWithoutTransactionsInput, CashRegisterSessionUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: CashRegisterSessionCreateOrConnectWithoutTransactionsInput
+    connect?: CashRegisterSessionWhereUniqueInput
+  }
+
+  export type EnumCashMovementTypeFieldUpdateOperationsInput = {
+    set?: $Enums.CashMovementType
+  }
+
+  export type EnumCashCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.CashCategory
+  }
+
+  export type EnumPaymentMethodFieldUpdateOperationsInput = {
+    set?: $Enums.PaymentMethod
+  }
+
+  export type CashRegisterSessionUpdateOneRequiredWithoutTransactionsNestedInput = {
+    create?: XOR<CashRegisterSessionCreateWithoutTransactionsInput, CashRegisterSessionUncheckedCreateWithoutTransactionsInput>
+    connectOrCreate?: CashRegisterSessionCreateOrConnectWithoutTransactionsInput
+    upsert?: CashRegisterSessionUpsertWithoutTransactionsInput
+    connect?: CashRegisterSessionWhereUniqueInput
+    update?: XOR<XOR<CashRegisterSessionUpdateToOneWithWhereWithoutTransactionsInput, CashRegisterSessionUpdateWithoutTransactionsInput>, CashRegisterSessionUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type StudentProfileCreateNestedOneWithoutBankMandatesInput = {
+    create?: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutBankMandatesInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type RemittanceItemCreateNestedManyWithoutMandateInput = {
+    create?: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput> | RemittanceItemCreateWithoutMandateInput[] | RemittanceItemUncheckedCreateWithoutMandateInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
+    createMany?: RemittanceItemCreateManyMandateInputEnvelope
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+  }
+
+  export type RemittanceItemUncheckedCreateNestedManyWithoutMandateInput = {
+    create?: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput> | RemittanceItemCreateWithoutMandateInput[] | RemittanceItemUncheckedCreateWithoutMandateInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
+    createMany?: RemittanceItemCreateManyMandateInputEnvelope
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutBankMandatesInput
+    upsert?: StudentProfileUpsertWithoutBankMandatesInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutBankMandatesInput, StudentProfileUpdateWithoutBankMandatesInput>, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
+  }
+
+  export type RemittanceItemUpdateManyWithoutMandateNestedInput = {
+    create?: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput> | RemittanceItemCreateWithoutMandateInput[] | RemittanceItemUncheckedCreateWithoutMandateInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
+    upsert?: RemittanceItemUpsertWithWhereUniqueWithoutMandateInput | RemittanceItemUpsertWithWhereUniqueWithoutMandateInput[]
+    createMany?: RemittanceItemCreateManyMandateInputEnvelope
+    set?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    disconnect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    delete?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    update?: RemittanceItemUpdateWithWhereUniqueWithoutMandateInput | RemittanceItemUpdateWithWhereUniqueWithoutMandateInput[]
+    updateMany?: RemittanceItemUpdateManyWithWhereWithoutMandateInput | RemittanceItemUpdateManyWithWhereWithoutMandateInput[]
+    deleteMany?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+  }
+
+  export type RemittanceItemUncheckedUpdateManyWithoutMandateNestedInput = {
+    create?: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput> | RemittanceItemCreateWithoutMandateInput[] | RemittanceItemUncheckedCreateWithoutMandateInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
+    upsert?: RemittanceItemUpsertWithWhereUniqueWithoutMandateInput | RemittanceItemUpsertWithWhereUniqueWithoutMandateInput[]
+    createMany?: RemittanceItemCreateManyMandateInputEnvelope
+    set?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    disconnect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    delete?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    update?: RemittanceItemUpdateWithWhereUniqueWithoutMandateInput | RemittanceItemUpdateWithWhereUniqueWithoutMandateInput[]
+    updateMany?: RemittanceItemUpdateManyWithWhereWithoutMandateInput | RemittanceItemUpdateManyWithWhereWithoutMandateInput[]
+    deleteMany?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+  }
+
+  export type RemittanceItemCreateNestedManyWithoutBatchInput = {
+    create?: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput> | RemittanceItemCreateWithoutBatchInput[] | RemittanceItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutBatchInput | RemittanceItemCreateOrConnectWithoutBatchInput[]
+    createMany?: RemittanceItemCreateManyBatchInputEnvelope
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+  }
+
+  export type RemittanceItemUncheckedCreateNestedManyWithoutBatchInput = {
+    create?: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput> | RemittanceItemCreateWithoutBatchInput[] | RemittanceItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutBatchInput | RemittanceItemCreateOrConnectWithoutBatchInput[]
+    createMany?: RemittanceItemCreateManyBatchInputEnvelope
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+  }
+
+  export type EnumRemittanceStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RemittanceStatus
+  }
+
+  export type RemittanceItemUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput> | RemittanceItemCreateWithoutBatchInput[] | RemittanceItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutBatchInput | RemittanceItemCreateOrConnectWithoutBatchInput[]
+    upsert?: RemittanceItemUpsertWithWhereUniqueWithoutBatchInput | RemittanceItemUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: RemittanceItemCreateManyBatchInputEnvelope
+    set?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    disconnect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    delete?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    update?: RemittanceItemUpdateWithWhereUniqueWithoutBatchInput | RemittanceItemUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: RemittanceItemUpdateManyWithWhereWithoutBatchInput | RemittanceItemUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+  }
+
+  export type RemittanceItemUncheckedUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput> | RemittanceItemCreateWithoutBatchInput[] | RemittanceItemUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: RemittanceItemCreateOrConnectWithoutBatchInput | RemittanceItemCreateOrConnectWithoutBatchInput[]
+    upsert?: RemittanceItemUpsertWithWhereUniqueWithoutBatchInput | RemittanceItemUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: RemittanceItemCreateManyBatchInputEnvelope
+    set?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    disconnect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    delete?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
+    update?: RemittanceItemUpdateWithWhereUniqueWithoutBatchInput | RemittanceItemUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: RemittanceItemUpdateManyWithWhereWithoutBatchInput | RemittanceItemUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+  }
+
+  export type RemittanceBatchCreateNestedOneWithoutItemsInput = {
+    create?: XOR<RemittanceBatchCreateWithoutItemsInput, RemittanceBatchUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: RemittanceBatchCreateOrConnectWithoutItemsInput
+    connect?: RemittanceBatchWhereUniqueInput
+  }
+
+  export type BankMandateCreateNestedOneWithoutRemittanceItemsInput = {
+    create?: XOR<BankMandateCreateWithoutRemittanceItemsInput, BankMandateUncheckedCreateWithoutRemittanceItemsInput>
+    connectOrCreate?: BankMandateCreateOrConnectWithoutRemittanceItemsInput
+    connect?: BankMandateWhereUniqueInput
+  }
+
+  export type EnumRemittanceItemStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RemittanceItemStatus
+  }
+
+  export type RemittanceBatchUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<RemittanceBatchCreateWithoutItemsInput, RemittanceBatchUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: RemittanceBatchCreateOrConnectWithoutItemsInput
+    upsert?: RemittanceBatchUpsertWithoutItemsInput
+    connect?: RemittanceBatchWhereUniqueInput
+    update?: XOR<XOR<RemittanceBatchUpdateToOneWithWhereWithoutItemsInput, RemittanceBatchUpdateWithoutItemsInput>, RemittanceBatchUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type BankMandateUpdateOneRequiredWithoutRemittanceItemsNestedInput = {
+    create?: XOR<BankMandateCreateWithoutRemittanceItemsInput, BankMandateUncheckedCreateWithoutRemittanceItemsInput>
+    connectOrCreate?: BankMandateCreateOrConnectWithoutRemittanceItemsInput
+    upsert?: BankMandateUpsertWithoutRemittanceItemsInput
+    connect?: BankMandateWhereUniqueInput
+    update?: XOR<XOR<BankMandateUpdateToOneWithWhereWithoutRemittanceItemsInput, BankMandateUpdateWithoutRemittanceItemsInput>, BankMandateUncheckedUpdateWithoutRemittanceItemsInput>
   }
 
   export type StudentLicenseCreateNestedManyWithoutFederationInput = {
@@ -21432,20 +33650,216 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
     _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPromotionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionTypeFilter<$PrismaModel> | $Enums.PromotionType
+  }
+
+  export type NestedEnumPromotionCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionCategoryFilter<$PrismaModel> | $Enums.PromotionCategory
+  }
+
+  export type NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel> | $Enums.PromotionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPromotionTypeFilter<$PrismaModel>
+    _max?: NestedEnumPromotionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel> | $Enums.PromotionCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+    _max?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCashSessionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashSessionStatus | EnumCashSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashSessionStatusFilter<$PrismaModel> | $Enums.CashSessionStatus
+  }
+
+  export type NestedEnumCashSessionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashSessionStatus | EnumCashSessionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashSessionStatus[] | ListEnumCashSessionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashSessionStatusWithAggregatesFilter<$PrismaModel> | $Enums.CashSessionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashSessionStatusFilter<$PrismaModel>
+    _max?: NestedEnumCashSessionStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCashMovementTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashMovementType | EnumCashMovementTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashMovementTypeFilter<$PrismaModel> | $Enums.CashMovementType
+  }
+
+  export type NestedEnumCashCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashCategory | EnumCashCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashCategoryFilter<$PrismaModel> | $Enums.CashCategory
+  }
+
+  export type NestedEnumPaymentMethodFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentMethodFilter<$PrismaModel> | $Enums.PaymentMethod
+  }
+
+  export type NestedEnumCashMovementTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashMovementType | EnumCashMovementTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashMovementType[] | ListEnumCashMovementTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashMovementTypeWithAggregatesFilter<$PrismaModel> | $Enums.CashMovementType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashMovementTypeFilter<$PrismaModel>
+    _max?: NestedEnumCashMovementTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCashCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CashCategory | EnumCashCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CashCategory[] | ListEnumCashCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumCashCategoryWithAggregatesFilter<$PrismaModel> | $Enums.CashCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCashCategoryFilter<$PrismaModel>
+    _max?: NestedEnumCashCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumPaymentMethodWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.PaymentMethod | EnumPaymentMethodFieldRefInput<$PrismaModel>
+    in?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    notIn?: $Enums.PaymentMethod[] | ListEnumPaymentMethodFieldRefInput<$PrismaModel>
+    not?: NestedEnumPaymentMethodWithAggregatesFilter<$PrismaModel> | $Enums.PaymentMethod
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumPaymentMethodFilter<$PrismaModel>
+    _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRemittanceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceStatus | EnumRemittanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceStatusFilter<$PrismaModel> | $Enums.RemittanceStatus
+  }
+
+  export type NestedEnumRemittanceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceStatus | EnumRemittanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceStatus[] | ListEnumRemittanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceStatusWithAggregatesFilter<$PrismaModel> | $Enums.RemittanceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRemittanceStatusFilter<$PrismaModel>
+    _max?: NestedEnumRemittanceStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRemittanceItemStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceItemStatus | EnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceItemStatusFilter<$PrismaModel> | $Enums.RemittanceItemStatus
+  }
+
+  export type NestedEnumRemittanceItemStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RemittanceItemStatus | EnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RemittanceItemStatus[] | ListEnumRemittanceItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRemittanceItemStatusWithAggregatesFilter<$PrismaModel> | $Enums.RemittanceItemStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
+    _max?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
   }
 
   export type StudentProfileCreateWithoutUserInput = {
@@ -21462,6 +33876,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
@@ -21478,6 +33895,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUserInput = {
@@ -21615,6 +34035,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
@@ -21631,6 +34054,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GuardianUpsertWithoutUserInput = {
@@ -21897,15 +34323,13 @@ export namespace Prisma {
   export type StudentSubscriptionCreateWithoutStudentInput = {
     id?: string
     isActive?: boolean
-    mandateReference?: string | null
-    feePlan: FeePlanCreateNestedOneWithoutSubscriptionsInput
+    feeTier: FeeTierCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type StudentSubscriptionUncheckedCreateWithoutStudentInput = {
     id?: string
-    feePlanId: string
+    feeTierId: string
     isActive?: boolean
-    mandateReference?: string | null
   }
 
   export type StudentSubscriptionCreateOrConnectWithoutStudentInput = {
@@ -21941,6 +34365,96 @@ export namespace Prisma {
 
   export type StudentLicenseCreateManyStudentInputEnvelope = {
     data: StudentLicenseCreateManyStudentInput | StudentLicenseCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentFeeCreateWithoutStudentInput = {
+    id?: string
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    feeTier?: FeeTierCreateNestedOneWithoutStudentFeesInput
+  }
+
+  export type StudentFeeUncheckedCreateWithoutStudentInput = {
+    id?: string
+    feeTierId?: string | null
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StudentFeeCreateOrConnectWithoutStudentInput = {
+    where: StudentFeeWhereUniqueInput
+    create: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput>
+  }
+
+  export type StudentFeeCreateManyStudentInputEnvelope = {
+    data: StudentFeeCreateManyStudentInput | StudentFeeCreateManyStudentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentPromotionCreateWithoutStudentProfileInput = {
+    id?: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+    promotion: PromotionCreateNestedOneWithoutStudentPromotionsInput
+  }
+
+  export type StudentPromotionUncheckedCreateWithoutStudentProfileInput = {
+    id?: string
+    promotionId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type StudentPromotionCreateOrConnectWithoutStudentProfileInput = {
+    where: StudentPromotionWhereUniqueInput
+    create: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput>
+  }
+
+  export type StudentPromotionCreateManyStudentProfileInputEnvelope = {
+    data: StudentPromotionCreateManyStudentProfileInput | StudentPromotionCreateManyStudentProfileInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type BankMandateCreateWithoutStudentInput = {
+    id?: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    remittanceItems?: RemittanceItemCreateNestedManyWithoutMandateInput
+  }
+
+  export type BankMandateUncheckedCreateWithoutStudentInput = {
+    id?: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    remittanceItems?: RemittanceItemUncheckedCreateNestedManyWithoutMandateInput
+  }
+
+  export type BankMandateCreateOrConnectWithoutStudentInput = {
+    where: BankMandateWhereUniqueInput
+    create: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput>
+  }
+
+  export type BankMandateCreateManyStudentInputEnvelope = {
+    data: BankMandateCreateManyStudentInput | BankMandateCreateManyStudentInput[]
     skipDuplicates?: boolean
   }
 
@@ -22119,9 +34633,8 @@ export namespace Prisma {
     NOT?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
     id?: StringFilter<"StudentSubscription"> | string
     studentProfileId?: StringFilter<"StudentSubscription"> | string
-    feePlanId?: StringFilter<"StudentSubscription"> | string
+    feeTierId?: StringFilter<"StudentSubscription"> | string
     isActive?: BoolFilter<"StudentSubscription"> | boolean
-    mandateReference?: StringNullableFilter<"StudentSubscription"> | string | null
   }
 
   export type StudentLicenseUpsertWithWhereUniqueWithoutStudentInput = {
@@ -22150,6 +34663,95 @@ export namespace Prisma {
     licenseNumber?: StringFilter<"StudentLicense"> | string
     validUntil?: DateTimeFilter<"StudentLicense"> | Date | string
     isActive?: BoolFilter<"StudentLicense"> | boolean
+  }
+
+  export type StudentFeeUpsertWithWhereUniqueWithoutStudentInput = {
+    where: StudentFeeWhereUniqueInput
+    update: XOR<StudentFeeUpdateWithoutStudentInput, StudentFeeUncheckedUpdateWithoutStudentInput>
+    create: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput>
+  }
+
+  export type StudentFeeUpdateWithWhereUniqueWithoutStudentInput = {
+    where: StudentFeeWhereUniqueInput
+    data: XOR<StudentFeeUpdateWithoutStudentInput, StudentFeeUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type StudentFeeUpdateManyWithWhereWithoutStudentInput = {
+    where: StudentFeeScalarWhereInput
+    data: XOR<StudentFeeUpdateManyMutationInput, StudentFeeUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type StudentFeeScalarWhereInput = {
+    AND?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+    OR?: StudentFeeScalarWhereInput[]
+    NOT?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+    id?: StringFilter<"StudentFee"> | string
+    studentProfileId?: StringFilter<"StudentFee"> | string
+    feeTierId?: StringNullableFilter<"StudentFee"> | string | null
+    customAmount?: DecimalNullableFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFilter<"StudentFee"> | boolean
+    effectiveFrom?: DateTimeFilter<"StudentFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
+    createdAt?: DateTimeFilter<"StudentFee"> | Date | string
+    updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
+  }
+
+  export type StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentPromotionWhereUniqueInput
+    update: XOR<StudentPromotionUpdateWithoutStudentProfileInput, StudentPromotionUncheckedUpdateWithoutStudentProfileInput>
+    create: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput>
+  }
+
+  export type StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentPromotionWhereUniqueInput
+    data: XOR<StudentPromotionUpdateWithoutStudentProfileInput, StudentPromotionUncheckedUpdateWithoutStudentProfileInput>
+  }
+
+  export type StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput = {
+    where: StudentPromotionScalarWhereInput
+    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyWithoutStudentProfileInput>
+  }
+
+  export type StudentPromotionScalarWhereInput = {
+    AND?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+    OR?: StudentPromotionScalarWhereInput[]
+    NOT?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+    id?: StringFilter<"StudentPromotion"> | string
+    studentProfileId?: StringFilter<"StudentPromotion"> | string
+    promotionId?: StringFilter<"StudentPromotion"> | string
+    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+  }
+
+  export type BankMandateUpsertWithWhereUniqueWithoutStudentInput = {
+    where: BankMandateWhereUniqueInput
+    update: XOR<BankMandateUpdateWithoutStudentInput, BankMandateUncheckedUpdateWithoutStudentInput>
+    create: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput>
+  }
+
+  export type BankMandateUpdateWithWhereUniqueWithoutStudentInput = {
+    where: BankMandateWhereUniqueInput
+    data: XOR<BankMandateUpdateWithoutStudentInput, BankMandateUncheckedUpdateWithoutStudentInput>
+  }
+
+  export type BankMandateUpdateManyWithWhereWithoutStudentInput = {
+    where: BankMandateScalarWhereInput
+    data: XOR<BankMandateUpdateManyMutationInput, BankMandateUncheckedUpdateManyWithoutStudentInput>
+  }
+
+  export type BankMandateScalarWhereInput = {
+    AND?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
+    OR?: BankMandateScalarWhereInput[]
+    NOT?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
+    id?: StringFilter<"BankMandate"> | string
+    studentProfileId?: StringFilter<"BankMandate"> | string
+    iban?: StringFilter<"BankMandate"> | string
+    bic?: StringNullableFilter<"BankMandate"> | string | null
+    mandateReference?: StringFilter<"BankMandate"> | string
+    signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
+    isActive?: BoolFilter<"BankMandate"> | boolean
+    createdAt?: DateTimeFilter<"BankMandate"> | Date | string
+    updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
   }
 
   export type UserCreateWithoutGuardianProfileInput = {
@@ -22278,6 +34880,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
@@ -22294,6 +34899,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -22343,6 +34951,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
@@ -22359,6 +34970,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GuardianUpsertWithoutStudentsInput = {
@@ -22642,6 +35256,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutRanksInput = {
@@ -22658,6 +35275,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutRanksInput = {
@@ -22715,6 +35335,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutRanksInput = {
@@ -22731,6 +35354,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type BeltRankUpsertWithoutStudentRanksInput = {
@@ -22778,6 +35404,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendancesInput = {
@@ -22794,6 +35423,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendancesInput = {
@@ -22826,6 +35458,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendancesInput = {
@@ -22842,6 +35477,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
@@ -22858,6 +35496,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUpdateRequestsInput = {
@@ -22874,6 +35515,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUpdateRequestsInput = {
@@ -22941,6 +35585,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUpdateRequestsInput = {
@@ -22957,6 +35604,9 @@ export namespace Prisma {
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserUpsertWithoutReviewedUpdatesInput = {
@@ -23014,6 +35664,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutPromotionRequestsInput = {
@@ -23030,6 +35683,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutPromotionRequestsInput = {
@@ -23132,6 +35788,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutPromotionRequestsInput = {
@@ -23148,6 +35807,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type UserUpsertWithoutProposedPromotionsInput = {
@@ -23232,44 +35894,454 @@ export namespace Prisma {
     proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
   }
 
-  export type StudentSubscriptionCreateWithoutFeePlanInput = {
+  export type StudentFeeCreateWithoutFeeTierInput = {
     id?: string
-    isActive?: boolean
-    mandateReference?: string | null
-    student: StudentProfileCreateNestedOneWithoutSubscriptionsInput
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutStudentFeesInput
   }
 
-  export type StudentSubscriptionUncheckedCreateWithoutFeePlanInput = {
+  export type StudentFeeUncheckedCreateWithoutFeeTierInput = {
     id?: string
     studentProfileId: string
-    isActive?: boolean
-    mandateReference?: string | null
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentSubscriptionCreateOrConnectWithoutFeePlanInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    create: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput>
+  export type StudentFeeCreateOrConnectWithoutFeeTierInput = {
+    where: StudentFeeWhereUniqueInput
+    create: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput>
   }
 
-  export type StudentSubscriptionCreateManyFeePlanInputEnvelope = {
-    data: StudentSubscriptionCreateManyFeePlanInput | StudentSubscriptionCreateManyFeePlanInput[]
+  export type StudentFeeCreateManyFeeTierInputEnvelope = {
+    data: StudentFeeCreateManyFeeTierInput | StudentFeeCreateManyFeeTierInput[]
     skipDuplicates?: boolean
   }
 
-  export type StudentSubscriptionUpsertWithWhereUniqueWithoutFeePlanInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    update: XOR<StudentSubscriptionUpdateWithoutFeePlanInput, StudentSubscriptionUncheckedUpdateWithoutFeePlanInput>
-    create: XOR<StudentSubscriptionCreateWithoutFeePlanInput, StudentSubscriptionUncheckedCreateWithoutFeePlanInput>
+  export type StudentSubscriptionCreateWithoutFeeTierInput = {
+    id?: string
+    isActive?: boolean
+    student: StudentProfileCreateNestedOneWithoutSubscriptionsInput
   }
 
-  export type StudentSubscriptionUpdateWithWhereUniqueWithoutFeePlanInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    data: XOR<StudentSubscriptionUpdateWithoutFeePlanInput, StudentSubscriptionUncheckedUpdateWithoutFeePlanInput>
+  export type StudentSubscriptionUncheckedCreateWithoutFeeTierInput = {
+    id?: string
+    studentProfileId: string
+    isActive?: boolean
   }
 
-  export type StudentSubscriptionUpdateManyWithWhereWithoutFeePlanInput = {
+  export type StudentSubscriptionCreateOrConnectWithoutFeeTierInput = {
+    where: StudentSubscriptionWhereUniqueInput
+    create: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput>
+  }
+
+  export type StudentSubscriptionCreateManyFeeTierInputEnvelope = {
+    data: StudentSubscriptionCreateManyFeeTierInput | StudentSubscriptionCreateManyFeeTierInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentFeeUpsertWithWhereUniqueWithoutFeeTierInput = {
+    where: StudentFeeWhereUniqueInput
+    update: XOR<StudentFeeUpdateWithoutFeeTierInput, StudentFeeUncheckedUpdateWithoutFeeTierInput>
+    create: XOR<StudentFeeCreateWithoutFeeTierInput, StudentFeeUncheckedCreateWithoutFeeTierInput>
+  }
+
+  export type StudentFeeUpdateWithWhereUniqueWithoutFeeTierInput = {
+    where: StudentFeeWhereUniqueInput
+    data: XOR<StudentFeeUpdateWithoutFeeTierInput, StudentFeeUncheckedUpdateWithoutFeeTierInput>
+  }
+
+  export type StudentFeeUpdateManyWithWhereWithoutFeeTierInput = {
+    where: StudentFeeScalarWhereInput
+    data: XOR<StudentFeeUpdateManyMutationInput, StudentFeeUncheckedUpdateManyWithoutFeeTierInput>
+  }
+
+  export type StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput = {
+    where: StudentSubscriptionWhereUniqueInput
+    update: XOR<StudentSubscriptionUpdateWithoutFeeTierInput, StudentSubscriptionUncheckedUpdateWithoutFeeTierInput>
+    create: XOR<StudentSubscriptionCreateWithoutFeeTierInput, StudentSubscriptionUncheckedCreateWithoutFeeTierInput>
+  }
+
+  export type StudentSubscriptionUpdateWithWhereUniqueWithoutFeeTierInput = {
+    where: StudentSubscriptionWhereUniqueInput
+    data: XOR<StudentSubscriptionUpdateWithoutFeeTierInput, StudentSubscriptionUncheckedUpdateWithoutFeeTierInput>
+  }
+
+  export type StudentSubscriptionUpdateManyWithWhereWithoutFeeTierInput = {
     where: StudentSubscriptionScalarWhereInput
-    data: XOR<StudentSubscriptionUpdateManyMutationInput, StudentSubscriptionUncheckedUpdateManyWithoutFeePlanInput>
+    data: XOR<StudentSubscriptionUpdateManyMutationInput, StudentSubscriptionUncheckedUpdateManyWithoutFeeTierInput>
+  }
+
+  export type StudentProfileCreateWithoutStudentFeesInput = {
+    id?: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutStudentFeesInput = {
+    id?: string
+    userId: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutStudentFeesInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
+  }
+
+  export type FeeTierCreateWithoutStudentFeesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutFeeTierInput
+  }
+
+  export type FeeTierUncheckedCreateWithoutStudentFeesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutFeeTierInput
+  }
+
+  export type FeeTierCreateOrConnectWithoutStudentFeesInput = {
+    where: FeeTierWhereUniqueInput
+    create: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
+  }
+
+  export type StudentProfileUpsertWithoutStudentFeesInput = {
+    update: XOR<StudentProfileUpdateWithoutStudentFeesInput, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
+    create: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutStudentFeesInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutStudentFeesInput, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
+  }
+
+  export type StudentProfileUpdateWithoutStudentFeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutStudentFeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type FeeTierUpsertWithoutStudentFeesInput = {
+    update: XOR<FeeTierUpdateWithoutStudentFeesInput, FeeTierUncheckedUpdateWithoutStudentFeesInput>
+    create: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
+    where?: FeeTierWhereInput
+  }
+
+  export type FeeTierUpdateToOneWithWhereWithoutStudentFeesInput = {
+    where?: FeeTierWhereInput
+    data: XOR<FeeTierUpdateWithoutStudentFeesInput, FeeTierUncheckedUpdateWithoutStudentFeesInput>
+  }
+
+  export type FeeTierUpdateWithoutStudentFeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: StudentSubscriptionUpdateManyWithoutFeeTierNestedInput
+  }
+
+  export type FeeTierUncheckedUpdateWithoutStudentFeesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutFeeTierNestedInput
+  }
+
+  export type StudentPromotionCreateWithoutPromotionInput = {
+    id?: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+    studentProfile: StudentProfileCreateNestedOneWithoutStudentPromotionsInput
+  }
+
+  export type StudentPromotionUncheckedCreateWithoutPromotionInput = {
+    id?: string
+    studentProfileId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type StudentPromotionCreateOrConnectWithoutPromotionInput = {
+    where: StudentPromotionWhereUniqueInput
+    create: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput>
+  }
+
+  export type StudentPromotionCreateManyPromotionInputEnvelope = {
+    data: StudentPromotionCreateManyPromotionInput | StudentPromotionCreateManyPromotionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput = {
+    where: StudentPromotionWhereUniqueInput
+    update: XOR<StudentPromotionUpdateWithoutPromotionInput, StudentPromotionUncheckedUpdateWithoutPromotionInput>
+    create: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput>
+  }
+
+  export type StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput = {
+    where: StudentPromotionWhereUniqueInput
+    data: XOR<StudentPromotionUpdateWithoutPromotionInput, StudentPromotionUncheckedUpdateWithoutPromotionInput>
+  }
+
+  export type StudentPromotionUpdateManyWithWhereWithoutPromotionInput = {
+    where: StudentPromotionScalarWhereInput
+    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyWithoutPromotionInput>
+  }
+
+  export type StudentProfileCreateWithoutStudentPromotionsInput = {
+    id?: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutStudentPromotionsInput = {
+    id?: string
+    userId: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutStudentPromotionsInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+  }
+
+  export type PromotionCreateWithoutStudentPromotionsInput = {
+    id?: string
+    code: string
+    name: string
+    description?: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value?: Decimal | DecimalJsLike | number | string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PromotionUncheckedCreateWithoutStudentPromotionsInput = {
+    id?: string
+    code: string
+    name: string
+    description?: string | null
+    type: $Enums.PromotionType
+    category: $Enums.PromotionCategory
+    value?: Decimal | DecimalJsLike | number | string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PromotionCreateOrConnectWithoutStudentPromotionsInput = {
+    where: PromotionWhereUniqueInput
+    create: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
+  }
+
+  export type StudentProfileUpsertWithoutStudentPromotionsInput = {
+    update: XOR<StudentProfileUpdateWithoutStudentPromotionsInput, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
+    create: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutStudentPromotionsInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutStudentPromotionsInput, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
+  }
+
+  export type StudentProfileUpdateWithoutStudentPromotionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutStudentPromotionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type PromotionUpsertWithoutStudentPromotionsInput = {
+    update: XOR<PromotionUpdateWithoutStudentPromotionsInput, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
+    create: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
+    where?: PromotionWhereInput
+  }
+
+  export type PromotionUpdateToOneWithWhereWithoutStudentPromotionsInput = {
+    where?: PromotionWhereInput
+    data: XOR<PromotionUpdateWithoutStudentPromotionsInput, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
+  }
+
+  export type PromotionUpdateWithoutStudentPromotionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PromotionUncheckedUpdateWithoutStudentPromotionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
+    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentProfileCreateWithoutSubscriptionsInput = {
@@ -23286,6 +36358,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutSubscriptionsInput = {
@@ -23302,6 +36377,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutSubscriptionsInput = {
@@ -23309,21 +36387,33 @@ export namespace Prisma {
     create: XOR<StudentProfileCreateWithoutSubscriptionsInput, StudentProfileUncheckedCreateWithoutSubscriptionsInput>
   }
 
-  export type FeePlanCreateWithoutSubscriptionsInput = {
+  export type FeeTierCreateWithoutSubscriptionsInput = {
     id?: string
     name: string
-    monthlyPrice: number
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentFees?: StudentFeeCreateNestedManyWithoutFeeTierInput
   }
 
-  export type FeePlanUncheckedCreateWithoutSubscriptionsInput = {
+  export type FeeTierUncheckedCreateWithoutSubscriptionsInput = {
     id?: string
     name: string
-    monthlyPrice: number
+    description?: string | null
+    baseAmount: Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutFeeTierInput
   }
 
-  export type FeePlanCreateOrConnectWithoutSubscriptionsInput = {
-    where: FeePlanWhereUniqueInput
-    create: XOR<FeePlanCreateWithoutSubscriptionsInput, FeePlanUncheckedCreateWithoutSubscriptionsInput>
+  export type FeeTierCreateOrConnectWithoutSubscriptionsInput = {
+    where: FeeTierWhereUniqueInput
+    create: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
   }
 
   export type StudentProfileUpsertWithoutSubscriptionsInput = {
@@ -23351,6 +36441,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutSubscriptionsInput = {
@@ -23367,29 +36460,520 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
-  export type FeePlanUpsertWithoutSubscriptionsInput = {
-    update: XOR<FeePlanUpdateWithoutSubscriptionsInput, FeePlanUncheckedUpdateWithoutSubscriptionsInput>
-    create: XOR<FeePlanCreateWithoutSubscriptionsInput, FeePlanUncheckedCreateWithoutSubscriptionsInput>
-    where?: FeePlanWhereInput
+  export type FeeTierUpsertWithoutSubscriptionsInput = {
+    update: XOR<FeeTierUpdateWithoutSubscriptionsInput, FeeTierUncheckedUpdateWithoutSubscriptionsInput>
+    create: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
+    where?: FeeTierWhereInput
   }
 
-  export type FeePlanUpdateToOneWithWhereWithoutSubscriptionsInput = {
-    where?: FeePlanWhereInput
-    data: XOR<FeePlanUpdateWithoutSubscriptionsInput, FeePlanUncheckedUpdateWithoutSubscriptionsInput>
+  export type FeeTierUpdateToOneWithWhereWithoutSubscriptionsInput = {
+    where?: FeeTierWhereInput
+    data: XOR<FeeTierUpdateWithoutSubscriptionsInput, FeeTierUncheckedUpdateWithoutSubscriptionsInput>
   }
 
-  export type FeePlanUpdateWithoutSubscriptionsInput = {
+  export type FeeTierUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentFees?: StudentFeeUpdateManyWithoutFeeTierNestedInput
   }
 
-  export type FeePlanUncheckedUpdateWithoutSubscriptionsInput = {
+  export type FeeTierUncheckedUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    monthlyPrice?: FloatFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    baseAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    criteria?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutFeeTierNestedInput
+  }
+
+  export type CashTransactionCreateWithoutSessionInput = {
+    id?: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+  }
+
+  export type CashTransactionUncheckedCreateWithoutSessionInput = {
+    id?: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+  }
+
+  export type CashTransactionCreateOrConnectWithoutSessionInput = {
+    where: CashTransactionWhereUniqueInput
+    create: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput>
+  }
+
+  export type CashTransactionCreateManySessionInputEnvelope = {
+    data: CashTransactionCreateManySessionInput | CashTransactionCreateManySessionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CashTransactionUpsertWithWhereUniqueWithoutSessionInput = {
+    where: CashTransactionWhereUniqueInput
+    update: XOR<CashTransactionUpdateWithoutSessionInput, CashTransactionUncheckedUpdateWithoutSessionInput>
+    create: XOR<CashTransactionCreateWithoutSessionInput, CashTransactionUncheckedCreateWithoutSessionInput>
+  }
+
+  export type CashTransactionUpdateWithWhereUniqueWithoutSessionInput = {
+    where: CashTransactionWhereUniqueInput
+    data: XOR<CashTransactionUpdateWithoutSessionInput, CashTransactionUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type CashTransactionUpdateManyWithWhereWithoutSessionInput = {
+    where: CashTransactionScalarWhereInput
+    data: XOR<CashTransactionUpdateManyMutationInput, CashTransactionUncheckedUpdateManyWithoutSessionInput>
+  }
+
+  export type CashTransactionScalarWhereInput = {
+    AND?: CashTransactionScalarWhereInput | CashTransactionScalarWhereInput[]
+    OR?: CashTransactionScalarWhereInput[]
+    NOT?: CashTransactionScalarWhereInput | CashTransactionScalarWhereInput[]
+    id?: StringFilter<"CashTransaction"> | string
+    sessionId?: StringFilter<"CashTransaction"> | string
+    studentProfileId?: StringNullableFilter<"CashTransaction"> | string | null
+    type?: EnumCashMovementTypeFilter<"CashTransaction"> | $Enums.CashMovementType
+    category?: EnumCashCategoryFilter<"CashTransaction"> | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFilter<"CashTransaction"> | $Enums.PaymentMethod
+    amount?: DecimalFilter<"CashTransaction"> | Decimal | DecimalJsLike | number | string
+    description?: StringFilter<"CashTransaction"> | string
+    recordedById?: StringFilter<"CashTransaction"> | string
+    createdAt?: DateTimeFilter<"CashTransaction"> | Date | string
+  }
+
+  export type CashRegisterSessionCreateWithoutTransactionsInput = {
+    id?: string
+    openedById: string
+    closedById?: string | null
+    openingDate?: Date | string
+    closingDate?: Date | string | null
+    initialBalance: Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    discrepancy?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.CashSessionStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CashRegisterSessionUncheckedCreateWithoutTransactionsInput = {
+    id?: string
+    openedById: string
+    closedById?: string | null
+    openingDate?: Date | string
+    closingDate?: Date | string | null
+    initialBalance: Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: Decimal | DecimalJsLike | number | string | null
+    discrepancy?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.CashSessionStatus
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CashRegisterSessionCreateOrConnectWithoutTransactionsInput = {
+    where: CashRegisterSessionWhereUniqueInput
+    create: XOR<CashRegisterSessionCreateWithoutTransactionsInput, CashRegisterSessionUncheckedCreateWithoutTransactionsInput>
+  }
+
+  export type CashRegisterSessionUpsertWithoutTransactionsInput = {
+    update: XOR<CashRegisterSessionUpdateWithoutTransactionsInput, CashRegisterSessionUncheckedUpdateWithoutTransactionsInput>
+    create: XOR<CashRegisterSessionCreateWithoutTransactionsInput, CashRegisterSessionUncheckedCreateWithoutTransactionsInput>
+    where?: CashRegisterSessionWhereInput
+  }
+
+  export type CashRegisterSessionUpdateToOneWithWhereWithoutTransactionsInput = {
+    where?: CashRegisterSessionWhereInput
+    data: XOR<CashRegisterSessionUpdateWithoutTransactionsInput, CashRegisterSessionUncheckedUpdateWithoutTransactionsInput>
+  }
+
+  export type CashRegisterSessionUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashRegisterSessionUncheckedUpdateWithoutTransactionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    openedById?: StringFieldUpdateOperationsInput | string
+    closedById?: NullableStringFieldUpdateOperationsInput | string | null
+    openingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    closingDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    initialBalance?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    expectedClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    actualClosingBalance?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    discrepancy?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumCashSessionStatusFieldUpdateOperationsInput | $Enums.CashSessionStatus
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentProfileCreateWithoutBankMandatesInput = {
+    id?: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutBankMandatesInput = {
+    id?: string
+    userId: string
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutBankMandatesInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
+  }
+
+  export type RemittanceItemCreateWithoutMandateInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: RemittanceBatchCreateNestedOneWithoutItemsInput
+  }
+
+  export type RemittanceItemUncheckedCreateWithoutMandateInput = {
+    id?: string
+    batchId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemCreateOrConnectWithoutMandateInput = {
+    where: RemittanceItemWhereUniqueInput
+    create: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput>
+  }
+
+  export type RemittanceItemCreateManyMandateInputEnvelope = {
+    data: RemittanceItemCreateManyMandateInput | RemittanceItemCreateManyMandateInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type StudentProfileUpsertWithoutBankMandatesInput = {
+    update: XOR<StudentProfileUpdateWithoutBankMandatesInput, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
+    create: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutBankMandatesInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutBankMandatesInput, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
+  }
+
+  export type StudentProfileUpdateWithoutBankMandatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutBankMandatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+  }
+
+  export type RemittanceItemUpsertWithWhereUniqueWithoutMandateInput = {
+    where: RemittanceItemWhereUniqueInput
+    update: XOR<RemittanceItemUpdateWithoutMandateInput, RemittanceItemUncheckedUpdateWithoutMandateInput>
+    create: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput>
+  }
+
+  export type RemittanceItemUpdateWithWhereUniqueWithoutMandateInput = {
+    where: RemittanceItemWhereUniqueInput
+    data: XOR<RemittanceItemUpdateWithoutMandateInput, RemittanceItemUncheckedUpdateWithoutMandateInput>
+  }
+
+  export type RemittanceItemUpdateManyWithWhereWithoutMandateInput = {
+    where: RemittanceItemScalarWhereInput
+    data: XOR<RemittanceItemUpdateManyMutationInput, RemittanceItemUncheckedUpdateManyWithoutMandateInput>
+  }
+
+  export type RemittanceItemScalarWhereInput = {
+    AND?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+    OR?: RemittanceItemScalarWhereInput[]
+    NOT?: RemittanceItemScalarWhereInput | RemittanceItemScalarWhereInput[]
+    id?: StringFilter<"RemittanceItem"> | string
+    batchId?: StringFilter<"RemittanceItem"> | string
+    mandateId?: StringFilter<"RemittanceItem"> | string
+    amount?: DecimalFilter<"RemittanceItem"> | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFilter<"RemittanceItem"> | $Enums.RemittanceItemStatus
+    returnReason?: StringNullableFilter<"RemittanceItem"> | string | null
+    createdAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+    updatedAt?: DateTimeFilter<"RemittanceItem"> | Date | string
+  }
+
+  export type RemittanceItemCreateWithoutBatchInput = {
+    id?: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    mandate: BankMandateCreateNestedOneWithoutRemittanceItemsInput
+  }
+
+  export type RemittanceItemUncheckedCreateWithoutBatchInput = {
+    id?: string
+    mandateId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemCreateOrConnectWithoutBatchInput = {
+    where: RemittanceItemWhereUniqueInput
+    create: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput>
+  }
+
+  export type RemittanceItemCreateManyBatchInputEnvelope = {
+    data: RemittanceItemCreateManyBatchInput | RemittanceItemCreateManyBatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type RemittanceItemUpsertWithWhereUniqueWithoutBatchInput = {
+    where: RemittanceItemWhereUniqueInput
+    update: XOR<RemittanceItemUpdateWithoutBatchInput, RemittanceItemUncheckedUpdateWithoutBatchInput>
+    create: XOR<RemittanceItemCreateWithoutBatchInput, RemittanceItemUncheckedCreateWithoutBatchInput>
+  }
+
+  export type RemittanceItemUpdateWithWhereUniqueWithoutBatchInput = {
+    where: RemittanceItemWhereUniqueInput
+    data: XOR<RemittanceItemUpdateWithoutBatchInput, RemittanceItemUncheckedUpdateWithoutBatchInput>
+  }
+
+  export type RemittanceItemUpdateManyWithWhereWithoutBatchInput = {
+    where: RemittanceItemScalarWhereInput
+    data: XOR<RemittanceItemUpdateManyMutationInput, RemittanceItemUncheckedUpdateManyWithoutBatchInput>
+  }
+
+  export type RemittanceBatchCreateWithoutItemsInput = {
+    id?: string
+    batchReference: string
+    executionDate: Date | string
+    totalAmount: Decimal | DecimalJsLike | number | string
+    totalItems: number
+    status?: $Enums.RemittanceStatus
+    generatedById: string
+    filePath?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceBatchUncheckedCreateWithoutItemsInput = {
+    id?: string
+    batchReference: string
+    executionDate: Date | string
+    totalAmount: Decimal | DecimalJsLike | number | string
+    totalItems: number
+    status?: $Enums.RemittanceStatus
+    generatedById: string
+    filePath?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceBatchCreateOrConnectWithoutItemsInput = {
+    where: RemittanceBatchWhereUniqueInput
+    create: XOR<RemittanceBatchCreateWithoutItemsInput, RemittanceBatchUncheckedCreateWithoutItemsInput>
+  }
+
+  export type BankMandateCreateWithoutRemittanceItemsInput = {
+    id?: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    student: StudentProfileCreateNestedOneWithoutBankMandatesInput
+  }
+
+  export type BankMandateUncheckedCreateWithoutRemittanceItemsInput = {
+    id?: string
+    studentProfileId: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BankMandateCreateOrConnectWithoutRemittanceItemsInput = {
+    where: BankMandateWhereUniqueInput
+    create: XOR<BankMandateCreateWithoutRemittanceItemsInput, BankMandateUncheckedCreateWithoutRemittanceItemsInput>
+  }
+
+  export type RemittanceBatchUpsertWithoutItemsInput = {
+    update: XOR<RemittanceBatchUpdateWithoutItemsInput, RemittanceBatchUncheckedUpdateWithoutItemsInput>
+    create: XOR<RemittanceBatchCreateWithoutItemsInput, RemittanceBatchUncheckedCreateWithoutItemsInput>
+    where?: RemittanceBatchWhereInput
+  }
+
+  export type RemittanceBatchUpdateToOneWithWhereWithoutItemsInput = {
+    where?: RemittanceBatchWhereInput
+    data: XOR<RemittanceBatchUpdateWithoutItemsInput, RemittanceBatchUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type RemittanceBatchUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceBatchUncheckedUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchReference?: StringFieldUpdateOperationsInput | string
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    totalAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalItems?: IntFieldUpdateOperationsInput | number
+    status?: EnumRemittanceStatusFieldUpdateOperationsInput | $Enums.RemittanceStatus
+    generatedById?: StringFieldUpdateOperationsInput | string
+    filePath?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BankMandateUpsertWithoutRemittanceItemsInput = {
+    update: XOR<BankMandateUpdateWithoutRemittanceItemsInput, BankMandateUncheckedUpdateWithoutRemittanceItemsInput>
+    create: XOR<BankMandateCreateWithoutRemittanceItemsInput, BankMandateUncheckedCreateWithoutRemittanceItemsInput>
+    where?: BankMandateWhereInput
+  }
+
+  export type BankMandateUpdateToOneWithWhereWithoutRemittanceItemsInput = {
+    where?: BankMandateWhereInput
+    data: XOR<BankMandateUpdateWithoutRemittanceItemsInput, BankMandateUncheckedUpdateWithoutRemittanceItemsInput>
+  }
+
+  export type BankMandateUpdateWithoutRemittanceItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput
+  }
+
+  export type BankMandateUncheckedUpdateWithoutRemittanceItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentLicenseCreateWithoutFederationInput = {
@@ -23448,6 +37032,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutLicensesInput = {
@@ -23464,6 +37051,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutLicensesInput = {
@@ -23513,6 +37103,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutLicensesInput = {
@@ -23529,6 +37122,9 @@ export namespace Prisma {
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type FederationUpsertWithoutLicensesInput = {
@@ -23711,9 +37307,8 @@ export namespace Prisma {
 
   export type StudentSubscriptionCreateManyStudentInput = {
     id?: string
-    feePlanId: string
+    feeTierId: string
     isActive?: boolean
-    mandateReference?: string | null
   }
 
   export type StudentLicenseCreateManyStudentInput = {
@@ -23722,6 +37317,35 @@ export namespace Prisma {
     licenseNumber: string
     validUntil: Date | string
     isActive?: boolean
+  }
+
+  export type StudentFeeCreateManyStudentInput = {
+    id?: string
+    feeTierId?: string | null
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StudentPromotionCreateManyStudentProfileInput = {
+    id?: string
+    promotionId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type BankMandateCreateManyStudentInput = {
+    id?: string
+    iban: string
+    bic?: string | null
+    mandateReference: string
+    signatureDate: Date | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type StudentGuardianUpdateWithoutStudentInput = {
@@ -23844,22 +37468,19 @@ export namespace Prisma {
   export type StudentSubscriptionUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
-    feePlan?: FeePlanUpdateOneRequiredWithoutSubscriptionsNestedInput
+    feeTier?: FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
   export type StudentSubscriptionUncheckedUpdateWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    feePlanId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StudentSubscriptionUncheckedUpdateManyWithoutStudentInput = {
     id?: StringFieldUpdateOperationsInput | string
-    feePlanId?: StringFieldUpdateOperationsInput | string
+    feeTierId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StudentLicenseUpdateWithoutStudentInput = {
@@ -23884,6 +37505,95 @@ export namespace Prisma {
     licenseNumber?: StringFieldUpdateOperationsInput | string
     validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type StudentFeeUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    feeTier?: FeeTierUpdateOneWithoutStudentFeesNestedInput
+  }
+
+  export type StudentFeeUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentFeeUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentPromotionUpdateWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    promotion?: PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput
+  }
+
+  export type StudentPromotionUncheckedUpdateWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    promotionId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type StudentPromotionUncheckedUpdateManyWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    promotionId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type BankMandateUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remittanceItems?: RemittanceItemUpdateManyWithoutMandateNestedInput
+  }
+
+  export type BankMandateUncheckedUpdateWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remittanceItems?: RemittanceItemUncheckedUpdateManyWithoutMandateNestedInput
+  }
+
+  export type BankMandateUncheckedUpdateManyWithoutStudentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    mandateReference?: StringFieldUpdateOperationsInput | string
+    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentGuardianCreateManyGuardianInput = {
@@ -24010,32 +37720,228 @@ export namespace Prisma {
     lastStripeAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentSubscriptionCreateManyFeePlanInput = {
+  export type StudentFeeCreateManyFeeTierInput = {
+    id?: string
+    studentProfileId: string
+    customAmount?: Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: boolean
+    effectiveFrom?: Date | string
+    effectiveTo?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StudentSubscriptionCreateManyFeeTierInput = {
     id?: string
     studentProfileId: string
     isActive?: boolean
-    mandateReference?: string | null
   }
 
-  export type StudentSubscriptionUpdateWithoutFeePlanInput = {
+  export type StudentFeeUpdateWithoutFeeTierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    student?: StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput
+  }
+
+  export type StudentFeeUncheckedUpdateWithoutFeeTierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentFeeUncheckedUpdateManyWithoutFeeTierInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
+    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
+    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentSubscriptionUpdateWithoutFeeTierInput = {
     id?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
     student?: StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
-  export type StudentSubscriptionUncheckedUpdateWithoutFeePlanInput = {
+  export type StudentSubscriptionUncheckedUpdateWithoutFeeTierInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type StudentSubscriptionUncheckedUpdateManyWithoutFeePlanInput = {
+  export type StudentSubscriptionUncheckedUpdateManyWithoutFeeTierInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    mandateReference?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type StudentPromotionCreateManyPromotionInput = {
+    id?: string
+    studentProfileId: string
+    assignedAt?: Date | string
+    expiresAt?: Date | string | null
+  }
+
+  export type StudentPromotionUpdateWithoutPromotionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput
+  }
+
+  export type StudentPromotionUncheckedUpdateWithoutPromotionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type StudentPromotionUncheckedUpdateManyWithoutPromotionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type CashTransactionCreateManySessionInput = {
+    id?: string
+    studentProfileId?: string | null
+    type: $Enums.CashMovementType
+    category: $Enums.CashCategory
+    paymentMethod: $Enums.PaymentMethod
+    amount: Decimal | DecimalJsLike | number | string
+    description: string
+    recordedById: string
+    createdAt?: Date | string
+  }
+
+  export type CashTransactionUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashTransactionUncheckedUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CashTransactionUncheckedUpdateManyWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: EnumCashMovementTypeFieldUpdateOperationsInput | $Enums.CashMovementType
+    category?: EnumCashCategoryFieldUpdateOperationsInput | $Enums.CashCategory
+    paymentMethod?: EnumPaymentMethodFieldUpdateOperationsInput | $Enums.PaymentMethod
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    description?: StringFieldUpdateOperationsInput | string
+    recordedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemCreateManyMandateInput = {
+    id?: string
+    batchId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemUpdateWithoutMandateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: RemittanceBatchUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type RemittanceItemUncheckedUpdateWithoutMandateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemUncheckedUpdateManyWithoutMandateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemCreateManyBatchInput = {
+    id?: string
+    mandateId: string
+    amount: Decimal | DecimalJsLike | number | string
+    status?: $Enums.RemittanceItemStatus
+    returnReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type RemittanceItemUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mandate?: BankMandateUpdateOneRequiredWithoutRemittanceItemsNestedInput
+  }
+
+  export type RemittanceItemUncheckedUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    mandateId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RemittanceItemUncheckedUpdateManyWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    mandateId?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumRemittanceItemStatusFieldUpdateOperationsInput | $Enums.RemittanceItemStatus
+    returnReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentLicenseCreateManyFederationInput = {
@@ -24100,9 +38006,25 @@ export namespace Prisma {
      */
     export type BeltRankCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BeltRankCountOutputTypeDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use FeePlanCountOutputTypeDefaultArgs instead
+     * @deprecated Use FeeTierCountOutputTypeDefaultArgs instead
      */
-    export type FeePlanCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeePlanCountOutputTypeDefaultArgs<ExtArgs>
+    export type FeeTierCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeeTierCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use PromotionCountOutputTypeDefaultArgs instead
+     */
+    export type PromotionCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use CashRegisterSessionCountOutputTypeDefaultArgs instead
+     */
+    export type CashRegisterSessionCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CashRegisterSessionCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use BankMandateCountOutputTypeDefaultArgs instead
+     */
+    export type BankMandateCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BankMandateCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use RemittanceBatchCountOutputTypeDefaultArgs instead
+     */
+    export type RemittanceBatchCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = RemittanceBatchCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use FederationCountOutputTypeDefaultArgs instead
      */
@@ -24152,13 +38074,45 @@ export namespace Prisma {
      */
     export type PromotionRequestArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionRequestDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use FeePlanDefaultArgs instead
+     * @deprecated Use FeeTierDefaultArgs instead
      */
-    export type FeePlanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeePlanDefaultArgs<ExtArgs>
+    export type FeeTierArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeeTierDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StudentFeeDefaultArgs instead
+     */
+    export type StudentFeeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentFeeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use PromotionDefaultArgs instead
+     */
+    export type PromotionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StudentPromotionDefaultArgs instead
+     */
+    export type StudentPromotionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentPromotionDefaultArgs<ExtArgs>
     /**
      * @deprecated Use StudentSubscriptionDefaultArgs instead
      */
     export type StudentSubscriptionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentSubscriptionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use CashRegisterSessionDefaultArgs instead
+     */
+    export type CashRegisterSessionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CashRegisterSessionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use CashTransactionDefaultArgs instead
+     */
+    export type CashTransactionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CashTransactionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use BankMandateDefaultArgs instead
+     */
+    export type BankMandateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BankMandateDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use RemittanceBatchDefaultArgs instead
+     */
+    export type RemittanceBatchArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = RemittanceBatchDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use RemittanceItemDefaultArgs instead
+     */
+    export type RemittanceItemArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = RemittanceItemDefaultArgs<ExtArgs>
     /**
      * @deprecated Use FederationDefaultArgs instead
      */

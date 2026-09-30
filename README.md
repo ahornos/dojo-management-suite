@@ -11,15 +11,16 @@ Dojo Management Suite is structured as a high-performance monorepo managed via *
 ```text
 dojo-management-suite/
 ├── apps/
-│   ├── academic-service/     # Core academic module (Students, Ranks, Attendances, Promotions)
-│   ├── auth-service/         # (Planned) Centralized authentication & IAM service
-│   ├── financial-service/    # (Planned) Billing, fee plans, and subscriptions
-│   └── api-gateway/          # (Planned) Unified API Gateway routing and load balancing
+│   ├── api-gateway/          # Unified API Gateway routing and load balancing[cite: 1]
+│   ├── auth-service/         # Centralized authentication & IAM service[cite: 1]
+│   ├── academic-service/     # Core academic module (Students, Ranks, Attendances, Promotions)[cite: 1, 10]
+│   └── financial-service/    # Billing, fee plans, cash register, and SEPA remittances[cite: 1]
 ├── packages/
 │   ├── database/             # Shared Prisma ORM client, database schema & migrations
 │   └── shared-types/         # Shared TypeScript interfaces and DTOs
 ├── pnpm-workspace.yaml
-└── docker-compose.yml
+├── docker-compose.yml
+└── SETUP.md                  # Comprehensive initial setup and clean deployment guide
 ```
 
 ---
@@ -37,94 +38,52 @@ dojo-management-suite/
 
 ## ⚙️ Getting Started (Development Environment)
 
-### Prerequisites
-* Node.js (v20+ recommended)
-* pnpm (`npm install -g pnpm`)
-* Docker and Docker Compose
-
-### 1. Clone the Repository & Install Dependencies
-```bash
-git clone https://github.com/your-username/dojo-management-suite.git
-cd dojo-management-suite
-pnpm install
-```
-
-### 2. Set Up Environment Variables
-Copy the environment template to create your local `.env` file:
-```bash
-cp .env.example .env
-```
-
-### 3. Spin Up Infrastructure (PostgreSQL & Redis)
-Start the local databases using Docker Compose:
-```bash
-docker compose up -d
-```
-
-### 4. Initialize Database Schema & Client
-Navigate to the database package to push the schema and generate the Prisma client:
-```bash
-cd packages/database
-npx prisma db push
-npx prisma generate
-cd ../..
-```
-
-### 5. Run the Academic Service in Development Mode
-```bash
-pnpm --filter dms-academic-service start:dev
-```
-
-Once running, you can access the **Swagger API Documentation** at:
-👉 `http://localhost:3001/api`
-
----
+For a complete, clean initialization from scratch (destroying previous volumes, purging artifacts, hydrating the database, and running test suites), please refer to the [SETUP.md](./SETUP.md) guide.
 
 ## 🔄 Database Workflow (Schema Changes)
+Whenever you modify the `schema.prisma` file located in `packages/database/prisma/schema.prisma`
 
-Whenever you modify the `schema.prisma` file located in `packages/database/prisma/schema.prisma`:
+1. Apply changes to your local or containerized PostgreSQL database:
 
-1. Apply changes to your local PostgreSQL database:
-   ```bash
-   cd packages/database
-   npx prisma db push
-   ```
-2. Regenerate the shared Prisma Client:
-   ```bash
-   npx prisma generate
-   cd ../..
-   ```
+```bash
+pnpm --filter @dms/database db:push
+```
 
+2. Regenerate the shared Prisma Client typings:
+
+```bash
+pnpm --filter @dms/database exec prisma generate
+```
 ---
 
 ## 🧪 Running Tests
 
-To run unit tests across packages or specific microservices:
-```bash
-# Run tests for the academic service
-pnpm --filter dms-academic-service test
-```
+To run unit and E2E test suites across microservices:
 
+```bash
+# Unit tests
+pnpm --filter auth-service test
+pnpm --filter academic-service test
+pnpm --filter financial-service test
+
+# E2E integration tests
+pnpm --filter auth-service test:e2e
+pnpm --filter academic-service test:e2e
+```
 ---
 
-## 📦 Deployment Instructions
+## 🌐 API Documentation (Swagger)
 
-### Microservice Deployment
-To build and run an individual microservice for production:
-```bash
-# Build the package
-pnpm --filter dms-academic-service build
+Once the infrastructure and services are running via Docker Compose, each microservice exposes its OpenAPI documentation at `/api/docs`:
 
-# Start production server
-pnpm --filter dms-academic-service start:prod
-```
+* Auth Service: [http://localhost:3001/api/docs](http://localhost:3001/api/docs)
 
-### Full Project Deployment (Docker)
-You can orchestrate the full stack deployment by extending the `docker-compose.yml` to include container definitions for each microservice alongside PostgreSQL and Redis.
+* Academic Service: [http://localhost:3002/api/docs](http://localhost:3002/api/docs)
 
----
+* Financial Service: [http://localhost:3003/api/docs](http://localhost:3003/api/docs)
 
 ## 📄 License
 
-This project is open-source software licensed under the **MIT License**. Feel free to use, modify, and distribute it under the terms of the license.
+This project is open-source software licensed under the MIT License. Feel free to use, modify, and distribute it under the terms of the license.
 
+For a complet license text, please refer to [LICENSE](./LICENCE)

@@ -4,7 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
 /**
- * Unit tests for PromotionsService covering evaluation, promotion execution, proposals, and rollbacks.
+ * @group unit
+ * @description Unit tests for PromotionsService covering evaluation, promotion execution, proposals, and rollbacks.
  */
 describe('PromotionsService', () => {
   let service: PromotionsService;
@@ -15,7 +16,7 @@ describe('PromotionsService', () => {
       findUnique: jest.fn(),
     },
     promotionRequest: {
-      create: jest.fn(),
+      create: jest.fn().mockResolvedValue({ id: 'req-uuid', status: 'PENDING' }),
     },
     studentRank: {
       update: jest.fn(),
@@ -47,6 +48,16 @@ describe('PromotionsService', () => {
 
       await expect(
         service.evaluatePromotionEligibility('non-existent-id'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('proposePromotion', () => {
+    it('should throw NotFoundException if student profile does not exist when proposing', async () => {
+      mockPrisma.studentProfile.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.proposePromotion('non-existent-id', 'instructor-uuid'),
       ).rejects.toThrow(NotFoundException);
     });
   });

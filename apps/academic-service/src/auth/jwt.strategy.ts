@@ -1,6 +1,6 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -8,12 +8,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET || 'super-secret-dojo-key-change-in-prod',
+      secretOrKey: process.env.JWT_SECRET || 'super-secret-jwt-key-change-in-production',
     });
   }
 
+  /**
+   * @description Validates and extracts the decoded JWT payload, attaching it to the request object.
+   * @param {any} payload - The decoded JSON Web Token payload.
+   * @returns {Promise<any>} An object containing the user's ID, email, and role.
+   */
   async validate(payload: any) {
-    // This payload is injected into the request object as `req.user`
-    return { userId: payload.sub, email: payload.email, role: payload.role };
+    return { id: payload.sub, email: payload.email, role: payload.role };
   }
 }

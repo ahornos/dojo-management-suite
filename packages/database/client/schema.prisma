@@ -33,6 +33,65 @@ enum RequestStatus {
   REJECTED
 }
 
+/// Type of promotion discount applied.
+enum PromotionType {
+  PERCENTAGE
+  FIXED_DISCOUNT
+  FREE_PERIOD
+}
+
+/// Category of promotion rule.
+enum PromotionCategory {
+  FAMILY
+  SECURITY_FORCES
+  TEMPORARY
+}
+
+/// Status of a daily cash register session.
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+  RECONCILED
+}
+
+/// Type of cash movement (income or expense).
+enum CashMovementType {
+  INCOME
+  EXPENSE
+}
+
+/// Category classifying the financial movement in the cash register.
+enum CashCategory {
+  MEMBERSHIP_PAYMENT
+  EXAM_FEE
+  MERCHANDISE_SALE
+  OTHER_INCOME
+  OPERATIONAL_EXPENSE
+}
+
+/// Payment method used for the transaction.
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+}
+
+/// Status of a SEPA remittance batch file.
+enum RemittanceStatus {
+  DRAFT
+  GENERATED
+  SUBMITTED
+  SETTLED
+  REJECTED
+}
+
+/// Status of an individual transaction within a remittance batch.
+enum RemittanceItemStatus {
+  PENDING
+  SETTLED
+  RETURNED
+}
+
 /// ---------------------------------------------------------
 /// Core Identity & Users
 /// ---------------------------------------------------------
@@ -74,6 +133,9 @@ model StudentProfile {
   promotionRequests PromotionRequest[]
   subscriptions     StudentSubscription[]
   licenses          StudentLicense[]
+  studentFees       StudentFee[]
+  studentPromotions StudentPromotion[]
+  bankMandates      BankMandate[]
 
   @@map("student_profiles")
 }
@@ -210,30 +272,193 @@ model PromotionRequest {
 }
 
 /// ---------------------------------------------------------
-/// Billing & Subscriptions (Foundation)
+/// Billing, Subscriptions & Financial Engine
 /// ---------------------------------------------------------
 
-model FeePlan {
-  id           String @id @default(uuid())
-  name         String
-  monthlyPrice Float
+/// Base fee tiers configured for the academy (e.g., Bronze, Silver, Gold, Child).
+model FeeTier {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  baseAmount  Decimal  @db.Decimal(10, 2)
+  criteria    Json? /// Criteria like training hours, age ranges, etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  studentFees   StudentFee[]
   subscriptions StudentSubscription[]
 
-  @@map("fee_plans")
+  @@map("fee_tiers")
 }
 
+/// Custom or historical fee assignments mapped specifically to a student profile.
+model StudentFee {
+  id               String    @id @default(uuid())
+  studentProfileId String
+  feeTierId        String?
+  customAmount     Decimal?  @db.Decimal(10, 2) /// Specific agreed historical or custom amount
+  ipcApplied       Boolean   @default(false)
+  effectiveFrom    DateTime  @default(now())
+  effectiveTo      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  feeTier FeeTier?       @relation(fields: [feeTierId], references: [id])
+
+  @@index([studentProfileId])
+  @@map("student_fees")
+}
+
+/// Discount rules and special promotional campaigns.
+model Promotion {
+  id          String            @id @default(uuid())
+  code        String            @unique
+  name        String
+  description String?
+  type        PromotionType
+  category    PromotionCategory
+  value       Decimal?          @db.Decimal(10, 2) /// Percentage value or fixed discount amount
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  studentPromotions StudentPromotion[]
+
+  @@map("promotions")
+}
+
+/// Mapping of active promotions assigned to student profiles.
+model StudentPromotion {
+  id               String    @id @default(uuid())
+  studentProfileId String
+  promotionId      String
+  assignedAt       DateTime  @default(now())
+  expiresAt        DateTime?
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  promotion      Promotion      @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+
+  @@unique([studentProfileId, promotionId])
+  @@map("student_promotions")
+}
+
+/// Subscription tracking linking students to fee tiers.
 model StudentSubscription {
   id               String  @id @default(uuid())
   studentProfileId String
-  feePlanId        String
+  feeTierId        String
   isActive         Boolean @default(true)
-  mandateReference String?
 
   student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  feePlan FeePlan        @relation(fields: [feePlanId], references: [id])
+  feeTier FeeTier        @relation(fields: [feeTierId], references: [id])
 
   @@map("student_subscriptions")
+}
+
+/// ---------------------------------------------------------
+/// Daily Cash Register Submodule
+/// ---------------------------------------------------------
+
+/// Represents a daily cash register session managed by administrative staff.
+model CashRegisterSession {
+  id                     String            @id @default(uuid())
+  openedById             String /// User ID of the staff member who opened the register
+  closedById             String? /// User ID of the staff member who closed the register
+  openingDate            DateTime          @default(now())
+  closingDate            DateTime?
+  initialBalance         Decimal           @db.Decimal(10, 2) /// Starting cash amount in the register
+  expectedClosingBalance Decimal?          @db.Decimal(10, 2) /// Calculated expected cash at close
+  actualClosingBalance   Decimal?          @db.Decimal(10, 2) /// Real physical counted cash at close
+  discrepancy            Decimal?          @db.Decimal(10, 2) /// Difference between expected and actual
+  status                 CashSessionStatus @default(OPEN)
+  notes                  String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  transactions CashTransaction[]
+
+  @@map("cash_register_sessions")
+}
+
+/// Represents an individual income or expense entry within a cash session.
+model CashTransaction {
+  id               String           @id @default(uuid())
+  sessionId        String
+  studentProfileId String? /// Optional link if transaction is associated with a student
+  type             CashMovementType
+  category         CashCategory
+  paymentMethod    PaymentMethod
+  amount           Decimal          @db.Decimal(10, 2)
+  description      String
+  recordedById     String /// User ID of the staff member who registered the transaction
+  createdAt        DateTime         @default(now())
+
+  session CashRegisterSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([studentProfileId])
+  @@map("cash_transactions")
+}
+
+/// ---------------------------------------------------------
+/// Bank Remittance Submodule (SEPA / Caixabank Integration)
+/// ---------------------------------------------------------
+
+/// Represents a SEPA direct debit bank mandate signed by a student or guardian.
+model BankMandate {
+  id               String   @id @default(uuid())
+  studentProfileId String
+  iban             String /// Debtor IBAN account number
+  bic              String? /// BIC / SWIFT code of the debtor bank
+  mandateReference String   @unique /// Unique mandate reference code required by SEPA
+  signatureDate    DateTime /// Date when the mandate was signed
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student         StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  remittanceItems RemittanceItem[]
+
+  @@map("bank_mandates")
+}
+
+/// Represents a generated SEPA XML batch file submitted to the bank.
+model RemittanceBatch {
+  id             String           @id @default(uuid())
+  batchReference String           @unique /// Unique reference for the remittance batch
+  executionDate  DateTime /// Planned execution date for bank collection
+  totalAmount    Decimal          @db.Decimal(10, 2) /// Total sum of all items in the batch
+  totalItems     Int /// Total number of direct debit items
+  status         RemittanceStatus @default(DRAFT)
+  generatedById  String /// User ID of the staff member who generated the file
+  filePath       String? /// Storage path of the generated SEPA XML file
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  items RemittanceItem[]
+
+  @@map("remittance_batches")
+}
+
+/// Represents an individual collection item inside a SEPA remittance batch.
+model RemittanceItem {
+  id           String               @id @default(uuid())
+  batchId      String
+  mandateId    String
+  amount       Decimal              @db.Decimal(10, 2)
+  status       RemittanceItemStatus @default(PENDING)
+  returnReason String? /// Reason code if payment is returned/rejected by the bank
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  batch   RemittanceBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  mandate BankMandate     @relation(fields: [mandateId], references: [id])
+
+  @@map("remittance_items")
 }
 
 /// ---------------------------------------------------------

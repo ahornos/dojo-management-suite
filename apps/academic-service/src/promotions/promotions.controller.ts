@@ -7,7 +7,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@dms/database/client';
 
 /**
- * Controller responsible for evaluating and executing martial arts promotions and rollbacks.
+ * @class PromotionsController
+ * @description Controller responsible for evaluating and executing martial arts promotions and rollbacks.
  * Protected by JWT authentication and Role-Based Access Control.
  */
 @ApiTags('Academic Promotions')
@@ -18,11 +19,9 @@ export class PromotionsController {
   constructor(private readonly promotionsService: PromotionsService) {}
 
   /**
-   * Evaluates if a student is eligible for a stripe or belt promotion
-   * based on their accumulated hours and minimum time in rank.
-   * 
-   * @param studentProfileId - The UUID of the student's profile.
-   * @returns Eligibility report.
+   * @description Evaluates if a student is eligible for a stripe or belt promotion based on hours and time in rank.
+   * @param {string} studentProfileId - The UUID of the student's profile.
+   * @returns {Promise<any>} Eligibility report.
    */
   @Get('eligibility/:studentProfileId')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR)
@@ -32,7 +31,7 @@ export class PromotionsController {
   }
 
   /**
-   * Attempts to promote a student. Behavior changes based on the user's role:
+   * @description Attempts to promote a student. Behavior changes based on the user's role:
    * - INSTRUCTOR: Creates a pending PromotionRequest for approval.
    * - DIRECTOR / ADMIN: Directly executes the promotion in the database.
    * 
@@ -57,7 +56,7 @@ export class PromotionsController {
   }
 
   /**
-   * Reverts the last promotion or stripe awarded to a student in case of an administrative error.
+   * @description Reverts the last promotion or stripe awarded to a student in case of an administrative error.
    * Strictly restricted to SUPER_ADMIN, ADMIN_STAFF, and SPORTS_TECHNICAL_DIRECTOR.
    * 
    * @param studentProfileId - The UUID of the student's profile.

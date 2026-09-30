@@ -7,7 +7,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@dms/database/client';
 
 /**
- * Controller for managing student profiles and personal data updates.
+ * @class StudentsController
+ * @description Controller for managing student profiles and personal data updates.
  * Implements data ownership, conditional approval workflows, and administrative deletions.
  */
 @ApiTags('Student Management')
@@ -18,8 +19,8 @@ export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   /**
-   * Retrieves all student profiles.
-   * Strictly limited to staff members. Students cannot access the directory.
+   * @description Retrieves all student profiles. Strictly limited to staff members. Students cannot access the directory.
+   * @returns {Promise<any[]>} An array of student profile records.
    */
   @Get()
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR)
@@ -29,8 +30,10 @@ export class StudentsController {
   }
 
   /**
-   * Retrieves a specific student profile.
-   * Accessible by staff or the owner of the profile.
+   * @description Retrieves a specific student profile. Accessible by staff or the owner of the profile.
+   * @param {string} id - The UUID of the student profile.
+   * @param {any} req - The Express request object containing the authenticated user.
+   * @returns {Promise<any>} The student profile details.
    */
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
@@ -39,7 +42,11 @@ export class StudentsController {
   }
 
   /**
-   * Updates student data. Staff bypasses approval, students generate a request.
+   * @description Updates student data. Staff bypasses approval, whereas students generate an update request.
+   * @param {string} id - The UUID of the student profile to update.
+   * @param {any} updateDto - The payload containing the updated fields.
+   * @param {any} req - The Express request object containing the authenticated user.
+   * @returns {Promise<any>} The updated profile or the generated update request.
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update profile or propose changes' })
@@ -49,11 +56,9 @@ export class StudentsController {
   }
 
   /**
-   * Deletes a student profile by its unique identifier.
-   * Strictly restricted to SUPER_ADMIN role for security and auditing purposes.
-   * 
-   * @param id - Student Profile UUID.
-   * @returns The deleted student profile record.
+   * @description Deletes a student profile by its unique identifier. Strictly restricted to SUPER_ADMIN.
+   * @param {string} id - The UUID of the student profile to delete.
+   * @returns {Promise<any>} The deleted student profile record.
    */
   @Delete(':id')
   @Roles(Role.SUPER_ADMIN)

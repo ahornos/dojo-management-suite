@@ -5,7 +5,8 @@ import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Role } from '@dms/database/client';
 
 /**
- * Unit tests for StudentsService covering data isolation and profile update workflows.
+ * @group unit
+ * @description Unit tests for StudentsService covering data isolation and profile update workflows.
  */
 describe('StudentsService', () => {
   let service: StudentsService;

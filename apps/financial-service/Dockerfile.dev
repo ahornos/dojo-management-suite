@@ -15,6 +15,9 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages/ ./packages/
 COPY apps/ ./apps/
 
+# Instalar dependencias del monorepo
+RUN pnpm install
+
 # Establecer el directorio de trabajo en el microservicio correspondiente (ej. financial-service)
 WORKDIR /app/apps/financial-service
 
