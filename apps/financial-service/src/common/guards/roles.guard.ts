@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from '@dms/database/client';
+import { Role } from '@dms/shared-types';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 /**

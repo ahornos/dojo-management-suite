@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@dms/database": "workspace:*",
+    "@dms/shared-types": "workspace:*",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^12.0.2",

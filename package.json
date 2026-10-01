@@ -1,24 +1,16 @@
 {
   "name": "dojo-management-suite",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
+    "build:shared": "pnpm --filter @dms/shared-types build",
+    "build:auth": "pnpm --filter auth-service build",
+    "build": "pnpm --filter @dms/shared-types build && pnpm --filter auth-service build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "12.6.0",
-      "onFail": "download"
-    }
-  },
-  "packageManager": "pnpm@12.6.0",
-  "type": "module",
   "devDependencies": {
     "turbo": "^2.11.3"
-  }
+  },
+  "packageManager": "pnpm@12.6.0",
+  "type": "module"
 }

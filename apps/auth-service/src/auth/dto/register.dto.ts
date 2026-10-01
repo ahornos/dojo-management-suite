@@ -1,29 +1,33 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsString, IsEmail, IsNotEmpty, IsEnum, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '@dms/shared-types';
 
 /**
- * @class RegisterDto
- * @description Data Transfer Object for validating user registration payloads.
+ * @file register.dto.ts
+ * @description Data Transfer Object for user registration.
  */
 export class RegisterDto {
-  @ApiProperty({ example: 'user@dojo.com' })
+  @ApiProperty({ description: 'User email address', example: 'user@dojo.com' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'SecurePassword123' })
+  @ApiProperty({ description: 'Plain text password', example: 'SecurePassword123!' })
   @IsString()
-  @IsNotEmpty()
-  @MinLength(6)
+  @MinLength(8)
   password: string;
 
-  @ApiProperty({ example: 'Juan' })
+  @ApiProperty({ description: 'User first name', example: 'John' })
   @IsString()
   @IsNotEmpty()
   firstName: string;
 
-  @ApiProperty({ example: 'Pérez' })
+  @ApiProperty({ description: 'User last name', example: 'Doe' })
   @IsString()
   @IsNotEmpty()
   lastName: string;
+
+  @ApiProperty({ description: 'System role assigned to the user', enum: Role, example: Role.STUDENT })
+  @IsEnum(Role)
+  role: Role;
 }

@@ -10,7 +10,10 @@ const config: Config = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  transformIgnorePatterns: ['node_modules/(?!(@nestjs/jwt))'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(@nestjs/jwt))',
+    '<rootDir>/../../packages/' 
+  ],
 };
 
 export default config;

@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { Role } from '@dms/shared-types';
 import * as bcrypt from 'bcrypt';
 
 /**
@@ -38,9 +39,10 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
-        passwordHash: hashedPassword, // Mapeado correctamente a Prisma[cite: 4]
-        firstName: dto.firstName,     // Mapeado correctamente a Prisma[cite: 4]
-        lastName: dto.lastName,       // Mapeado correctamente a Prisma[cite: 4]
+        passwordHash: hashedPassword,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        role: dto.role || Role.STUDENT,
       },
     });
 
@@ -67,7 +69,7 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash); // Uso de passwordHash[cite: 4]
+    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -81,8 +83,8 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName, // Devolvemos el nombre real[cite: 4]
-        lastName: user.lastName,   // Devolvemos el apellido real[cite: 4]
+        firstName: user.firstName,
+        lastName: user.lastName,
         role: user.role,
       },
     };

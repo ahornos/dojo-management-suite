@@ -6,7 +6,7 @@ import { AssignPromotionDto } from './dto/assign-promotion.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '@dms/database/client';
+import { Role } from '@dms/shared-types';
 
 /**
  * @file promotions.controller.ts

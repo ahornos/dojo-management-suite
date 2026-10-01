@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { FeesModule } from './fees/fees.module';
 import { PromotionsModule } from './promotions/promotions.module';
+import { CashModule } from './cash/cash.module';
+import { RemittancesModule } from './remittances/remittances.module';
 
 /**
  * @file app.module.ts
@@ -11,7 +13,9 @@ import { PromotionsModule } from './promotions/promotions.module';
   imports: [
     PrismaModule,
     FeesModule,
-    PromotionsModule
+    PromotionsModule,
+    CashModule,
+    RemittancesModule
   ],
 })
 export class AppModule {}

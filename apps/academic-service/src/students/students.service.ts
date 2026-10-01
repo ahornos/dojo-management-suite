@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from '@dms/database/client';
+import { Role } from '@dms/shared-types';
 
 /**
  * Service handling student profile operations with strict data isolation.

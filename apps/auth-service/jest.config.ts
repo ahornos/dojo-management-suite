@@ -13,7 +13,7 @@ const config: Config = {
   transformIgnorePatterns: ['node_modules/(?!(@nestjs/jwt))'],
   moduleNameMapper: {
     '^@dms/database(.*)$': '<rootDir>/../../../packages/database$1',
-    // Redirigimos @nestjs/jwt a un mock limpio para evitar el error de sintaxis ESM en Jest
+    '^@dms/shared-types(.*)$': '<rootDir>/../../../packages/shared-types/src$1',
     '^@nestjs/jwt$': '<rootDir>/src/auth/__mocks__/@nestjs/jwt.ts',
   },
 };

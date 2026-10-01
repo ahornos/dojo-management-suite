@@ -31,14 +31,17 @@ docker compose up --build --force-recreate -d
 ```
 > **_NOTE:_** Wait approximately 10–15 seconds for the PostgreSQL container to pass its health checks.
 
-## 4. Database Hydration & Typings (Critical)
-Do not run tests before this step. The microservices require the database tables to be initialized and the Prisma client to be fully generated.
+## 4. Shared Types Compilation & Database Hydration (Critical)
+Do not run tests or build microservices before this step. The shared package must be compiled first so that microservices can resolve path aliases, and the database schema must be fully synchronized.
 
 ```bash
-# 1. Synchronize the database schema with the PostgreSQL instance
+# 1. Build the shared types package (generates /dist required for TypeScript path aliasing)
+pnpm --filter @dms/shared-types build
+
+# 2. Synchronize the database schema with the PostgreSQL instance
 pnpm --filter @dms/database db:push
 
-# 2. Generate the Prisma Client typings for TypeScript compilation
+# 3. Generate the Prisma Client typings for TypeScript compilation
 pnpm --filter @dms/database exec prisma generate
 ```
 

@@ -1,0 +1,14 @@
+{
+  "name": "@dms/shared-types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript definitions and enums for Dojo Management Suite",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.3"
+  }
+}

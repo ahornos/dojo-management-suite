@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty, IsEnum, IsNumber, IsOptional, IsBoolean, IsDateString, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PromotionType, PromotionCategory } from '@dms/database/client';
+import { PromotionType, PromotionCategory } from '@dms/shared-types'; 
 
 /**
  * @file create-promotion.dto.ts
