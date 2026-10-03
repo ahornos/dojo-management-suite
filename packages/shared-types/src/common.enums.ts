@@ -12,13 +12,13 @@ export enum Role {
   PARENT = 'PARENT',
 }
 
-export enum PromotionType {
+export enum DiscountType {
   PERCENTAGE = 'PERCENTAGE',
   FIXED_DISCOUNT = 'FIXED_DISCOUNT',
   FREE_PERIOD = 'FREE_PERIOD',
 }
 
-export enum PromotionCategory {
+export enum DiscountCategory {
   FAMILY = 'FAMILY',
   SECURITY_FORCES = 'SECURITY_FORCES',
   TEMPORARY = 'TEMPORARY',

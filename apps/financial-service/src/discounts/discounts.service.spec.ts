@@ -1,23 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PromotionsService } from './promotions.service';
+import { DiscountsService } from './discounts.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 /**
- * @file promotions.service.spec.ts
- * @description Unit tests validating the calculation logic of the discount engine.
+ * @file discounts.service.spec.ts
+ * @description Unit tests validating the calculation logic of the financial discount engine.
  */
-describe('PromotionsService', () => {
-  let service: PromotionsService;
+describe('DiscountsService', () => {
+  let service: DiscountsService;
 
   const mockPrismaService = {
-    promotion: {
-      create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: 'promo-uuid', ...dto.data })),
+    discount: {
+      create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: 'discount-uuid', ...dto.data })),
     },
-    studentPromotion: {
-      create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: 'sp-uuid', ...dto.data })),
+    studentDiscount: {
+      create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: 'sd-uuid', ...dto.data })),
       findMany: jest.fn().mockResolvedValue([
         {
-          promotion: { type: 'PERCENTAGE', value: 20, isActive: true },
+          discount: { type: 'PERCENTAGE', value: 20, isActive: true },
         },
       ]),
     },
@@ -26,12 +26,12 @@ describe('PromotionsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        PromotionsService,
+        DiscountsService,
         { provide: PrismaService, useValue: mockPrismaService },
       ],
     }).compile();
 
-    service = module.get<PromotionsService>(PromotionsService);
+    service = module.get<DiscountsService>(DiscountsService);
   });
 
   it('should be defined', () => {
@@ -41,9 +41,8 @@ describe('PromotionsService', () => {
   describe('calculateDiscountedFee', () => {
     it('should correctly apply a percentage discount', async () => {
       const baseAmount = 100;
-      // Mock returns a 20% discount
       const result = await service.calculateDiscountedFee('student-uuid', baseAmount);
-      expect(result).toBe(80); // 100 - 20% = 80
+      expect(result).toBe(80); 
     });
   });
 });

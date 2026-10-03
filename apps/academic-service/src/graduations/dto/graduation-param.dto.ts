@@ -1,7 +1,11 @@
 import { IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PromotionParamDto {
+/**
+ * @class GraduationParamDto
+ * @description DTO used to validate student profile UUID parameters across graduation endpoints.
+ */
+export class GraduationParamDto {
   @ApiProperty({
     description: 'Unique identifier of the student profile',
     example: '123e4567-e89b-12d3-a456-426614174000',

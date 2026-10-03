@@ -8,7 +8,7 @@ import { Role } from '@dms/shared-types';
 
 /**
  * @group e2e
- * @description End-to-end tests for Academic Service endpoints (Disciplines, Attendances, Promotions, Students).
+ * @description End-to-end tests for Academic Service endpoints (Disciplines, Attendances, Graduations, Students).
  */
 describe('Academic Service (e2e)', () => {
   let app: INestApplication;

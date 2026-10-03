@@ -7,8 +7,7 @@
     "^.+\\.ts$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^@nestjs/jwt$": "<rootDir>/__mocks__/jwt.mock.ts",
-    "^@nestjs/swagger$": "<rootDir>/__mocks__/swagger.mock.ts",
-    "^@nestjs/passport$": "<rootDir>/__mocks__/passport.mock.ts"
+    "^@nestjs/axios$": "<rootDir>/__mocks__/axios.mock.ts",
+    "^@nestjs/swagger$": "<rootDir>/__mocks__/swagger.mock.ts"
   }
 }

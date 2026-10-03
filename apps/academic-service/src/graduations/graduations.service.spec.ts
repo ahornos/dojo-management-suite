@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PromotionsService } from './promotions.service';
+import { GraduationsService } from './graduations.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
 /**
  * @group unit
- * @description Unit tests for PromotionsService covering evaluation, promotion execution, proposals, and rollbacks.
+ * @description Unit tests for GraduationsService covering evaluation, graduation execution, proposals, and rollbacks.
  */
-describe('PromotionsService', () => {
-  let service: PromotionsService;
+describe('GraduationsService', () => {
+  let service: GraduationsService;
   let prisma: PrismaService;
 
   const mockPrisma = {
     studentProfile: {
       findUnique: jest.fn(),
     },
-    promotionRequest: {
+    graduationRequest: {
       create: jest.fn().mockResolvedValue({ id: 'req-uuid', status: 'PENDING' }),
     },
     studentRank: {
@@ -29,12 +29,12 @@ describe('PromotionsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        PromotionsService,
+        GraduationsService,
         { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 
-    service = module.get<PromotionsService>(PromotionsService);
+    service = module.get<GraduationsService>(GraduationsService);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
@@ -42,22 +42,22 @@ describe('PromotionsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('evaluatePromotionEligibility', () => {
+  describe('evaluateGraduationEligibility', () => {
     it('should throw NotFoundException if student profile does not exist', async () => {
       mockPrisma.studentProfile.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.evaluatePromotionEligibility('non-existent-id'),
+        service.evaluateGraduationEligibility('non-existent-id'),
       ).rejects.toThrow(NotFoundException);
     });
   });
 
-  describe('proposePromotion', () => {
+  describe('proposeGraduation', () => {
     it('should throw NotFoundException if student profile does not exist when proposing', async () => {
       mockPrisma.studentProfile.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.proposePromotion('non-existent-id', 'instructor-uuid'),
+        service.proposeGraduation('non-existent-id', 'instructor-uuid'),
       ).rejects.toThrow(NotFoundException);
     });
   });

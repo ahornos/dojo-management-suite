@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { FeesModule } from './fees/fees.module';
-import { PromotionsModule } from './promotions/promotions.module';
+import { DiscountsModule } from './discounts/discounts.module';
 import { CashModule } from './cash/cash.module';
 import { RemittancesModule } from './remittances/remittances.module';
 
@@ -13,7 +13,7 @@ import { RemittancesModule } from './remittances/remittances.module';
   imports: [
     PrismaModule,
     FeesModule,
-    PromotionsModule,
+    DiscountsModule,
     CashModule,
     RemittancesModule
   ],

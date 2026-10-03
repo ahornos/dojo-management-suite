@@ -4,9 +4,9 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { StudentsModule } from './students/students.module';
 import { AttendancesModule } from './attendances/attendances.module';
-import { PromotionsModule } from './promotions/promotions.module';
+import { GraduationsModule } from './graduations/graduations.module';
 import { DisciplinesModule } from './disciplines/disciplines.module';
-import { AuthModule } from './auth/auth.module'; // <-- IMPORTANTE
+import { AuthModule } from './auth/auth.module';
 
 /**
  * @class AppModule
@@ -14,13 +14,12 @@ import { AuthModule } from './auth/auth.module'; // <-- IMPORTANTE
  * including security (AuthModule), database (PrismaModule), and core academic features.
  */
 @Module({
-  // Añadido AuthModule a los imports
   imports: [
     PrismaModule, 
     AuthModule, 
     StudentsModule,
     AttendancesModule, 
-    PromotionsModule, 
+    GraduationsModule, 
     DisciplinesModule
   ],
   controllers: [AppController],

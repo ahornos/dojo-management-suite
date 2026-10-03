@@ -206,7 +206,7 @@ exports.Prisma.ProfileUpdateRequestScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PromotionRequestScalarFieldEnum = {
+exports.Prisma.GraduationRequestScalarFieldEnum = {
   id: 'id',
   studentProfileId: 'studentProfileId',
   proposedBeltId: 'proposedBeltId',
@@ -240,7 +240,7 @@ exports.Prisma.StudentFeeScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.PromotionScalarFieldEnum = {
+exports.Prisma.DiscountScalarFieldEnum = {
   id: 'id',
   code: 'code',
   name: 'name',
@@ -255,10 +255,10 @@ exports.Prisma.PromotionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.StudentPromotionScalarFieldEnum = {
+exports.Prisma.StudentDiscountScalarFieldEnum = {
   id: 'id',
   studentProfileId: 'studentProfileId',
-  promotionId: 'promotionId',
+  discountId: 'discountId',
   assignedAt: 'assignedAt',
   expiresAt: 'expiresAt'
 };
@@ -394,13 +394,13 @@ exports.RequestStatus = exports.$Enums.RequestStatus = {
   REJECTED: 'REJECTED'
 };
 
-exports.PromotionType = exports.$Enums.PromotionType = {
+exports.DiscountType = exports.$Enums.DiscountType = {
   PERCENTAGE: 'PERCENTAGE',
   FIXED_DISCOUNT: 'FIXED_DISCOUNT',
   FREE_PERIOD: 'FREE_PERIOD'
 };
 
-exports.PromotionCategory = exports.$Enums.PromotionCategory = {
+exports.DiscountCategory = exports.$Enums.DiscountCategory = {
   FAMILY: 'FAMILY',
   SECURITY_FORCES: 'SECURITY_FORCES',
   TEMPORARY: 'TEMPORARY'
@@ -456,11 +456,11 @@ exports.Prisma.ModelName = {
   StudentRank: 'StudentRank',
   Attendance: 'Attendance',
   ProfileUpdateRequest: 'ProfileUpdateRequest',
-  PromotionRequest: 'PromotionRequest',
+  GraduationRequest: 'GraduationRequest',
   FeeTier: 'FeeTier',
   StudentFee: 'StudentFee',
-  Promotion: 'Promotion',
-  StudentPromotion: 'StudentPromotion',
+  Discount: 'Discount',
+  StudentDiscount: 'StudentDiscount',
   StudentSubscription: 'StudentSubscription',
   CashRegisterSession: 'CashRegisterSession',
   CashTransaction: 'CashTransaction',

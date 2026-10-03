@@ -64,10 +64,10 @@ export type Attendance = $Result.DefaultSelection<Prisma.$AttendancePayload>
  */
 export type ProfileUpdateRequest = $Result.DefaultSelection<Prisma.$ProfileUpdateRequestPayload>
 /**
- * Model PromotionRequest
+ * Model GraduationRequest
  * 
  */
-export type PromotionRequest = $Result.DefaultSelection<Prisma.$PromotionRequestPayload>
+export type GraduationRequest = $Result.DefaultSelection<Prisma.$GraduationRequestPayload>
 /**
  * Model FeeTier
  * Base fee tiers configured for the academy (e.g., Bronze, Silver, Gold, Child).
@@ -79,15 +79,15 @@ export type FeeTier = $Result.DefaultSelection<Prisma.$FeeTierPayload>
  */
 export type StudentFee = $Result.DefaultSelection<Prisma.$StudentFeePayload>
 /**
- * Model Promotion
- * Discount rules and special promotional campaigns.
+ * Model Discount
+ * Discount rules and special promotional campaigns (Financial).
  */
-export type Promotion = $Result.DefaultSelection<Prisma.$PromotionPayload>
+export type Discount = $Result.DefaultSelection<Prisma.$DiscountPayload>
 /**
- * Model StudentPromotion
- * Mapping of active promotions assigned to student profiles.
+ * Model StudentDiscount
+ * Mapping of active financial discounts assigned to student profiles.
  */
-export type StudentPromotion = $Result.DefaultSelection<Prisma.$StudentPromotionPayload>
+export type StudentDiscount = $Result.DefaultSelection<Prisma.$StudentDiscountPayload>
 /**
  * Model StudentSubscription
  * Subscription tracking linking students to fee tiers.
@@ -154,22 +154,22 @@ export const RequestStatus: {
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
 
 
-export const PromotionType: {
+export const DiscountType: {
   PERCENTAGE: 'PERCENTAGE',
   FIXED_DISCOUNT: 'FIXED_DISCOUNT',
   FREE_PERIOD: 'FREE_PERIOD'
 };
 
-export type PromotionType = (typeof PromotionType)[keyof typeof PromotionType]
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
 
 
-export const PromotionCategory: {
+export const DiscountCategory: {
   FAMILY: 'FAMILY',
   SECURITY_FORCES: 'SECURITY_FORCES',
   TEMPORARY: 'TEMPORARY'
 };
 
-export type PromotionCategory = (typeof PromotionCategory)[keyof typeof PromotionCategory]
+export type DiscountCategory = (typeof DiscountCategory)[keyof typeof DiscountCategory]
 
 
 export const CashSessionStatus: {
@@ -238,13 +238,13 @@ export type RequestStatus = $Enums.RequestStatus
 
 export const RequestStatus: typeof $Enums.RequestStatus
 
-export type PromotionType = $Enums.PromotionType
+export type DiscountType = $Enums.DiscountType
 
-export const PromotionType: typeof $Enums.PromotionType
+export const DiscountType: typeof $Enums.DiscountType
 
-export type PromotionCategory = $Enums.PromotionCategory
+export type DiscountCategory = $Enums.DiscountCategory
 
-export const PromotionCategory: typeof $Enums.PromotionCategory
+export const DiscountCategory: typeof $Enums.DiscountCategory
 
 export type CashSessionStatus = $Enums.CashSessionStatus
 
@@ -494,14 +494,14 @@ export class PrismaClient<
   get profileUpdateRequest(): Prisma.ProfileUpdateRequestDelegate<ExtArgs>;
 
   /**
-   * `prisma.promotionRequest`: Exposes CRUD operations for the **PromotionRequest** model.
+   * `prisma.graduationRequest`: Exposes CRUD operations for the **GraduationRequest** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more PromotionRequests
-    * const promotionRequests = await prisma.promotionRequest.findMany()
+    * // Fetch zero or more GraduationRequests
+    * const graduationRequests = await prisma.graduationRequest.findMany()
     * ```
     */
-  get promotionRequest(): Prisma.PromotionRequestDelegate<ExtArgs>;
+  get graduationRequest(): Prisma.GraduationRequestDelegate<ExtArgs>;
 
   /**
    * `prisma.feeTier`: Exposes CRUD operations for the **FeeTier** model.
@@ -524,24 +524,24 @@ export class PrismaClient<
   get studentFee(): Prisma.StudentFeeDelegate<ExtArgs>;
 
   /**
-   * `prisma.promotion`: Exposes CRUD operations for the **Promotion** model.
+   * `prisma.discount`: Exposes CRUD operations for the **Discount** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more Promotions
-    * const promotions = await prisma.promotion.findMany()
+    * // Fetch zero or more Discounts
+    * const discounts = await prisma.discount.findMany()
     * ```
     */
-  get promotion(): Prisma.PromotionDelegate<ExtArgs>;
+  get discount(): Prisma.DiscountDelegate<ExtArgs>;
 
   /**
-   * `prisma.studentPromotion`: Exposes CRUD operations for the **StudentPromotion** model.
+   * `prisma.studentDiscount`: Exposes CRUD operations for the **StudentDiscount** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more StudentPromotions
-    * const studentPromotions = await prisma.studentPromotion.findMany()
+    * // Fetch zero or more StudentDiscounts
+    * const studentDiscounts = await prisma.studentDiscount.findMany()
     * ```
     */
-  get studentPromotion(): Prisma.StudentPromotionDelegate<ExtArgs>;
+  get studentDiscount(): Prisma.StudentDiscountDelegate<ExtArgs>;
 
   /**
    * `prisma.studentSubscription`: Exposes CRUD operations for the **StudentSubscription** model.
@@ -1073,11 +1073,11 @@ export namespace Prisma {
     StudentRank: 'StudentRank',
     Attendance: 'Attendance',
     ProfileUpdateRequest: 'ProfileUpdateRequest',
-    PromotionRequest: 'PromotionRequest',
+    GraduationRequest: 'GraduationRequest',
     FeeTier: 'FeeTier',
     StudentFee: 'StudentFee',
-    Promotion: 'Promotion',
-    StudentPromotion: 'StudentPromotion',
+    Discount: 'Discount',
+    StudentDiscount: 'StudentDiscount',
     StudentSubscription: 'StudentSubscription',
     CashRegisterSession: 'CashRegisterSession',
     CashTransaction: 'CashTransaction',
@@ -1101,7 +1101,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "promotionRequest" | "feeTier" | "studentFee" | "promotion" | "studentPromotion" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
+      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1805,73 +1805,73 @@ export namespace Prisma {
           }
         }
       }
-      PromotionRequest: {
-        payload: Prisma.$PromotionRequestPayload<ExtArgs>
-        fields: Prisma.PromotionRequestFieldRefs
+      GraduationRequest: {
+        payload: Prisma.$GraduationRequestPayload<ExtArgs>
+        fields: Prisma.GraduationRequestFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.PromotionRequestFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload> | null
+            args: Prisma.GraduationRequestFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.PromotionRequestFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           findFirst: {
-            args: Prisma.PromotionRequestFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload> | null
+            args: Prisma.GraduationRequestFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.PromotionRequestFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           findMany: {
-            args: Prisma.PromotionRequestFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>[]
+            args: Prisma.GraduationRequestFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>[]
           }
           create: {
-            args: Prisma.PromotionRequestCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           createMany: {
-            args: Prisma.PromotionRequestCreateManyArgs<ExtArgs>
+            args: Prisma.GraduationRequestCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.PromotionRequestCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>[]
+            args: Prisma.GraduationRequestCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>[]
           }
           delete: {
-            args: Prisma.PromotionRequestDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           update: {
-            args: Prisma.PromotionRequestUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           deleteMany: {
-            args: Prisma.PromotionRequestDeleteManyArgs<ExtArgs>
+            args: Prisma.GraduationRequestDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.PromotionRequestUpdateManyArgs<ExtArgs>
+            args: Prisma.GraduationRequestUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           upsert: {
-            args: Prisma.PromotionRequestUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionRequestPayload>
+            args: Prisma.GraduationRequestUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GraduationRequestPayload>
           }
           aggregate: {
-            args: Prisma.PromotionRequestAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregatePromotionRequest>
+            args: Prisma.GraduationRequestAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGraduationRequest>
           }
           groupBy: {
-            args: Prisma.PromotionRequestGroupByArgs<ExtArgs>
-            result: $Utils.Optional<PromotionRequestGroupByOutputType>[]
+            args: Prisma.GraduationRequestGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GraduationRequestGroupByOutputType>[]
           }
           count: {
-            args: Prisma.PromotionRequestCountArgs<ExtArgs>
-            result: $Utils.Optional<PromotionRequestCountAggregateOutputType> | number
+            args: Prisma.GraduationRequestCountArgs<ExtArgs>
+            result: $Utils.Optional<GraduationRequestCountAggregateOutputType> | number
           }
         }
       }
@@ -2015,143 +2015,143 @@ export namespace Prisma {
           }
         }
       }
-      Promotion: {
-        payload: Prisma.$PromotionPayload<ExtArgs>
-        fields: Prisma.PromotionFieldRefs
+      Discount: {
+        payload: Prisma.$DiscountPayload<ExtArgs>
+        fields: Prisma.DiscountFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.PromotionFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload> | null
+            args: Prisma.DiscountFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.PromotionFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           findFirst: {
-            args: Prisma.PromotionFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload> | null
+            args: Prisma.DiscountFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.PromotionFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           findMany: {
-            args: Prisma.PromotionFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>[]
+            args: Prisma.DiscountFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>[]
           }
           create: {
-            args: Prisma.PromotionCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           createMany: {
-            args: Prisma.PromotionCreateManyArgs<ExtArgs>
+            args: Prisma.DiscountCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.PromotionCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>[]
+            args: Prisma.DiscountCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>[]
           }
           delete: {
-            args: Prisma.PromotionDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           update: {
-            args: Prisma.PromotionUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           deleteMany: {
-            args: Prisma.PromotionDeleteManyArgs<ExtArgs>
+            args: Prisma.DiscountDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.PromotionUpdateManyArgs<ExtArgs>
+            args: Prisma.DiscountUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           upsert: {
-            args: Prisma.PromotionUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PromotionPayload>
+            args: Prisma.DiscountUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DiscountPayload>
           }
           aggregate: {
-            args: Prisma.PromotionAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregatePromotion>
+            args: Prisma.DiscountAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDiscount>
           }
           groupBy: {
-            args: Prisma.PromotionGroupByArgs<ExtArgs>
-            result: $Utils.Optional<PromotionGroupByOutputType>[]
+            args: Prisma.DiscountGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DiscountGroupByOutputType>[]
           }
           count: {
-            args: Prisma.PromotionCountArgs<ExtArgs>
-            result: $Utils.Optional<PromotionCountAggregateOutputType> | number
+            args: Prisma.DiscountCountArgs<ExtArgs>
+            result: $Utils.Optional<DiscountCountAggregateOutputType> | number
           }
         }
       }
-      StudentPromotion: {
-        payload: Prisma.$StudentPromotionPayload<ExtArgs>
-        fields: Prisma.StudentPromotionFieldRefs
+      StudentDiscount: {
+        payload: Prisma.$StudentDiscountPayload<ExtArgs>
+        fields: Prisma.StudentDiscountFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.StudentPromotionFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload> | null
+            args: Prisma.StudentDiscountFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.StudentPromotionFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           findFirst: {
-            args: Prisma.StudentPromotionFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload> | null
+            args: Prisma.StudentDiscountFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.StudentPromotionFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           findMany: {
-            args: Prisma.StudentPromotionFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>[]
+            args: Prisma.StudentDiscountFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>[]
           }
           create: {
-            args: Prisma.StudentPromotionCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           createMany: {
-            args: Prisma.StudentPromotionCreateManyArgs<ExtArgs>
+            args: Prisma.StudentDiscountCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.StudentPromotionCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>[]
+            args: Prisma.StudentDiscountCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>[]
           }
           delete: {
-            args: Prisma.StudentPromotionDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           update: {
-            args: Prisma.StudentPromotionUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           deleteMany: {
-            args: Prisma.StudentPromotionDeleteManyArgs<ExtArgs>
+            args: Prisma.StudentDiscountDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.StudentPromotionUpdateManyArgs<ExtArgs>
+            args: Prisma.StudentDiscountUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           upsert: {
-            args: Prisma.StudentPromotionUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentPromotionPayload>
+            args: Prisma.StudentDiscountUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentDiscountPayload>
           }
           aggregate: {
-            args: Prisma.StudentPromotionAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStudentPromotion>
+            args: Prisma.StudentDiscountAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStudentDiscount>
           }
           groupBy: {
-            args: Prisma.StudentPromotionGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StudentPromotionGroupByOutputType>[]
+            args: Prisma.StudentDiscountGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StudentDiscountGroupByOutputType>[]
           }
           count: {
-            args: Prisma.StudentPromotionCountArgs<ExtArgs>
-            result: $Utils.Optional<StudentPromotionCountAggregateOutputType> | number
+            args: Prisma.StudentDiscountCountArgs<ExtArgs>
+            result: $Utils.Optional<StudentDiscountCountAggregateOutputType> | number
           }
         }
       }
@@ -2877,14 +2877,14 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     reviewedUpdates: number
-    proposedPromotions: number
-    approvedPromotions: number
+    proposedGraduations: number
+    approvedGraduations: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reviewedUpdates?: boolean | UserCountOutputTypeCountReviewedUpdatesArgs
-    proposedPromotions?: boolean | UserCountOutputTypeCountProposedPromotionsArgs
-    approvedPromotions?: boolean | UserCountOutputTypeCountApprovedPromotionsArgs
+    proposedGraduations?: boolean | UserCountOutputTypeCountProposedGraduationsArgs
+    approvedGraduations?: boolean | UserCountOutputTypeCountApprovedGraduationsArgs
   }
 
   // Custom InputTypes
@@ -2908,15 +2908,15 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountProposedPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PromotionRequestWhereInput
+  export type UserCountOutputTypeCountProposedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GraduationRequestWhereInput
   }
 
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountApprovedPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PromotionRequestWhereInput
+  export type UserCountOutputTypeCountApprovedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GraduationRequestWhereInput
   }
 
 
@@ -2929,11 +2929,11 @@ export namespace Prisma {
     ranks: number
     attendances: number
     updateRequests: number
-    promotionRequests: number
+    graduationRequests: number
     subscriptions: number
     licenses: number
     studentFees: number
-    studentPromotions: number
+    studentDiscounts: number
     bankMandates: number
   }
 
@@ -2942,11 +2942,11 @@ export namespace Prisma {
     ranks?: boolean | StudentProfileCountOutputTypeCountRanksArgs
     attendances?: boolean | StudentProfileCountOutputTypeCountAttendancesArgs
     updateRequests?: boolean | StudentProfileCountOutputTypeCountUpdateRequestsArgs
-    promotionRequests?: boolean | StudentProfileCountOutputTypeCountPromotionRequestsArgs
+    graduationRequests?: boolean | StudentProfileCountOutputTypeCountGraduationRequestsArgs
     subscriptions?: boolean | StudentProfileCountOutputTypeCountSubscriptionsArgs
     licenses?: boolean | StudentProfileCountOutputTypeCountLicensesArgs
     studentFees?: boolean | StudentProfileCountOutputTypeCountStudentFeesArgs
-    studentPromotions?: boolean | StudentProfileCountOutputTypeCountStudentPromotionsArgs
+    studentDiscounts?: boolean | StudentProfileCountOutputTypeCountStudentDiscountsArgs
     bankMandates?: boolean | StudentProfileCountOutputTypeCountBankMandatesArgs
   }
 
@@ -2992,8 +2992,8 @@ export namespace Prisma {
   /**
    * StudentProfileCountOutputType without action
    */
-  export type StudentProfileCountOutputTypeCountPromotionRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PromotionRequestWhereInput
+  export type StudentProfileCountOutputTypeCountGraduationRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GraduationRequestWhereInput
   }
 
   /**
@@ -3020,8 +3020,8 @@ export namespace Prisma {
   /**
    * StudentProfileCountOutputType without action
    */
-  export type StudentProfileCountOutputTypeCountStudentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentPromotionWhereInput
+  export type StudentProfileCountOutputTypeCountStudentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentDiscountWhereInput
   }
 
   /**
@@ -3197,33 +3197,33 @@ export namespace Prisma {
 
 
   /**
-   * Count Type PromotionCountOutputType
+   * Count Type DiscountCountOutputType
    */
 
-  export type PromotionCountOutputType = {
-    studentPromotions: number
+  export type DiscountCountOutputType = {
+    studentDiscounts: number
   }
 
-  export type PromotionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    studentPromotions?: boolean | PromotionCountOutputTypeCountStudentPromotionsArgs
+  export type DiscountCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentDiscounts?: boolean | DiscountCountOutputTypeCountStudentDiscountsArgs
   }
 
   // Custom InputTypes
   /**
-   * PromotionCountOutputType without action
+   * DiscountCountOutputType without action
    */
-  export type PromotionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionCountOutputType
+     * Select specific fields to fetch from the DiscountCountOutputType
      */
-    select?: PromotionCountOutputTypeSelect<ExtArgs> | null
+    select?: DiscountCountOutputTypeSelect<ExtArgs> | null
   }
 
   /**
-   * PromotionCountOutputType without action
+   * DiscountCountOutputType without action
    */
-  export type PromotionCountOutputTypeCountStudentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentPromotionWhereInput
+  export type DiscountCountOutputTypeCountStudentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentDiscountWhereInput
   }
 
 
@@ -3546,8 +3546,8 @@ export namespace Prisma {
     studentProfile?: boolean | User$studentProfileArgs<ExtArgs>
     guardianProfile?: boolean | User$guardianProfileArgs<ExtArgs>
     reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
-    proposedPromotions?: boolean | User$proposedPromotionsArgs<ExtArgs>
-    approvedPromotions?: boolean | User$approvedPromotionsArgs<ExtArgs>
+    proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
+    approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3577,8 +3577,8 @@ export namespace Prisma {
     studentProfile?: boolean | User$studentProfileArgs<ExtArgs>
     guardianProfile?: boolean | User$guardianProfileArgs<ExtArgs>
     reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
-    proposedPromotions?: boolean | User$proposedPromotionsArgs<ExtArgs>
-    approvedPromotions?: boolean | User$approvedPromotionsArgs<ExtArgs>
+    proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
+    approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3589,8 +3589,8 @@ export namespace Prisma {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs> | null
       guardianProfile: Prisma.$GuardianPayload<ExtArgs> | null
       reviewedUpdates: Prisma.$ProfileUpdateRequestPayload<ExtArgs>[]
-      proposedPromotions: Prisma.$PromotionRequestPayload<ExtArgs>[]
-      approvedPromotions: Prisma.$PromotionRequestPayload<ExtArgs>[]
+      proposedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
+      approvedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3968,8 +3968,8 @@ export namespace Prisma {
     studentProfile<T extends User$studentProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$studentProfileArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     guardianProfile<T extends User$guardianProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$guardianProfileArgs<ExtArgs>>): Prisma__GuardianClient<$Result.GetResult<Prisma.$GuardianPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     reviewedUpdates<T extends User$reviewedUpdatesArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewedUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfileUpdateRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    proposedPromotions<T extends User$proposedPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, User$proposedPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    approvedPromotions<T extends User$approvedPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findMany"> | Null>
+    proposedGraduations<T extends User$proposedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$proposedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
+    approvedGraduations<T extends User$approvedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4371,43 +4371,43 @@ export namespace Prisma {
   }
 
   /**
-   * User.proposedPromotions
+   * User.proposedGraduations
    */
-  export type User$proposedPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$proposedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
-    where?: PromotionRequestWhereInput
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
-    cursor?: PromotionRequestWhereUniqueInput
+    include?: GraduationRequestInclude<ExtArgs> | null
+    where?: GraduationRequestWhereInput
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
+    cursor?: GraduationRequestWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
-   * User.approvedPromotions
+   * User.approvedGraduations
    */
-  export type User$approvedPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$approvedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
-    where?: PromotionRequestWhereInput
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
-    cursor?: PromotionRequestWhereUniqueInput
+    include?: GraduationRequestInclude<ExtArgs> | null
+    where?: GraduationRequestWhereInput
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
+    cursor?: GraduationRequestWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
@@ -4610,11 +4610,11 @@ export namespace Prisma {
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
     updateRequests?: boolean | StudentProfile$updateRequestsArgs<ExtArgs>
-    promotionRequests?: boolean | StudentProfile$promotionRequestsArgs<ExtArgs>
+    graduationRequests?: boolean | StudentProfile$graduationRequestsArgs<ExtArgs>
     subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
     licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
     studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
-    studentPromotions?: boolean | StudentProfile$studentPromotionsArgs<ExtArgs>
+    studentDiscounts?: boolean | StudentProfile$studentDiscountsArgs<ExtArgs>
     bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
@@ -4646,11 +4646,11 @@ export namespace Prisma {
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
     updateRequests?: boolean | StudentProfile$updateRequestsArgs<ExtArgs>
-    promotionRequests?: boolean | StudentProfile$promotionRequestsArgs<ExtArgs>
+    graduationRequests?: boolean | StudentProfile$graduationRequestsArgs<ExtArgs>
     subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
     licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
     studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
-    studentPromotions?: boolean | StudentProfile$studentPromotionsArgs<ExtArgs>
+    studentDiscounts?: boolean | StudentProfile$studentDiscountsArgs<ExtArgs>
     bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -4666,11 +4666,11 @@ export namespace Prisma {
       ranks: Prisma.$StudentRankPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       updateRequests: Prisma.$ProfileUpdateRequestPayload<ExtArgs>[]
-      promotionRequests: Prisma.$PromotionRequestPayload<ExtArgs>[]
+      graduationRequests: Prisma.$GraduationRequestPayload<ExtArgs>[]
       subscriptions: Prisma.$StudentSubscriptionPayload<ExtArgs>[]
       licenses: Prisma.$StudentLicensePayload<ExtArgs>[]
       studentFees: Prisma.$StudentFeePayload<ExtArgs>[]
-      studentPromotions: Prisma.$StudentPromotionPayload<ExtArgs>[]
+      studentDiscounts: Prisma.$StudentDiscountPayload<ExtArgs>[]
       bankMandates: Prisma.$BankMandatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -5050,11 +5050,11 @@ export namespace Prisma {
     ranks<T extends StudentProfile$ranksArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$ranksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentRankPayload<ExtArgs>, T, "findMany"> | Null>
     attendances<T extends StudentProfile$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany"> | Null>
     updateRequests<T extends StudentProfile$updateRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$updateRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfileUpdateRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    promotionRequests<T extends StudentProfile$promotionRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$promotionRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findMany"> | Null>
+    graduationRequests<T extends StudentProfile$graduationRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$graduationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
     subscriptions<T extends StudentProfile$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
     licenses<T extends StudentProfile$licensesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findMany"> | Null>
     studentFees<T extends StudentProfile$studentFeesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findMany"> | Null>
-    studentPromotions<T extends StudentProfile$studentPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany"> | Null>
+    studentDiscounts<T extends StudentProfile$studentDiscountsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentDiscountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findMany"> | Null>
     bankMandates<T extends StudentProfile$bankMandatesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$bankMandatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -5490,23 +5490,23 @@ export namespace Prisma {
   }
 
   /**
-   * StudentProfile.promotionRequests
+   * StudentProfile.graduationRequests
    */
-  export type StudentProfile$promotionRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentProfile$graduationRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
-    where?: PromotionRequestWhereInput
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
-    cursor?: PromotionRequestWhereUniqueInput
+    include?: GraduationRequestInclude<ExtArgs> | null
+    where?: GraduationRequestWhereInput
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
+    cursor?: GraduationRequestWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
@@ -5570,23 +5570,23 @@ export namespace Prisma {
   }
 
   /**
-   * StudentProfile.studentPromotions
+   * StudentProfile.studentDiscounts
    */
-  export type StudentProfile$studentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentProfile$studentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
-    where?: StudentPromotionWhereInput
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
-    cursor?: StudentPromotionWhereUniqueInput
+    include?: StudentDiscountInclude<ExtArgs> | null
+    where?: StudentDiscountWhereInput
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
+    cursor?: StudentDiscountWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
   }
 
   /**
@@ -13321,26 +13321,26 @@ export namespace Prisma {
 
 
   /**
-   * Model PromotionRequest
+   * Model GraduationRequest
    */
 
-  export type AggregatePromotionRequest = {
-    _count: PromotionRequestCountAggregateOutputType | null
-    _avg: PromotionRequestAvgAggregateOutputType | null
-    _sum: PromotionRequestSumAggregateOutputType | null
-    _min: PromotionRequestMinAggregateOutputType | null
-    _max: PromotionRequestMaxAggregateOutputType | null
+  export type AggregateGraduationRequest = {
+    _count: GraduationRequestCountAggregateOutputType | null
+    _avg: GraduationRequestAvgAggregateOutputType | null
+    _sum: GraduationRequestSumAggregateOutputType | null
+    _min: GraduationRequestMinAggregateOutputType | null
+    _max: GraduationRequestMaxAggregateOutputType | null
   }
 
-  export type PromotionRequestAvgAggregateOutputType = {
+  export type GraduationRequestAvgAggregateOutputType = {
     proposedStripes: number | null
   }
 
-  export type PromotionRequestSumAggregateOutputType = {
+  export type GraduationRequestSumAggregateOutputType = {
     proposedStripes: number | null
   }
 
-  export type PromotionRequestMinAggregateOutputType = {
+  export type GraduationRequestMinAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
     proposedBeltId: string | null
@@ -13351,7 +13351,7 @@ export namespace Prisma {
     createdAt: Date | null
   }
 
-  export type PromotionRequestMaxAggregateOutputType = {
+  export type GraduationRequestMaxAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
     proposedBeltId: string | null
@@ -13362,7 +13362,7 @@ export namespace Prisma {
     createdAt: Date | null
   }
 
-  export type PromotionRequestCountAggregateOutputType = {
+  export type GraduationRequestCountAggregateOutputType = {
     id: number
     studentProfileId: number
     proposedBeltId: number
@@ -13375,15 +13375,15 @@ export namespace Prisma {
   }
 
 
-  export type PromotionRequestAvgAggregateInputType = {
+  export type GraduationRequestAvgAggregateInputType = {
     proposedStripes?: true
   }
 
-  export type PromotionRequestSumAggregateInputType = {
+  export type GraduationRequestSumAggregateInputType = {
     proposedStripes?: true
   }
 
-  export type PromotionRequestMinAggregateInputType = {
+  export type GraduationRequestMinAggregateInputType = {
     id?: true
     studentProfileId?: true
     proposedBeltId?: true
@@ -13394,7 +13394,7 @@ export namespace Prisma {
     createdAt?: true
   }
 
-  export type PromotionRequestMaxAggregateInputType = {
+  export type GraduationRequestMaxAggregateInputType = {
     id?: true
     studentProfileId?: true
     proposedBeltId?: true
@@ -13405,7 +13405,7 @@ export namespace Prisma {
     createdAt?: true
   }
 
-  export type PromotionRequestCountAggregateInputType = {
+  export type GraduationRequestCountAggregateInputType = {
     id?: true
     studentProfileId?: true
     proposedBeltId?: true
@@ -13417,93 +13417,93 @@ export namespace Prisma {
     _all?: true
   }
 
-  export type PromotionRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which PromotionRequest to aggregate.
+     * Filter which GraduationRequest to aggregate.
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of PromotionRequests to fetch.
+     * Determine the order of GraduationRequests to fetch.
      */
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: PromotionRequestWhereUniqueInput
+    cursor?: GraduationRequestWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` PromotionRequests from the position of the cursor.
+     * Take `±n` GraduationRequests from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` PromotionRequests.
+     * Skip the first `n` GraduationRequests.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned PromotionRequests
+     * Count returned GraduationRequests
     **/
-    _count?: true | PromotionRequestCountAggregateInputType
+    _count?: true | GraduationRequestCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to average
     **/
-    _avg?: PromotionRequestAvgAggregateInputType
+    _avg?: GraduationRequestAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to sum
     **/
-    _sum?: PromotionRequestSumAggregateInputType
+    _sum?: GraduationRequestSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: PromotionRequestMinAggregateInputType
+    _min?: GraduationRequestMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: PromotionRequestMaxAggregateInputType
+    _max?: GraduationRequestMaxAggregateInputType
   }
 
-  export type GetPromotionRequestAggregateType<T extends PromotionRequestAggregateArgs> = {
-        [P in keyof T & keyof AggregatePromotionRequest]: P extends '_count' | 'count'
+  export type GetGraduationRequestAggregateType<T extends GraduationRequestAggregateArgs> = {
+        [P in keyof T & keyof AggregateGraduationRequest]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregatePromotionRequest[P]>
-      : GetScalarType<T[P], AggregatePromotionRequest[P]>
+        : GetScalarType<T[P], AggregateGraduationRequest[P]>
+      : GetScalarType<T[P], AggregateGraduationRequest[P]>
   }
 
 
 
 
-  export type PromotionRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PromotionRequestWhereInput
-    orderBy?: PromotionRequestOrderByWithAggregationInput | PromotionRequestOrderByWithAggregationInput[]
-    by: PromotionRequestScalarFieldEnum[] | PromotionRequestScalarFieldEnum
-    having?: PromotionRequestScalarWhereWithAggregatesInput
+  export type GraduationRequestGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GraduationRequestWhereInput
+    orderBy?: GraduationRequestOrderByWithAggregationInput | GraduationRequestOrderByWithAggregationInput[]
+    by: GraduationRequestScalarFieldEnum[] | GraduationRequestScalarFieldEnum
+    having?: GraduationRequestScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: PromotionRequestCountAggregateInputType | true
-    _avg?: PromotionRequestAvgAggregateInputType
-    _sum?: PromotionRequestSumAggregateInputType
-    _min?: PromotionRequestMinAggregateInputType
-    _max?: PromotionRequestMaxAggregateInputType
+    _count?: GraduationRequestCountAggregateInputType | true
+    _avg?: GraduationRequestAvgAggregateInputType
+    _sum?: GraduationRequestSumAggregateInputType
+    _min?: GraduationRequestMinAggregateInputType
+    _max?: GraduationRequestMaxAggregateInputType
   }
 
-  export type PromotionRequestGroupByOutputType = {
+  export type GraduationRequestGroupByOutputType = {
     id: string
     studentProfileId: string
     proposedBeltId: string | null
@@ -13512,28 +13512,28 @@ export namespace Prisma {
     approvedById: string | null
     status: $Enums.RequestStatus
     createdAt: Date
-    _count: PromotionRequestCountAggregateOutputType | null
-    _avg: PromotionRequestAvgAggregateOutputType | null
-    _sum: PromotionRequestSumAggregateOutputType | null
-    _min: PromotionRequestMinAggregateOutputType | null
-    _max: PromotionRequestMaxAggregateOutputType | null
+    _count: GraduationRequestCountAggregateOutputType | null
+    _avg: GraduationRequestAvgAggregateOutputType | null
+    _sum: GraduationRequestSumAggregateOutputType | null
+    _min: GraduationRequestMinAggregateOutputType | null
+    _max: GraduationRequestMaxAggregateOutputType | null
   }
 
-  type GetPromotionRequestGroupByPayload<T extends PromotionRequestGroupByArgs> = Prisma.PrismaPromise<
+  type GetGraduationRequestGroupByPayload<T extends GraduationRequestGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<PromotionRequestGroupByOutputType, T['by']> &
+      PickEnumerable<GraduationRequestGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof PromotionRequestGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof GraduationRequestGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], PromotionRequestGroupByOutputType[P]>
-            : GetScalarType<T[P], PromotionRequestGroupByOutputType[P]>
+              : GetScalarType<T[P], GraduationRequestGroupByOutputType[P]>
+            : GetScalarType<T[P], GraduationRequestGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type PromotionRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type GraduationRequestSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
     proposedBeltId?: boolean
@@ -13544,10 +13544,10 @@ export namespace Prisma {
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | PromotionRequest$approvedByArgs<ExtArgs>
-  }, ExtArgs["result"]["promotionRequest"]>
+    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
+  }, ExtArgs["result"]["graduationRequest"]>
 
-  export type PromotionRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type GraduationRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
     proposedBeltId?: boolean
@@ -13558,10 +13558,10 @@ export namespace Prisma {
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | PromotionRequest$approvedByArgs<ExtArgs>
-  }, ExtArgs["result"]["promotionRequest"]>
+    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
+  }, ExtArgs["result"]["graduationRequest"]>
 
-  export type PromotionRequestSelectScalar = {
+  export type GraduationRequestSelectScalar = {
     id?: boolean
     studentProfileId?: boolean
     proposedBeltId?: boolean
@@ -13572,19 +13572,19 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type PromotionRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | PromotionRequest$approvedByArgs<ExtArgs>
+    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }
-  export type PromotionRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | PromotionRequest$approvedByArgs<ExtArgs>
+    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }
 
-  export type $PromotionRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "PromotionRequest"
+  export type $GraduationRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GraduationRequest"
     objects: {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
       proposedBy: Prisma.$UserPayload<ExtArgs>
@@ -13599,136 +13599,136 @@ export namespace Prisma {
       approvedById: string | null
       status: $Enums.RequestStatus
       createdAt: Date
-    }, ExtArgs["result"]["promotionRequest"]>
+    }, ExtArgs["result"]["graduationRequest"]>
     composites: {}
   }
 
-  type PromotionRequestGetPayload<S extends boolean | null | undefined | PromotionRequestDefaultArgs> = $Result.GetResult<Prisma.$PromotionRequestPayload, S>
+  type GraduationRequestGetPayload<S extends boolean | null | undefined | GraduationRequestDefaultArgs> = $Result.GetResult<Prisma.$GraduationRequestPayload, S>
 
-  type PromotionRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<PromotionRequestFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: PromotionRequestCountAggregateInputType | true
+  type GraduationRequestCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<GraduationRequestFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: GraduationRequestCountAggregateInputType | true
     }
 
-  export interface PromotionRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PromotionRequest'], meta: { name: 'PromotionRequest' } }
+  export interface GraduationRequestDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GraduationRequest'], meta: { name: 'GraduationRequest' } }
     /**
-     * Find zero or one PromotionRequest that matches the filter.
-     * @param {PromotionRequestFindUniqueArgs} args - Arguments to find a PromotionRequest
+     * Find zero or one GraduationRequest that matches the filter.
+     * @param {GraduationRequestFindUniqueArgs} args - Arguments to find a GraduationRequest
      * @example
-     * // Get one PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.findUnique({
+     * // Get one GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends PromotionRequestFindUniqueArgs>(args: SelectSubset<T, PromotionRequestFindUniqueArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends GraduationRequestFindUniqueArgs>(args: SelectSubset<T, GraduationRequestFindUniqueArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
 
     /**
-     * Find one PromotionRequest that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one GraduationRequest that matches the filter or throw an error with `error.code='P2025'` 
      * if no matches were found.
-     * @param {PromotionRequestFindUniqueOrThrowArgs} args - Arguments to find a PromotionRequest
+     * @param {GraduationRequestFindUniqueOrThrowArgs} args - Arguments to find a GraduationRequest
      * @example
-     * // Get one PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.findUniqueOrThrow({
+     * // Get one GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends PromotionRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, PromotionRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends GraduationRequestFindUniqueOrThrowArgs>(args: SelectSubset<T, GraduationRequestFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
 
     /**
-     * Find the first PromotionRequest that matches the filter.
+     * Find the first GraduationRequest that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestFindFirstArgs} args - Arguments to find a PromotionRequest
+     * @param {GraduationRequestFindFirstArgs} args - Arguments to find a GraduationRequest
      * @example
-     * // Get one PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.findFirst({
+     * // Get one GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends PromotionRequestFindFirstArgs>(args?: SelectSubset<T, PromotionRequestFindFirstArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends GraduationRequestFindFirstArgs>(args?: SelectSubset<T, GraduationRequestFindFirstArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
 
     /**
-     * Find the first PromotionRequest that matches the filter or
+     * Find the first GraduationRequest that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestFindFirstOrThrowArgs} args - Arguments to find a PromotionRequest
+     * @param {GraduationRequestFindFirstOrThrowArgs} args - Arguments to find a GraduationRequest
      * @example
-     * // Get one PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.findFirstOrThrow({
+     * // Get one GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends PromotionRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, PromotionRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends GraduationRequestFindFirstOrThrowArgs>(args?: SelectSubset<T, GraduationRequestFindFirstOrThrowArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
 
     /**
-     * Find zero or more PromotionRequests that matches the filter.
+     * Find zero or more GraduationRequests that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {GraduationRequestFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all PromotionRequests
-     * const promotionRequests = await prisma.promotionRequest.findMany()
+     * // Get all GraduationRequests
+     * const graduationRequests = await prisma.graduationRequest.findMany()
      * 
-     * // Get first 10 PromotionRequests
-     * const promotionRequests = await prisma.promotionRequest.findMany({ take: 10 })
+     * // Get first 10 GraduationRequests
+     * const graduationRequests = await prisma.graduationRequest.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const promotionRequestWithIdOnly = await prisma.promotionRequest.findMany({ select: { id: true } })
+     * const graduationRequestWithIdOnly = await prisma.graduationRequest.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends PromotionRequestFindManyArgs>(args?: SelectSubset<T, PromotionRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends GraduationRequestFindManyArgs>(args?: SelectSubset<T, GraduationRequestFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany">>
 
     /**
-     * Create a PromotionRequest.
-     * @param {PromotionRequestCreateArgs} args - Arguments to create a PromotionRequest.
+     * Create a GraduationRequest.
+     * @param {GraduationRequestCreateArgs} args - Arguments to create a GraduationRequest.
      * @example
-     * // Create one PromotionRequest
-     * const PromotionRequest = await prisma.promotionRequest.create({
+     * // Create one GraduationRequest
+     * const GraduationRequest = await prisma.graduationRequest.create({
      *   data: {
-     *     // ... data to create a PromotionRequest
+     *     // ... data to create a GraduationRequest
      *   }
      * })
      * 
      */
-    create<T extends PromotionRequestCreateArgs>(args: SelectSubset<T, PromotionRequestCreateArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends GraduationRequestCreateArgs>(args: SelectSubset<T, GraduationRequestCreateArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "create">, never, ExtArgs>
 
     /**
-     * Create many PromotionRequests.
-     * @param {PromotionRequestCreateManyArgs} args - Arguments to create many PromotionRequests.
+     * Create many GraduationRequests.
+     * @param {GraduationRequestCreateManyArgs} args - Arguments to create many GraduationRequests.
      * @example
-     * // Create many PromotionRequests
-     * const promotionRequest = await prisma.promotionRequest.createMany({
+     * // Create many GraduationRequests
+     * const graduationRequest = await prisma.graduationRequest.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends PromotionRequestCreateManyArgs>(args?: SelectSubset<T, PromotionRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends GraduationRequestCreateManyArgs>(args?: SelectSubset<T, GraduationRequestCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many PromotionRequests and returns the data saved in the database.
-     * @param {PromotionRequestCreateManyAndReturnArgs} args - Arguments to create many PromotionRequests.
+     * Create many GraduationRequests and returns the data saved in the database.
+     * @param {GraduationRequestCreateManyAndReturnArgs} args - Arguments to create many GraduationRequests.
      * @example
-     * // Create many PromotionRequests
-     * const promotionRequest = await prisma.promotionRequest.createManyAndReturn({
+     * // Create many GraduationRequests
+     * const graduationRequest = await prisma.graduationRequest.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many PromotionRequests and only return the `id`
-     * const promotionRequestWithIdOnly = await prisma.promotionRequest.createManyAndReturn({ 
+     * // Create many GraduationRequests and only return the `id`
+     * const graduationRequestWithIdOnly = await prisma.graduationRequest.createManyAndReturn({ 
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -13738,28 +13738,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends PromotionRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, PromotionRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends GraduationRequestCreateManyAndReturnArgs>(args?: SelectSubset<T, GraduationRequestCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "createManyAndReturn">>
 
     /**
-     * Delete a PromotionRequest.
-     * @param {PromotionRequestDeleteArgs} args - Arguments to delete one PromotionRequest.
+     * Delete a GraduationRequest.
+     * @param {GraduationRequestDeleteArgs} args - Arguments to delete one GraduationRequest.
      * @example
-     * // Delete one PromotionRequest
-     * const PromotionRequest = await prisma.promotionRequest.delete({
+     * // Delete one GraduationRequest
+     * const GraduationRequest = await prisma.graduationRequest.delete({
      *   where: {
-     *     // ... filter to delete one PromotionRequest
+     *     // ... filter to delete one GraduationRequest
      *   }
      * })
      * 
      */
-    delete<T extends PromotionRequestDeleteArgs>(args: SelectSubset<T, PromotionRequestDeleteArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends GraduationRequestDeleteArgs>(args: SelectSubset<T, GraduationRequestDeleteArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "delete">, never, ExtArgs>
 
     /**
-     * Update one PromotionRequest.
-     * @param {PromotionRequestUpdateArgs} args - Arguments to update one PromotionRequest.
+     * Update one GraduationRequest.
+     * @param {GraduationRequestUpdateArgs} args - Arguments to update one GraduationRequest.
      * @example
-     * // Update one PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.update({
+     * // Update one GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13769,30 +13769,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends PromotionRequestUpdateArgs>(args: SelectSubset<T, PromotionRequestUpdateArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends GraduationRequestUpdateArgs>(args: SelectSubset<T, GraduationRequestUpdateArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "update">, never, ExtArgs>
 
     /**
-     * Delete zero or more PromotionRequests.
-     * @param {PromotionRequestDeleteManyArgs} args - Arguments to filter PromotionRequests to delete.
+     * Delete zero or more GraduationRequests.
+     * @param {GraduationRequestDeleteManyArgs} args - Arguments to filter GraduationRequests to delete.
      * @example
-     * // Delete a few PromotionRequests
-     * const { count } = await prisma.promotionRequest.deleteMany({
+     * // Delete a few GraduationRequests
+     * const { count } = await prisma.graduationRequest.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends PromotionRequestDeleteManyArgs>(args?: SelectSubset<T, PromotionRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends GraduationRequestDeleteManyArgs>(args?: SelectSubset<T, GraduationRequestDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more PromotionRequests.
+     * Update zero or more GraduationRequests.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {GraduationRequestUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many PromotionRequests
-     * const promotionRequest = await prisma.promotionRequest.updateMany({
+     * // Update many GraduationRequests
+     * const graduationRequest = await prisma.graduationRequest.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -13802,56 +13802,56 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends PromotionRequestUpdateManyArgs>(args: SelectSubset<T, PromotionRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends GraduationRequestUpdateManyArgs>(args: SelectSubset<T, GraduationRequestUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one PromotionRequest.
-     * @param {PromotionRequestUpsertArgs} args - Arguments to update or create a PromotionRequest.
+     * Create or update one GraduationRequest.
+     * @param {GraduationRequestUpsertArgs} args - Arguments to update or create a GraduationRequest.
      * @example
-     * // Update or create a PromotionRequest
-     * const promotionRequest = await prisma.promotionRequest.upsert({
+     * // Update or create a GraduationRequest
+     * const graduationRequest = await prisma.graduationRequest.upsert({
      *   create: {
-     *     // ... data to create a PromotionRequest
+     *     // ... data to create a GraduationRequest
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the PromotionRequest we want to update
+     *     // ... the filter for the GraduationRequest we want to update
      *   }
      * })
      */
-    upsert<T extends PromotionRequestUpsertArgs>(args: SelectSubset<T, PromotionRequestUpsertArgs<ExtArgs>>): Prisma__PromotionRequestClient<$Result.GetResult<Prisma.$PromotionRequestPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends GraduationRequestUpsertArgs>(args: SelectSubset<T, GraduationRequestUpsertArgs<ExtArgs>>): Prisma__GraduationRequestClient<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
 
 
     /**
-     * Count the number of PromotionRequests.
+     * Count the number of GraduationRequests.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestCountArgs} args - Arguments to filter PromotionRequests to count.
+     * @param {GraduationRequestCountArgs} args - Arguments to filter GraduationRequests to count.
      * @example
-     * // Count the number of PromotionRequests
-     * const count = await prisma.promotionRequest.count({
+     * // Count the number of GraduationRequests
+     * const count = await prisma.graduationRequest.count({
      *   where: {
-     *     // ... the filter for the PromotionRequests we want to count
+     *     // ... the filter for the GraduationRequests we want to count
      *   }
      * })
     **/
-    count<T extends PromotionRequestCountArgs>(
-      args?: Subset<T, PromotionRequestCountArgs>,
+    count<T extends GraduationRequestCountArgs>(
+      args?: Subset<T, GraduationRequestCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], PromotionRequestCountAggregateOutputType>
+          : GetScalarType<T['select'], GraduationRequestCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a PromotionRequest.
+     * Allows you to perform aggregations operations on a GraduationRequest.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {GraduationRequestAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -13871,13 +13871,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends PromotionRequestAggregateArgs>(args: Subset<T, PromotionRequestAggregateArgs>): Prisma.PrismaPromise<GetPromotionRequestAggregateType<T>>
+    aggregate<T extends GraduationRequestAggregateArgs>(args: Subset<T, GraduationRequestAggregateArgs>): Prisma.PrismaPromise<GetGraduationRequestAggregateType<T>>
 
     /**
-     * Group by PromotionRequest.
+     * Group by GraduationRequest.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionRequestGroupByArgs} args - Group by arguments.
+     * @param {GraduationRequestGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -13892,14 +13892,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends PromotionRequestGroupByArgs,
+      T extends GraduationRequestGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: PromotionRequestGroupByArgs['orderBy'] }
-        : { orderBy?: PromotionRequestGroupByArgs['orderBy'] },
+        ? { orderBy: GraduationRequestGroupByArgs['orderBy'] }
+        : { orderBy?: GraduationRequestGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -13948,24 +13948,24 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, PromotionRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPromotionRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, GraduationRequestGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGraduationRequestGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the PromotionRequest model
+   * Fields of the GraduationRequest model
    */
-  readonly fields: PromotionRequestFieldRefs;
+  readonly fields: GraduationRequestFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for PromotionRequest.
+   * The delegate class that acts as a "Promise-like" for GraduationRequest.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__PromotionRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__GraduationRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     proposedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    approvedBy<T extends PromotionRequest$approvedByArgs<ExtArgs> = {}>(args?: Subset<T, PromotionRequest$approvedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    approvedBy<T extends GraduationRequest$approvedByArgs<ExtArgs> = {}>(args?: Subset<T, GraduationRequest$approvedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13992,338 +13992,338 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the PromotionRequest model
+   * Fields of the GraduationRequest model
    */ 
-  interface PromotionRequestFieldRefs {
-    readonly id: FieldRef<"PromotionRequest", 'String'>
-    readonly studentProfileId: FieldRef<"PromotionRequest", 'String'>
-    readonly proposedBeltId: FieldRef<"PromotionRequest", 'String'>
-    readonly proposedStripes: FieldRef<"PromotionRequest", 'Int'>
-    readonly proposedById: FieldRef<"PromotionRequest", 'String'>
-    readonly approvedById: FieldRef<"PromotionRequest", 'String'>
-    readonly status: FieldRef<"PromotionRequest", 'RequestStatus'>
-    readonly createdAt: FieldRef<"PromotionRequest", 'DateTime'>
+  interface GraduationRequestFieldRefs {
+    readonly id: FieldRef<"GraduationRequest", 'String'>
+    readonly studentProfileId: FieldRef<"GraduationRequest", 'String'>
+    readonly proposedBeltId: FieldRef<"GraduationRequest", 'String'>
+    readonly proposedStripes: FieldRef<"GraduationRequest", 'Int'>
+    readonly proposedById: FieldRef<"GraduationRequest", 'String'>
+    readonly approvedById: FieldRef<"GraduationRequest", 'String'>
+    readonly status: FieldRef<"GraduationRequest", 'RequestStatus'>
+    readonly createdAt: FieldRef<"GraduationRequest", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * PromotionRequest findUnique
+   * GraduationRequest findUnique
    */
-  export type PromotionRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter, which PromotionRequest to fetch.
+     * Filter, which GraduationRequest to fetch.
      */
-    where: PromotionRequestWhereUniqueInput
+    where: GraduationRequestWhereUniqueInput
   }
 
   /**
-   * PromotionRequest findUniqueOrThrow
+   * GraduationRequest findUniqueOrThrow
    */
-  export type PromotionRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter, which PromotionRequest to fetch.
+     * Filter, which GraduationRequest to fetch.
      */
-    where: PromotionRequestWhereUniqueInput
+    where: GraduationRequestWhereUniqueInput
   }
 
   /**
-   * PromotionRequest findFirst
+   * GraduationRequest findFirst
    */
-  export type PromotionRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter, which PromotionRequest to fetch.
+     * Filter, which GraduationRequest to fetch.
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of PromotionRequests to fetch.
+     * Determine the order of GraduationRequests to fetch.
      */
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for PromotionRequests.
+     * Sets the position for searching for GraduationRequests.
      */
-    cursor?: PromotionRequestWhereUniqueInput
+    cursor?: GraduationRequestWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` PromotionRequests from the position of the cursor.
+     * Take `±n` GraduationRequests from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` PromotionRequests.
+     * Skip the first `n` GraduationRequests.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of PromotionRequests.
+     * Filter by unique combinations of GraduationRequests.
      */
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
-   * PromotionRequest findFirstOrThrow
+   * GraduationRequest findFirstOrThrow
    */
-  export type PromotionRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter, which PromotionRequest to fetch.
+     * Filter, which GraduationRequest to fetch.
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of PromotionRequests to fetch.
+     * Determine the order of GraduationRequests to fetch.
      */
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for PromotionRequests.
+     * Sets the position for searching for GraduationRequests.
      */
-    cursor?: PromotionRequestWhereUniqueInput
+    cursor?: GraduationRequestWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` PromotionRequests from the position of the cursor.
+     * Take `±n` GraduationRequests from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` PromotionRequests.
+     * Skip the first `n` GraduationRequests.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of PromotionRequests.
+     * Filter by unique combinations of GraduationRequests.
      */
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
-   * PromotionRequest findMany
+   * GraduationRequest findMany
    */
-  export type PromotionRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter, which PromotionRequests to fetch.
+     * Filter, which GraduationRequests to fetch.
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of PromotionRequests to fetch.
+     * Determine the order of GraduationRequests to fetch.
      */
-    orderBy?: PromotionRequestOrderByWithRelationInput | PromotionRequestOrderByWithRelationInput[]
+    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing PromotionRequests.
+     * Sets the position for listing GraduationRequests.
      */
-    cursor?: PromotionRequestWhereUniqueInput
+    cursor?: GraduationRequestWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` PromotionRequests from the position of the cursor.
+     * Take `±n` GraduationRequests from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` PromotionRequests.
+     * Skip the first `n` GraduationRequests.
      */
     skip?: number
-    distinct?: PromotionRequestScalarFieldEnum | PromotionRequestScalarFieldEnum[]
+    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
   }
 
   /**
-   * PromotionRequest create
+   * GraduationRequest create
    */
-  export type PromotionRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * The data needed to create a PromotionRequest.
+     * The data needed to create a GraduationRequest.
      */
-    data: XOR<PromotionRequestCreateInput, PromotionRequestUncheckedCreateInput>
+    data: XOR<GraduationRequestCreateInput, GraduationRequestUncheckedCreateInput>
   }
 
   /**
-   * PromotionRequest createMany
+   * GraduationRequest createMany
    */
-  export type PromotionRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many PromotionRequests.
+     * The data used to create many GraduationRequests.
      */
-    data: PromotionRequestCreateManyInput | PromotionRequestCreateManyInput[]
+    data: GraduationRequestCreateManyInput | GraduationRequestCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * PromotionRequest createManyAndReturn
+   * GraduationRequest createManyAndReturn
    */
-  export type PromotionRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelectCreateManyAndReturn<ExtArgs> | null
+    select?: GraduationRequestSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * The data used to create many PromotionRequests.
+     * The data used to create many GraduationRequests.
      */
-    data: PromotionRequestCreateManyInput | PromotionRequestCreateManyInput[]
+    data: GraduationRequestCreateManyInput | GraduationRequestCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: GraduationRequestIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * PromotionRequest update
+   * GraduationRequest update
    */
-  export type PromotionRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * The data needed to update a PromotionRequest.
+     * The data needed to update a GraduationRequest.
      */
-    data: XOR<PromotionRequestUpdateInput, PromotionRequestUncheckedUpdateInput>
+    data: XOR<GraduationRequestUpdateInput, GraduationRequestUncheckedUpdateInput>
     /**
-     * Choose, which PromotionRequest to update.
+     * Choose, which GraduationRequest to update.
      */
-    where: PromotionRequestWhereUniqueInput
+    where: GraduationRequestWhereUniqueInput
   }
 
   /**
-   * PromotionRequest updateMany
+   * GraduationRequest updateMany
    */
-  export type PromotionRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update PromotionRequests.
+     * The data used to update GraduationRequests.
      */
-    data: XOR<PromotionRequestUpdateManyMutationInput, PromotionRequestUncheckedUpdateManyInput>
+    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyInput>
     /**
-     * Filter which PromotionRequests to update
+     * Filter which GraduationRequests to update
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
   }
 
   /**
-   * PromotionRequest upsert
+   * GraduationRequest upsert
    */
-  export type PromotionRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * The filter to search for the PromotionRequest to update in case it exists.
+     * The filter to search for the GraduationRequest to update in case it exists.
      */
-    where: PromotionRequestWhereUniqueInput
+    where: GraduationRequestWhereUniqueInput
     /**
-     * In case the PromotionRequest found by the `where` argument doesn't exist, create a new PromotionRequest with this data.
+     * In case the GraduationRequest found by the `where` argument doesn't exist, create a new GraduationRequest with this data.
      */
-    create: XOR<PromotionRequestCreateInput, PromotionRequestUncheckedCreateInput>
+    create: XOR<GraduationRequestCreateInput, GraduationRequestUncheckedCreateInput>
     /**
-     * In case the PromotionRequest was found with the provided `where` argument, update it with this data.
+     * In case the GraduationRequest was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<PromotionRequestUpdateInput, PromotionRequestUncheckedUpdateInput>
+    update: XOR<GraduationRequestUpdateInput, GraduationRequestUncheckedUpdateInput>
   }
 
   /**
-   * PromotionRequest delete
+   * GraduationRequest delete
    */
-  export type PromotionRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
     /**
-     * Filter which PromotionRequest to delete.
+     * Filter which GraduationRequest to delete.
      */
-    where: PromotionRequestWhereUniqueInput
+    where: GraduationRequestWhereUniqueInput
   }
 
   /**
-   * PromotionRequest deleteMany
+   * GraduationRequest deleteMany
    */
-  export type PromotionRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which PromotionRequests to delete
+     * Filter which GraduationRequests to delete
      */
-    where?: PromotionRequestWhereInput
+    where?: GraduationRequestWhereInput
   }
 
   /**
-   * PromotionRequest.approvedBy
+   * GraduationRequest.approvedBy
    */
-  export type PromotionRequest$approvedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequest$approvedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -14336,17 +14336,17 @@ export namespace Prisma {
   }
 
   /**
-   * PromotionRequest without action
+   * GraduationRequest without action
    */
-  export type PromotionRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type GraduationRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the PromotionRequest
+     * Select specific fields to fetch from the GraduationRequest
      */
-    select?: PromotionRequestSelect<ExtArgs> | null
+    select?: GraduationRequestSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionRequestInclude<ExtArgs> | null
+    include?: GraduationRequestInclude<ExtArgs> | null
   }
 
 
@@ -16431,32 +16431,32 @@ export namespace Prisma {
 
 
   /**
-   * Model Promotion
+   * Model Discount
    */
 
-  export type AggregatePromotion = {
-    _count: PromotionCountAggregateOutputType | null
-    _avg: PromotionAvgAggregateOutputType | null
-    _sum: PromotionSumAggregateOutputType | null
-    _min: PromotionMinAggregateOutputType | null
-    _max: PromotionMaxAggregateOutputType | null
+  export type AggregateDiscount = {
+    _count: DiscountCountAggregateOutputType | null
+    _avg: DiscountAvgAggregateOutputType | null
+    _sum: DiscountSumAggregateOutputType | null
+    _min: DiscountMinAggregateOutputType | null
+    _max: DiscountMaxAggregateOutputType | null
   }
 
-  export type PromotionAvgAggregateOutputType = {
+  export type DiscountAvgAggregateOutputType = {
     value: Decimal | null
   }
 
-  export type PromotionSumAggregateOutputType = {
+  export type DiscountSumAggregateOutputType = {
     value: Decimal | null
   }
 
-  export type PromotionMinAggregateOutputType = {
+  export type DiscountMinAggregateOutputType = {
     id: string | null
     code: string | null
     name: string | null
     description: string | null
-    type: $Enums.PromotionType | null
-    category: $Enums.PromotionCategory | null
+    type: $Enums.DiscountType | null
+    category: $Enums.DiscountCategory | null
     value: Decimal | null
     startDate: Date | null
     endDate: Date | null
@@ -16465,13 +16465,13 @@ export namespace Prisma {
     updatedAt: Date | null
   }
 
-  export type PromotionMaxAggregateOutputType = {
+  export type DiscountMaxAggregateOutputType = {
     id: string | null
     code: string | null
     name: string | null
     description: string | null
-    type: $Enums.PromotionType | null
-    category: $Enums.PromotionCategory | null
+    type: $Enums.DiscountType | null
+    category: $Enums.DiscountCategory | null
     value: Decimal | null
     startDate: Date | null
     endDate: Date | null
@@ -16480,7 +16480,7 @@ export namespace Prisma {
     updatedAt: Date | null
   }
 
-  export type PromotionCountAggregateOutputType = {
+  export type DiscountCountAggregateOutputType = {
     id: number
     code: number
     name: number
@@ -16497,15 +16497,15 @@ export namespace Prisma {
   }
 
 
-  export type PromotionAvgAggregateInputType = {
+  export type DiscountAvgAggregateInputType = {
     value?: true
   }
 
-  export type PromotionSumAggregateInputType = {
+  export type DiscountSumAggregateInputType = {
     value?: true
   }
 
-  export type PromotionMinAggregateInputType = {
+  export type DiscountMinAggregateInputType = {
     id?: true
     code?: true
     name?: true
@@ -16520,7 +16520,7 @@ export namespace Prisma {
     updatedAt?: true
   }
 
-  export type PromotionMaxAggregateInputType = {
+  export type DiscountMaxAggregateInputType = {
     id?: true
     code?: true
     name?: true
@@ -16535,7 +16535,7 @@ export namespace Prisma {
     updatedAt?: true
   }
 
-  export type PromotionCountAggregateInputType = {
+  export type DiscountCountAggregateInputType = {
     id?: true
     code?: true
     name?: true
@@ -16551,127 +16551,127 @@ export namespace Prisma {
     _all?: true
   }
 
-  export type PromotionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Promotion to aggregate.
+     * Filter which Discount to aggregate.
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Promotions to fetch.
+     * Determine the order of Discounts to fetch.
      */
-    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    orderBy?: DiscountOrderByWithRelationInput | DiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: PromotionWhereUniqueInput
+    cursor?: DiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Promotions from the position of the cursor.
+     * Take `±n` Discounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Promotions.
+     * Skip the first `n` Discounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned Promotions
+     * Count returned Discounts
     **/
-    _count?: true | PromotionCountAggregateInputType
+    _count?: true | DiscountCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to average
     **/
-    _avg?: PromotionAvgAggregateInputType
+    _avg?: DiscountAvgAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to sum
     **/
-    _sum?: PromotionSumAggregateInputType
+    _sum?: DiscountSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: PromotionMinAggregateInputType
+    _min?: DiscountMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: PromotionMaxAggregateInputType
+    _max?: DiscountMaxAggregateInputType
   }
 
-  export type GetPromotionAggregateType<T extends PromotionAggregateArgs> = {
-        [P in keyof T & keyof AggregatePromotion]: P extends '_count' | 'count'
+  export type GetDiscountAggregateType<T extends DiscountAggregateArgs> = {
+        [P in keyof T & keyof AggregateDiscount]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregatePromotion[P]>
-      : GetScalarType<T[P], AggregatePromotion[P]>
+        : GetScalarType<T[P], AggregateDiscount[P]>
+      : GetScalarType<T[P], AggregateDiscount[P]>
   }
 
 
 
 
-  export type PromotionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PromotionWhereInput
-    orderBy?: PromotionOrderByWithAggregationInput | PromotionOrderByWithAggregationInput[]
-    by: PromotionScalarFieldEnum[] | PromotionScalarFieldEnum
-    having?: PromotionScalarWhereWithAggregatesInput
+  export type DiscountGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiscountWhereInput
+    orderBy?: DiscountOrderByWithAggregationInput | DiscountOrderByWithAggregationInput[]
+    by: DiscountScalarFieldEnum[] | DiscountScalarFieldEnum
+    having?: DiscountScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: PromotionCountAggregateInputType | true
-    _avg?: PromotionAvgAggregateInputType
-    _sum?: PromotionSumAggregateInputType
-    _min?: PromotionMinAggregateInputType
-    _max?: PromotionMaxAggregateInputType
+    _count?: DiscountCountAggregateInputType | true
+    _avg?: DiscountAvgAggregateInputType
+    _sum?: DiscountSumAggregateInputType
+    _min?: DiscountMinAggregateInputType
+    _max?: DiscountMaxAggregateInputType
   }
 
-  export type PromotionGroupByOutputType = {
+  export type DiscountGroupByOutputType = {
     id: string
     code: string
     name: string
     description: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value: Decimal | null
     startDate: Date | null
     endDate: Date | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
-    _count: PromotionCountAggregateOutputType | null
-    _avg: PromotionAvgAggregateOutputType | null
-    _sum: PromotionSumAggregateOutputType | null
-    _min: PromotionMinAggregateOutputType | null
-    _max: PromotionMaxAggregateOutputType | null
+    _count: DiscountCountAggregateOutputType | null
+    _avg: DiscountAvgAggregateOutputType | null
+    _sum: DiscountSumAggregateOutputType | null
+    _min: DiscountMinAggregateOutputType | null
+    _max: DiscountMaxAggregateOutputType | null
   }
 
-  type GetPromotionGroupByPayload<T extends PromotionGroupByArgs> = Prisma.PrismaPromise<
+  type GetDiscountGroupByPayload<T extends DiscountGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<PromotionGroupByOutputType, T['by']> &
+      PickEnumerable<DiscountGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof PromotionGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof DiscountGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], PromotionGroupByOutputType[P]>
-            : GetScalarType<T[P], PromotionGroupByOutputType[P]>
+              : GetScalarType<T[P], DiscountGroupByOutputType[P]>
+            : GetScalarType<T[P], DiscountGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type PromotionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type DiscountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     code?: boolean
     name?: boolean
@@ -16684,11 +16684,11 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    studentPromotions?: boolean | Promotion$studentPromotionsArgs<ExtArgs>
-    _count?: boolean | PromotionCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["promotion"]>
+    studentDiscounts?: boolean | Discount$studentDiscountsArgs<ExtArgs>
+    _count?: boolean | DiscountCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["discount"]>
 
-  export type PromotionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type DiscountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     code?: boolean
     name?: boolean
@@ -16701,9 +16701,9 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-  }, ExtArgs["result"]["promotion"]>
+  }, ExtArgs["result"]["discount"]>
 
-  export type PromotionSelectScalar = {
+  export type DiscountSelectScalar = {
     id?: boolean
     code?: boolean
     name?: boolean
@@ -16718,24 +16718,24 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type PromotionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    studentPromotions?: boolean | Promotion$studentPromotionsArgs<ExtArgs>
-    _count?: boolean | PromotionCountOutputTypeDefaultArgs<ExtArgs>
+  export type DiscountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentDiscounts?: boolean | Discount$studentDiscountsArgs<ExtArgs>
+    _count?: boolean | DiscountCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type PromotionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DiscountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
-  export type $PromotionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Promotion"
+  export type $DiscountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Discount"
     objects: {
-      studentPromotions: Prisma.$StudentPromotionPayload<ExtArgs>[]
+      studentDiscounts: Prisma.$StudentDiscountPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       code: string
       name: string
       description: string | null
-      type: $Enums.PromotionType
-      category: $Enums.PromotionCategory
+      type: $Enums.DiscountType
+      category: $Enums.DiscountCategory
       /**
        * Percentage value or fixed discount amount
        */
@@ -16745,136 +16745,136 @@ export namespace Prisma {
       isActive: boolean
       createdAt: Date
       updatedAt: Date
-    }, ExtArgs["result"]["promotion"]>
+    }, ExtArgs["result"]["discount"]>
     composites: {}
   }
 
-  type PromotionGetPayload<S extends boolean | null | undefined | PromotionDefaultArgs> = $Result.GetResult<Prisma.$PromotionPayload, S>
+  type DiscountGetPayload<S extends boolean | null | undefined | DiscountDefaultArgs> = $Result.GetResult<Prisma.$DiscountPayload, S>
 
-  type PromotionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<PromotionFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: PromotionCountAggregateInputType | true
+  type DiscountCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<DiscountFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: DiscountCountAggregateInputType | true
     }
 
-  export interface PromotionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Promotion'], meta: { name: 'Promotion' } }
+  export interface DiscountDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Discount'], meta: { name: 'Discount' } }
     /**
-     * Find zero or one Promotion that matches the filter.
-     * @param {PromotionFindUniqueArgs} args - Arguments to find a Promotion
+     * Find zero or one Discount that matches the filter.
+     * @param {DiscountFindUniqueArgs} args - Arguments to find a Discount
      * @example
-     * // Get one Promotion
-     * const promotion = await prisma.promotion.findUnique({
+     * // Get one Discount
+     * const discount = await prisma.discount.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends PromotionFindUniqueArgs>(args: SelectSubset<T, PromotionFindUniqueArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends DiscountFindUniqueArgs>(args: SelectSubset<T, DiscountFindUniqueArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
 
     /**
-     * Find one Promotion that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one Discount that matches the filter or throw an error with `error.code='P2025'` 
      * if no matches were found.
-     * @param {PromotionFindUniqueOrThrowArgs} args - Arguments to find a Promotion
+     * @param {DiscountFindUniqueOrThrowArgs} args - Arguments to find a Discount
      * @example
-     * // Get one Promotion
-     * const promotion = await prisma.promotion.findUniqueOrThrow({
+     * // Get one Discount
+     * const discount = await prisma.discount.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends PromotionFindUniqueOrThrowArgs>(args: SelectSubset<T, PromotionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends DiscountFindUniqueOrThrowArgs>(args: SelectSubset<T, DiscountFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
 
     /**
-     * Find the first Promotion that matches the filter.
+     * Find the first Discount that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionFindFirstArgs} args - Arguments to find a Promotion
+     * @param {DiscountFindFirstArgs} args - Arguments to find a Discount
      * @example
-     * // Get one Promotion
-     * const promotion = await prisma.promotion.findFirst({
+     * // Get one Discount
+     * const discount = await prisma.discount.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends PromotionFindFirstArgs>(args?: SelectSubset<T, PromotionFindFirstArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends DiscountFindFirstArgs>(args?: SelectSubset<T, DiscountFindFirstArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
 
     /**
-     * Find the first Promotion that matches the filter or
+     * Find the first Discount that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionFindFirstOrThrowArgs} args - Arguments to find a Promotion
+     * @param {DiscountFindFirstOrThrowArgs} args - Arguments to find a Discount
      * @example
-     * // Get one Promotion
-     * const promotion = await prisma.promotion.findFirstOrThrow({
+     * // Get one Discount
+     * const discount = await prisma.discount.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends PromotionFindFirstOrThrowArgs>(args?: SelectSubset<T, PromotionFindFirstOrThrowArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends DiscountFindFirstOrThrowArgs>(args?: SelectSubset<T, DiscountFindFirstOrThrowArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
 
     /**
-     * Find zero or more Promotions that matches the filter.
+     * Find zero or more Discounts that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {DiscountFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all Promotions
-     * const promotions = await prisma.promotion.findMany()
+     * // Get all Discounts
+     * const discounts = await prisma.discount.findMany()
      * 
-     * // Get first 10 Promotions
-     * const promotions = await prisma.promotion.findMany({ take: 10 })
+     * // Get first 10 Discounts
+     * const discounts = await prisma.discount.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const promotionWithIdOnly = await prisma.promotion.findMany({ select: { id: true } })
+     * const discountWithIdOnly = await prisma.discount.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends PromotionFindManyArgs>(args?: SelectSubset<T, PromotionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends DiscountFindManyArgs>(args?: SelectSubset<T, DiscountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findMany">>
 
     /**
-     * Create a Promotion.
-     * @param {PromotionCreateArgs} args - Arguments to create a Promotion.
+     * Create a Discount.
+     * @param {DiscountCreateArgs} args - Arguments to create a Discount.
      * @example
-     * // Create one Promotion
-     * const Promotion = await prisma.promotion.create({
+     * // Create one Discount
+     * const Discount = await prisma.discount.create({
      *   data: {
-     *     // ... data to create a Promotion
+     *     // ... data to create a Discount
      *   }
      * })
      * 
      */
-    create<T extends PromotionCreateArgs>(args: SelectSubset<T, PromotionCreateArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends DiscountCreateArgs>(args: SelectSubset<T, DiscountCreateArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "create">, never, ExtArgs>
 
     /**
-     * Create many Promotions.
-     * @param {PromotionCreateManyArgs} args - Arguments to create many Promotions.
+     * Create many Discounts.
+     * @param {DiscountCreateManyArgs} args - Arguments to create many Discounts.
      * @example
-     * // Create many Promotions
-     * const promotion = await prisma.promotion.createMany({
+     * // Create many Discounts
+     * const discount = await prisma.discount.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends PromotionCreateManyArgs>(args?: SelectSubset<T, PromotionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends DiscountCreateManyArgs>(args?: SelectSubset<T, DiscountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many Promotions and returns the data saved in the database.
-     * @param {PromotionCreateManyAndReturnArgs} args - Arguments to create many Promotions.
+     * Create many Discounts and returns the data saved in the database.
+     * @param {DiscountCreateManyAndReturnArgs} args - Arguments to create many Discounts.
      * @example
-     * // Create many Promotions
-     * const promotion = await prisma.promotion.createManyAndReturn({
+     * // Create many Discounts
+     * const discount = await prisma.discount.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many Promotions and only return the `id`
-     * const promotionWithIdOnly = await prisma.promotion.createManyAndReturn({ 
+     * // Create many Discounts and only return the `id`
+     * const discountWithIdOnly = await prisma.discount.createManyAndReturn({ 
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -16884,28 +16884,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends PromotionCreateManyAndReturnArgs>(args?: SelectSubset<T, PromotionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends DiscountCreateManyAndReturnArgs>(args?: SelectSubset<T, DiscountCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "createManyAndReturn">>
 
     /**
-     * Delete a Promotion.
-     * @param {PromotionDeleteArgs} args - Arguments to delete one Promotion.
+     * Delete a Discount.
+     * @param {DiscountDeleteArgs} args - Arguments to delete one Discount.
      * @example
-     * // Delete one Promotion
-     * const Promotion = await prisma.promotion.delete({
+     * // Delete one Discount
+     * const Discount = await prisma.discount.delete({
      *   where: {
-     *     // ... filter to delete one Promotion
+     *     // ... filter to delete one Discount
      *   }
      * })
      * 
      */
-    delete<T extends PromotionDeleteArgs>(args: SelectSubset<T, PromotionDeleteArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends DiscountDeleteArgs>(args: SelectSubset<T, DiscountDeleteArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "delete">, never, ExtArgs>
 
     /**
-     * Update one Promotion.
-     * @param {PromotionUpdateArgs} args - Arguments to update one Promotion.
+     * Update one Discount.
+     * @param {DiscountUpdateArgs} args - Arguments to update one Discount.
      * @example
-     * // Update one Promotion
-     * const promotion = await prisma.promotion.update({
+     * // Update one Discount
+     * const discount = await prisma.discount.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -16915,30 +16915,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends PromotionUpdateArgs>(args: SelectSubset<T, PromotionUpdateArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends DiscountUpdateArgs>(args: SelectSubset<T, DiscountUpdateArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "update">, never, ExtArgs>
 
     /**
-     * Delete zero or more Promotions.
-     * @param {PromotionDeleteManyArgs} args - Arguments to filter Promotions to delete.
+     * Delete zero or more Discounts.
+     * @param {DiscountDeleteManyArgs} args - Arguments to filter Discounts to delete.
      * @example
-     * // Delete a few Promotions
-     * const { count } = await prisma.promotion.deleteMany({
+     * // Delete a few Discounts
+     * const { count } = await prisma.discount.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends PromotionDeleteManyArgs>(args?: SelectSubset<T, PromotionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends DiscountDeleteManyArgs>(args?: SelectSubset<T, DiscountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more Promotions.
+     * Update zero or more Discounts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {DiscountUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many Promotions
-     * const promotion = await prisma.promotion.updateMany({
+     * // Update many Discounts
+     * const discount = await prisma.discount.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -16948,56 +16948,56 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends PromotionUpdateManyArgs>(args: SelectSubset<T, PromotionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends DiscountUpdateManyArgs>(args: SelectSubset<T, DiscountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one Promotion.
-     * @param {PromotionUpsertArgs} args - Arguments to update or create a Promotion.
+     * Create or update one Discount.
+     * @param {DiscountUpsertArgs} args - Arguments to update or create a Discount.
      * @example
-     * // Update or create a Promotion
-     * const promotion = await prisma.promotion.upsert({
+     * // Update or create a Discount
+     * const discount = await prisma.discount.upsert({
      *   create: {
-     *     // ... data to create a Promotion
+     *     // ... data to create a Discount
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the Promotion we want to update
+     *     // ... the filter for the Discount we want to update
      *   }
      * })
      */
-    upsert<T extends PromotionUpsertArgs>(args: SelectSubset<T, PromotionUpsertArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends DiscountUpsertArgs>(args: SelectSubset<T, DiscountUpsertArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
 
 
     /**
-     * Count the number of Promotions.
+     * Count the number of Discounts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionCountArgs} args - Arguments to filter Promotions to count.
+     * @param {DiscountCountArgs} args - Arguments to filter Discounts to count.
      * @example
-     * // Count the number of Promotions
-     * const count = await prisma.promotion.count({
+     * // Count the number of Discounts
+     * const count = await prisma.discount.count({
      *   where: {
-     *     // ... the filter for the Promotions we want to count
+     *     // ... the filter for the Discounts we want to count
      *   }
      * })
     **/
-    count<T extends PromotionCountArgs>(
-      args?: Subset<T, PromotionCountArgs>,
+    count<T extends DiscountCountArgs>(
+      args?: Subset<T, DiscountCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], PromotionCountAggregateOutputType>
+          : GetScalarType<T['select'], DiscountCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a Promotion.
+     * Allows you to perform aggregations operations on a Discount.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {DiscountAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -17017,13 +17017,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends PromotionAggregateArgs>(args: Subset<T, PromotionAggregateArgs>): Prisma.PrismaPromise<GetPromotionAggregateType<T>>
+    aggregate<T extends DiscountAggregateArgs>(args: Subset<T, DiscountAggregateArgs>): Prisma.PrismaPromise<GetDiscountAggregateType<T>>
 
     /**
-     * Group by Promotion.
+     * Group by Discount.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {PromotionGroupByArgs} args - Group by arguments.
+     * @param {DiscountGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -17038,14 +17038,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends PromotionGroupByArgs,
+      T extends DiscountGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: PromotionGroupByArgs['orderBy'] }
-        : { orderBy?: PromotionGroupByArgs['orderBy'] },
+        ? { orderBy: DiscountGroupByArgs['orderBy'] }
+        : { orderBy?: DiscountGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -17094,22 +17094,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, PromotionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPromotionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, DiscountGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDiscountGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the Promotion model
+   * Fields of the Discount model
    */
-  readonly fields: PromotionFieldRefs;
+  readonly fields: DiscountFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for Promotion.
+   * The delegate class that acts as a "Promise-like" for Discount.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__PromotionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__DiscountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    studentPromotions<T extends Promotion$studentPromotionsArgs<ExtArgs> = {}>(args?: Subset<T, Promotion$studentPromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany"> | Null>
+    studentDiscounts<T extends Discount$studentDiscountsArgs<ExtArgs> = {}>(args?: Subset<T, Discount$studentDiscountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17136,706 +17136,706 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the Promotion model
+   * Fields of the Discount model
    */ 
-  interface PromotionFieldRefs {
-    readonly id: FieldRef<"Promotion", 'String'>
-    readonly code: FieldRef<"Promotion", 'String'>
-    readonly name: FieldRef<"Promotion", 'String'>
-    readonly description: FieldRef<"Promotion", 'String'>
-    readonly type: FieldRef<"Promotion", 'PromotionType'>
-    readonly category: FieldRef<"Promotion", 'PromotionCategory'>
-    readonly value: FieldRef<"Promotion", 'Decimal'>
-    readonly startDate: FieldRef<"Promotion", 'DateTime'>
-    readonly endDate: FieldRef<"Promotion", 'DateTime'>
-    readonly isActive: FieldRef<"Promotion", 'Boolean'>
-    readonly createdAt: FieldRef<"Promotion", 'DateTime'>
-    readonly updatedAt: FieldRef<"Promotion", 'DateTime'>
+  interface DiscountFieldRefs {
+    readonly id: FieldRef<"Discount", 'String'>
+    readonly code: FieldRef<"Discount", 'String'>
+    readonly name: FieldRef<"Discount", 'String'>
+    readonly description: FieldRef<"Discount", 'String'>
+    readonly type: FieldRef<"Discount", 'DiscountType'>
+    readonly category: FieldRef<"Discount", 'DiscountCategory'>
+    readonly value: FieldRef<"Discount", 'Decimal'>
+    readonly startDate: FieldRef<"Discount", 'DateTime'>
+    readonly endDate: FieldRef<"Discount", 'DateTime'>
+    readonly isActive: FieldRef<"Discount", 'Boolean'>
+    readonly createdAt: FieldRef<"Discount", 'DateTime'>
+    readonly updatedAt: FieldRef<"Discount", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * Promotion findUnique
+   * Discount findUnique
    */
-  export type PromotionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter, which Promotion to fetch.
+     * Filter, which Discount to fetch.
      */
-    where: PromotionWhereUniqueInput
+    where: DiscountWhereUniqueInput
   }
 
   /**
-   * Promotion findUniqueOrThrow
+   * Discount findUniqueOrThrow
    */
-  export type PromotionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter, which Promotion to fetch.
+     * Filter, which Discount to fetch.
      */
-    where: PromotionWhereUniqueInput
+    where: DiscountWhereUniqueInput
   }
 
   /**
-   * Promotion findFirst
+   * Discount findFirst
    */
-  export type PromotionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter, which Promotion to fetch.
+     * Filter, which Discount to fetch.
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Promotions to fetch.
+     * Determine the order of Discounts to fetch.
      */
-    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    orderBy?: DiscountOrderByWithRelationInput | DiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Promotions.
+     * Sets the position for searching for Discounts.
      */
-    cursor?: PromotionWhereUniqueInput
+    cursor?: DiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Promotions from the position of the cursor.
+     * Take `±n` Discounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Promotions.
+     * Skip the first `n` Discounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Promotions.
+     * Filter by unique combinations of Discounts.
      */
-    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+    distinct?: DiscountScalarFieldEnum | DiscountScalarFieldEnum[]
   }
 
   /**
-   * Promotion findFirstOrThrow
+   * Discount findFirstOrThrow
    */
-  export type PromotionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter, which Promotion to fetch.
+     * Filter, which Discount to fetch.
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Promotions to fetch.
+     * Determine the order of Discounts to fetch.
      */
-    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    orderBy?: DiscountOrderByWithRelationInput | DiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for Promotions.
+     * Sets the position for searching for Discounts.
      */
-    cursor?: PromotionWhereUniqueInput
+    cursor?: DiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Promotions from the position of the cursor.
+     * Take `±n` Discounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Promotions.
+     * Skip the first `n` Discounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of Promotions.
+     * Filter by unique combinations of Discounts.
      */
-    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+    distinct?: DiscountScalarFieldEnum | DiscountScalarFieldEnum[]
   }
 
   /**
-   * Promotion findMany
+   * Discount findMany
    */
-  export type PromotionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter, which Promotions to fetch.
+     * Filter, which Discounts to fetch.
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of Promotions to fetch.
+     * Determine the order of Discounts to fetch.
      */
-    orderBy?: PromotionOrderByWithRelationInput | PromotionOrderByWithRelationInput[]
+    orderBy?: DiscountOrderByWithRelationInput | DiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing Promotions.
+     * Sets the position for listing Discounts.
      */
-    cursor?: PromotionWhereUniqueInput
+    cursor?: DiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` Promotions from the position of the cursor.
+     * Take `±n` Discounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` Promotions.
+     * Skip the first `n` Discounts.
      */
     skip?: number
-    distinct?: PromotionScalarFieldEnum | PromotionScalarFieldEnum[]
+    distinct?: DiscountScalarFieldEnum | DiscountScalarFieldEnum[]
   }
 
   /**
-   * Promotion create
+   * Discount create
    */
-  export type PromotionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * The data needed to create a Promotion.
+     * The data needed to create a Discount.
      */
-    data: XOR<PromotionCreateInput, PromotionUncheckedCreateInput>
+    data: XOR<DiscountCreateInput, DiscountUncheckedCreateInput>
   }
 
   /**
-   * Promotion createMany
+   * Discount createMany
    */
-  export type PromotionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many Promotions.
+     * The data used to create many Discounts.
      */
-    data: PromotionCreateManyInput | PromotionCreateManyInput[]
+    data: DiscountCreateManyInput | DiscountCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * Promotion createManyAndReturn
+   * Discount createManyAndReturn
    */
-  export type PromotionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelectCreateManyAndReturn<ExtArgs> | null
+    select?: DiscountSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * The data used to create many Promotions.
+     * The data used to create many Discounts.
      */
-    data: PromotionCreateManyInput | PromotionCreateManyInput[]
+    data: DiscountCreateManyInput | DiscountCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * Promotion update
+   * Discount update
    */
-  export type PromotionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * The data needed to update a Promotion.
+     * The data needed to update a Discount.
      */
-    data: XOR<PromotionUpdateInput, PromotionUncheckedUpdateInput>
+    data: XOR<DiscountUpdateInput, DiscountUncheckedUpdateInput>
     /**
-     * Choose, which Promotion to update.
+     * Choose, which Discount to update.
      */
-    where: PromotionWhereUniqueInput
+    where: DiscountWhereUniqueInput
   }
 
   /**
-   * Promotion updateMany
+   * Discount updateMany
    */
-  export type PromotionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update Promotions.
+     * The data used to update Discounts.
      */
-    data: XOR<PromotionUpdateManyMutationInput, PromotionUncheckedUpdateManyInput>
+    data: XOR<DiscountUpdateManyMutationInput, DiscountUncheckedUpdateManyInput>
     /**
-     * Filter which Promotions to update
+     * Filter which Discounts to update
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
   }
 
   /**
-   * Promotion upsert
+   * Discount upsert
    */
-  export type PromotionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * The filter to search for the Promotion to update in case it exists.
+     * The filter to search for the Discount to update in case it exists.
      */
-    where: PromotionWhereUniqueInput
+    where: DiscountWhereUniqueInput
     /**
-     * In case the Promotion found by the `where` argument doesn't exist, create a new Promotion with this data.
+     * In case the Discount found by the `where` argument doesn't exist, create a new Discount with this data.
      */
-    create: XOR<PromotionCreateInput, PromotionUncheckedCreateInput>
+    create: XOR<DiscountCreateInput, DiscountUncheckedCreateInput>
     /**
-     * In case the Promotion was found with the provided `where` argument, update it with this data.
+     * In case the Discount was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<PromotionUpdateInput, PromotionUncheckedUpdateInput>
+    update: XOR<DiscountUpdateInput, DiscountUncheckedUpdateInput>
   }
 
   /**
-   * Promotion delete
+   * Discount delete
    */
-  export type PromotionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
     /**
-     * Filter which Promotion to delete.
+     * Filter which Discount to delete.
      */
-    where: PromotionWhereUniqueInput
+    where: DiscountWhereUniqueInput
   }
 
   /**
-   * Promotion deleteMany
+   * Discount deleteMany
    */
-  export type PromotionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which Promotions to delete
+     * Filter which Discounts to delete
      */
-    where?: PromotionWhereInput
+    where?: DiscountWhereInput
   }
 
   /**
-   * Promotion.studentPromotions
+   * Discount.studentDiscounts
    */
-  export type Promotion$studentPromotionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Discount$studentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
-    where?: StudentPromotionWhereInput
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
-    cursor?: StudentPromotionWhereUniqueInput
+    include?: StudentDiscountInclude<ExtArgs> | null
+    where?: StudentDiscountWhereInput
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
+    cursor?: StudentDiscountWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
   }
 
   /**
-   * Promotion without action
+   * Discount without action
    */
-  export type PromotionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DiscountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Promotion
+     * Select specific fields to fetch from the Discount
      */
-    select?: PromotionSelect<ExtArgs> | null
+    select?: DiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: PromotionInclude<ExtArgs> | null
+    include?: DiscountInclude<ExtArgs> | null
   }
 
 
   /**
-   * Model StudentPromotion
+   * Model StudentDiscount
    */
 
-  export type AggregateStudentPromotion = {
-    _count: StudentPromotionCountAggregateOutputType | null
-    _min: StudentPromotionMinAggregateOutputType | null
-    _max: StudentPromotionMaxAggregateOutputType | null
+  export type AggregateStudentDiscount = {
+    _count: StudentDiscountCountAggregateOutputType | null
+    _min: StudentDiscountMinAggregateOutputType | null
+    _max: StudentDiscountMaxAggregateOutputType | null
   }
 
-  export type StudentPromotionMinAggregateOutputType = {
+  export type StudentDiscountMinAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
-    promotionId: string | null
+    discountId: string | null
     assignedAt: Date | null
     expiresAt: Date | null
   }
 
-  export type StudentPromotionMaxAggregateOutputType = {
+  export type StudentDiscountMaxAggregateOutputType = {
     id: string | null
     studentProfileId: string | null
-    promotionId: string | null
+    discountId: string | null
     assignedAt: Date | null
     expiresAt: Date | null
   }
 
-  export type StudentPromotionCountAggregateOutputType = {
+  export type StudentDiscountCountAggregateOutputType = {
     id: number
     studentProfileId: number
-    promotionId: number
+    discountId: number
     assignedAt: number
     expiresAt: number
     _all: number
   }
 
 
-  export type StudentPromotionMinAggregateInputType = {
+  export type StudentDiscountMinAggregateInputType = {
     id?: true
     studentProfileId?: true
-    promotionId?: true
+    discountId?: true
     assignedAt?: true
     expiresAt?: true
   }
 
-  export type StudentPromotionMaxAggregateInputType = {
+  export type StudentDiscountMaxAggregateInputType = {
     id?: true
     studentProfileId?: true
-    promotionId?: true
+    discountId?: true
     assignedAt?: true
     expiresAt?: true
   }
 
-  export type StudentPromotionCountAggregateInputType = {
+  export type StudentDiscountCountAggregateInputType = {
     id?: true
     studentProfileId?: true
-    promotionId?: true
+    discountId?: true
     assignedAt?: true
     expiresAt?: true
     _all?: true
   }
 
-  export type StudentPromotionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which StudentPromotion to aggregate.
+     * Filter which StudentDiscount to aggregate.
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentPromotions to fetch.
+     * Determine the order of StudentDiscounts to fetch.
      */
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: StudentPromotionWhereUniqueInput
+    cursor?: StudentDiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentPromotions from the position of the cursor.
+     * Take `±n` StudentDiscounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentPromotions.
+     * Skip the first `n` StudentDiscounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned StudentPromotions
+     * Count returned StudentDiscounts
     **/
-    _count?: true | StudentPromotionCountAggregateInputType
+    _count?: true | StudentDiscountCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: StudentPromotionMinAggregateInputType
+    _min?: StudentDiscountMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: StudentPromotionMaxAggregateInputType
+    _max?: StudentDiscountMaxAggregateInputType
   }
 
-  export type GetStudentPromotionAggregateType<T extends StudentPromotionAggregateArgs> = {
-        [P in keyof T & keyof AggregateStudentPromotion]: P extends '_count' | 'count'
+  export type GetStudentDiscountAggregateType<T extends StudentDiscountAggregateArgs> = {
+        [P in keyof T & keyof AggregateStudentDiscount]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateStudentPromotion[P]>
-      : GetScalarType<T[P], AggregateStudentPromotion[P]>
+        : GetScalarType<T[P], AggregateStudentDiscount[P]>
+      : GetScalarType<T[P], AggregateStudentDiscount[P]>
   }
 
 
 
 
-  export type StudentPromotionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentPromotionWhereInput
-    orderBy?: StudentPromotionOrderByWithAggregationInput | StudentPromotionOrderByWithAggregationInput[]
-    by: StudentPromotionScalarFieldEnum[] | StudentPromotionScalarFieldEnum
-    having?: StudentPromotionScalarWhereWithAggregatesInput
+  export type StudentDiscountGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentDiscountWhereInput
+    orderBy?: StudentDiscountOrderByWithAggregationInput | StudentDiscountOrderByWithAggregationInput[]
+    by: StudentDiscountScalarFieldEnum[] | StudentDiscountScalarFieldEnum
+    having?: StudentDiscountScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: StudentPromotionCountAggregateInputType | true
-    _min?: StudentPromotionMinAggregateInputType
-    _max?: StudentPromotionMaxAggregateInputType
+    _count?: StudentDiscountCountAggregateInputType | true
+    _min?: StudentDiscountMinAggregateInputType
+    _max?: StudentDiscountMaxAggregateInputType
   }
 
-  export type StudentPromotionGroupByOutputType = {
+  export type StudentDiscountGroupByOutputType = {
     id: string
     studentProfileId: string
-    promotionId: string
+    discountId: string
     assignedAt: Date
     expiresAt: Date | null
-    _count: StudentPromotionCountAggregateOutputType | null
-    _min: StudentPromotionMinAggregateOutputType | null
-    _max: StudentPromotionMaxAggregateOutputType | null
+    _count: StudentDiscountCountAggregateOutputType | null
+    _min: StudentDiscountMinAggregateOutputType | null
+    _max: StudentDiscountMaxAggregateOutputType | null
   }
 
-  type GetStudentPromotionGroupByPayload<T extends StudentPromotionGroupByArgs> = Prisma.PrismaPromise<
+  type GetStudentDiscountGroupByPayload<T extends StudentDiscountGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<StudentPromotionGroupByOutputType, T['by']> &
+      PickEnumerable<StudentDiscountGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof StudentPromotionGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof StudentDiscountGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], StudentPromotionGroupByOutputType[P]>
-            : GetScalarType<T[P], StudentPromotionGroupByOutputType[P]>
+              : GetScalarType<T[P], StudentDiscountGroupByOutputType[P]>
+            : GetScalarType<T[P], StudentDiscountGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type StudentPromotionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type StudentDiscountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
-    promotionId?: boolean
+    discountId?: boolean
     assignedAt?: boolean
     expiresAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["studentPromotion"]>
+    discount?: boolean | DiscountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["studentDiscount"]>
 
-  export type StudentPromotionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type StudentDiscountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     studentProfileId?: boolean
-    promotionId?: boolean
+    discountId?: boolean
     assignedAt?: boolean
     expiresAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["studentPromotion"]>
+    discount?: boolean | DiscountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["studentDiscount"]>
 
-  export type StudentPromotionSelectScalar = {
+  export type StudentDiscountSelectScalar = {
     id?: boolean
     studentProfileId?: boolean
-    promotionId?: boolean
+    discountId?: boolean
     assignedAt?: boolean
     expiresAt?: boolean
   }
 
-  export type StudentPromotionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+    discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }
-  export type StudentPromotionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    promotion?: boolean | PromotionDefaultArgs<ExtArgs>
+    discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }
 
-  export type $StudentPromotionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "StudentPromotion"
+  export type $StudentDiscountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StudentDiscount"
     objects: {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
-      promotion: Prisma.$PromotionPayload<ExtArgs>
+      discount: Prisma.$DiscountPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       studentProfileId: string
-      promotionId: string
+      discountId: string
       assignedAt: Date
       expiresAt: Date | null
-    }, ExtArgs["result"]["studentPromotion"]>
+    }, ExtArgs["result"]["studentDiscount"]>
     composites: {}
   }
 
-  type StudentPromotionGetPayload<S extends boolean | null | undefined | StudentPromotionDefaultArgs> = $Result.GetResult<Prisma.$StudentPromotionPayload, S>
+  type StudentDiscountGetPayload<S extends boolean | null | undefined | StudentDiscountDefaultArgs> = $Result.GetResult<Prisma.$StudentDiscountPayload, S>
 
-  type StudentPromotionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<StudentPromotionFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: StudentPromotionCountAggregateInputType | true
+  type StudentDiscountCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StudentDiscountFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StudentDiscountCountAggregateInputType | true
     }
 
-  export interface StudentPromotionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentPromotion'], meta: { name: 'StudentPromotion' } }
+  export interface StudentDiscountDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentDiscount'], meta: { name: 'StudentDiscount' } }
     /**
-     * Find zero or one StudentPromotion that matches the filter.
-     * @param {StudentPromotionFindUniqueArgs} args - Arguments to find a StudentPromotion
+     * Find zero or one StudentDiscount that matches the filter.
+     * @param {StudentDiscountFindUniqueArgs} args - Arguments to find a StudentDiscount
      * @example
-     * // Get one StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.findUnique({
+     * // Get one StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends StudentPromotionFindUniqueArgs>(args: SelectSubset<T, StudentPromotionFindUniqueArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends StudentDiscountFindUniqueArgs>(args: SelectSubset<T, StudentDiscountFindUniqueArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
 
     /**
-     * Find one StudentPromotion that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one StudentDiscount that matches the filter or throw an error with `error.code='P2025'` 
      * if no matches were found.
-     * @param {StudentPromotionFindUniqueOrThrowArgs} args - Arguments to find a StudentPromotion
+     * @param {StudentDiscountFindUniqueOrThrowArgs} args - Arguments to find a StudentDiscount
      * @example
-     * // Get one StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.findUniqueOrThrow({
+     * // Get one StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends StudentPromotionFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentPromotionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends StudentDiscountFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentDiscountFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
 
     /**
-     * Find the first StudentPromotion that matches the filter.
+     * Find the first StudentDiscount that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionFindFirstArgs} args - Arguments to find a StudentPromotion
+     * @param {StudentDiscountFindFirstArgs} args - Arguments to find a StudentDiscount
      * @example
-     * // Get one StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.findFirst({
+     * // Get one StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends StudentPromotionFindFirstArgs>(args?: SelectSubset<T, StudentPromotionFindFirstArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends StudentDiscountFindFirstArgs>(args?: SelectSubset<T, StudentDiscountFindFirstArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
 
     /**
-     * Find the first StudentPromotion that matches the filter or
+     * Find the first StudentDiscount that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionFindFirstOrThrowArgs} args - Arguments to find a StudentPromotion
+     * @param {StudentDiscountFindFirstOrThrowArgs} args - Arguments to find a StudentDiscount
      * @example
-     * // Get one StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.findFirstOrThrow({
+     * // Get one StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends StudentPromotionFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentPromotionFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends StudentDiscountFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentDiscountFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
 
     /**
-     * Find zero or more StudentPromotions that matches the filter.
+     * Find zero or more StudentDiscounts that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {StudentDiscountFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all StudentPromotions
-     * const studentPromotions = await prisma.studentPromotion.findMany()
+     * // Get all StudentDiscounts
+     * const studentDiscounts = await prisma.studentDiscount.findMany()
      * 
-     * // Get first 10 StudentPromotions
-     * const studentPromotions = await prisma.studentPromotion.findMany({ take: 10 })
+     * // Get first 10 StudentDiscounts
+     * const studentDiscounts = await prisma.studentDiscount.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const studentPromotionWithIdOnly = await prisma.studentPromotion.findMany({ select: { id: true } })
+     * const studentDiscountWithIdOnly = await prisma.studentDiscount.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends StudentPromotionFindManyArgs>(args?: SelectSubset<T, StudentPromotionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "findMany">>
+    findMany<T extends StudentDiscountFindManyArgs>(args?: SelectSubset<T, StudentDiscountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findMany">>
 
     /**
-     * Create a StudentPromotion.
-     * @param {StudentPromotionCreateArgs} args - Arguments to create a StudentPromotion.
+     * Create a StudentDiscount.
+     * @param {StudentDiscountCreateArgs} args - Arguments to create a StudentDiscount.
      * @example
-     * // Create one StudentPromotion
-     * const StudentPromotion = await prisma.studentPromotion.create({
+     * // Create one StudentDiscount
+     * const StudentDiscount = await prisma.studentDiscount.create({
      *   data: {
-     *     // ... data to create a StudentPromotion
+     *     // ... data to create a StudentDiscount
      *   }
      * })
      * 
      */
-    create<T extends StudentPromotionCreateArgs>(args: SelectSubset<T, StudentPromotionCreateArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends StudentDiscountCreateArgs>(args: SelectSubset<T, StudentDiscountCreateArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "create">, never, ExtArgs>
 
     /**
-     * Create many StudentPromotions.
-     * @param {StudentPromotionCreateManyArgs} args - Arguments to create many StudentPromotions.
+     * Create many StudentDiscounts.
+     * @param {StudentDiscountCreateManyArgs} args - Arguments to create many StudentDiscounts.
      * @example
-     * // Create many StudentPromotions
-     * const studentPromotion = await prisma.studentPromotion.createMany({
+     * // Create many StudentDiscounts
+     * const studentDiscount = await prisma.studentDiscount.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends StudentPromotionCreateManyArgs>(args?: SelectSubset<T, StudentPromotionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends StudentDiscountCreateManyArgs>(args?: SelectSubset<T, StudentDiscountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many StudentPromotions and returns the data saved in the database.
-     * @param {StudentPromotionCreateManyAndReturnArgs} args - Arguments to create many StudentPromotions.
+     * Create many StudentDiscounts and returns the data saved in the database.
+     * @param {StudentDiscountCreateManyAndReturnArgs} args - Arguments to create many StudentDiscounts.
      * @example
-     * // Create many StudentPromotions
-     * const studentPromotion = await prisma.studentPromotion.createManyAndReturn({
+     * // Create many StudentDiscounts
+     * const studentDiscount = await prisma.studentDiscount.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many StudentPromotions and only return the `id`
-     * const studentPromotionWithIdOnly = await prisma.studentPromotion.createManyAndReturn({ 
+     * // Create many StudentDiscounts and only return the `id`
+     * const studentDiscountWithIdOnly = await prisma.studentDiscount.createManyAndReturn({ 
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -17845,28 +17845,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends StudentPromotionCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentPromotionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends StudentDiscountCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentDiscountCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "createManyAndReturn">>
 
     /**
-     * Delete a StudentPromotion.
-     * @param {StudentPromotionDeleteArgs} args - Arguments to delete one StudentPromotion.
+     * Delete a StudentDiscount.
+     * @param {StudentDiscountDeleteArgs} args - Arguments to delete one StudentDiscount.
      * @example
-     * // Delete one StudentPromotion
-     * const StudentPromotion = await prisma.studentPromotion.delete({
+     * // Delete one StudentDiscount
+     * const StudentDiscount = await prisma.studentDiscount.delete({
      *   where: {
-     *     // ... filter to delete one StudentPromotion
+     *     // ... filter to delete one StudentDiscount
      *   }
      * })
      * 
      */
-    delete<T extends StudentPromotionDeleteArgs>(args: SelectSubset<T, StudentPromotionDeleteArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends StudentDiscountDeleteArgs>(args: SelectSubset<T, StudentDiscountDeleteArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "delete">, never, ExtArgs>
 
     /**
-     * Update one StudentPromotion.
-     * @param {StudentPromotionUpdateArgs} args - Arguments to update one StudentPromotion.
+     * Update one StudentDiscount.
+     * @param {StudentDiscountUpdateArgs} args - Arguments to update one StudentDiscount.
      * @example
-     * // Update one StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.update({
+     * // Update one StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -17876,30 +17876,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends StudentPromotionUpdateArgs>(args: SelectSubset<T, StudentPromotionUpdateArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends StudentDiscountUpdateArgs>(args: SelectSubset<T, StudentDiscountUpdateArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "update">, never, ExtArgs>
 
     /**
-     * Delete zero or more StudentPromotions.
-     * @param {StudentPromotionDeleteManyArgs} args - Arguments to filter StudentPromotions to delete.
+     * Delete zero or more StudentDiscounts.
+     * @param {StudentDiscountDeleteManyArgs} args - Arguments to filter StudentDiscounts to delete.
      * @example
-     * // Delete a few StudentPromotions
-     * const { count } = await prisma.studentPromotion.deleteMany({
+     * // Delete a few StudentDiscounts
+     * const { count } = await prisma.studentDiscount.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends StudentPromotionDeleteManyArgs>(args?: SelectSubset<T, StudentPromotionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends StudentDiscountDeleteManyArgs>(args?: SelectSubset<T, StudentDiscountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more StudentPromotions.
+     * Update zero or more StudentDiscounts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {StudentDiscountUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many StudentPromotions
-     * const studentPromotion = await prisma.studentPromotion.updateMany({
+     * // Update many StudentDiscounts
+     * const studentDiscount = await prisma.studentDiscount.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -17909,56 +17909,56 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends StudentPromotionUpdateManyArgs>(args: SelectSubset<T, StudentPromotionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends StudentDiscountUpdateManyArgs>(args: SelectSubset<T, StudentDiscountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one StudentPromotion.
-     * @param {StudentPromotionUpsertArgs} args - Arguments to update or create a StudentPromotion.
+     * Create or update one StudentDiscount.
+     * @param {StudentDiscountUpsertArgs} args - Arguments to update or create a StudentDiscount.
      * @example
-     * // Update or create a StudentPromotion
-     * const studentPromotion = await prisma.studentPromotion.upsert({
+     * // Update or create a StudentDiscount
+     * const studentDiscount = await prisma.studentDiscount.upsert({
      *   create: {
-     *     // ... data to create a StudentPromotion
+     *     // ... data to create a StudentDiscount
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the StudentPromotion we want to update
+     *     // ... the filter for the StudentDiscount we want to update
      *   }
      * })
      */
-    upsert<T extends StudentPromotionUpsertArgs>(args: SelectSubset<T, StudentPromotionUpsertArgs<ExtArgs>>): Prisma__StudentPromotionClient<$Result.GetResult<Prisma.$StudentPromotionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends StudentDiscountUpsertArgs>(args: SelectSubset<T, StudentDiscountUpsertArgs<ExtArgs>>): Prisma__StudentDiscountClient<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
 
 
     /**
-     * Count the number of StudentPromotions.
+     * Count the number of StudentDiscounts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionCountArgs} args - Arguments to filter StudentPromotions to count.
+     * @param {StudentDiscountCountArgs} args - Arguments to filter StudentDiscounts to count.
      * @example
-     * // Count the number of StudentPromotions
-     * const count = await prisma.studentPromotion.count({
+     * // Count the number of StudentDiscounts
+     * const count = await prisma.studentDiscount.count({
      *   where: {
-     *     // ... the filter for the StudentPromotions we want to count
+     *     // ... the filter for the StudentDiscounts we want to count
      *   }
      * })
     **/
-    count<T extends StudentPromotionCountArgs>(
-      args?: Subset<T, StudentPromotionCountArgs>,
+    count<T extends StudentDiscountCountArgs>(
+      args?: Subset<T, StudentDiscountCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], StudentPromotionCountAggregateOutputType>
+          : GetScalarType<T['select'], StudentDiscountCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a StudentPromotion.
+     * Allows you to perform aggregations operations on a StudentDiscount.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {StudentDiscountAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -17978,13 +17978,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends StudentPromotionAggregateArgs>(args: Subset<T, StudentPromotionAggregateArgs>): Prisma.PrismaPromise<GetStudentPromotionAggregateType<T>>
+    aggregate<T extends StudentDiscountAggregateArgs>(args: Subset<T, StudentDiscountAggregateArgs>): Prisma.PrismaPromise<GetStudentDiscountAggregateType<T>>
 
     /**
-     * Group by StudentPromotion.
+     * Group by StudentDiscount.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentPromotionGroupByArgs} args - Group by arguments.
+     * @param {StudentDiscountGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -17999,14 +17999,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends StudentPromotionGroupByArgs,
+      T extends StudentDiscountGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StudentPromotionGroupByArgs['orderBy'] }
-        : { orderBy?: StudentPromotionGroupByArgs['orderBy'] },
+        ? { orderBy: StudentDiscountGroupByArgs['orderBy'] }
+        : { orderBy?: StudentDiscountGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -18055,23 +18055,23 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, StudentPromotionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentPromotionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, StudentDiscountGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentDiscountGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the StudentPromotion model
+   * Fields of the StudentDiscount model
    */
-  readonly fields: StudentPromotionFieldRefs;
+  readonly fields: StudentDiscountFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for StudentPromotion.
+   * The delegate class that acts as a "Promise-like" for StudentDiscount.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__StudentPromotionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__StudentDiscountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    promotion<T extends PromotionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PromotionDefaultArgs<ExtArgs>>): Prisma__PromotionClient<$Result.GetResult<Prisma.$PromotionPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    discount<T extends DiscountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DiscountDefaultArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18098,343 +18098,343 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the StudentPromotion model
+   * Fields of the StudentDiscount model
    */ 
-  interface StudentPromotionFieldRefs {
-    readonly id: FieldRef<"StudentPromotion", 'String'>
-    readonly studentProfileId: FieldRef<"StudentPromotion", 'String'>
-    readonly promotionId: FieldRef<"StudentPromotion", 'String'>
-    readonly assignedAt: FieldRef<"StudentPromotion", 'DateTime'>
-    readonly expiresAt: FieldRef<"StudentPromotion", 'DateTime'>
+  interface StudentDiscountFieldRefs {
+    readonly id: FieldRef<"StudentDiscount", 'String'>
+    readonly studentProfileId: FieldRef<"StudentDiscount", 'String'>
+    readonly discountId: FieldRef<"StudentDiscount", 'String'>
+    readonly assignedAt: FieldRef<"StudentDiscount", 'DateTime'>
+    readonly expiresAt: FieldRef<"StudentDiscount", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * StudentPromotion findUnique
+   * StudentDiscount findUnique
    */
-  export type StudentPromotionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter, which StudentPromotion to fetch.
+     * Filter, which StudentDiscount to fetch.
      */
-    where: StudentPromotionWhereUniqueInput
+    where: StudentDiscountWhereUniqueInput
   }
 
   /**
-   * StudentPromotion findUniqueOrThrow
+   * StudentDiscount findUniqueOrThrow
    */
-  export type StudentPromotionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter, which StudentPromotion to fetch.
+     * Filter, which StudentDiscount to fetch.
      */
-    where: StudentPromotionWhereUniqueInput
+    where: StudentDiscountWhereUniqueInput
   }
 
   /**
-   * StudentPromotion findFirst
+   * StudentDiscount findFirst
    */
-  export type StudentPromotionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter, which StudentPromotion to fetch.
+     * Filter, which StudentDiscount to fetch.
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentPromotions to fetch.
+     * Determine the order of StudentDiscounts to fetch.
      */
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for StudentPromotions.
+     * Sets the position for searching for StudentDiscounts.
      */
-    cursor?: StudentPromotionWhereUniqueInput
+    cursor?: StudentDiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentPromotions from the position of the cursor.
+     * Take `±n` StudentDiscounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentPromotions.
+     * Skip the first `n` StudentDiscounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of StudentPromotions.
+     * Filter by unique combinations of StudentDiscounts.
      */
-    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
   }
 
   /**
-   * StudentPromotion findFirstOrThrow
+   * StudentDiscount findFirstOrThrow
    */
-  export type StudentPromotionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter, which StudentPromotion to fetch.
+     * Filter, which StudentDiscount to fetch.
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentPromotions to fetch.
+     * Determine the order of StudentDiscounts to fetch.
      */
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for StudentPromotions.
+     * Sets the position for searching for StudentDiscounts.
      */
-    cursor?: StudentPromotionWhereUniqueInput
+    cursor?: StudentDiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentPromotions from the position of the cursor.
+     * Take `±n` StudentDiscounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentPromotions.
+     * Skip the first `n` StudentDiscounts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of StudentPromotions.
+     * Filter by unique combinations of StudentDiscounts.
      */
-    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
   }
 
   /**
-   * StudentPromotion findMany
+   * StudentDiscount findMany
    */
-  export type StudentPromotionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter, which StudentPromotions to fetch.
+     * Filter, which StudentDiscounts to fetch.
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentPromotions to fetch.
+     * Determine the order of StudentDiscounts to fetch.
      */
-    orderBy?: StudentPromotionOrderByWithRelationInput | StudentPromotionOrderByWithRelationInput[]
+    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing StudentPromotions.
+     * Sets the position for listing StudentDiscounts.
      */
-    cursor?: StudentPromotionWhereUniqueInput
+    cursor?: StudentDiscountWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentPromotions from the position of the cursor.
+     * Take `±n` StudentDiscounts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentPromotions.
+     * Skip the first `n` StudentDiscounts.
      */
     skip?: number
-    distinct?: StudentPromotionScalarFieldEnum | StudentPromotionScalarFieldEnum[]
+    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
   }
 
   /**
-   * StudentPromotion create
+   * StudentDiscount create
    */
-  export type StudentPromotionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * The data needed to create a StudentPromotion.
+     * The data needed to create a StudentDiscount.
      */
-    data: XOR<StudentPromotionCreateInput, StudentPromotionUncheckedCreateInput>
+    data: XOR<StudentDiscountCreateInput, StudentDiscountUncheckedCreateInput>
   }
 
   /**
-   * StudentPromotion createMany
+   * StudentDiscount createMany
    */
-  export type StudentPromotionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many StudentPromotions.
+     * The data used to create many StudentDiscounts.
      */
-    data: StudentPromotionCreateManyInput | StudentPromotionCreateManyInput[]
+    data: StudentDiscountCreateManyInput | StudentDiscountCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * StudentPromotion createManyAndReturn
+   * StudentDiscount createManyAndReturn
    */
-  export type StudentPromotionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelectCreateManyAndReturn<ExtArgs> | null
+    select?: StudentDiscountSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * The data used to create many StudentPromotions.
+     * The data used to create many StudentDiscounts.
      */
-    data: StudentPromotionCreateManyInput | StudentPromotionCreateManyInput[]
+    data: StudentDiscountCreateManyInput | StudentDiscountCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: StudentDiscountIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * StudentPromotion update
+   * StudentDiscount update
    */
-  export type StudentPromotionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * The data needed to update a StudentPromotion.
+     * The data needed to update a StudentDiscount.
      */
-    data: XOR<StudentPromotionUpdateInput, StudentPromotionUncheckedUpdateInput>
+    data: XOR<StudentDiscountUpdateInput, StudentDiscountUncheckedUpdateInput>
     /**
-     * Choose, which StudentPromotion to update.
+     * Choose, which StudentDiscount to update.
      */
-    where: StudentPromotionWhereUniqueInput
+    where: StudentDiscountWhereUniqueInput
   }
 
   /**
-   * StudentPromotion updateMany
+   * StudentDiscount updateMany
    */
-  export type StudentPromotionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update StudentPromotions.
+     * The data used to update StudentDiscounts.
      */
-    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyInput>
+    data: XOR<StudentDiscountUpdateManyMutationInput, StudentDiscountUncheckedUpdateManyInput>
     /**
-     * Filter which StudentPromotions to update
+     * Filter which StudentDiscounts to update
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
   }
 
   /**
-   * StudentPromotion upsert
+   * StudentDiscount upsert
    */
-  export type StudentPromotionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * The filter to search for the StudentPromotion to update in case it exists.
+     * The filter to search for the StudentDiscount to update in case it exists.
      */
-    where: StudentPromotionWhereUniqueInput
+    where: StudentDiscountWhereUniqueInput
     /**
-     * In case the StudentPromotion found by the `where` argument doesn't exist, create a new StudentPromotion with this data.
+     * In case the StudentDiscount found by the `where` argument doesn't exist, create a new StudentDiscount with this data.
      */
-    create: XOR<StudentPromotionCreateInput, StudentPromotionUncheckedCreateInput>
+    create: XOR<StudentDiscountCreateInput, StudentDiscountUncheckedCreateInput>
     /**
-     * In case the StudentPromotion was found with the provided `where` argument, update it with this data.
+     * In case the StudentDiscount was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<StudentPromotionUpdateInput, StudentPromotionUncheckedUpdateInput>
+    update: XOR<StudentDiscountUpdateInput, StudentDiscountUncheckedUpdateInput>
   }
 
   /**
-   * StudentPromotion delete
+   * StudentDiscount delete
    */
-  export type StudentPromotionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
     /**
-     * Filter which StudentPromotion to delete.
+     * Filter which StudentDiscount to delete.
      */
-    where: StudentPromotionWhereUniqueInput
+    where: StudentDiscountWhereUniqueInput
   }
 
   /**
-   * StudentPromotion deleteMany
+   * StudentDiscount deleteMany
    */
-  export type StudentPromotionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which StudentPromotions to delete
+     * Filter which StudentDiscounts to delete
      */
-    where?: StudentPromotionWhereInput
+    where?: StudentDiscountWhereInput
   }
 
   /**
-   * StudentPromotion without action
+   * StudentDiscount without action
    */
-  export type StudentPromotionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type StudentDiscountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentPromotion
+     * Select specific fields to fetch from the StudentDiscount
      */
-    select?: StudentPromotionSelect<ExtArgs> | null
+    select?: StudentDiscountSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentPromotionInclude<ExtArgs> | null
+    include?: StudentDiscountInclude<ExtArgs> | null
   }
 
 
@@ -26604,7 +26604,7 @@ export namespace Prisma {
   export type ProfileUpdateRequestScalarFieldEnum = (typeof ProfileUpdateRequestScalarFieldEnum)[keyof typeof ProfileUpdateRequestScalarFieldEnum]
 
 
-  export const PromotionRequestScalarFieldEnum: {
+  export const GraduationRequestScalarFieldEnum: {
     id: 'id',
     studentProfileId: 'studentProfileId',
     proposedBeltId: 'proposedBeltId',
@@ -26615,7 +26615,7 @@ export namespace Prisma {
     createdAt: 'createdAt'
   };
 
-  export type PromotionRequestScalarFieldEnum = (typeof PromotionRequestScalarFieldEnum)[keyof typeof PromotionRequestScalarFieldEnum]
+  export type GraduationRequestScalarFieldEnum = (typeof GraduationRequestScalarFieldEnum)[keyof typeof GraduationRequestScalarFieldEnum]
 
 
   export const FeeTierScalarFieldEnum: {
@@ -26647,7 +26647,7 @@ export namespace Prisma {
   export type StudentFeeScalarFieldEnum = (typeof StudentFeeScalarFieldEnum)[keyof typeof StudentFeeScalarFieldEnum]
 
 
-  export const PromotionScalarFieldEnum: {
+  export const DiscountScalarFieldEnum: {
     id: 'id',
     code: 'code',
     name: 'name',
@@ -26662,18 +26662,18 @@ export namespace Prisma {
     updatedAt: 'updatedAt'
   };
 
-  export type PromotionScalarFieldEnum = (typeof PromotionScalarFieldEnum)[keyof typeof PromotionScalarFieldEnum]
+  export type DiscountScalarFieldEnum = (typeof DiscountScalarFieldEnum)[keyof typeof DiscountScalarFieldEnum]
 
 
-  export const StudentPromotionScalarFieldEnum: {
+  export const StudentDiscountScalarFieldEnum: {
     id: 'id',
     studentProfileId: 'studentProfileId',
-    promotionId: 'promotionId',
+    discountId: 'discountId',
     assignedAt: 'assignedAt',
     expiresAt: 'expiresAt'
   };
 
-  export type StudentPromotionScalarFieldEnum = (typeof StudentPromotionScalarFieldEnum)[keyof typeof StudentPromotionScalarFieldEnum]
+  export type StudentDiscountScalarFieldEnum = (typeof StudentDiscountScalarFieldEnum)[keyof typeof StudentDiscountScalarFieldEnum]
 
 
   export const StudentSubscriptionScalarFieldEnum: {
@@ -26939,30 +26939,30 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'PromotionType'
+   * Reference to a field of type 'DiscountType'
    */
-  export type EnumPromotionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionType'>
+  export type EnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType'>
     
 
 
   /**
-   * Reference to a field of type 'PromotionType[]'
+   * Reference to a field of type 'DiscountType[]'
    */
-  export type ListEnumPromotionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionType[]'>
+  export type ListEnumDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountType[]'>
     
 
 
   /**
-   * Reference to a field of type 'PromotionCategory'
+   * Reference to a field of type 'DiscountCategory'
    */
-  export type EnumPromotionCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionCategory'>
+  export type EnumDiscountCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountCategory'>
     
 
 
   /**
-   * Reference to a field of type 'PromotionCategory[]'
+   * Reference to a field of type 'DiscountCategory[]'
    */
-  export type ListEnumPromotionCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PromotionCategory[]'>
+  export type ListEnumDiscountCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DiscountCategory[]'>
     
 
 
@@ -27082,8 +27082,8 @@ export namespace Prisma {
     studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
     guardianProfile?: XOR<GuardianNullableRelationFilter, GuardianWhereInput> | null
     reviewedUpdates?: ProfileUpdateRequestListRelationFilter
-    proposedPromotions?: PromotionRequestListRelationFilter
-    approvedPromotions?: PromotionRequestListRelationFilter
+    proposedGraduations?: GraduationRequestListRelationFilter
+    approvedGraduations?: GraduationRequestListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -27098,8 +27098,8 @@ export namespace Prisma {
     studentProfile?: StudentProfileOrderByWithRelationInput
     guardianProfile?: GuardianOrderByWithRelationInput
     reviewedUpdates?: ProfileUpdateRequestOrderByRelationAggregateInput
-    proposedPromotions?: PromotionRequestOrderByRelationAggregateInput
-    approvedPromotions?: PromotionRequestOrderByRelationAggregateInput
+    proposedGraduations?: GraduationRequestOrderByRelationAggregateInput
+    approvedGraduations?: GraduationRequestOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -27117,8 +27117,8 @@ export namespace Prisma {
     studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
     guardianProfile?: XOR<GuardianNullableRelationFilter, GuardianWhereInput> | null
     reviewedUpdates?: ProfileUpdateRequestListRelationFilter
-    proposedPromotions?: PromotionRequestListRelationFilter
-    approvedPromotions?: PromotionRequestListRelationFilter
+    proposedGraduations?: GraduationRequestListRelationFilter
+    approvedGraduations?: GraduationRequestListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -27165,11 +27165,11 @@ export namespace Prisma {
     ranks?: StudentRankListRelationFilter
     attendances?: AttendanceListRelationFilter
     updateRequests?: ProfileUpdateRequestListRelationFilter
-    promotionRequests?: PromotionRequestListRelationFilter
+    graduationRequests?: GraduationRequestListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
     licenses?: StudentLicenseListRelationFilter
     studentFees?: StudentFeeListRelationFilter
-    studentPromotions?: StudentPromotionListRelationFilter
+    studentDiscounts?: StudentDiscountListRelationFilter
     bankMandates?: BankMandateListRelationFilter
   }
 
@@ -27186,11 +27186,11 @@ export namespace Prisma {
     ranks?: StudentRankOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
     updateRequests?: ProfileUpdateRequestOrderByRelationAggregateInput
-    promotionRequests?: PromotionRequestOrderByRelationAggregateInput
+    graduationRequests?: GraduationRequestOrderByRelationAggregateInput
     subscriptions?: StudentSubscriptionOrderByRelationAggregateInput
     licenses?: StudentLicenseOrderByRelationAggregateInput
     studentFees?: StudentFeeOrderByRelationAggregateInput
-    studentPromotions?: StudentPromotionOrderByRelationAggregateInput
+    studentDiscounts?: StudentDiscountOrderByRelationAggregateInput
     bankMandates?: BankMandateOrderByRelationAggregateInput
   }
 
@@ -27210,11 +27210,11 @@ export namespace Prisma {
     ranks?: StudentRankListRelationFilter
     attendances?: AttendanceListRelationFilter
     updateRequests?: ProfileUpdateRequestListRelationFilter
-    promotionRequests?: PromotionRequestListRelationFilter
+    graduationRequests?: GraduationRequestListRelationFilter
     subscriptions?: StudentSubscriptionListRelationFilter
     licenses?: StudentLicenseListRelationFilter
     studentFees?: StudentFeeListRelationFilter
-    studentPromotions?: StudentPromotionListRelationFilter
+    studentDiscounts?: StudentDiscountListRelationFilter
     bankMandates?: BankMandateListRelationFilter
   }, "id" | "userId">
 
@@ -27704,24 +27704,24 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ProfileUpdateRequest"> | Date | string
   }
 
-  export type PromotionRequestWhereInput = {
-    AND?: PromotionRequestWhereInput | PromotionRequestWhereInput[]
-    OR?: PromotionRequestWhereInput[]
-    NOT?: PromotionRequestWhereInput | PromotionRequestWhereInput[]
-    id?: StringFilter<"PromotionRequest"> | string
-    studentProfileId?: StringFilter<"PromotionRequest"> | string
-    proposedBeltId?: StringNullableFilter<"PromotionRequest"> | string | null
-    proposedStripes?: IntNullableFilter<"PromotionRequest"> | number | null
-    proposedById?: StringFilter<"PromotionRequest"> | string
-    approvedById?: StringNullableFilter<"PromotionRequest"> | string | null
-    status?: EnumRequestStatusFilter<"PromotionRequest"> | $Enums.RequestStatus
-    createdAt?: DateTimeFilter<"PromotionRequest"> | Date | string
+  export type GraduationRequestWhereInput = {
+    AND?: GraduationRequestWhereInput | GraduationRequestWhereInput[]
+    OR?: GraduationRequestWhereInput[]
+    NOT?: GraduationRequestWhereInput | GraduationRequestWhereInput[]
+    id?: StringFilter<"GraduationRequest"> | string
+    studentProfileId?: StringFilter<"GraduationRequest"> | string
+    proposedBeltId?: StringNullableFilter<"GraduationRequest"> | string | null
+    proposedStripes?: IntNullableFilter<"GraduationRequest"> | number | null
+    proposedById?: StringFilter<"GraduationRequest"> | string
+    approvedById?: StringNullableFilter<"GraduationRequest"> | string | null
+    status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
+    createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     proposedBy?: XOR<UserRelationFilter, UserWhereInput>
     approvedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
-  export type PromotionRequestOrderByWithRelationInput = {
+  export type GraduationRequestOrderByWithRelationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
     proposedBeltId?: SortOrderInput | SortOrder
@@ -27735,24 +27735,24 @@ export namespace Prisma {
     approvedBy?: UserOrderByWithRelationInput
   }
 
-  export type PromotionRequestWhereUniqueInput = Prisma.AtLeast<{
+  export type GraduationRequestWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    AND?: PromotionRequestWhereInput | PromotionRequestWhereInput[]
-    OR?: PromotionRequestWhereInput[]
-    NOT?: PromotionRequestWhereInput | PromotionRequestWhereInput[]
-    studentProfileId?: StringFilter<"PromotionRequest"> | string
-    proposedBeltId?: StringNullableFilter<"PromotionRequest"> | string | null
-    proposedStripes?: IntNullableFilter<"PromotionRequest"> | number | null
-    proposedById?: StringFilter<"PromotionRequest"> | string
-    approvedById?: StringNullableFilter<"PromotionRequest"> | string | null
-    status?: EnumRequestStatusFilter<"PromotionRequest"> | $Enums.RequestStatus
-    createdAt?: DateTimeFilter<"PromotionRequest"> | Date | string
+    AND?: GraduationRequestWhereInput | GraduationRequestWhereInput[]
+    OR?: GraduationRequestWhereInput[]
+    NOT?: GraduationRequestWhereInput | GraduationRequestWhereInput[]
+    studentProfileId?: StringFilter<"GraduationRequest"> | string
+    proposedBeltId?: StringNullableFilter<"GraduationRequest"> | string | null
+    proposedStripes?: IntNullableFilter<"GraduationRequest"> | number | null
+    proposedById?: StringFilter<"GraduationRequest"> | string
+    approvedById?: StringNullableFilter<"GraduationRequest"> | string | null
+    status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
+    createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     proposedBy?: XOR<UserRelationFilter, UserWhereInput>
     approvedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id">
 
-  export type PromotionRequestOrderByWithAggregationInput = {
+  export type GraduationRequestOrderByWithAggregationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
     proposedBeltId?: SortOrderInput | SortOrder
@@ -27761,25 +27761,25 @@ export namespace Prisma {
     approvedById?: SortOrderInput | SortOrder
     status?: SortOrder
     createdAt?: SortOrder
-    _count?: PromotionRequestCountOrderByAggregateInput
-    _avg?: PromotionRequestAvgOrderByAggregateInput
-    _max?: PromotionRequestMaxOrderByAggregateInput
-    _min?: PromotionRequestMinOrderByAggregateInput
-    _sum?: PromotionRequestSumOrderByAggregateInput
+    _count?: GraduationRequestCountOrderByAggregateInput
+    _avg?: GraduationRequestAvgOrderByAggregateInput
+    _max?: GraduationRequestMaxOrderByAggregateInput
+    _min?: GraduationRequestMinOrderByAggregateInput
+    _sum?: GraduationRequestSumOrderByAggregateInput
   }
 
-  export type PromotionRequestScalarWhereWithAggregatesInput = {
-    AND?: PromotionRequestScalarWhereWithAggregatesInput | PromotionRequestScalarWhereWithAggregatesInput[]
-    OR?: PromotionRequestScalarWhereWithAggregatesInput[]
-    NOT?: PromotionRequestScalarWhereWithAggregatesInput | PromotionRequestScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"PromotionRequest"> | string
-    studentProfileId?: StringWithAggregatesFilter<"PromotionRequest"> | string
-    proposedBeltId?: StringNullableWithAggregatesFilter<"PromotionRequest"> | string | null
-    proposedStripes?: IntNullableWithAggregatesFilter<"PromotionRequest"> | number | null
-    proposedById?: StringWithAggregatesFilter<"PromotionRequest"> | string
-    approvedById?: StringNullableWithAggregatesFilter<"PromotionRequest"> | string | null
-    status?: EnumRequestStatusWithAggregatesFilter<"PromotionRequest"> | $Enums.RequestStatus
-    createdAt?: DateTimeWithAggregatesFilter<"PromotionRequest"> | Date | string
+  export type GraduationRequestScalarWhereWithAggregatesInput = {
+    AND?: GraduationRequestScalarWhereWithAggregatesInput | GraduationRequestScalarWhereWithAggregatesInput[]
+    OR?: GraduationRequestScalarWhereWithAggregatesInput[]
+    NOT?: GraduationRequestScalarWhereWithAggregatesInput | GraduationRequestScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GraduationRequest"> | string
+    studentProfileId?: StringWithAggregatesFilter<"GraduationRequest"> | string
+    proposedBeltId?: StringNullableWithAggregatesFilter<"GraduationRequest"> | string | null
+    proposedStripes?: IntNullableWithAggregatesFilter<"GraduationRequest"> | number | null
+    proposedById?: StringWithAggregatesFilter<"GraduationRequest"> | string
+    approvedById?: StringNullableWithAggregatesFilter<"GraduationRequest"> | string | null
+    status?: EnumRequestStatusWithAggregatesFilter<"GraduationRequest"> | $Enums.RequestStatus
+    createdAt?: DateTimeWithAggregatesFilter<"GraduationRequest"> | Date | string
   }
 
   export type FeeTierWhereInput = {
@@ -27937,26 +27937,26 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"StudentFee"> | Date | string
   }
 
-  export type PromotionWhereInput = {
-    AND?: PromotionWhereInput | PromotionWhereInput[]
-    OR?: PromotionWhereInput[]
-    NOT?: PromotionWhereInput | PromotionWhereInput[]
-    id?: StringFilter<"Promotion"> | string
-    code?: StringFilter<"Promotion"> | string
-    name?: StringFilter<"Promotion"> | string
-    description?: StringNullableFilter<"Promotion"> | string | null
-    type?: EnumPromotionTypeFilter<"Promotion"> | $Enums.PromotionType
-    category?: EnumPromotionCategoryFilter<"Promotion"> | $Enums.PromotionCategory
-    value?: DecimalNullableFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
-    startDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
-    endDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
-    isActive?: BoolFilter<"Promotion"> | boolean
-    createdAt?: DateTimeFilter<"Promotion"> | Date | string
-    updatedAt?: DateTimeFilter<"Promotion"> | Date | string
-    studentPromotions?: StudentPromotionListRelationFilter
+  export type DiscountWhereInput = {
+    AND?: DiscountWhereInput | DiscountWhereInput[]
+    OR?: DiscountWhereInput[]
+    NOT?: DiscountWhereInput | DiscountWhereInput[]
+    id?: StringFilter<"Discount"> | string
+    code?: StringFilter<"Discount"> | string
+    name?: StringFilter<"Discount"> | string
+    description?: StringNullableFilter<"Discount"> | string | null
+    type?: EnumDiscountTypeFilter<"Discount"> | $Enums.DiscountType
+    category?: EnumDiscountCategoryFilter<"Discount"> | $Enums.DiscountCategory
+    value?: DecimalNullableFilter<"Discount"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableFilter<"Discount"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Discount"> | Date | string | null
+    isActive?: BoolFilter<"Discount"> | boolean
+    createdAt?: DateTimeFilter<"Discount"> | Date | string
+    updatedAt?: DateTimeFilter<"Discount"> | Date | string
+    studentDiscounts?: StudentDiscountListRelationFilter
   }
 
-  export type PromotionOrderByWithRelationInput = {
+  export type DiscountOrderByWithRelationInput = {
     id?: SortOrder
     code?: SortOrder
     name?: SortOrder
@@ -27969,29 +27969,29 @@ export namespace Prisma {
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    studentPromotions?: StudentPromotionOrderByRelationAggregateInput
+    studentDiscounts?: StudentDiscountOrderByRelationAggregateInput
   }
 
-  export type PromotionWhereUniqueInput = Prisma.AtLeast<{
+  export type DiscountWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     code?: string
-    AND?: PromotionWhereInput | PromotionWhereInput[]
-    OR?: PromotionWhereInput[]
-    NOT?: PromotionWhereInput | PromotionWhereInput[]
-    name?: StringFilter<"Promotion"> | string
-    description?: StringNullableFilter<"Promotion"> | string | null
-    type?: EnumPromotionTypeFilter<"Promotion"> | $Enums.PromotionType
-    category?: EnumPromotionCategoryFilter<"Promotion"> | $Enums.PromotionCategory
-    value?: DecimalNullableFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
-    startDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
-    endDate?: DateTimeNullableFilter<"Promotion"> | Date | string | null
-    isActive?: BoolFilter<"Promotion"> | boolean
-    createdAt?: DateTimeFilter<"Promotion"> | Date | string
-    updatedAt?: DateTimeFilter<"Promotion"> | Date | string
-    studentPromotions?: StudentPromotionListRelationFilter
+    AND?: DiscountWhereInput | DiscountWhereInput[]
+    OR?: DiscountWhereInput[]
+    NOT?: DiscountWhereInput | DiscountWhereInput[]
+    name?: StringFilter<"Discount"> | string
+    description?: StringNullableFilter<"Discount"> | string | null
+    type?: EnumDiscountTypeFilter<"Discount"> | $Enums.DiscountType
+    category?: EnumDiscountCategoryFilter<"Discount"> | $Enums.DiscountCategory
+    value?: DecimalNullableFilter<"Discount"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableFilter<"Discount"> | Date | string | null
+    endDate?: DateTimeNullableFilter<"Discount"> | Date | string | null
+    isActive?: BoolFilter<"Discount"> | boolean
+    createdAt?: DateTimeFilter<"Discount"> | Date | string
+    updatedAt?: DateTimeFilter<"Discount"> | Date | string
+    studentDiscounts?: StudentDiscountListRelationFilter
   }, "id" | "code">
 
-  export type PromotionOrderByWithAggregationInput = {
+  export type DiscountOrderByWithAggregationInput = {
     id?: SortOrder
     code?: SortOrder
     name?: SortOrder
@@ -28004,88 +28004,88 @@ export namespace Prisma {
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    _count?: PromotionCountOrderByAggregateInput
-    _avg?: PromotionAvgOrderByAggregateInput
-    _max?: PromotionMaxOrderByAggregateInput
-    _min?: PromotionMinOrderByAggregateInput
-    _sum?: PromotionSumOrderByAggregateInput
+    _count?: DiscountCountOrderByAggregateInput
+    _avg?: DiscountAvgOrderByAggregateInput
+    _max?: DiscountMaxOrderByAggregateInput
+    _min?: DiscountMinOrderByAggregateInput
+    _sum?: DiscountSumOrderByAggregateInput
   }
 
-  export type PromotionScalarWhereWithAggregatesInput = {
-    AND?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
-    OR?: PromotionScalarWhereWithAggregatesInput[]
-    NOT?: PromotionScalarWhereWithAggregatesInput | PromotionScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Promotion"> | string
-    code?: StringWithAggregatesFilter<"Promotion"> | string
-    name?: StringWithAggregatesFilter<"Promotion"> | string
-    description?: StringNullableWithAggregatesFilter<"Promotion"> | string | null
-    type?: EnumPromotionTypeWithAggregatesFilter<"Promotion"> | $Enums.PromotionType
-    category?: EnumPromotionCategoryWithAggregatesFilter<"Promotion"> | $Enums.PromotionCategory
-    value?: DecimalNullableWithAggregatesFilter<"Promotion"> | Decimal | DecimalJsLike | number | string | null
-    startDate?: DateTimeNullableWithAggregatesFilter<"Promotion"> | Date | string | null
-    endDate?: DateTimeNullableWithAggregatesFilter<"Promotion"> | Date | string | null
-    isActive?: BoolWithAggregatesFilter<"Promotion"> | boolean
-    createdAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
-    updatedAt?: DateTimeWithAggregatesFilter<"Promotion"> | Date | string
+  export type DiscountScalarWhereWithAggregatesInput = {
+    AND?: DiscountScalarWhereWithAggregatesInput | DiscountScalarWhereWithAggregatesInput[]
+    OR?: DiscountScalarWhereWithAggregatesInput[]
+    NOT?: DiscountScalarWhereWithAggregatesInput | DiscountScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Discount"> | string
+    code?: StringWithAggregatesFilter<"Discount"> | string
+    name?: StringWithAggregatesFilter<"Discount"> | string
+    description?: StringNullableWithAggregatesFilter<"Discount"> | string | null
+    type?: EnumDiscountTypeWithAggregatesFilter<"Discount"> | $Enums.DiscountType
+    category?: EnumDiscountCategoryWithAggregatesFilter<"Discount"> | $Enums.DiscountCategory
+    value?: DecimalNullableWithAggregatesFilter<"Discount"> | Decimal | DecimalJsLike | number | string | null
+    startDate?: DateTimeNullableWithAggregatesFilter<"Discount"> | Date | string | null
+    endDate?: DateTimeNullableWithAggregatesFilter<"Discount"> | Date | string | null
+    isActive?: BoolWithAggregatesFilter<"Discount"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Discount"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Discount"> | Date | string
   }
 
-  export type StudentPromotionWhereInput = {
-    AND?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
-    OR?: StudentPromotionWhereInput[]
-    NOT?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
-    id?: StringFilter<"StudentPromotion"> | string
-    studentProfileId?: StringFilter<"StudentPromotion"> | string
-    promotionId?: StringFilter<"StudentPromotion"> | string
-    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
-    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+  export type StudentDiscountWhereInput = {
+    AND?: StudentDiscountWhereInput | StudentDiscountWhereInput[]
+    OR?: StudentDiscountWhereInput[]
+    NOT?: StudentDiscountWhereInput | StudentDiscountWhereInput[]
+    id?: StringFilter<"StudentDiscount"> | string
+    studentProfileId?: StringFilter<"StudentDiscount"> | string
+    discountId?: StringFilter<"StudentDiscount"> | string
+    assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    promotion?: XOR<PromotionRelationFilter, PromotionWhereInput>
+    discount?: XOR<DiscountRelationFilter, DiscountWhereInput>
   }
 
-  export type StudentPromotionOrderByWithRelationInput = {
+  export type StudentDiscountOrderByWithRelationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    promotionId?: SortOrder
+    discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrderInput | SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
-    promotion?: PromotionOrderByWithRelationInput
+    discount?: DiscountOrderByWithRelationInput
   }
 
-  export type StudentPromotionWhereUniqueInput = Prisma.AtLeast<{
+  export type StudentDiscountWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    studentProfileId_promotionId?: StudentPromotionStudentProfileIdPromotionIdCompoundUniqueInput
-    AND?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
-    OR?: StudentPromotionWhereInput[]
-    NOT?: StudentPromotionWhereInput | StudentPromotionWhereInput[]
-    studentProfileId?: StringFilter<"StudentPromotion"> | string
-    promotionId?: StringFilter<"StudentPromotion"> | string
-    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
-    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+    studentProfileId_discountId?: StudentDiscountStudentProfileIdDiscountIdCompoundUniqueInput
+    AND?: StudentDiscountWhereInput | StudentDiscountWhereInput[]
+    OR?: StudentDiscountWhereInput[]
+    NOT?: StudentDiscountWhereInput | StudentDiscountWhereInput[]
+    studentProfileId?: StringFilter<"StudentDiscount"> | string
+    discountId?: StringFilter<"StudentDiscount"> | string
+    assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    promotion?: XOR<PromotionRelationFilter, PromotionWhereInput>
-  }, "id" | "studentProfileId_promotionId">
+    discount?: XOR<DiscountRelationFilter, DiscountWhereInput>
+  }, "id" | "studentProfileId_discountId">
 
-  export type StudentPromotionOrderByWithAggregationInput = {
+  export type StudentDiscountOrderByWithAggregationInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    promotionId?: SortOrder
+    discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrderInput | SortOrder
-    _count?: StudentPromotionCountOrderByAggregateInput
-    _max?: StudentPromotionMaxOrderByAggregateInput
-    _min?: StudentPromotionMinOrderByAggregateInput
+    _count?: StudentDiscountCountOrderByAggregateInput
+    _max?: StudentDiscountMaxOrderByAggregateInput
+    _min?: StudentDiscountMinOrderByAggregateInput
   }
 
-  export type StudentPromotionScalarWhereWithAggregatesInput = {
-    AND?: StudentPromotionScalarWhereWithAggregatesInput | StudentPromotionScalarWhereWithAggregatesInput[]
-    OR?: StudentPromotionScalarWhereWithAggregatesInput[]
-    NOT?: StudentPromotionScalarWhereWithAggregatesInput | StudentPromotionScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StudentPromotion"> | string
-    studentProfileId?: StringWithAggregatesFilter<"StudentPromotion"> | string
-    promotionId?: StringWithAggregatesFilter<"StudentPromotion"> | string
-    assignedAt?: DateTimeWithAggregatesFilter<"StudentPromotion"> | Date | string
-    expiresAt?: DateTimeNullableWithAggregatesFilter<"StudentPromotion"> | Date | string | null
+  export type StudentDiscountScalarWhereWithAggregatesInput = {
+    AND?: StudentDiscountScalarWhereWithAggregatesInput | StudentDiscountScalarWhereWithAggregatesInput[]
+    OR?: StudentDiscountScalarWhereWithAggregatesInput[]
+    NOT?: StudentDiscountScalarWhereWithAggregatesInput | StudentDiscountScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StudentDiscount"> | string
+    studentProfileId?: StringWithAggregatesFilter<"StudentDiscount"> | string
+    discountId?: StringWithAggregatesFilter<"StudentDiscount"> | string
+    assignedAt?: DateTimeWithAggregatesFilter<"StudentDiscount"> | Date | string
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"StudentDiscount"> | Date | string | null
   }
 
   export type StudentSubscriptionWhereInput = {
@@ -28675,8 +28675,8 @@ export namespace Prisma {
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -28691,8 +28691,8 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserUpdateInput = {
@@ -28707,8 +28707,8 @@ export namespace Prisma {
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -28723,8 +28723,8 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -28772,11 +28772,11 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -28792,11 +28792,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -28812,11 +28812,11 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -28832,11 +28832,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -29316,18 +29316,18 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestCreateInput = {
+  export type GraduationRequestCreateInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutPromotionRequestsInput
-    proposedBy: UserCreateNestedOneWithoutProposedPromotionsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedPromotionsInput
+    studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
+    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
   }
 
-  export type PromotionRequestUncheckedCreateInput = {
+  export type GraduationRequestUncheckedCreateInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -29338,18 +29338,18 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestUpdateInput = {
+  export type GraduationRequestUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutPromotionRequestsNestedInput
-    proposedBy?: UserUpdateOneRequiredWithoutProposedPromotionsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedPromotionsNestedInput
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
+    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
   }
 
-  export type PromotionRequestUncheckedUpdateInput = {
+  export type GraduationRequestUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29360,7 +29360,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestCreateManyInput = {
+  export type GraduationRequestCreateManyInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -29371,7 +29371,7 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestUpdateManyMutationInput = {
+  export type GraduationRequestUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
@@ -29379,7 +29379,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUncheckedUpdateManyInput = {
+  export type GraduationRequestUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29557,77 +29557,77 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionCreateInput = {
+  export type DiscountCreateInput = {
     id?: string
     code: string
     name: string
     description?: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value?: Decimal | DecimalJsLike | number | string | null
     startDate?: Date | string | null
     endDate?: Date | string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutPromotionInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutDiscountInput
   }
 
-  export type PromotionUncheckedCreateInput = {
+  export type DiscountUncheckedCreateInput = {
     id?: string
     code: string
     name: string
     description?: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value?: Decimal | DecimalJsLike | number | string | null
     startDate?: Date | string | null
     endDate?: Date | string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutPromotionInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutDiscountInput
   }
 
-  export type PromotionUpdateInput = {
+  export type DiscountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentPromotions?: StudentPromotionUpdateManyWithoutPromotionNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutDiscountNestedInput
   }
 
-  export type PromotionUncheckedUpdateInput = {
+  export type DiscountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutPromotionNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutDiscountNestedInput
   }
 
-  export type PromotionCreateManyInput = {
+  export type DiscountCreateManyInput = {
     id?: string
     code: string
     name: string
     description?: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value?: Decimal | DecimalJsLike | number | string | null
     startDate?: Date | string | null
     endDate?: Date | string | null
@@ -29636,13 +29636,13 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type PromotionUpdateManyMutationInput = {
+  export type DiscountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29651,13 +29651,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionUncheckedUpdateManyInput = {
+  export type DiscountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29666,56 +29666,56 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentPromotionCreateInput = {
+  export type StudentDiscountCreateInput = {
     id?: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
-    studentProfile: StudentProfileCreateNestedOneWithoutStudentPromotionsInput
-    promotion: PromotionCreateNestedOneWithoutStudentPromotionsInput
+    studentProfile: StudentProfileCreateNestedOneWithoutStudentDiscountsInput
+    discount: DiscountCreateNestedOneWithoutStudentDiscountsInput
   }
 
-  export type StudentPromotionUncheckedCreateInput = {
+  export type StudentDiscountUncheckedCreateInput = {
     id?: string
     studentProfileId: string
-    promotionId: string
+    discountId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
 
-  export type StudentPromotionUpdateInput = {
+  export type StudentDiscountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput
-    promotion?: PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput
+    discount?: DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput
   }
 
-  export type StudentPromotionUncheckedUpdateInput = {
+  export type StudentDiscountUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
-    promotionId?: StringFieldUpdateOperationsInput | string
+    discountId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type StudentPromotionCreateManyInput = {
+  export type StudentDiscountCreateManyInput = {
     id?: string
     studentProfileId: string
-    promotionId: string
+    discountId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
 
-  export type StudentPromotionUpdateManyMutationInput = {
+  export type StudentDiscountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type StudentPromotionUncheckedUpdateManyInput = {
+  export type StudentDiscountUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
-    promotionId?: StringFieldUpdateOperationsInput | string
+    discountId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -30386,17 +30386,17 @@ export namespace Prisma {
     none?: ProfileUpdateRequestWhereInput
   }
 
-  export type PromotionRequestListRelationFilter = {
-    every?: PromotionRequestWhereInput
-    some?: PromotionRequestWhereInput
-    none?: PromotionRequestWhereInput
+  export type GraduationRequestListRelationFilter = {
+    every?: GraduationRequestWhereInput
+    some?: GraduationRequestWhereInput
+    none?: GraduationRequestWhereInput
   }
 
   export type ProfileUpdateRequestOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
-  export type PromotionRequestOrderByRelationAggregateInput = {
+  export type GraduationRequestOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -30542,10 +30542,10 @@ export namespace Prisma {
     none?: StudentFeeWhereInput
   }
 
-  export type StudentPromotionListRelationFilter = {
-    every?: StudentPromotionWhereInput
-    some?: StudentPromotionWhereInput
-    none?: StudentPromotionWhereInput
+  export type StudentDiscountListRelationFilter = {
+    every?: StudentDiscountWhereInput
+    some?: StudentDiscountWhereInput
+    none?: StudentDiscountWhereInput
   }
 
   export type BankMandateListRelationFilter = {
@@ -30583,7 +30583,7 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type StudentPromotionOrderByRelationAggregateInput = {
+  export type StudentDiscountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31044,7 +31044,7 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type PromotionRequestCountOrderByAggregateInput = {
+  export type GraduationRequestCountOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
     proposedBeltId?: SortOrder
@@ -31055,11 +31055,11 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type PromotionRequestAvgOrderByAggregateInput = {
+  export type GraduationRequestAvgOrderByAggregateInput = {
     proposedStripes?: SortOrder
   }
 
-  export type PromotionRequestMaxOrderByAggregateInput = {
+  export type GraduationRequestMaxOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
     proposedBeltId?: SortOrder
@@ -31070,7 +31070,7 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type PromotionRequestMinOrderByAggregateInput = {
+  export type GraduationRequestMinOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
     proposedBeltId?: SortOrder
@@ -31081,7 +31081,7 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
-  export type PromotionRequestSumOrderByAggregateInput = {
+  export type GraduationRequestSumOrderByAggregateInput = {
     proposedStripes?: SortOrder
   }
 
@@ -31290,21 +31290,21 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
-  export type EnumPromotionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionTypeFilter<$PrismaModel> | $Enums.PromotionType
+  export type EnumDiscountTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
   }
 
-  export type EnumPromotionCategoryFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionCategoryFilter<$PrismaModel> | $Enums.PromotionCategory
+  export type EnumDiscountCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountCategory | EnumDiscountCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountCategoryFilter<$PrismaModel> | $Enums.DiscountCategory
   }
 
-  export type PromotionCountOrderByAggregateInput = {
+  export type DiscountCountOrderByAggregateInput = {
     id?: SortOrder
     code?: SortOrder
     name?: SortOrder
@@ -31319,11 +31319,11 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type PromotionAvgOrderByAggregateInput = {
+  export type DiscountAvgOrderByAggregateInput = {
     value?: SortOrder
   }
 
-  export type PromotionMaxOrderByAggregateInput = {
+  export type DiscountMaxOrderByAggregateInput = {
     id?: SortOrder
     code?: SortOrder
     name?: SortOrder
@@ -31338,7 +31338,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type PromotionMinOrderByAggregateInput = {
+  export type DiscountMinOrderByAggregateInput = {
     id?: SortOrder
     code?: SortOrder
     name?: SortOrder
@@ -31353,60 +31353,60 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
-  export type PromotionSumOrderByAggregateInput = {
+  export type DiscountSumOrderByAggregateInput = {
     value?: SortOrder
   }
 
-  export type EnumPromotionTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel> | $Enums.PromotionType
+  export type EnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPromotionTypeFilter<$PrismaModel>
-    _max?: NestedEnumPromotionTypeFilter<$PrismaModel>
+    _min?: NestedEnumDiscountTypeFilter<$PrismaModel>
+    _max?: NestedEnumDiscountTypeFilter<$PrismaModel>
   }
 
-  export type EnumPromotionCategoryWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel> | $Enums.PromotionCategory
+  export type EnumDiscountCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountCategory | EnumDiscountCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DiscountCategory
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPromotionCategoryFilter<$PrismaModel>
-    _max?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+    _min?: NestedEnumDiscountCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDiscountCategoryFilter<$PrismaModel>
   }
 
-  export type PromotionRelationFilter = {
-    is?: PromotionWhereInput
-    isNot?: PromotionWhereInput
+  export type DiscountRelationFilter = {
+    is?: DiscountWhereInput
+    isNot?: DiscountWhereInput
   }
 
-  export type StudentPromotionStudentProfileIdPromotionIdCompoundUniqueInput = {
+  export type StudentDiscountStudentProfileIdDiscountIdCompoundUniqueInput = {
     studentProfileId: string
-    promotionId: string
+    discountId: string
   }
 
-  export type StudentPromotionCountOrderByAggregateInput = {
+  export type StudentDiscountCountOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    promotionId?: SortOrder
+    discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrder
   }
 
-  export type StudentPromotionMaxOrderByAggregateInput = {
+  export type StudentDiscountMaxOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    promotionId?: SortOrder
+    discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrder
   }
 
-  export type StudentPromotionMinOrderByAggregateInput = {
+  export type StudentDiscountMinOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
-    promotionId?: SortOrder
+    discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrder
   }
@@ -31878,18 +31878,18 @@ export namespace Prisma {
     connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestCreateNestedManyWithoutProposedByInput = {
-    create?: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput> | PromotionRequestCreateWithoutProposedByInput[] | PromotionRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutProposedByInput | PromotionRequestCreateOrConnectWithoutProposedByInput[]
-    createMany?: PromotionRequestCreateManyProposedByInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestCreateNestedManyWithoutProposedByInput = {
+    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
+    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput> | PromotionRequestCreateWithoutApprovedByInput[] | PromotionRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutApprovedByInput | PromotionRequestCreateOrConnectWithoutApprovedByInput[]
-    createMany?: PromotionRequestCreateManyApprovedByInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestCreateNestedManyWithoutApprovedByInput = {
+    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
+    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
   export type StudentProfileUncheckedCreateNestedOneWithoutUserInput = {
@@ -31911,18 +31911,18 @@ export namespace Prisma {
     connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput = {
-    create?: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput> | PromotionRequestCreateWithoutProposedByInput[] | PromotionRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutProposedByInput | PromotionRequestCreateOrConnectWithoutProposedByInput[]
-    createMany?: PromotionRequestCreateManyProposedByInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput = {
+    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
+    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput> | PromotionRequestCreateWithoutApprovedByInput[] | PromotionRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutApprovedByInput | PromotionRequestCreateOrConnectWithoutApprovedByInput[]
-    createMany?: PromotionRequestCreateManyApprovedByInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput = {
+    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
+    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -31971,32 +31971,32 @@ export namespace Prisma {
     deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUpdateManyWithoutProposedByNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput> | PromotionRequestCreateWithoutProposedByInput[] | PromotionRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutProposedByInput | PromotionRequestCreateOrConnectWithoutProposedByInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutProposedByInput | PromotionRequestUpsertWithWhereUniqueWithoutProposedByInput[]
-    createMany?: PromotionRequestCreateManyProposedByInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutProposedByInput | PromotionRequestUpdateWithWhereUniqueWithoutProposedByInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutProposedByInput | PromotionRequestUpdateManyWithWhereWithoutProposedByInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUpdateManyWithoutProposedByNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput | GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput[]
+    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput | GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutProposedByInput | GraduationRequestUpdateManyWithWhereWithoutProposedByInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput> | PromotionRequestCreateWithoutApprovedByInput[] | PromotionRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutApprovedByInput | PromotionRequestCreateOrConnectWithoutApprovedByInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutApprovedByInput | PromotionRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: PromotionRequestCreateManyApprovedByInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutApprovedByInput | PromotionRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutApprovedByInput | PromotionRequestUpdateManyWithWhereWithoutApprovedByInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUpdateManyWithoutApprovedByNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
+    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutApprovedByInput | GraduationRequestUpdateManyWithWhereWithoutApprovedByInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
   export type StudentProfileUncheckedUpdateOneWithoutUserNestedInput = {
@@ -32033,32 +32033,32 @@ export namespace Prisma {
     deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput> | PromotionRequestCreateWithoutProposedByInput[] | PromotionRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutProposedByInput | PromotionRequestCreateOrConnectWithoutProposedByInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutProposedByInput | PromotionRequestUpsertWithWhereUniqueWithoutProposedByInput[]
-    createMany?: PromotionRequestCreateManyProposedByInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutProposedByInput | PromotionRequestUpdateWithWhereUniqueWithoutProposedByInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutProposedByInput | PromotionRequestUpdateManyWithWhereWithoutProposedByInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput | GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput[]
+    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput | GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutProposedByInput | GraduationRequestUpdateManyWithWhereWithoutProposedByInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput> | PromotionRequestCreateWithoutApprovedByInput[] | PromotionRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutApprovedByInput | PromotionRequestCreateOrConnectWithoutApprovedByInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutApprovedByInput | PromotionRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: PromotionRequestCreateManyApprovedByInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutApprovedByInput | PromotionRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutApprovedByInput | PromotionRequestUpdateManyWithWhereWithoutApprovedByInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
+    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutApprovedByInput | GraduationRequestUpdateManyWithWhereWithoutApprovedByInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutStudentProfileInput = {
@@ -32095,11 +32095,11 @@ export namespace Prisma {
     connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput> | PromotionRequestCreateWithoutStudentProfileInput[] | PromotionRequestUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutStudentProfileInput | PromotionRequestCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: PromotionRequestCreateManyStudentProfileInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput> | GraduationRequestCreateWithoutStudentProfileInput[] | GraduationRequestUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutStudentProfileInput | GraduationRequestCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: GraduationRequestCreateManyStudentProfileInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
   export type StudentSubscriptionCreateNestedManyWithoutStudentInput = {
@@ -32123,11 +32123,11 @@ export namespace Prisma {
     connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
   }
 
-  export type StudentPromotionCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  export type StudentDiscountCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
   }
 
   export type BankMandateCreateNestedManyWithoutStudentInput = {
@@ -32165,11 +32165,11 @@ export namespace Prisma {
     connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
   }
 
-  export type PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput> | PromotionRequestCreateWithoutStudentProfileInput[] | PromotionRequestUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutStudentProfileInput | PromotionRequestCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: PromotionRequestCreateManyStudentProfileInputEnvelope
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
+  export type GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput> | GraduationRequestCreateWithoutStudentProfileInput[] | GraduationRequestUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutStudentProfileInput | GraduationRequestCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: GraduationRequestCreateManyStudentProfileInputEnvelope
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
   export type StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput = {
@@ -32193,11 +32193,11 @@ export namespace Prisma {
     connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
   }
 
-  export type StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  export type StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
   }
 
   export type BankMandateUncheckedCreateNestedManyWithoutStudentInput = {
@@ -32279,18 +32279,18 @@ export namespace Prisma {
     deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput> | PromotionRequestCreateWithoutStudentProfileInput[] | PromotionRequestUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutStudentProfileInput | PromotionRequestCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutStudentProfileInput | PromotionRequestUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: PromotionRequestCreateManyStudentProfileInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutStudentProfileInput | PromotionRequestUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutStudentProfileInput | PromotionRequestUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput> | GraduationRequestCreateWithoutStudentProfileInput[] | GraduationRequestUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutStudentProfileInput | GraduationRequestCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput | GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: GraduationRequestCreateManyStudentProfileInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutStudentProfileInput | GraduationRequestUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput | GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
   export type StudentSubscriptionUpdateManyWithoutStudentNestedInput = {
@@ -32335,18 +32335,18 @@ export namespace Prisma {
     deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
   }
 
-  export type StudentPromotionUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
-    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    update?: StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput | StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  export type StudentDiscountUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
+    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    update?: StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput | StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
   }
 
   export type BankMandateUpdateManyWithoutStudentNestedInput = {
@@ -32419,18 +32419,18 @@ export namespace Prisma {
     deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
   }
 
-  export type PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput> | PromotionRequestCreateWithoutStudentProfileInput[] | PromotionRequestUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: PromotionRequestCreateOrConnectWithoutStudentProfileInput | PromotionRequestCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: PromotionRequestUpsertWithWhereUniqueWithoutStudentProfileInput | PromotionRequestUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: PromotionRequestCreateManyStudentProfileInputEnvelope
-    set?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    disconnect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    delete?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    connect?: PromotionRequestWhereUniqueInput | PromotionRequestWhereUniqueInput[]
-    update?: PromotionRequestUpdateWithWhereUniqueWithoutStudentProfileInput | PromotionRequestUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: PromotionRequestUpdateManyWithWhereWithoutStudentProfileInput | PromotionRequestUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
+  export type GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput> | GraduationRequestCreateWithoutStudentProfileInput[] | GraduationRequestUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: GraduationRequestCreateOrConnectWithoutStudentProfileInput | GraduationRequestCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput | GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: GraduationRequestCreateManyStudentProfileInputEnvelope
+    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+    update?: GraduationRequestUpdateWithWhereUniqueWithoutStudentProfileInput | GraduationRequestUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput | GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
   export type StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput = {
@@ -32475,18 +32475,18 @@ export namespace Prisma {
     deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
   }
 
-  export type StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput> | StudentPromotionCreateWithoutStudentProfileInput[] | StudentPromotionUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutStudentProfileInput | StudentPromotionCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: StudentPromotionCreateManyStudentProfileInputEnvelope
-    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    update?: StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput | StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput | StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  export type StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
+    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    update?: StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput | StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
   }
 
   export type BankMandateUncheckedUpdateManyWithoutStudentNestedInput = {
@@ -32829,21 +32829,21 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReviewedUpdatesInput, UserUpdateWithoutReviewedUpdatesInput>, UserUncheckedUpdateWithoutReviewedUpdatesInput>
   }
 
-  export type StudentProfileCreateNestedOneWithoutPromotionRequestsInput = {
-    create?: XOR<StudentProfileCreateWithoutPromotionRequestsInput, StudentProfileUncheckedCreateWithoutPromotionRequestsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutPromotionRequestsInput
+  export type StudentProfileCreateNestedOneWithoutGraduationRequestsInput = {
+    create?: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutGraduationRequestsInput
     connect?: StudentProfileWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutProposedPromotionsInput = {
-    create?: XOR<UserCreateWithoutProposedPromotionsInput, UserUncheckedCreateWithoutProposedPromotionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutProposedPromotionsInput
+  export type UserCreateNestedOneWithoutProposedGraduationsInput = {
+    create?: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProposedGraduationsInput
     connect?: UserWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutApprovedPromotionsInput = {
-    create?: XOR<UserCreateWithoutApprovedPromotionsInput, UserUncheckedCreateWithoutApprovedPromotionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedPromotionsInput
+  export type UserCreateNestedOneWithoutApprovedGraduationsInput = {
+    create?: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApprovedGraduationsInput
     connect?: UserWhereUniqueInput
   }
 
@@ -32855,30 +32855,30 @@ export namespace Prisma {
     divide?: number
   }
 
-  export type StudentProfileUpdateOneRequiredWithoutPromotionRequestsNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutPromotionRequestsInput, StudentProfileUncheckedCreateWithoutPromotionRequestsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutPromotionRequestsInput
-    upsert?: StudentProfileUpsertWithoutPromotionRequestsInput
+  export type StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutGraduationRequestsInput
+    upsert?: StudentProfileUpsertWithoutGraduationRequestsInput
     connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutPromotionRequestsInput, StudentProfileUpdateWithoutPromotionRequestsInput>, StudentProfileUncheckedUpdateWithoutPromotionRequestsInput>
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutGraduationRequestsInput, StudentProfileUpdateWithoutGraduationRequestsInput>, StudentProfileUncheckedUpdateWithoutGraduationRequestsInput>
   }
 
-  export type UserUpdateOneRequiredWithoutProposedPromotionsNestedInput = {
-    create?: XOR<UserCreateWithoutProposedPromotionsInput, UserUncheckedCreateWithoutProposedPromotionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutProposedPromotionsInput
-    upsert?: UserUpsertWithoutProposedPromotionsInput
+  export type UserUpdateOneRequiredWithoutProposedGraduationsNestedInput = {
+    create?: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProposedGraduationsInput
+    upsert?: UserUpsertWithoutProposedGraduationsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProposedPromotionsInput, UserUpdateWithoutProposedPromotionsInput>, UserUncheckedUpdateWithoutProposedPromotionsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProposedGraduationsInput, UserUpdateWithoutProposedGraduationsInput>, UserUncheckedUpdateWithoutProposedGraduationsInput>
   }
 
-  export type UserUpdateOneWithoutApprovedPromotionsNestedInput = {
-    create?: XOR<UserCreateWithoutApprovedPromotionsInput, UserUncheckedCreateWithoutApprovedPromotionsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedPromotionsInput
-    upsert?: UserUpsertWithoutApprovedPromotionsInput
+  export type UserUpdateOneWithoutApprovedGraduationsNestedInput = {
+    create?: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApprovedGraduationsInput
+    upsert?: UserUpsertWithoutApprovedGraduationsInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovedPromotionsInput, UserUpdateWithoutApprovedPromotionsInput>, UserUncheckedUpdateWithoutApprovedPromotionsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovedGraduationsInput, UserUpdateWithoutApprovedGraduationsInput>, UserUncheckedUpdateWithoutApprovedGraduationsInput>
   }
 
   export type StudentFeeCreateNestedManyWithoutFeeTierInput = {
@@ -33011,82 +33011,82 @@ export namespace Prisma {
     update?: XOR<XOR<FeeTierUpdateToOneWithWhereWithoutStudentFeesInput, FeeTierUpdateWithoutStudentFeesInput>, FeeTierUncheckedUpdateWithoutStudentFeesInput>
   }
 
-  export type StudentPromotionCreateNestedManyWithoutPromotionInput = {
-    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
-    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  export type StudentDiscountCreateNestedManyWithoutDiscountInput = {
+    create?: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput> | StudentDiscountCreateWithoutDiscountInput[] | StudentDiscountUncheckedCreateWithoutDiscountInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutDiscountInput | StudentDiscountCreateOrConnectWithoutDiscountInput[]
+    createMany?: StudentDiscountCreateManyDiscountInputEnvelope
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
   }
 
-  export type StudentPromotionUncheckedCreateNestedManyWithoutPromotionInput = {
-    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
-    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
+  export type StudentDiscountUncheckedCreateNestedManyWithoutDiscountInput = {
+    create?: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput> | StudentDiscountCreateWithoutDiscountInput[] | StudentDiscountUncheckedCreateWithoutDiscountInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutDiscountInput | StudentDiscountCreateOrConnectWithoutDiscountInput[]
+    createMany?: StudentDiscountCreateManyDiscountInputEnvelope
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
   }
 
-  export type EnumPromotionTypeFieldUpdateOperationsInput = {
-    set?: $Enums.PromotionType
+  export type EnumDiscountTypeFieldUpdateOperationsInput = {
+    set?: $Enums.DiscountType
   }
 
-  export type EnumPromotionCategoryFieldUpdateOperationsInput = {
-    set?: $Enums.PromotionCategory
+  export type EnumDiscountCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.DiscountCategory
   }
 
-  export type StudentPromotionUpdateManyWithoutPromotionNestedInput = {
-    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
-    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput | StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput[]
-    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
-    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    update?: StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput | StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput[]
-    updateMany?: StudentPromotionUpdateManyWithWhereWithoutPromotionInput | StudentPromotionUpdateManyWithWhereWithoutPromotionInput[]
-    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  export type StudentDiscountUpdateManyWithoutDiscountNestedInput = {
+    create?: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput> | StudentDiscountCreateWithoutDiscountInput[] | StudentDiscountUncheckedCreateWithoutDiscountInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutDiscountInput | StudentDiscountCreateOrConnectWithoutDiscountInput[]
+    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutDiscountInput | StudentDiscountUpsertWithWhereUniqueWithoutDiscountInput[]
+    createMany?: StudentDiscountCreateManyDiscountInputEnvelope
+    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    update?: StudentDiscountUpdateWithWhereUniqueWithoutDiscountInput | StudentDiscountUpdateWithWhereUniqueWithoutDiscountInput[]
+    updateMany?: StudentDiscountUpdateManyWithWhereWithoutDiscountInput | StudentDiscountUpdateManyWithWhereWithoutDiscountInput[]
+    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
   }
 
-  export type StudentPromotionUncheckedUpdateManyWithoutPromotionNestedInput = {
-    create?: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput> | StudentPromotionCreateWithoutPromotionInput[] | StudentPromotionUncheckedCreateWithoutPromotionInput[]
-    connectOrCreate?: StudentPromotionCreateOrConnectWithoutPromotionInput | StudentPromotionCreateOrConnectWithoutPromotionInput[]
-    upsert?: StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput | StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput[]
-    createMany?: StudentPromotionCreateManyPromotionInputEnvelope
-    set?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    disconnect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    delete?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    connect?: StudentPromotionWhereUniqueInput | StudentPromotionWhereUniqueInput[]
-    update?: StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput | StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput[]
-    updateMany?: StudentPromotionUpdateManyWithWhereWithoutPromotionInput | StudentPromotionUpdateManyWithWhereWithoutPromotionInput[]
-    deleteMany?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
+  export type StudentDiscountUncheckedUpdateManyWithoutDiscountNestedInput = {
+    create?: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput> | StudentDiscountCreateWithoutDiscountInput[] | StudentDiscountUncheckedCreateWithoutDiscountInput[]
+    connectOrCreate?: StudentDiscountCreateOrConnectWithoutDiscountInput | StudentDiscountCreateOrConnectWithoutDiscountInput[]
+    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutDiscountInput | StudentDiscountUpsertWithWhereUniqueWithoutDiscountInput[]
+    createMany?: StudentDiscountCreateManyDiscountInputEnvelope
+    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
+    update?: StudentDiscountUpdateWithWhereUniqueWithoutDiscountInput | StudentDiscountUpdateWithWhereUniqueWithoutDiscountInput[]
+    updateMany?: StudentDiscountUpdateManyWithWhereWithoutDiscountInput | StudentDiscountUpdateManyWithWhereWithoutDiscountInput[]
+    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
   }
 
-  export type StudentProfileCreateNestedOneWithoutStudentPromotionsInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentPromotionsInput
+  export type StudentProfileCreateNestedOneWithoutStudentDiscountsInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentDiscountsInput
     connect?: StudentProfileWhereUniqueInput
   }
 
-  export type PromotionCreateNestedOneWithoutStudentPromotionsInput = {
-    create?: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutStudentPromotionsInput
-    connect?: PromotionWhereUniqueInput
+  export type DiscountCreateNestedOneWithoutStudentDiscountsInput = {
+    create?: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
+    connectOrCreate?: DiscountCreateOrConnectWithoutStudentDiscountsInput
+    connect?: DiscountWhereUniqueInput
   }
 
-  export type StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentPromotionsInput
-    upsert?: StudentProfileUpsertWithoutStudentPromotionsInput
+  export type StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentDiscountsInput
+    upsert?: StudentProfileUpsertWithoutStudentDiscountsInput
     connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentPromotionsInput, StudentProfileUpdateWithoutStudentPromotionsInput>, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentDiscountsInput, StudentProfileUpdateWithoutStudentDiscountsInput>, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
-  export type PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput = {
-    create?: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
-    connectOrCreate?: PromotionCreateOrConnectWithoutStudentPromotionsInput
-    upsert?: PromotionUpsertWithoutStudentPromotionsInput
-    connect?: PromotionWhereUniqueInput
-    update?: XOR<XOR<PromotionUpdateToOneWithWhereWithoutStudentPromotionsInput, PromotionUpdateWithoutStudentPromotionsInput>, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
+  export type DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput = {
+    create?: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
+    connectOrCreate?: DiscountCreateOrConnectWithoutStudentDiscountsInput
+    upsert?: DiscountUpsertWithoutStudentDiscountsInput
+    connect?: DiscountWhereUniqueInput
+    update?: XOR<XOR<DiscountUpdateToOneWithWhereWithoutStudentDiscountsInput, DiscountUpdateWithoutStudentDiscountsInput>, DiscountUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
   export type StudentProfileCreateNestedOneWithoutSubscriptionsInput = {
@@ -33726,38 +33726,38 @@ export namespace Prisma {
     _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
-  export type NestedEnumPromotionTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionTypeFilter<$PrismaModel> | $Enums.PromotionType
+  export type NestedEnumDiscountTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeFilter<$PrismaModel> | $Enums.DiscountType
   }
 
-  export type NestedEnumPromotionCategoryFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionCategoryFilter<$PrismaModel> | $Enums.PromotionCategory
+  export type NestedEnumDiscountCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountCategory | EnumDiscountCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountCategoryFilter<$PrismaModel> | $Enums.DiscountCategory
   }
 
-  export type NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionType | EnumPromotionTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionType[] | ListEnumPromotionTypeFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionTypeWithAggregatesFilter<$PrismaModel> | $Enums.PromotionType
+  export type NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountType | EnumDiscountTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountType[] | ListEnumDiscountTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountTypeWithAggregatesFilter<$PrismaModel> | $Enums.DiscountType
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPromotionTypeFilter<$PrismaModel>
-    _max?: NestedEnumPromotionTypeFilter<$PrismaModel>
+    _min?: NestedEnumDiscountTypeFilter<$PrismaModel>
+    _max?: NestedEnumDiscountTypeFilter<$PrismaModel>
   }
 
-  export type NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.PromotionCategory | EnumPromotionCategoryFieldRefInput<$PrismaModel>
-    in?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    notIn?: $Enums.PromotionCategory[] | ListEnumPromotionCategoryFieldRefInput<$PrismaModel>
-    not?: NestedEnumPromotionCategoryWithAggregatesFilter<$PrismaModel> | $Enums.PromotionCategory
+  export type NestedEnumDiscountCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DiscountCategory | EnumDiscountCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumDiscountCategoryWithAggregatesFilter<$PrismaModel> | $Enums.DiscountCategory
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumPromotionCategoryFilter<$PrismaModel>
-    _max?: NestedEnumPromotionCategoryFilter<$PrismaModel>
+    _min?: NestedEnumDiscountCategoryFilter<$PrismaModel>
+    _max?: NestedEnumDiscountCategoryFilter<$PrismaModel>
   }
 
   export type NestedEnumCashSessionStatusFilter<$PrismaModel = never> = {
@@ -33873,11 +33873,11 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -33892,11 +33892,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -33950,17 +33950,17 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PromotionRequestCreateWithoutProposedByInput = {
+  export type GraduationRequestCreateWithoutProposedByInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutPromotionRequestsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedPromotionsInput
+    studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
   }
 
-  export type PromotionRequestUncheckedCreateWithoutProposedByInput = {
+  export type GraduationRequestUncheckedCreateWithoutProposedByInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -33970,27 +33970,27 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestCreateOrConnectWithoutProposedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    create: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput>
+  export type GraduationRequestCreateOrConnectWithoutProposedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    create: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput>
   }
 
-  export type PromotionRequestCreateManyProposedByInputEnvelope = {
-    data: PromotionRequestCreateManyProposedByInput | PromotionRequestCreateManyProposedByInput[]
+  export type GraduationRequestCreateManyProposedByInputEnvelope = {
+    data: GraduationRequestCreateManyProposedByInput | GraduationRequestCreateManyProposedByInput[]
     skipDuplicates?: boolean
   }
 
-  export type PromotionRequestCreateWithoutApprovedByInput = {
+  export type GraduationRequestCreateWithoutApprovedByInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutPromotionRequestsInput
-    proposedBy: UserCreateNestedOneWithoutProposedPromotionsInput
+    studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
+    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
   }
 
-  export type PromotionRequestUncheckedCreateWithoutApprovedByInput = {
+  export type GraduationRequestUncheckedCreateWithoutApprovedByInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -34000,13 +34000,13 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestCreateOrConnectWithoutApprovedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    create: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput>
+  export type GraduationRequestCreateOrConnectWithoutApprovedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    create: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput>
   }
 
-  export type PromotionRequestCreateManyApprovedByInputEnvelope = {
-    data: PromotionRequestCreateManyApprovedByInput | PromotionRequestCreateManyApprovedByInput[]
+  export type GraduationRequestCreateManyApprovedByInputEnvelope = {
+    data: GraduationRequestCreateManyApprovedByInput | GraduationRequestCreateManyApprovedByInput[]
     skipDuplicates?: boolean
   }
 
@@ -34032,11 +34032,11 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -34051,11 +34051,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -34111,50 +34111,50 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
   }
 
-  export type PromotionRequestUpsertWithWhereUniqueWithoutProposedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    update: XOR<PromotionRequestUpdateWithoutProposedByInput, PromotionRequestUncheckedUpdateWithoutProposedByInput>
-    create: XOR<PromotionRequestCreateWithoutProposedByInput, PromotionRequestUncheckedCreateWithoutProposedByInput>
+  export type GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    update: XOR<GraduationRequestUpdateWithoutProposedByInput, GraduationRequestUncheckedUpdateWithoutProposedByInput>
+    create: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput>
   }
 
-  export type PromotionRequestUpdateWithWhereUniqueWithoutProposedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    data: XOR<PromotionRequestUpdateWithoutProposedByInput, PromotionRequestUncheckedUpdateWithoutProposedByInput>
+  export type GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    data: XOR<GraduationRequestUpdateWithoutProposedByInput, GraduationRequestUncheckedUpdateWithoutProposedByInput>
   }
 
-  export type PromotionRequestUpdateManyWithWhereWithoutProposedByInput = {
-    where: PromotionRequestScalarWhereInput
-    data: XOR<PromotionRequestUpdateManyMutationInput, PromotionRequestUncheckedUpdateManyWithoutProposedByInput>
+  export type GraduationRequestUpdateManyWithWhereWithoutProposedByInput = {
+    where: GraduationRequestScalarWhereInput
+    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutProposedByInput>
   }
 
-  export type PromotionRequestScalarWhereInput = {
-    AND?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
-    OR?: PromotionRequestScalarWhereInput[]
-    NOT?: PromotionRequestScalarWhereInput | PromotionRequestScalarWhereInput[]
-    id?: StringFilter<"PromotionRequest"> | string
-    studentProfileId?: StringFilter<"PromotionRequest"> | string
-    proposedBeltId?: StringNullableFilter<"PromotionRequest"> | string | null
-    proposedStripes?: IntNullableFilter<"PromotionRequest"> | number | null
-    proposedById?: StringFilter<"PromotionRequest"> | string
-    approvedById?: StringNullableFilter<"PromotionRequest"> | string | null
-    status?: EnumRequestStatusFilter<"PromotionRequest"> | $Enums.RequestStatus
-    createdAt?: DateTimeFilter<"PromotionRequest"> | Date | string
+  export type GraduationRequestScalarWhereInput = {
+    AND?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
+    OR?: GraduationRequestScalarWhereInput[]
+    NOT?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
+    id?: StringFilter<"GraduationRequest"> | string
+    studentProfileId?: StringFilter<"GraduationRequest"> | string
+    proposedBeltId?: StringNullableFilter<"GraduationRequest"> | string | null
+    proposedStripes?: IntNullableFilter<"GraduationRequest"> | number | null
+    proposedById?: StringFilter<"GraduationRequest"> | string
+    approvedById?: StringNullableFilter<"GraduationRequest"> | string | null
+    status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
+    createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
   }
 
-  export type PromotionRequestUpsertWithWhereUniqueWithoutApprovedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    update: XOR<PromotionRequestUpdateWithoutApprovedByInput, PromotionRequestUncheckedUpdateWithoutApprovedByInput>
-    create: XOR<PromotionRequestCreateWithoutApprovedByInput, PromotionRequestUncheckedCreateWithoutApprovedByInput>
+  export type GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    update: XOR<GraduationRequestUpdateWithoutApprovedByInput, GraduationRequestUncheckedUpdateWithoutApprovedByInput>
+    create: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput>
   }
 
-  export type PromotionRequestUpdateWithWhereUniqueWithoutApprovedByInput = {
-    where: PromotionRequestWhereUniqueInput
-    data: XOR<PromotionRequestUpdateWithoutApprovedByInput, PromotionRequestUncheckedUpdateWithoutApprovedByInput>
+  export type GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput = {
+    where: GraduationRequestWhereUniqueInput
+    data: XOR<GraduationRequestUpdateWithoutApprovedByInput, GraduationRequestUncheckedUpdateWithoutApprovedByInput>
   }
 
-  export type PromotionRequestUpdateManyWithWhereWithoutApprovedByInput = {
-    where: PromotionRequestScalarWhereInput
-    data: XOR<PromotionRequestUpdateManyMutationInput, PromotionRequestUncheckedUpdateManyWithoutApprovedByInput>
+  export type GraduationRequestUpdateManyWithWhereWithoutApprovedByInput = {
+    where: GraduationRequestScalarWhereInput
+    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutApprovedByInput>
   }
 
   export type UserCreateWithoutStudentProfileInput = {
@@ -34168,8 +34168,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserUncheckedCreateWithoutStudentProfileInput = {
@@ -34183,8 +34183,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserCreateOrConnectWithoutStudentProfileInput = {
@@ -34290,17 +34290,17 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PromotionRequestCreateWithoutStudentProfileInput = {
+  export type GraduationRequestCreateWithoutStudentProfileInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
-    proposedBy: UserCreateNestedOneWithoutProposedPromotionsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedPromotionsInput
+    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
   }
 
-  export type PromotionRequestUncheckedCreateWithoutStudentProfileInput = {
+  export type GraduationRequestUncheckedCreateWithoutStudentProfileInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
@@ -34310,13 +34310,13 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestCreateOrConnectWithoutStudentProfileInput = {
-    where: PromotionRequestWhereUniqueInput
-    create: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput>
+  export type GraduationRequestCreateOrConnectWithoutStudentProfileInput = {
+    where: GraduationRequestWhereUniqueInput
+    create: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput>
   }
 
-  export type PromotionRequestCreateManyStudentProfileInputEnvelope = {
-    data: PromotionRequestCreateManyStudentProfileInput | PromotionRequestCreateManyStudentProfileInput[]
+  export type GraduationRequestCreateManyStudentProfileInputEnvelope = {
+    data: GraduationRequestCreateManyStudentProfileInput | GraduationRequestCreateManyStudentProfileInput[]
     skipDuplicates?: boolean
   }
 
@@ -34400,27 +34400,27 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type StudentPromotionCreateWithoutStudentProfileInput = {
+  export type StudentDiscountCreateWithoutStudentProfileInput = {
     id?: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
-    promotion: PromotionCreateNestedOneWithoutStudentPromotionsInput
+    discount: DiscountCreateNestedOneWithoutStudentDiscountsInput
   }
 
-  export type StudentPromotionUncheckedCreateWithoutStudentProfileInput = {
+  export type StudentDiscountUncheckedCreateWithoutStudentProfileInput = {
     id?: string
-    promotionId: string
+    discountId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
 
-  export type StudentPromotionCreateOrConnectWithoutStudentProfileInput = {
-    where: StudentPromotionWhereUniqueInput
-    create: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput>
+  export type StudentDiscountCreateOrConnectWithoutStudentProfileInput = {
+    where: StudentDiscountWhereUniqueInput
+    create: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput>
   }
 
-  export type StudentPromotionCreateManyStudentProfileInputEnvelope = {
-    data: StudentPromotionCreateManyStudentProfileInput | StudentPromotionCreateManyStudentProfileInput[]
+  export type StudentDiscountCreateManyStudentProfileInputEnvelope = {
+    data: StudentDiscountCreateManyStudentProfileInput | StudentDiscountCreateManyStudentProfileInput[]
     skipDuplicates?: boolean
   }
 
@@ -34480,8 +34480,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStudentProfileInput = {
@@ -34495,8 +34495,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
   }
 
   export type StudentGuardianUpsertWithWhereUniqueWithoutStudentInput = {
@@ -34595,20 +34595,20 @@ export namespace Prisma {
     data: XOR<ProfileUpdateRequestUpdateManyMutationInput, ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileInput>
   }
 
-  export type PromotionRequestUpsertWithWhereUniqueWithoutStudentProfileInput = {
-    where: PromotionRequestWhereUniqueInput
-    update: XOR<PromotionRequestUpdateWithoutStudentProfileInput, PromotionRequestUncheckedUpdateWithoutStudentProfileInput>
-    create: XOR<PromotionRequestCreateWithoutStudentProfileInput, PromotionRequestUncheckedCreateWithoutStudentProfileInput>
+  export type GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput = {
+    where: GraduationRequestWhereUniqueInput
+    update: XOR<GraduationRequestUpdateWithoutStudentProfileInput, GraduationRequestUncheckedUpdateWithoutStudentProfileInput>
+    create: XOR<GraduationRequestCreateWithoutStudentProfileInput, GraduationRequestUncheckedCreateWithoutStudentProfileInput>
   }
 
-  export type PromotionRequestUpdateWithWhereUniqueWithoutStudentProfileInput = {
-    where: PromotionRequestWhereUniqueInput
-    data: XOR<PromotionRequestUpdateWithoutStudentProfileInput, PromotionRequestUncheckedUpdateWithoutStudentProfileInput>
+  export type GraduationRequestUpdateWithWhereUniqueWithoutStudentProfileInput = {
+    where: GraduationRequestWhereUniqueInput
+    data: XOR<GraduationRequestUpdateWithoutStudentProfileInput, GraduationRequestUncheckedUpdateWithoutStudentProfileInput>
   }
 
-  export type PromotionRequestUpdateManyWithWhereWithoutStudentProfileInput = {
-    where: PromotionRequestScalarWhereInput
-    data: XOR<PromotionRequestUpdateManyMutationInput, PromotionRequestUncheckedUpdateManyWithoutStudentProfileInput>
+  export type GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput = {
+    where: GraduationRequestScalarWhereInput
+    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutStudentProfileInput>
   }
 
   export type StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput = {
@@ -34696,31 +34696,31 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
   }
 
-  export type StudentPromotionUpsertWithWhereUniqueWithoutStudentProfileInput = {
-    where: StudentPromotionWhereUniqueInput
-    update: XOR<StudentPromotionUpdateWithoutStudentProfileInput, StudentPromotionUncheckedUpdateWithoutStudentProfileInput>
-    create: XOR<StudentPromotionCreateWithoutStudentProfileInput, StudentPromotionUncheckedCreateWithoutStudentProfileInput>
+  export type StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentDiscountWhereUniqueInput
+    update: XOR<StudentDiscountUpdateWithoutStudentProfileInput, StudentDiscountUncheckedUpdateWithoutStudentProfileInput>
+    create: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput>
   }
 
-  export type StudentPromotionUpdateWithWhereUniqueWithoutStudentProfileInput = {
-    where: StudentPromotionWhereUniqueInput
-    data: XOR<StudentPromotionUpdateWithoutStudentProfileInput, StudentPromotionUncheckedUpdateWithoutStudentProfileInput>
+  export type StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentDiscountWhereUniqueInput
+    data: XOR<StudentDiscountUpdateWithoutStudentProfileInput, StudentDiscountUncheckedUpdateWithoutStudentProfileInput>
   }
 
-  export type StudentPromotionUpdateManyWithWhereWithoutStudentProfileInput = {
-    where: StudentPromotionScalarWhereInput
-    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyWithoutStudentProfileInput>
+  export type StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput = {
+    where: StudentDiscountScalarWhereInput
+    data: XOR<StudentDiscountUpdateManyMutationInput, StudentDiscountUncheckedUpdateManyWithoutStudentProfileInput>
   }
 
-  export type StudentPromotionScalarWhereInput = {
-    AND?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
-    OR?: StudentPromotionScalarWhereInput[]
-    NOT?: StudentPromotionScalarWhereInput | StudentPromotionScalarWhereInput[]
-    id?: StringFilter<"StudentPromotion"> | string
-    studentProfileId?: StringFilter<"StudentPromotion"> | string
-    promotionId?: StringFilter<"StudentPromotion"> | string
-    assignedAt?: DateTimeFilter<"StudentPromotion"> | Date | string
-    expiresAt?: DateTimeNullableFilter<"StudentPromotion"> | Date | string | null
+  export type StudentDiscountScalarWhereInput = {
+    AND?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
+    OR?: StudentDiscountScalarWhereInput[]
+    NOT?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
+    id?: StringFilter<"StudentDiscount"> | string
+    studentProfileId?: StringFilter<"StudentDiscount"> | string
+    discountId?: StringFilter<"StudentDiscount"> | string
+    assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
   }
 
   export type BankMandateUpsertWithWhereUniqueWithoutStudentInput = {
@@ -34765,8 +34765,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserUncheckedCreateWithoutGuardianProfileInput = {
@@ -34780,8 +34780,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserCreateOrConnectWithoutGuardianProfileInput = {
@@ -34831,8 +34831,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGuardianProfileInput = {
@@ -34846,8 +34846,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
   }
 
   export type StudentGuardianUpsertWithWhereUniqueWithoutGuardianInput = {
@@ -34877,11 +34877,11 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -34896,11 +34896,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -34948,11 +34948,11 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -34967,11 +34967,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -35253,11 +35253,11 @@ export namespace Prisma {
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -35272,11 +35272,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -35332,11 +35332,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -35351,11 +35351,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -35401,11 +35401,11 @@ export namespace Prisma {
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -35420,11 +35420,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -35455,11 +35455,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -35474,11 +35474,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -35493,11 +35493,11 @@ export namespace Prisma {
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -35512,11 +35512,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -35536,8 +35536,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    proposedPromotions?: PromotionRequestCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserUncheckedCreateWithoutReviewedUpdatesInput = {
@@ -35551,8 +35551,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    proposedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
   }
 
   export type UserCreateOrConnectWithoutReviewedUpdatesInput = {
@@ -35582,11 +35582,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -35601,11 +35601,11 @@ export namespace Prisma {
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -35631,8 +35631,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    proposedPromotions?: PromotionRequestUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewedUpdatesInput = {
@@ -35646,11 +35646,11 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedPromotions?: PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
   }
 
-  export type StudentProfileCreateWithoutPromotionRequestsInput = {
+  export type StudentProfileCreateWithoutGraduationRequestsInput = {
     id?: string
     birthDate?: Date | string | null
     phone?: string | null
@@ -35665,11 +35665,11 @@ export namespace Prisma {
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileUncheckedCreateWithoutPromotionRequestsInput = {
+  export type StudentProfileUncheckedCreateWithoutGraduationRequestsInput = {
     id?: string
     userId: string
     birthDate?: Date | string | null
@@ -35684,16 +35684,16 @@ export namespace Prisma {
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileCreateOrConnectWithoutPromotionRequestsInput = {
+  export type StudentProfileCreateOrConnectWithoutGraduationRequestsInput = {
     where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutPromotionRequestsInput, StudentProfileUncheckedCreateWithoutPromotionRequestsInput>
+    create: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
   }
 
-  export type UserCreateWithoutProposedPromotionsInput = {
+  export type UserCreateWithoutProposedGraduationsInput = {
     id?: string
     email: string
     passwordHash: string
@@ -35705,10 +35705,10 @@ export namespace Prisma {
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    approvedPromotions?: PromotionRequestCreateNestedManyWithoutApprovedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
   }
 
-  export type UserUncheckedCreateWithoutProposedPromotionsInput = {
+  export type UserUncheckedCreateWithoutProposedGraduationsInput = {
     id?: string
     email: string
     passwordHash: string
@@ -35720,15 +35720,15 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    approvedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
   }
 
-  export type UserCreateOrConnectWithoutProposedPromotionsInput = {
+  export type UserCreateOrConnectWithoutProposedGraduationsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutProposedPromotionsInput, UserUncheckedCreateWithoutProposedPromotionsInput>
+    create: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
   }
 
-  export type UserCreateWithoutApprovedPromotionsInput = {
+  export type UserCreateWithoutApprovedGraduationsInput = {
     id?: string
     email: string
     passwordHash: string
@@ -35740,10 +35740,10 @@ export namespace Prisma {
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestCreateNestedManyWithoutProposedByInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
   }
 
-  export type UserUncheckedCreateWithoutApprovedPromotionsInput = {
+  export type UserUncheckedCreateWithoutApprovedGraduationsInput = {
     id?: string
     email: string
     passwordHash: string
@@ -35755,26 +35755,26 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedPromotions?: PromotionRequestUncheckedCreateNestedManyWithoutProposedByInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
   }
 
-  export type UserCreateOrConnectWithoutApprovedPromotionsInput = {
+  export type UserCreateOrConnectWithoutApprovedGraduationsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutApprovedPromotionsInput, UserUncheckedCreateWithoutApprovedPromotionsInput>
+    create: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
   }
 
-  export type StudentProfileUpsertWithoutPromotionRequestsInput = {
-    update: XOR<StudentProfileUpdateWithoutPromotionRequestsInput, StudentProfileUncheckedUpdateWithoutPromotionRequestsInput>
-    create: XOR<StudentProfileCreateWithoutPromotionRequestsInput, StudentProfileUncheckedCreateWithoutPromotionRequestsInput>
+  export type StudentProfileUpsertWithoutGraduationRequestsInput = {
+    update: XOR<StudentProfileUpdateWithoutGraduationRequestsInput, StudentProfileUncheckedUpdateWithoutGraduationRequestsInput>
+    create: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
     where?: StudentProfileWhereInput
   }
 
-  export type StudentProfileUpdateToOneWithWhereWithoutPromotionRequestsInput = {
+  export type StudentProfileUpdateToOneWithWhereWithoutGraduationRequestsInput = {
     where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutPromotionRequestsInput, StudentProfileUncheckedUpdateWithoutPromotionRequestsInput>
+    data: XOR<StudentProfileUpdateWithoutGraduationRequestsInput, StudentProfileUncheckedUpdateWithoutGraduationRequestsInput>
   }
 
-  export type StudentProfileUpdateWithoutPromotionRequestsInput = {
+  export type StudentProfileUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -35789,11 +35789,11 @@ export namespace Prisma {
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
-  export type StudentProfileUncheckedUpdateWithoutPromotionRequestsInput = {
+  export type StudentProfileUncheckedUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35808,22 +35808,22 @@ export namespace Prisma {
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
-  export type UserUpsertWithoutProposedPromotionsInput = {
-    update: XOR<UserUpdateWithoutProposedPromotionsInput, UserUncheckedUpdateWithoutProposedPromotionsInput>
-    create: XOR<UserCreateWithoutProposedPromotionsInput, UserUncheckedCreateWithoutProposedPromotionsInput>
+  export type UserUpsertWithoutProposedGraduationsInput = {
+    update: XOR<UserUpdateWithoutProposedGraduationsInput, UserUncheckedUpdateWithoutProposedGraduationsInput>
+    create: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutProposedPromotionsInput = {
+  export type UserUpdateToOneWithWhereWithoutProposedGraduationsInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutProposedPromotionsInput, UserUncheckedUpdateWithoutProposedPromotionsInput>
+    data: XOR<UserUpdateWithoutProposedGraduationsInput, UserUncheckedUpdateWithoutProposedGraduationsInput>
   }
 
-  export type UserUpdateWithoutProposedPromotionsInput = {
+  export type UserUpdateWithoutProposedGraduationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -35835,10 +35835,10 @@ export namespace Prisma {
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    approvedPromotions?: PromotionRequestUpdateManyWithoutApprovedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutProposedPromotionsInput = {
+  export type UserUncheckedUpdateWithoutProposedGraduationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -35850,21 +35850,21 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    approvedPromotions?: PromotionRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
   }
 
-  export type UserUpsertWithoutApprovedPromotionsInput = {
-    update: XOR<UserUpdateWithoutApprovedPromotionsInput, UserUncheckedUpdateWithoutApprovedPromotionsInput>
-    create: XOR<UserCreateWithoutApprovedPromotionsInput, UserUncheckedCreateWithoutApprovedPromotionsInput>
+  export type UserUpsertWithoutApprovedGraduationsInput = {
+    update: XOR<UserUpdateWithoutApprovedGraduationsInput, UserUncheckedUpdateWithoutApprovedGraduationsInput>
+    create: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutApprovedPromotionsInput = {
+  export type UserUpdateToOneWithWhereWithoutApprovedGraduationsInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutApprovedPromotionsInput, UserUncheckedUpdateWithoutApprovedPromotionsInput>
+    data: XOR<UserUpdateWithoutApprovedGraduationsInput, UserUncheckedUpdateWithoutApprovedGraduationsInput>
   }
 
-  export type UserUpdateWithoutApprovedPromotionsInput = {
+  export type UserUpdateWithoutApprovedGraduationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -35876,10 +35876,10 @@ export namespace Prisma {
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUpdateManyWithoutProposedByNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutApprovedPromotionsInput = {
+  export type UserUncheckedUpdateWithoutApprovedGraduationsInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
@@ -35891,7 +35891,7 @@ export namespace Prisma {
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedPromotions?: PromotionRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
   }
 
   export type StudentFeeCreateWithoutFeeTierInput = {
@@ -35992,10 +35992,10 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -36011,10 +36011,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -36075,10 +36075,10 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -36094,10 +36094,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -36136,47 +36136,47 @@ export namespace Prisma {
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutFeeTierNestedInput
   }
 
-  export type StudentPromotionCreateWithoutPromotionInput = {
+  export type StudentDiscountCreateWithoutDiscountInput = {
     id?: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
-    studentProfile: StudentProfileCreateNestedOneWithoutStudentPromotionsInput
+    studentProfile: StudentProfileCreateNestedOneWithoutStudentDiscountsInput
   }
 
-  export type StudentPromotionUncheckedCreateWithoutPromotionInput = {
+  export type StudentDiscountUncheckedCreateWithoutDiscountInput = {
     id?: string
     studentProfileId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
 
-  export type StudentPromotionCreateOrConnectWithoutPromotionInput = {
-    where: StudentPromotionWhereUniqueInput
-    create: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput>
+  export type StudentDiscountCreateOrConnectWithoutDiscountInput = {
+    where: StudentDiscountWhereUniqueInput
+    create: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput>
   }
 
-  export type StudentPromotionCreateManyPromotionInputEnvelope = {
-    data: StudentPromotionCreateManyPromotionInput | StudentPromotionCreateManyPromotionInput[]
+  export type StudentDiscountCreateManyDiscountInputEnvelope = {
+    data: StudentDiscountCreateManyDiscountInput | StudentDiscountCreateManyDiscountInput[]
     skipDuplicates?: boolean
   }
 
-  export type StudentPromotionUpsertWithWhereUniqueWithoutPromotionInput = {
-    where: StudentPromotionWhereUniqueInput
-    update: XOR<StudentPromotionUpdateWithoutPromotionInput, StudentPromotionUncheckedUpdateWithoutPromotionInput>
-    create: XOR<StudentPromotionCreateWithoutPromotionInput, StudentPromotionUncheckedCreateWithoutPromotionInput>
+  export type StudentDiscountUpsertWithWhereUniqueWithoutDiscountInput = {
+    where: StudentDiscountWhereUniqueInput
+    update: XOR<StudentDiscountUpdateWithoutDiscountInput, StudentDiscountUncheckedUpdateWithoutDiscountInput>
+    create: XOR<StudentDiscountCreateWithoutDiscountInput, StudentDiscountUncheckedCreateWithoutDiscountInput>
   }
 
-  export type StudentPromotionUpdateWithWhereUniqueWithoutPromotionInput = {
-    where: StudentPromotionWhereUniqueInput
-    data: XOR<StudentPromotionUpdateWithoutPromotionInput, StudentPromotionUncheckedUpdateWithoutPromotionInput>
+  export type StudentDiscountUpdateWithWhereUniqueWithoutDiscountInput = {
+    where: StudentDiscountWhereUniqueInput
+    data: XOR<StudentDiscountUpdateWithoutDiscountInput, StudentDiscountUncheckedUpdateWithoutDiscountInput>
   }
 
-  export type StudentPromotionUpdateManyWithWhereWithoutPromotionInput = {
-    where: StudentPromotionScalarWhereInput
-    data: XOR<StudentPromotionUpdateManyMutationInput, StudentPromotionUncheckedUpdateManyWithoutPromotionInput>
+  export type StudentDiscountUpdateManyWithWhereWithoutDiscountInput = {
+    where: StudentDiscountScalarWhereInput
+    data: XOR<StudentDiscountUpdateManyMutationInput, StudentDiscountUncheckedUpdateManyWithoutDiscountInput>
   }
 
-  export type StudentProfileCreateWithoutStudentPromotionsInput = {
+  export type StudentProfileCreateWithoutStudentDiscountsInput = {
     id?: string
     birthDate?: Date | string | null
     phone?: string | null
@@ -36188,14 +36188,14 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileUncheckedCreateWithoutStudentPromotionsInput = {
+  export type StudentProfileUncheckedCreateWithoutStudentDiscountsInput = {
     id?: string
     userId: string
     birthDate?: Date | string | null
@@ -36207,25 +36207,25 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileCreateOrConnectWithoutStudentPromotionsInput = {
+  export type StudentProfileCreateOrConnectWithoutStudentDiscountsInput = {
     where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+    create: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
   }
 
-  export type PromotionCreateWithoutStudentPromotionsInput = {
+  export type DiscountCreateWithoutStudentDiscountsInput = {
     id?: string
     code: string
     name: string
     description?: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value?: Decimal | DecimalJsLike | number | string | null
     startDate?: Date | string | null
     endDate?: Date | string | null
@@ -36234,13 +36234,13 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type PromotionUncheckedCreateWithoutStudentPromotionsInput = {
+  export type DiscountUncheckedCreateWithoutStudentDiscountsInput = {
     id?: string
     code: string
     name: string
     description?: string | null
-    type: $Enums.PromotionType
-    category: $Enums.PromotionCategory
+    type: $Enums.DiscountType
+    category: $Enums.DiscountCategory
     value?: Decimal | DecimalJsLike | number | string | null
     startDate?: Date | string | null
     endDate?: Date | string | null
@@ -36249,23 +36249,23 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type PromotionCreateOrConnectWithoutStudentPromotionsInput = {
-    where: PromotionWhereUniqueInput
-    create: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
+  export type DiscountCreateOrConnectWithoutStudentDiscountsInput = {
+    where: DiscountWhereUniqueInput
+    create: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
   }
 
-  export type StudentProfileUpsertWithoutStudentPromotionsInput = {
-    update: XOR<StudentProfileUpdateWithoutStudentPromotionsInput, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
-    create: XOR<StudentProfileCreateWithoutStudentPromotionsInput, StudentProfileUncheckedCreateWithoutStudentPromotionsInput>
+  export type StudentProfileUpsertWithoutStudentDiscountsInput = {
+    update: XOR<StudentProfileUpdateWithoutStudentDiscountsInput, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
+    create: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
     where?: StudentProfileWhereInput
   }
 
-  export type StudentProfileUpdateToOneWithWhereWithoutStudentPromotionsInput = {
+  export type StudentProfileUpdateToOneWithWhereWithoutStudentDiscountsInput = {
     where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutStudentPromotionsInput, StudentProfileUncheckedUpdateWithoutStudentPromotionsInput>
+    data: XOR<StudentProfileUpdateWithoutStudentDiscountsInput, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
-  export type StudentProfileUpdateWithoutStudentPromotionsInput = {
+  export type StudentProfileUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36277,14 +36277,14 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
-  export type StudentProfileUncheckedUpdateWithoutStudentPromotionsInput = {
+  export type StudentProfileUncheckedUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36296,31 +36296,31 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
-  export type PromotionUpsertWithoutStudentPromotionsInput = {
-    update: XOR<PromotionUpdateWithoutStudentPromotionsInput, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
-    create: XOR<PromotionCreateWithoutStudentPromotionsInput, PromotionUncheckedCreateWithoutStudentPromotionsInput>
-    where?: PromotionWhereInput
+  export type DiscountUpsertWithoutStudentDiscountsInput = {
+    update: XOR<DiscountUpdateWithoutStudentDiscountsInput, DiscountUncheckedUpdateWithoutStudentDiscountsInput>
+    create: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
+    where?: DiscountWhereInput
   }
 
-  export type PromotionUpdateToOneWithWhereWithoutStudentPromotionsInput = {
-    where?: PromotionWhereInput
-    data: XOR<PromotionUpdateWithoutStudentPromotionsInput, PromotionUncheckedUpdateWithoutStudentPromotionsInput>
+  export type DiscountUpdateToOneWithWhereWithoutStudentDiscountsInput = {
+    where?: DiscountWhereInput
+    data: XOR<DiscountUpdateWithoutStudentDiscountsInput, DiscountUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
-  export type PromotionUpdateWithoutStudentPromotionsInput = {
+  export type DiscountUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36329,13 +36329,13 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionUncheckedUpdateWithoutStudentPromotionsInput = {
+  export type DiscountUncheckedUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     code?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    type?: EnumPromotionTypeFieldUpdateOperationsInput | $Enums.PromotionType
-    category?: EnumPromotionCategoryFieldUpdateOperationsInput | $Enums.PromotionCategory
+    type?: EnumDiscountTypeFieldUpdateOperationsInput | $Enums.DiscountType
+    category?: EnumDiscountCategoryFieldUpdateOperationsInput | $Enums.DiscountCategory
     value?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36356,10 +36356,10 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -36375,10 +36375,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -36439,10 +36439,10 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -36458,10 +36458,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -36658,11 +36658,11 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
   }
 
   export type StudentProfileUncheckedCreateWithoutBankMandatesInput = {
@@ -36677,11 +36677,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
   }
 
   export type StudentProfileCreateOrConnectWithoutBankMandatesInput = {
@@ -36742,11 +36742,11 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutBankMandatesInput = {
@@ -36761,11 +36761,11 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
   }
 
   export type RemittanceItemUpsertWithWhereUniqueWithoutMandateInput = {
@@ -37030,10 +37030,10 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
@@ -37049,10 +37049,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    promotionRequests?: PromotionRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
     studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentPromotions?: StudentPromotionUncheckedCreateNestedManyWithoutStudentProfileInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
     bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
@@ -37101,10 +37101,10 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
@@ -37120,10 +37120,10 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    promotionRequests?: PromotionRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentPromotions?: StudentPromotionUncheckedUpdateManyWithoutStudentProfileNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
@@ -37159,7 +37159,7 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type PromotionRequestCreateManyProposedByInput = {
+  export type GraduationRequestCreateManyProposedByInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -37169,7 +37169,7 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type PromotionRequestCreateManyApprovedByInput = {
+  export type GraduationRequestCreateManyApprovedByInput = {
     id?: string
     studentProfileId: string
     proposedBeltId?: string | null
@@ -37206,27 +37206,17 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUpdateWithoutProposedByInput = {
+  export type GraduationRequestUpdateWithoutProposedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutPromotionRequestsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedPromotionsNestedInput
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
   }
 
-  export type PromotionRequestUncheckedUpdateWithoutProposedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PromotionRequestUncheckedUpdateManyWithoutProposedByInput = {
+  export type GraduationRequestUncheckedUpdateWithoutProposedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37236,17 +37226,27 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUpdateWithoutApprovedByInput = {
+  export type GraduationRequestUncheckedUpdateManyWithoutProposedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
+    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GraduationRequestUpdateWithoutApprovedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutPromotionRequestsNestedInput
-    proposedBy?: UserUpdateOneRequiredWithoutProposedPromotionsNestedInput
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
+    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
   }
 
-  export type PromotionRequestUncheckedUpdateWithoutApprovedByInput = {
+  export type GraduationRequestUncheckedUpdateWithoutApprovedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37256,7 +37256,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUncheckedUpdateManyWithoutApprovedByInput = {
+  export type GraduationRequestUncheckedUpdateManyWithoutApprovedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37295,7 +37295,7 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type PromotionRequestCreateManyStudentProfileInput = {
+  export type GraduationRequestCreateManyStudentProfileInput = {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
@@ -37330,9 +37330,9 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type StudentPromotionCreateManyStudentProfileInput = {
+  export type StudentDiscountCreateManyStudentProfileInput = {
     id?: string
-    promotionId: string
+    discountId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
@@ -37435,17 +37435,17 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUpdateWithoutStudentProfileInput = {
+  export type GraduationRequestUpdateWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    proposedBy?: UserUpdateOneRequiredWithoutProposedPromotionsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedPromotionsNestedInput
+    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
   }
 
-  export type PromotionRequestUncheckedUpdateWithoutStudentProfileInput = {
+  export type GraduationRequestUncheckedUpdateWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
@@ -37455,7 +37455,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type PromotionRequestUncheckedUpdateManyWithoutStudentProfileInput = {
+  export type GraduationRequestUncheckedUpdateManyWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
@@ -37540,23 +37540,23 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentPromotionUpdateWithoutStudentProfileInput = {
+  export type StudentDiscountUpdateWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    promotion?: PromotionUpdateOneRequiredWithoutStudentPromotionsNestedInput
+    discount?: DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput
   }
 
-  export type StudentPromotionUncheckedUpdateWithoutStudentProfileInput = {
+  export type StudentDiscountUncheckedUpdateWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
-    promotionId?: StringFieldUpdateOperationsInput | string
+    discountId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type StudentPromotionUncheckedUpdateManyWithoutStudentProfileInput = {
+  export type StudentDiscountUncheckedUpdateManyWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
-    promotionId?: StringFieldUpdateOperationsInput | string
+    discountId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -37788,28 +37788,28 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
-  export type StudentPromotionCreateManyPromotionInput = {
+  export type StudentDiscountCreateManyDiscountInput = {
     id?: string
     studentProfileId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
   }
 
-  export type StudentPromotionUpdateWithoutPromotionInput = {
+  export type StudentDiscountUpdateWithoutDiscountInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentPromotionsNestedInput
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput
   }
 
-  export type StudentPromotionUncheckedUpdateWithoutPromotionInput = {
+  export type StudentDiscountUncheckedUpdateWithoutDiscountInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type StudentPromotionUncheckedUpdateManyWithoutPromotionInput = {
+  export type StudentDiscountUncheckedUpdateManyWithoutDiscountInput = {
     id?: StringFieldUpdateOperationsInput | string
     studentProfileId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -38010,9 +38010,9 @@ export namespace Prisma {
      */
     export type FeeTierCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeeTierCountOutputTypeDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use PromotionCountOutputTypeDefaultArgs instead
+     * @deprecated Use DiscountCountOutputTypeDefaultArgs instead
      */
-    export type PromotionCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionCountOutputTypeDefaultArgs<ExtArgs>
+    export type DiscountCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DiscountCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use CashRegisterSessionCountOutputTypeDefaultArgs instead
      */
@@ -38070,9 +38070,9 @@ export namespace Prisma {
      */
     export type ProfileUpdateRequestArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ProfileUpdateRequestDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use PromotionRequestDefaultArgs instead
+     * @deprecated Use GraduationRequestDefaultArgs instead
      */
-    export type PromotionRequestArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionRequestDefaultArgs<ExtArgs>
+    export type GraduationRequestArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = GraduationRequestDefaultArgs<ExtArgs>
     /**
      * @deprecated Use FeeTierDefaultArgs instead
      */
@@ -38082,13 +38082,13 @@ export namespace Prisma {
      */
     export type StudentFeeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentFeeDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use PromotionDefaultArgs instead
+     * @deprecated Use DiscountDefaultArgs instead
      */
-    export type PromotionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = PromotionDefaultArgs<ExtArgs>
+    export type DiscountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DiscountDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use StudentPromotionDefaultArgs instead
+     * @deprecated Use StudentDiscountDefaultArgs instead
      */
-    export type StudentPromotionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentPromotionDefaultArgs<ExtArgs>
+    export type StudentDiscountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentDiscountDefaultArgs<ExtArgs>
     /**
      * @deprecated Use StudentSubscriptionDefaultArgs instead
      */

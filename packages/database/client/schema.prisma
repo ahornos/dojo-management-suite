@@ -26,22 +26,22 @@ enum Role {
   PARENT
 }
 
-/// Status for approval workflows (profile updates, promotions).
+/// Status for approval workflows (profile updates, graduations).
 enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-/// Type of promotion discount applied.
-enum PromotionType {
+/// Type of discount applied (Financial).
+enum DiscountType {
   PERCENTAGE
   FIXED_DISCOUNT
   FREE_PERIOD
 }
 
-/// Category of promotion rule.
-enum PromotionCategory {
+/// Category of discount rule (Financial).
+enum DiscountCategory {
   FAMILY
   SECURITY_FORCES
   TEMPORARY
@@ -109,9 +109,9 @@ model User {
   studentProfile  StudentProfile?
   guardianProfile Guardian?
 
-  reviewedUpdates    ProfileUpdateRequest[] @relation("ProfileUpdateReviewer")
-  proposedPromotions PromotionRequest[]     @relation("ProposedPromotions")
-  approvedPromotions PromotionRequest[]     @relation("ApprovedPromotions")
+  reviewedUpdates     ProfileUpdateRequest[] @relation("ProfileUpdateReviewer")
+  proposedGraduations GraduationRequest[]    @relation("ProposedGraduations")
+  approvedGraduations GraduationRequest[]    @relation("ApprovedGraduations")
 
   @@map("users")
 }
@@ -125,17 +125,17 @@ model StudentProfile {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guardians         StudentGuardian[]
-  ranks             StudentRank[]
-  attendances       Attendance[]
-  updateRequests    ProfileUpdateRequest[]
-  promotionRequests PromotionRequest[]
-  subscriptions     StudentSubscription[]
-  licenses          StudentLicense[]
-  studentFees       StudentFee[]
-  studentPromotions StudentPromotion[]
-  bankMandates      BankMandate[]
+  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guardians          StudentGuardian[]
+  ranks              StudentRank[]
+  attendances        Attendance[]
+  updateRequests     ProfileUpdateRequest[]
+  graduationRequests GraduationRequest[]
+  subscriptions      StudentSubscription[]
+  licenses           StudentLicense[]
+  studentFees        StudentFee[]
+  studentDiscounts   StudentDiscount[]
+  bankMandates       BankMandate[]
 
   @@map("student_profiles")
 }
@@ -254,7 +254,7 @@ model ProfileUpdateRequest {
   @@map("profile_update_requests")
 }
 
-model PromotionRequest {
+model GraduationRequest {
   id               String        @id @default(uuid())
   studentProfileId String
   proposedBeltId   String?
@@ -265,10 +265,10 @@ model PromotionRequest {
   createdAt        DateTime      @default(now())
 
   studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  proposedBy     User           @relation("ProposedPromotions", fields: [proposedById], references: [id])
-  approvedBy     User?          @relation("ApprovedPromotions", fields: [approvedById], references: [id])
+  proposedBy     User           @relation("ProposedGraduations", fields: [proposedById], references: [id])
+  approvedBy     User?          @relation("ApprovedGraduations", fields: [approvedById], references: [id])
 
-  @@map("promotion_requests")
+  @@map("graduation_requests")
 }
 
 /// ---------------------------------------------------------
@@ -311,39 +311,39 @@ model StudentFee {
   @@map("student_fees")
 }
 
-/// Discount rules and special promotional campaigns.
-model Promotion {
-  id          String            @id @default(uuid())
-  code        String            @unique
+/// Discount rules and special promotional campaigns (Financial).
+model Discount {
+  id          String           @id @default(uuid())
+  code        String           @unique
   name        String
   description String?
-  type        PromotionType
-  category    PromotionCategory
-  value       Decimal?          @db.Decimal(10, 2) /// Percentage value or fixed discount amount
+  type        DiscountType
+  category    DiscountCategory
+  value       Decimal?         @db.Decimal(10, 2) /// Percentage value or fixed discount amount
   startDate   DateTime?
   endDate     DateTime?
-  isActive    Boolean           @default(true)
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  isActive    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
-  studentPromotions StudentPromotion[]
+  studentDiscounts StudentDiscount[]
 
-  @@map("promotions")
+  @@map("discounts")
 }
 
-/// Mapping of active promotions assigned to student profiles.
-model StudentPromotion {
+/// Mapping of active financial discounts assigned to student profiles.
+model StudentDiscount {
   id               String    @id @default(uuid())
   studentProfileId String
-  promotionId      String
+  discountId       String
   assignedAt       DateTime  @default(now())
   expiresAt        DateTime?
 
   studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  promotion      Promotion      @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  discount       Discount       @relation(fields: [discountId], references: [id], onDelete: Cascade)
 
-  @@unique([studentProfileId, promotionId])
-  @@map("student_promotions")
+  @@unique([studentProfileId, discountId])
+  @@map("student_discounts")
 }
 
 /// Subscription tracking linking students to fee tiers.
