@@ -2,6 +2,13 @@
 
 This guide outlines the standard operating procedure for a complete, clean initialization of the DMS monorepo. Following this sequence guarantees an idempotent deployment, ensuring that all microservices, databases, and test suites run successfully without ghost data or caching conflicts.
 
+## 0. Environment Variables Configuration
+Before spinning up the infrastructure, ensure your environment variables are configured in your `.env` files at the root and service levels:
+- `DEFAULT_SUPER_ADMIN_EMAIL`: Email address for the initial platform super administrator[cite: 6].
+- `DEFAULT_SUPER_ADMIN_PASSWORD`: Secure password for the initial super administrator[cite: 6].
+- `VITE_DEFAULT_TENANT_ID`: Default multi-tenant school identifier (e.g., `fox-jiujitsu-academy`).
+- `ALLOWED_ORIGINS`: Allowed CORS origins for the frontend and gateway (e.g., `http://localhost:5173,http://localhost:4200`).
+
 ## 1. Environment Reset (Clean Slate)
 To prevent conflicts with previous localized states, orphaned Docker networks, or outdated Prisma artifacts, execute a full tear-down.
 
@@ -31,8 +38,8 @@ docker compose up --build --force-recreate -d
 ```
 > **_NOTE:_** Wait approximately 10–15 seconds for the PostgreSQL container to pass its health checks.
 
-## 4. Shared Types Compilation & Database Hydration (Critical)
-Do not run tests or build microservices before this step. The shared package must be compiled first so that microservices can resolve path aliases, and the database schema must be fully synchronized.
+## 4. Shared Types Compilation, Database Hydration & SUPER_ADMIN Seeding (Critical)
+Do not run tests or build microservices before this step. The shared package must be compiled first so that microservices can resolve path aliases, the database schema must be fully synchronized, and the default super administrator account must be provisioned.
 
 ```bash
 # 1. Build the shared types package (generates /dist required for TypeScript path aliasing)
@@ -43,6 +50,9 @@ pnpm --filter @dms/database db:push
 
 # 3. Generate the Prisma Client typings for TypeScript compilation
 pnpm --filter @dms/database exec prisma generate
+
+# 4. Provision the initial SUPER_ADMIN user via the seeding script using environment variables
+docker exec -it dms-auth-service pnpm ts-node src/prisma/seed.ts
 ```
 
 ## 5. Validation & Test Suites
