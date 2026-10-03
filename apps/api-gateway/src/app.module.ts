@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ProxyModule } from './proxy/proxy.module';
+import { AuthController } from './auth/auth.controller';
 import { AcademicController } from './academic/academic.controller';
 import { FinancialController } from './financial/financial.controller';
 
@@ -31,6 +32,7 @@ import { FinancialController } from './financial/financial.controller';
     ProxyModule,
   ],
   controllers: [
+    AuthController,
     AcademicController,
     FinancialController,
   ],

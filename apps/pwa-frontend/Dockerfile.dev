@@ -1,0 +1,15 @@
+# Base image: Node.js 20 on Alpine Linux for a secure, lightweight footprint
+FROM node:20-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install pnpm globally to manage workspace dependencies
+RUN npm install -g pnpm
+
+# Expose the Vite default port
+EXPOSE 5173
+
+# Start the Vite development server. 
+# Note: Source code and node_modules will be mounted as volumes via docker-compose.
+CMD ["pnpm", "run", "dev"]

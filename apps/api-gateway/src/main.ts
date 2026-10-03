@@ -16,7 +16,7 @@ async function bootstrap() {
   app.use(helmet());
 
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:4200'], 
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:5173'], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-School-Id'],
