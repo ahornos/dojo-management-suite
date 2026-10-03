@@ -55,6 +55,7 @@ Verify the isolated business logic of each microservice:
 pnpm --filter auth-service test
 pnpm --filter academic-service test
 pnpm --filter financial-service test
+pnpm --filter api-gateway test
 ```
 
 ### End-to-End (E2E) Tests
@@ -64,6 +65,7 @@ Verify network boundaries, database connectivity, and HTTP request filters:
 pnpm --filter auth-service test:e2e
 pnpm --filter academic-service test:e2e
 pnpm --filter financial-service test:e2e
+pnpm --filter api-gateway test:e2e
 ```
 
 ## 6. Accessing the Microservices & Swagger UI
@@ -71,7 +73,7 @@ Once all tests pass successfully, the microservices are fully operational:
 
 | Microservice       | Internal Port | External Mapping | Swagger Documentation URL |
 |---                 | ---           |---               |--- 
-| API Gateway        |	3000	     | 3000	            | -                         |
+| API Gateway        |	3000	     | 3000	            | [http://localhost:3000/api/docs](http://localhost:3000/api/docs) |                         |
 | Auth Service       |	3000	     | 3001	            | [http://localhost:3001/api/docs](http://localhost:3001/api/docs) |
 | Academic Service   |	3000	     | 3002	            | [http://localhost:3002/api/docs](http://localhost:3002/api/docs) |
 | Financial Service  |	3000	     | 3003	            | [http://localhost:3003/api/docs](http://localhost:3003/api/docs) |
