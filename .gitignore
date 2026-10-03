@@ -20,6 +20,8 @@ build/
 .cache/
 *.tsbuildinfo
 .eslintcache
+# Prisma Client (custom output)
+packages/database/client/
 
 ==========================================
 
