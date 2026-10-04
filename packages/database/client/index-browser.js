@@ -128,6 +128,15 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   firstName: 'firstName',
   lastName: 'lastName',
+  dni: 'dni',
+  birthDate: 'birthDate',
+  phone: 'phone',
+  address: 'address',
+  city: 'city',
+  state: 'state',
+  postalCode: 'postalCode',
+  country: 'country',
+  isActive: 'isActive',
   role: 'role',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -139,6 +148,10 @@ exports.Prisma.StudentProfileScalarFieldEnum = {
   birthDate: 'birthDate',
   phone: 'phone',
   address: 'address',
+  city: 'city',
+  state: 'state',
+  postalCode: 'postalCode',
+  country: 'country',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

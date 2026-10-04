@@ -8,9 +8,13 @@
     "db:push": "prisma db push"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "^5.22.0",
+    "bcrypt": "^6.0.0"
   },
   "devDependencies": {
-    "prisma": "^5.22.0"
+    "@types/bcrypt": "^6.0.0",
+    "csv-parser": "^3.2.1",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2"
   }
 }

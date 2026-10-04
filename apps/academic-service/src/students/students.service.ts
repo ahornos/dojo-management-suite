@@ -1,10 +1,14 @@
+/**
+ * @file students.service.ts
+ * @description Service handling student profile operations with strict data isolation.
+ */
+
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@dms/shared-types';
+import * as bcrypt from 'bcrypt';
+import { CreateStudentDto } from './dto/create-student.dto';
 
-/**
- * Service handling student profile operations with strict data isolation.
- */
 @Injectable()
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
@@ -41,11 +45,56 @@ export class StudentsService {
 
     return student;
   }
+  
+  /**
+   * Creates a new student profile and its associated user account.
+   * Uses a Prisma transaction to ensure atomicity.
+   * 
+   * @param createStudentDto - The validated data to create the student.
+   * @returns The newly created student profile with minimal user data.
+   */
+  async create(createStudentDto: CreateStudentDto) {
+    const defaultPassword = 'ChangeMe123!';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: createStudentDto.email,
+          firstName: createStudentDto.firstName,
+          lastName: createStudentDto.lastName,
+          passwordHash: hashedPassword,
+          role: Role.STUDENT,
+        },
+      });
+
+      const studentProfile = await tx.studentProfile.create({
+        data: {
+          userId: user.id,
+          phone: createStudentDto.phone || null,
+          address: createStudentDto.address || null,
+          city: createStudentDto.city || null,
+          state: createStudentDto.state || null,
+          postalCode: createStudentDto.postalCode || null,
+          country: createStudentDto.country || 'ES',
+          birthDate: createStudentDto.birthDate ? new Date(createStudentDto.birthDate) : null,
+        },
+      });
+
+      return {
+        id: studentProfile.id,
+        user: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+        }
+      };
+    });
+  }
 
   /**
    * Updates a student profile.
-   * - Staff members execute direct database updates.
-   * - Students/Parents generate a pending ProfileUpdateRequest.
+   * Staff members execute direct updates; students generate a pending ProfileUpdateRequest.
    * 
    * @param id - Student Profile UUID.
    * @param updateData - JSON object with the requested changes.
@@ -53,7 +102,6 @@ export class StudentsService {
    */
   async updateProfile(id: string, updateData: any, requestUser: any) {
     const student = await this.findOne(id, requestUser);
-
     const isStaff = [Role.SUPER_ADMIN, Role.ADMIN_STAFF].includes(requestUser.role);
 
     if (!isStaff) {
@@ -70,14 +118,17 @@ export class StudentsService {
       data: {
         phone: updateData.phone,
         address: updateData.address,
-        birthDate: updateData.birthDate,
+        city: updateData.city,
+        state: updateData.state,
+        postalCode: updateData.postalCode,
+        country: updateData.country,
+        birthDate: updateData.birthDate ? new Date(updateData.birthDate) : undefined,
       },
     });
   }
 
   /**
    * Retrieves all student profiles.
-   * Restricted to Staff roles only via controller.
    */
   async findAll() {
     return this.prisma.studentProfile.findMany({
@@ -89,11 +140,9 @@ export class StudentsService {
 
   /**
    * Deletes a student profile from the database.
-   * Restricted strictly to super administrators.
    * 
    * @param id - Student Profile UUID.
    * @returns The deleted student profile record.
-   * @throws NotFoundException if the student profile does not exist.
    */
   async remove(id: string) {
     const student = await this.prisma.studentProfile.findUnique({

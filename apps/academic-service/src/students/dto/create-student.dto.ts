@@ -1,4 +1,10 @@
-import { IsEmail, IsOptional, IsString, IsDateString, ValidateNested, IsEnum } from 'class-validator';
+/**
+ * @file create-student.dto.ts
+ * @description Data Transfer Object for creating a new student profile.
+ * Implements strict validation and Swagger API documentation.
+ */
+
+import { IsEmail, IsOptional, IsString, IsDateString, ValidateNested, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -58,10 +64,21 @@ export class CreateStudentDto {
   @IsString()
   city?: string;
 
+  @ApiPropertyOptional({ example: 'Barcelona' })
+  @IsOptional()
+  @IsString()
+  state?: string;
+
   @ApiPropertyOptional({ example: '08001' })
   @IsOptional()
   @IsString()
   postalCode?: string;
+
+  @ApiPropertyOptional({ example: 'ES', description: 'ISO 3166-1 alpha-2 country code' })
+  @IsOptional()
+  @IsString()
+  @Length(2, 2)
+  country?: string;
 
   @ApiPropertyOptional({ example: '2012-05-15T00:00:00.000Z', description: 'Birth date, useful to determine if student is a minor' })
   @IsOptional()

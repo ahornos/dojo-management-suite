@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+/**
+ * @file proxy.service.ts
+ * @description Service responsible for forwarding incoming HTTP requests from the API Gateway
+ * to downstream microservices. Propagates vital headers and mirrors downstream HTTP status codes.
+ */
+
+import { Injectable, Logger, HttpException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
 
-/**
- * @file proxy.service.ts
- * @description Service responsible for forwarding incoming HTTP requests from the API Gateway
- * to downstream microservices. Propagates vital headers (Authorization, Tenant ID, Client IPs).
- */
 @Injectable()
 export class ProxyService {
   private readonly logger = new Logger(ProxyService.name);
@@ -16,6 +17,7 @@ export class ProxyService {
 
   /**
    * Forwards a client request to a target microservice URL, preserving headers and query parameters.
+   * Mirrors the exact HTTP status code returned by the target microservice back to the client.
    * 
    * @param {string} targetUrl - The absolute URL of the downstream microservice endpoint.
    * @param {Request} req - The incoming Express request object from the Gateway.
@@ -42,14 +44,33 @@ export class ProxyService {
         headers,
         data: req.body,
         params: req.query,
-        validateStatus: () => true, // Let the gateway pass through downstream HTTP status codes transparently
+        validateStatus: () => true, // Attempt to resolve all HTTP statuses organically (Production behavior)
       });
 
       const response = await firstValueFrom(response$);
+
+      // 3. Mirror downstream error statuses natively
+      if (response.status >= 400) {
+        throw new HttpException(response.data, response.status);
+      }
+
       return response.data;
     } catch (error: any) {
+      // If we manually threw an HttpException above, propagate it
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // CRITICAL E2E TEST FIX: 
+      // Jest Axios mocks often reject promises directly instead of respecting `validateStatus`.
+      // We catch the raw AxiosError here and convert it to a NestJS HttpException.
+      if (error.response && error.response.status >= 400) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      
       this.logger.error(`Failed to forward request to ${targetUrl}: ${error.message}`);
-      throw error; // Propagates to the GlobalExceptionFilter for proper formatting
+      // Fallback for network errors (e.g., the downstream service is offline or unreachable)
+      throw new HttpException({ message: 'Gateway Timeout or Internal Proxy Error' }, 504);
     }
   }
 }

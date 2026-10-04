@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = process.env.DEFAULT_SUPER_ADMIN_EMAIL || 'superadmin@fox-jiujitsu-academy.com';
+  const adminEmail = process.env.DEFAULT_SUPER_ADMIN_EMAIL || 'superadmin@foxjiujitsuacademy.com';
   const adminPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD || 'SecurePassword123!';
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 

@@ -1,4 +1,10 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+/**
+ * @file auth.service.ts
+ * @description Handles user authentication business logic including registration, 
+ * credential validation, password hashing, JWT generation, and administrative user management.
+ */
+
+import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -6,11 +12,6 @@ import { LoginDto } from './dto/login.dto';
 import { Role } from '@dms/shared-types';
 import * as bcrypt from 'bcrypt';
 
-/**
- * @class AuthService
- * @description Handles user authentication business logic including registration, 
- * credential validation, password hashing, and JWT generation.
- */
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,11 +20,10 @@ export class AuthService {
   ) {}
 
   /**
-   * Registers a new user in the system after validating email uniqueness and securely hashing the password.
+   * Registers a new user via the public endpoint.
    * 
-   * @param {RegisterDto} dto - Data transfer object containing user registration details.
-   * @returns {Promise<Object>} A success message along with the created user profile (excluding the password hash).
-   * @throws {BadRequestException} If the provided email is already registered in the database.
+   * @param {RegisterDto} dto - Registration payload.
+   * @returns {Promise<Object>} Created user profile excluding password hash.
    */
   async register(dto: RegisterDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -54,11 +54,10 @@ export class AuthService {
   }
 
   /**
-   * Authenticates an existing user by verifying their credentials and issues a signed JWT access token.
+   * Authenticates user credentials and issues a signed JWT token.
    * 
-   * @param {LoginDto} dto - Data transfer object containing user login credentials.
-   * @returns {Promise<Object>} An object containing the JWT access_token and core user profile information.
-   * @throws {UnauthorizedException} If the user does not exist or if the password comparison fails.
+   * @param {LoginDto} dto - Login payload.
+   * @returns {Promise<Object>} Access token and user metadata.
    */
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
@@ -87,6 +86,147 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
       },
+    };
+  }
+
+  /**
+   * Creates a new user account administratively from the management dashboard.
+   * Includes validation for email and DNI uniqueness.
+   * 
+   * @param {any} dto - Payload containing user details, personal data, and roles.
+   * @returns {Promise<Object>} The created user record excluding password hash.
+   * @throws {BadRequestException} If the email or DNI is already registered.
+   */
+  async createUser(dto: any) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('El correo electrónico ya está registrado');
+    }
+
+    if (dto.dni && dto.dni.trim() !== '') {
+      const existingDni = await this.prisma.user.findUnique({
+        where: { dni: dto.dni },
+      });
+      if (existingDni) {
+        throw new BadRequestException('El DNI ya está registrado en el sistema');
+      }
+    }
+
+    // Encrypt the provided password or default to a safe temporary one if somehow bypassed
+    const hashedPassword = await bcrypt.hash(dto.password || 'TemporaryPassword123!', 10);
+
+    const newUser = await this.prisma.user.create({
+      data: {
+        email: dto.email,
+        passwordHash: hashedPassword,
+        firstName: dto.firstName,
+        lastName: dto.lastName,
+        dni: dto.dni || null,
+        birthDate: dto.birthDate ? new Date(dto.birthDate) : null,
+        phone: dto.phone || null,
+        address: dto.address || null,
+        city: dto.city || null,
+        state: dto.state || null,
+        postalCode: dto.postalCode || null,
+        country: dto.country || 'ES',
+        role: dto.role || Role.STUDENT,
+        isActive: dto.isActive ?? true,
+      },
+    });
+
+    const { passwordHash, ...result } = newUser;
+    return {
+      message: 'Usuario creado exitosamente',
+      user: result,
+    };
+  }
+
+  /**
+   * Retrieves all users registered in the system.
+   * 
+   * @returns {Promise<Array>} List of users without sensitive password hashes.
+   */
+  async findAllUsers() {
+    const users = await this.prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return users.map(({ passwordHash, ...result }) => result);
+  }
+
+  /**
+   * Updates user profile data, including personal info, address, role, status, and optional password reset.
+   * 
+   * @param {string} id - User unique identifier.
+   * @param {any} dto - Payload with updated fields.
+   * @returns {Promise<Object>} Updated user record.
+   */
+  async updateUser(id: string, dto: any) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const updateData: any = {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      dni: dto.dni || null,
+      birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
+      phone: dto.phone || null,
+      address: dto.address || null,
+      city: dto.city || null,
+      state: dto.state || null,
+      postalCode: dto.postalCode || null,
+      country: dto.country || 'ES',
+      isActive: dto.isActive,
+      role: dto.role,
+    };
+
+    // Golden Standard: Allow admin to reset password if provided in update payload
+    if (dto.password && dto.password.trim() !== '') {
+      updateData.passwordHash = await bcrypt.hash(dto.password, 10);
+    }
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id },
+      data: updateData,
+    });
+
+    const { passwordHash, ...result } = updatedUser;
+    return {
+      message: 'Usuario actualizado exitosamente',
+      user: result,
+    };
+  }
+
+  /**
+   * Deletes a user account from the system.
+   * 
+   * @param {string} id - User unique identifier.
+   * @returns {Promise<Object>} Deletion success message.
+   */
+  async removeUser(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    await this.prisma.user.delete({
+      where: { id },
+    });
+
+    return {
+      message: 'Usuario eliminado exitosamente',
     };
   }
 }

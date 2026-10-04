@@ -1,0 +1,98 @@
+{
+  "sidebar": {
+    "title": "DMS Workspace",
+    "dashboard": "Dashboard",
+    "users": "Usuarios",
+    "students": "Alumnos",
+    "attendances": "Asistencia",
+    "graduations": "Graduaciones",
+    "financial": "Finanzas"
+  },
+  "header": {
+    "control_panel": "Panel de Control",
+    "logout": "Cerrar Sesión"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados."
+  },
+  "dashboard": {
+    "welcome": "Bienvenido al área privada."
+  },
+  "modules": {
+    "attendances": "Módulo de Asistencia",
+    "graduations": "Módulo de Graduaciones",
+    "financial": "Módulo de Finanzas"
+  },
+  "users": {
+    "title": "Gestión de Usuarios",
+    "subtitle": "Administra las cuentas de acceso, roles y datos personales del personal y socios.",
+    "search_placeholder": "Buscar por nombre o correo electrónico...",
+    "table_user": "Usuario",
+    "table_role": "Rol",
+    "table_dni_phone": "DNI / Teléfono",
+    "table_status": "Estado",
+    "table_actions": "Acciones",
+    "loading": "Cargando usuarios...",
+    "error": "Error al cargar los usuarios del sistema.",
+    "edit": "Editar",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "no_dni": "Sin DNI",
+    "no_phone": "Sin teléfono",
+    "edit_modal_title": "Editar Usuario",
+    "first_name": "Nombre",
+    "last_name": "Apellidos",
+    "email": "Correo Electrónico",
+    "dni": "DNI",
+    "phone": "Teléfono",
+    "role": "Rol del Sistema",
+    "status_label": "Estado de la Cuenta",
+    "address_section": "Dirección Postal",
+    "address": "Calle, número, piso",
+    "city": "Localidad",
+    "state": "Provincia / Estado",
+    "postal_code": "Código Postal",
+    "country": "País",
+    "password_section": "Seguridad y Contraseña",
+    "password": "Nueva Contraseña (Opcional)",
+    "password_hint": "Déjalo en blanco si no deseas modificar la contraseña actual.",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "save": "Guardar Cambios",
+    "new_user": "+ Nuevo Usuario",
+    "create_modal_title": "Dar de alta nuevo usuario",
+    "password": "Contraseña Temporal",
+    "password_hint": "Contraseña inicial para el acceso del usuario a la plataforma."
+  },
+  "students": {
+    "title": "Gestión de Alumnos",
+    "new_student": "+ Nuevo Alumno",
+    "loading": "Cargando alumnos...",
+    "error": "Error al cargar los alumnos.",
+    "create_title": "Dar de alta nuevo alumno",
+    "first_name": "Nombre *",
+    "last_name": "Apellidos *",
+    "email": "Correo Electrónico *",
+    "phone": "Teléfono",
+    "address": "Calle, número, piso",
+    "postal_code": "C.P.",
+    "country": "País",
+    "city": "Localidad",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "save": "Guardar Alumno",
+    "no_students": "No hay alumnos registrados.",
+    "active": "Activo",
+    "address_section": "Dirección Postal"
+  },
+  "login": {
+    "title": "Dojo Management Suite",
+    "subtitle": "Introduce tus credenciales para acceder a la plataforma",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "submit": "Iniciar Sesión",
+    "show_password": "Mostrar contraseña",
+    "hide_password": "Ocultar contraseña",
+    "error": "Error al iniciar sesión. Comprueba tus credenciales."
+  }
+}

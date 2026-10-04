@@ -1,3 +1,7 @@
+# ==============================================================================
+# DOJO MANAGEMENT SUITE (DMS) - DOCKER COMPOSE ORCHESTRATION
+# ==============================================================================
+
 services:
   # ---------------------------------------------------------
   # Database & Message Broker
@@ -52,11 +56,8 @@ services:
     volumes:
       - ./apps/api-gateway/src:/app/apps/api-gateway/src
       - ./packages:/app/packages
-    environment:
-      - PORT=3000
-      - AUTH_SERVICE_URL=http://auth-service:3000
-      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4200
-      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
+    env_file:
+      - .env
     command: pnpm --filter api-gateway start:dev
     networks:
       - dms-network
@@ -76,8 +77,8 @@ services:
     volumes:
       - ./apps/auth-service/src:/app/apps/auth-service/src
       - ./packages:/app/packages
-    environment:
-      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
+    env_file:
+      - .env
     networks:
       - dms-network
     depends_on:
@@ -97,8 +98,8 @@ services:
     volumes:
       - ./apps/academic-service/src:/app/apps/academic-service/src
       - ./packages:/app/packages
-    environment:
-      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
+    env_file:
+      - .env
     networks:
       - dms-network
     depends_on:
@@ -118,8 +119,8 @@ services:
     volumes:
       - ./apps/financial-service/src:/app/apps/financial-service/src
       - ./packages:/app/packages
-    environment:
-      - DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
+    env_file:
+      - .env
     networks:
       - dms-network
     depends_on:
@@ -140,10 +141,10 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      # Mount source code for HMR (Hot Module Replacement)
       - ./apps/pwa-frontend:/app
-      # Mask local node_modules to avoid cross-platform binary conflicts (Host vs Alpine)
       - /app/node_modules
+    env_file:
+      - .env
     networks:
       - dms-network
     depends_on:

@@ -1,60 +1,94 @@
-import axios from 'axios';
-import { useAuthStore } from '../store/useAuthStore';
-
 /**
  * @file api.ts
- * @description Centralized Axios HTTP client configuration for the DMS frontend.
- * Implements request interceptors for JWT and Tenant ID injection, and response
- * interceptors for global error handling (e.g., session expiration).
+ * @description Configures the global Axios instance for the frontend.
+ * Implements request interceptors for JWT injection and response interceptors 
+ * for centralized error and session management.
  */
 
+import axios from 'axios';
+import { useAuthStore } from '@/store/useAuthStore';
+
 /**
- * The pre-configured Axios instance to be used for all internal API requests.
+ * Pre-configured Axios instance pointing to the API Gateway.
  * 
- * @constant apiClient
+ * @constant
  */
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: 'http://localhost:3000/api', // Points directly to the API Gateway routes
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 seconds timeout limit
 });
 
 /**
- * Request Interceptor
- * Injects the `Authorization` header with the JWT and the `X-School-Id` header 
- * with the current tenant identifier before every request leaves the client.
+ * Request Interceptor: Injects the JWT authorization token into outgoing requests 
+ * if available in the global auth store or local storage.
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Retrieve state outside of the React component lifecycle
-    const { token, tenantId } = useAuthStore.getState();
+    // 1. Try to get token directly from Zustand state
+    let token = useAuthStore.getState().token;
+
+    // 2. Fallback: Parse Zustand's persisted storage in localStorage if not in memory
+    if (!token) {
+      try {
+        const persistedStore = localStorage.getItem('dms-auth-storage');
+        if (persistedStore) {
+          const parsed = JSON.parse(persistedStore);
+          token = parsed?.state?.token;
+        }
+      } catch (e) {
+        console.error('Failed to parse auth storage', e);
+      }
+    }
+
+    // 3. Ultimate fallback to raw token item
+    if (!token) {
+      token = localStorage.getItem('token');
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    if (tenantId) {
-      config.headers['X-School-Id'] = tenantId;
-    }
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 /**
- * Response Interceptor
- * Captures global HTTP errors. Specifically handles 401 Unauthorized errors 
- * by wiping the local session state and redirecting the user to the login view.
+ * Response Interceptor: Handles global error responses.
+ * Detects both proper HTTP errors and proxy-swallowed errors (200 OK with error payload).
  */
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+  (response) => {
+    // Defensive check: If the API Gateway swallows a 401/403 and returns it as a 200 OK body
+    if (response.data && (response.data.statusCode === 401 || response.data.statusCode === 403)) {
+      useAuthStore.getState().clearAuth();
+      localStorage.removeItem('token');
+      
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+      return Promise.reject(new Error(response.data.message || 'Unauthorized API Gateway response'));
     }
+    
+    return response;
+  },
+  (error) => {
+    // Standard HTTP error handling
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      useAuthStore.getState().clearAuth();
+      localStorage.removeItem('token');
+
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+
     return Promise.reject(error);
   }
 );

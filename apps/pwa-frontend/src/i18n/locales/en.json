@@ -1,0 +1,98 @@
+{
+  "sidebar": {
+    "title": "DMS Workspace",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "students": "Students",
+    "attendances": "Attendances",
+    "graduations": "Graduations",
+    "financial": "Financial"
+  },
+  "header": {
+    "control_panel": "Control Panel",
+    "logout": "Log Out"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  },
+  "dashboard": {
+    "welcome": "Welcome to the private area."
+  },
+  "modules": {
+    "attendances": "Attendance Module",
+    "graduations": "Graduations Module",
+    "financial": "Financial Module"
+  },
+  "users": {
+    "title": "User Management",
+    "subtitle": "Manage access accounts, roles, and personal data of staff and members.",
+    "search_placeholder": "Search by name or email...",
+    "table_user": "User",
+    "table_role": "Role",
+    "table_dni_phone": "DNI / Phone",
+    "table_status": "Status",
+    "table_actions": "Actions",
+    "loading": "Loading users...",
+    "error": "Error loading system users.",
+    "edit": "Edit",
+    "active": "Active",
+    "inactive": "Inactive",
+    "no_dni": "No DNI",
+    "no_phone": "No phone",
+    "edit_modal_title": "Edit User",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email Address",
+    "dni": "DNI",
+    "phone": "Phone",
+    "role": "System Role",
+    "status_label": "Account Status",
+    "address_section": "Postal Address",
+    "address": "Street, number, apartment",
+    "city": "City",
+    "state": "State / Province",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "password_section": "Security & Password",
+    "password": "New Password (Optional)",
+    "password_hint": "Leave blank if you do not want to change the current password.",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save Changes",
+    "new_user": "+ New User",
+    "create_modal_title": "Register New User",
+    "password": "Temporary Password",
+    "password_hint": "Initial password for the user to access the platform."
+  },
+  "students": {
+    "title": "Student Management",
+    "new_student": "+ New Student",
+    "loading": "Loading students...",
+    "error": "Error loading students.",
+    "create_title": "Register New Student",
+    "first_name": "First Name *",
+    "last_name": "Last Name *",
+    "email": "Email *",
+    "phone": "Phone",
+    "address": "Street, number, apartment",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "city": "City",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save Student",
+    "no_students": "No students registered.",
+    "active": "Active",
+    "address_section": "Postal Address"
+  },
+  "login": {
+    "title": "Dojo Management Suite",
+    "subtitle": "Enter your credentials to access the platform",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Log In",
+    "show_password": "Show password",
+    "hide_password": "Hide password",
+    "error": "Login error. Please check your credentials."
+  }
+}

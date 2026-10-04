@@ -1,16 +1,18 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
+/**
+ * @file students.controller.ts
+ * @description Controller for managing student profiles and personal data updates.
+ * Implements data ownership, conditional approval workflows, and administrative deletions.
+ */
+
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '@dms/shared-types';
+import { CreateStudentDto } from './dto/create-student.dto';
 
-/**
- * @class StudentsController
- * @description Controller for managing student profiles and personal data updates.
- * Implements data ownership, conditional approval workflows, and administrative deletions.
- */
 @ApiTags('Student Management')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,6 +41,19 @@ export class StudentsController {
   @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
   async findOne(@Param('id') id: string, @Req() req: any) {
     return this.studentsService.findOne(id, req.user);
+  }
+
+  /**
+   * @description Creates a new student profile. Strictly limited to staff members.
+   * @param {CreateStudentDto} createStudentDto - The payload for the new student.
+   * @returns {Promise<any>} The newly created student profile.
+   */
+  @Post()
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
+  @ApiOperation({ summary: 'Create a new student (Staff only)' })
+  @ApiResponse({ status: 201, description: 'Student successfully created.' })
+  async create(@Body() createStudentDto: CreateStudentDto) {
+    return this.studentsService.create(createStudentDto);
   }
 
   /**

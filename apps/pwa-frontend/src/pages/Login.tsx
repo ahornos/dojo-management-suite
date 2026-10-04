@@ -6,22 +6,17 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/useAuthStore";
 import { apiClient } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 
-/**
- * Login component renders the authentication form, manages state for credentials,
- * toggles password visibility, and interacts with the authentication backend.
- * 
- * @component
- * @returns {JSX.Element} The rendered login page layout.
- */
 export function Login(): JSX.Element {
+  const { t } = useTranslation();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -30,53 +25,50 @@ export function Login(): JSX.Element {
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
 
-  /**
-   * Handles form submission, authenticates credentials via the API client,
-   * saves session data in the global auth store, and redirects to the dashboard.
-   * 
-   * @async
-   * @function handleLogin
-   * @param {React.FormEvent} e - The form submission event.
-   * @returns {Promise<void>}
-   */
   const handleLogin = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     try {
       setError("");
-      const response = await apiClient.post("/auth/login", { email, password });
-      const { accessToken, user } = response.data;
       
-      setAuth(accessToken, user);
+      const response = await apiClient.post("/auth/login", { email, password });
+      const { access_token, user } = response.data;
+      
+      setAuth(access_token, user);
+      localStorage.setItem("token", access_token);
+      
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error al iniciar sesión. Comprueba tus credenciales.");
+      setError(err.response?.data?.message || t('login.error'));
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background relative px-4">
+      
+      {error && (
+        <div className="absolute top-10 flex items-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-red-600 rounded-md shadow-lg animate-in fade-in slide-in-from-top-5">
+          <AlertCircle className="h-5 w-5" />
+          <span>{error}</span>
+        </div>
+      )}
+
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Dojo Management Suite</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">{t('login.title')}</CardTitle>
           <CardDescription className="text-center">
-            Introduce tus credenciales para acceder a la plataforma
+            {t('login.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-                {error}
-              </div>
-            )}
             
             <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
+              <Label htmlFor="email">{t('login.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="superadmin@fox-jiujitsu.com"
+                placeholder="superadmin@fox-jiujitsu-academy.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -84,7 +76,7 @@ export function Login(): JSX.Element {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">{t('login.password')}</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -100,7 +92,7 @@ export function Login(): JSX.Element {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -111,8 +103,8 @@ export function Login(): JSX.Element {
               </div>
             </div>
 
-            <Button type="submit" className="w-full">
-              Iniciar Sesión
+            <Button type="submit" className="w-full mt-2">
+              {t('login.submit')}
             </Button>
           </form>
         </CardContent>

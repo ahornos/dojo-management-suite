@@ -1,0 +1,98 @@
+{
+  "sidebar": {
+    "title": "DMS Workspace",
+    "dashboard": "Tauler de Control",
+    "users": "Usuaris",
+    "students": "Alumnes",
+    "attendances": "Assistència",
+    "graduations": "Graduacions",
+    "financial": "Finances"
+  },
+  "header": {
+    "control_panel": "Tauler de Control",
+    "logout": "Tancar Sessió"
+  },
+  "footer": {
+    "rights": "Tots els drets reservats."
+  },
+  "dashboard": {
+    "welcome": "Benvingut a l'àrea privada."
+  },
+  "modules": {
+    "attendances": "Mòdul d'Assistència",
+    "graduations": "Mòdul de Graduacions",
+    "financial": "Mòdul de Finances"
+  },
+  "users": {
+    "title": "Gestió d'Usuaris",
+    "subtitle": "Administra els comptes d'accés, rols i dades personals del personal i socis.",
+    "search_placeholder": "Cercar per nom o correu electrònic...",
+    "table_user": "Usuari",
+    "table_role": "Rol",
+    "table_dni_phone": "DNI / Telèfon",
+    "table_status": "Estat",
+    "table_actions": "Accions",
+    "loading": "Carregant usuaris...",
+    "error": "Error en carregar els usuaris del sistema.",
+    "edit": "Editar",
+    "active": "Actiu",
+    "inactive": "Inactiu",
+    "no_dni": "Sense DNI",
+    "no_phone": "Sense telèfon",
+    "edit_modal_title": "Editar Usuari",
+    "first_name": "Nom",
+    "last_name": "Cognoms",
+    "email": "Correu Electrònic",
+    "dni": "DNI",
+    "phone": "Telèfon",
+    "role": "Rol del Sistema",
+    "status_label": "Estat del Compte",
+    "address_section": "Adreça Postal",
+    "address": "Carrer, número, pis",
+    "city": "Localitat",
+    "state": "Província / Estat",
+    "postal_code": "Codi Postal",
+    "country": "País",
+    "password_section": "Seguretat i Contrasenya",
+    "password": "Nova Contrasenya (Opcional)",
+    "password_hint": "Deixa-ho en blanc si no vols modificar la contrasenya actual.",
+    "cancel": "Cancel·lar",
+    "saving": "Desant...",
+    "save": "Desar Canvis",
+    "new_user": "+ Nou Usuari",
+    "create_modal_title": "Donar d'alta nou usuari",
+    "password": "Contrasenya Temporal",
+    "password_hint": "Contrasenya inicial per a l'accés de l'usuari a la plataforma."
+  },
+  "students": {
+    "title": "Gestió d'Alumnes",
+    "new_student": "+ Nou Alumne",
+    "loading": "Carregant alumnes...",
+    "error": "Error en carregar els alumnes.",
+    "create_title": "Donar d'alta nou alumne",
+    "first_name": "Nom *",
+    "last_name": "Cognoms *",
+    "email": "Correu Electrònic *",
+    "phone": "Telèfon",
+    "address": "Carrer, número, pis",
+    "postal_code": "C.P.",
+    "country": "País",
+    "city": "Localitat",
+    "cancel": "Cancel·lar",
+    "saving": "Desant...",
+    "save": "Desar Alumne",
+    "no_students": "No hi ha alumnes registrats.",
+    "active": "Actiu",
+    "address_section": "Adreça Postal"
+  },
+  "login": {
+    "title": "Dojo Management Suite",
+    "subtitle": "Introdueix les teves credencials per accedir a la plataforma",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "submit": "Iniciar Sessió",
+    "show_password": "Mostrar contrasenya",
+    "hide_password": "Amagar contrasenya",
+    "error": "Error en iniciar sessió. Comprova les teves credencials."
+  }
+}
