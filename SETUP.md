@@ -55,7 +55,16 @@ pnpm --filter @dms/database exec prisma generate
 docker exec -it dms-auth-service pnpm ts-node src/prisma/seed.ts
 ```
 
-## 5. Validation & Test Suites
+## 5. Optional: Bulk User Import from CSV (Academy Roster)
+If you wish to populate the database with an initial academy roster (such as instructors, administrative staff, or students) from a formatted CSV file, you can run the dynamic import script.
+
+```bash
+# Populate academy users securely from a CSV file (e.g., Fox Jiu-jitsu Academy roster)
+pnpm --filter database exec ts-node prisma/import-users.ts path/to/csv/users_dms.csv
+```
+> **_NOTE:_** This script is optional and fully idempotent. It strictly validates the CSV structure (checking for required headers such as Name, Surname/s, Email, Role, ID / Passport, etc.), securely hashes passwords with bcrypt, and skips already existing emails to prevent data duplication.
+
+## 6. Validation & Test Suites
 With the infrastructure running and the database fully hydrated, validate the integrity of the system.
 
 ### Unit Tests
@@ -78,7 +87,7 @@ pnpm --filter financial-service test:e2e
 pnpm --filter api-gateway test:e2e
 ```
 
-## 6. Accessing the Microservices & Swagger UI
+## 7. Accessing the Microservices & Swagger UI
 Once all tests pass successfully, the microservices are fully operational:
 
 | Microservice       | Internal Port | External Mapping | Swagger Documentation URL |
