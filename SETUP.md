@@ -3,11 +3,24 @@
 This guide outlines the standard operating procedure for a complete, clean initialization of the DMS monorepo. Following this sequence guarantees an idempotent deployment, ensuring that all microservices, databases, and test suites run successfully without ghost data or caching conflicts.
 
 ## 0. Environment Variables Configuration
-Before spinning up the infrastructure, ensure your environment variables are configured in your `.env` files at the root and service levels:
-- `DEFAULT_SUPER_ADMIN_EMAIL`: Email address for the initial platform super administrator.
-- `DEFAULT_SUPER_ADMIN_PASSWORD`: Secure password for the initial super administrator.
-- `VITE_DEFAULT_TENANT_ID`: Default multi-tenant school identifier (e.g., `fox-jiujitsu-academy`).
-- `ALLOWED_ORIGINS`: Allowed CORS origins for the frontend and gateway (e.g., `http://localhost:5173,http://localhost:4200`).
+Before spinning up the infrastructure, ensure your root `.env` file is properly configured with the following unified environment variables:
+
+- **1. Database Configuration (PostgreSQL)**:
+  - `DATABASE_URL`: Connection string targeting the internal Docker container network PostgreSQL service (`postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public`).
+- **2. Security & Authentication (JWT)**:
+  - `JWT_SECRET`: Cryptographic secret shared across microservices for token validation (`super-secret-jwt-key-change-in-production`).
+  - `JWT_EXPIRES_IN`: Token expiration duration (`1d`).
+- **3. Cache & Broker (Redis)**:
+  - `REDIS_HOST`: Redis container host (`redis`).
+  - `REDIS_PORT`: Redis port (`6379`).
+- **4. Microservices Routing & Ports**:
+  - `PORT`: Gateway or service port (`3000`).
+  - `AUTH_SERVICE_URL`, `ACADEMIC_SERVICE_URL`, `FINANCIAL_SERVICE_URL`: Internal microservice container endpoints.
+- **5. Initialization & Tenant Seeding**:
+  - `DEFAULT_SUPER_ADMIN_EMAIL`: Email address for the initial platform super administrator (`superadmin@foxjiujitsuacademy.com`).
+  - `DEFAULT_SUPER_ADMIN_PASSWORD`: Secure password for the initial super administrator (`SecurePassword123!`).
+  - `VITE_DEFAULT_TENANT_ID`: Default multi-tenant school identifier (`fox-jiujitsu-academy`).
+- **6. CORS & Security Policies**:
 
 ## 1. Environment Reset (Clean Slate)
 To prevent conflicts with previous localized states, orphaned Docker networks, or outdated Prisma artifacts, execute a full tear-down.
@@ -51,8 +64,8 @@ pnpm --filter @dms/database db:push
 # 3. Generate the Prisma Client typings for TypeScript compilation
 pnpm --filter @dms/database exec prisma generate
 
-# 4. Provision the initial SUPER_ADMIN user via the seeding script using environment variables
-docker exec -it dms-auth-service pnpm ts-node src/prisma/seed.ts
+# 4. Provision the initial SUPER_ADMIN and martial disciplines globally via the database workspace seed script
+pnpm --filter @dms/database db:seed
 ```
 
 ## 5. Optional: Bulk User Import from CSV (Academy Roster)
