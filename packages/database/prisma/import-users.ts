@@ -2,8 +2,8 @@
  * @file import-users.ts
  * @description Dynamic seed script to populate the database with users from a provided CSV file.
  * Accepts the CSV file path as a CLI argument, strictly validates the header structure, 
- * checks for existing users by email to prevent overwriting, securely hashes passwords, 
- * and maps the data to the Prisma schema.
+ * checks for existing users by email to prevent overwriting, handles duplicate DNIs gracefully,
+ * securely hashes passwords, and maps the data to the Prisma schema including birth dates.
  */
 
 // IMPORTANTE: Importamos desde la ruta custom generada "../client" según tu schema.prisma
@@ -26,6 +26,7 @@ interface CsvUserRow {
   'Init password': string;
   Role: string;
   'ID / Passport': string;
+  birthDate: string;
   Phone: string;
   Address: string;
   City: string;
@@ -45,6 +46,7 @@ const EXPECTED_HEADERS = [
   'Init password',
   'Role',
   'ID / Passport',
+  'birthDate',
   'Phone',
   'Address',
   'City',
@@ -113,6 +115,30 @@ async function importUsers(filePath: string): Promise<void> {
         continue;
       }
 
+      // Check if DNI already exists in the database to avoid P2002 unique constraint error
+      let dniToSave = row['ID / Passport']?.trim() || null;
+      if (dniToSave && dniToSave !== '') {
+        const existingDni = await prisma.user.findUnique({
+          where: { dni: dniToSave },
+        });
+        if (existingDni) {
+          console.warn(`⚠️  Warning: DNI '${dniToSave}' for user ${email} is already registered. Setting DNI to null for this record.`);
+          dniToSave = null;
+        }
+      }
+
+      // Safely parse the birth date if provided
+      let parsedBirthDate: Date | null = null;
+      const rawBirthDate = row.birthDate?.trim();
+      if (rawBirthDate && rawBirthDate !== '') {
+        const dateObj = new Date(rawBirthDate);
+        if (!isNaN(dateObj.getTime())) {
+          parsedBirthDate = dateObj;
+        } else {
+          console.warn(`⚠️  Warning: Invalid birthDate format ('${rawBirthDate}') for user ${email}. Setting to null.`);
+        }
+      }
+
       // Hash the initial password from the CSV, or fallback to a secure default
       const saltRounds = 10;
       const plainPassword = row['Init password']?.trim() || 'FoxJiuJitsu2026!';
@@ -126,7 +152,8 @@ async function importUsers(filePath: string): Promise<void> {
           email: email,
           passwordHash: passwordHash,
           role: (row.Role?.trim() as Role) || Role.STUDENT,
-          dni: row['ID / Passport']?.trim() || null,
+          dni: dniToSave,
+          birthDate: parsedBirthDate,
           phone: row.Phone?.trim() || null,
           address: row.Address?.trim() || null,
           city: row.City?.trim() || null,

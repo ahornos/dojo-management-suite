@@ -4,8 +4,8 @@ This guide outlines the standard operating procedure for a complete, clean initi
 
 ## 0. Environment Variables Configuration
 Before spinning up the infrastructure, ensure your environment variables are configured in your `.env` files at the root and service levels:
-- `DEFAULT_SUPER_ADMIN_EMAIL`: Email address for the initial platform super administrator[cite: 6].
-- `DEFAULT_SUPER_ADMIN_PASSWORD`: Secure password for the initial super administrator[cite: 6].
+- `DEFAULT_SUPER_ADMIN_EMAIL`: Email address for the initial platform super administrator.
+- `DEFAULT_SUPER_ADMIN_PASSWORD`: Secure password for the initial super administrator.
 - `VITE_DEFAULT_TENANT_ID`: Default multi-tenant school identifier (e.g., `fox-jiujitsu-academy`).
 - `ALLOWED_ORIGINS`: Allowed CORS origins for the frontend and gateway (e.g., `http://localhost:5173,http://localhost:4200`).
 

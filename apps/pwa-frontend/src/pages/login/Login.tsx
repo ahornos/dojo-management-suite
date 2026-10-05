@@ -15,6 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 
+/**
+ * Renders the login authentication view.
+ * 
+ * @component
+ * @returns {React.ReactElement} The rendered Login page.
+ */
 export function Login(): JSX.Element {
   const { t } = useTranslation();
   const [email, setEmail] = useState<string>("");
@@ -44,7 +50,6 @@ export function Login(): JSX.Element {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background relative px-4">
-      
       {error && (
         <div className="absolute top-10 flex items-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-red-600 rounded-md shadow-lg animate-in fade-in slide-in-from-top-5">
           <AlertCircle className="h-5 w-5" />
@@ -61,7 +66,6 @@ export function Login(): JSX.Element {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
-            
             <div className="space-y-2">
               <Label htmlFor="email">{t('login.email')}</Label>
               <Input
@@ -94,11 +98,7 @@ export function Login(): JSX.Element {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>

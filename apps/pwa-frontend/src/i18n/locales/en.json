@@ -62,7 +62,24 @@
     "new_user": "+ New User",
     "create_modal_title": "Register New User",
     "password": "Temporary Password",
-    "password_hint": "Initial password for the user to access the platform."
+    "password_hint": "Initial password for the user to access the platform.",
+    "birth_date": "Birth Date",
+    "delete": "Delete",
+    "delete_confirm_title": "Delete User",
+    "delete_confirm_message": "Are you sure you want to permanently delete this user? This action cannot be undone.",
+    "deleting": "Deleting...",
+    "search_placeholder": "Search by name, email, DNI, or phone...",
+    "filter_role": "Filter by role",
+    "all_roles": "All roles",
+    "table_name": "Name",
+    "table_last_name": "Last Name",
+    "table_email": "Email",
+    "table_birth_date": "Birth Date",
+    "expanded_info": "Additional user information",
+    "no_birth_date": "No date",
+    "table_role": "Role",
+    "table_dni": "ID / Passport",
+    "no_phone": "No phone"
   },
   "students": {
     "title": "Student Management",
@@ -87,12 +104,12 @@
   },
   "login": {
     "title": "Dojo Management Suite",
-    "subtitle": "Enter your credentials to access the platform",
+    "subtitle": "Sign in to your account",
     "email": "Email address",
     "password": "Password",
-    "submit": "Log In",
+    "submit": "Sign In",
+    "error": "Invalid credentials or connection error",
     "show_password": "Show password",
-    "hide_password": "Hide password",
-    "error": "Login error. Please check your credentials."
+    "hide_password": "Hide password"
   }
 }

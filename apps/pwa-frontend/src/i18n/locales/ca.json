@@ -62,7 +62,24 @@
     "new_user": "+ Nou Usuari",
     "create_modal_title": "Donar d'alta nou usuari",
     "password": "Contrasenya Temporal",
-    "password_hint": "Contrasenya inicial per a l'accés de l'usuari a la plataforma."
+    "password_hint": "Contrasenya inicial per a l'accés de l'usuari a la plataforma.",
+    "birth_date": "Data de Naixement",
+    "delete": "Eliminar",
+    "delete_confirm_title": "Eliminar usuari",
+    "delete_confirm_message": "Estàs segur que vols eliminar permanentment aquest usuari? Aquesta acció no es pot desfer.",
+    "deleting": "Eliminant...",
+    "search_placeholder": "Cerca per nom, email, DNI o telèfon...",
+    "filter_role": "Filtrar per rol",
+    "all_roles": "Tots els rols",
+    "table_name": "Nom",
+    "table_last_name": "Cognoms",
+    "table_email": "Email",
+    "table_birth_date": "Data Naix.",
+    "expanded_info": "Informació addicional de l'usuari",
+    "no_birth_date": "Sense data",
+    "table_role": "Rol",
+    "table_dni": "DNI / Passaport",
+    "no_phone": "Sense telèfon"
   },
   "students": {
     "title": "Gestió d'Alumnes",
@@ -87,12 +104,12 @@
   },
   "login": {
     "title": "Dojo Management Suite",
-    "subtitle": "Introdueix les teves credencials per accedir a la plataforma",
+    "subtitle": "Inicia sessió al teu compte",
     "email": "Correu electrònic",
     "password": "Contrasenya",
-    "submit": "Iniciar Sessió",
-    "show_password": "Mostrar contrasenya",
-    "hide_password": "Amagar contrasenya",
-    "error": "Error en iniciar sessió. Comprova les teves credencials."
+    "submit": "Entrar",
+    "error": "Credencials invàlides o error de connexió",
+    "show_password": "Mostra la contrasenya",
+    "hide_password": "Amaga la contrasenya"
   }
 }

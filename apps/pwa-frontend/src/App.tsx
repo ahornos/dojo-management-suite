@@ -10,8 +10,8 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 
 // Module Views
-import Login from '@/pages/Login';
-import Users from '@/pages/Users';
+import Login from '@/pages/login/Login';
+import Users from '@/pages/users/Users';
 import Students from './pages/Students'; 
 
 /**
@@ -70,7 +70,9 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             
             {/* Connected Submodules */}
-            <Route path="/users" element={<Users />} />
+            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
+              <Route path="/users" element={<Users />} />
+            </Route>
             <Route path="/students" element={<Students />} />
             
             <Route path="/attendances" element={<Attendances />} />

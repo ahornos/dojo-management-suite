@@ -62,7 +62,24 @@
     "new_user": "+ Nuevo Usuario",
     "create_modal_title": "Dar de alta nuevo usuario",
     "password": "Contraseña Temporal",
-    "password_hint": "Contraseña inicial para el acceso del usuario a la plataforma."
+    "password_hint": "Contraseña inicial para el acceso del usuario a la plataforma.",
+    "birth_date": "Fecha de Nacimiento",
+    "delete": "Eliminar",
+    "delete_confirm_title": "Eliminar usuario",
+    "delete_confirm_message": "¿Estás seguro de que deseas eliminar permanentemente a este usuario? Esta acción no se puede deshacer.",
+    "deleting": "Eliminando...",
+    "search_placeholder": "Buscar por nombre, email, DNI o teléfono...",
+    "filter_role": "Filtrar por rol",
+    "all_roles": "Todos los roles",
+    "table_name": "Nombre",
+    "table_last_name": "Apellidos",
+    "table_email": "Email",
+    "table_birth_date": "Fecha Nac.",
+    "expanded_info": "Información adicional del usuario",
+    "no_birth_date": "Sin fecha",
+    "table_role": "Rol",
+    "table_dni": "DNI / Pasaporte",
+    "no_phone": "Sin teléfono"
   },
   "students": {
     "title": "Gestión de Alumnos",
@@ -87,12 +104,12 @@
   },
   "login": {
     "title": "Dojo Management Suite",
-    "subtitle": "Introduce tus credenciales para acceder a la plataforma",
+    "subtitle": "Inicia sesión en tu cuenta",
     "email": "Correo electrónico",
     "password": "Contraseña",
-    "submit": "Iniciar Sesión",
+    "submit": "Entrar",
+    "error": "Credenciales inválidas o error de conexión",
     "show_password": "Mostrar contraseña",
-    "hide_password": "Ocultar contraseña",
-    "error": "Error al iniciar sesión. Comprueba tus credenciales."
+    "hide_password": "Ocultar contraseña"
   }
 }
