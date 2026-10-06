@@ -3,6 +3,7 @@
     "title": "DMS Workspace",
     "dashboard": "Tauler de Control",
     "users": "Usuaris",
+    "disciplines": "Disciplines",
     "students": "Alumnes",
     "attendances": "Assistència",
     "graduations": "Graduacions",
@@ -26,7 +27,7 @@
   "users": {
     "title": "Gestió d'Usuaris",
     "subtitle": "Administra els comptes d'accés, rols i dades personals del personal i socis.",
-    "search_placeholder": "Cercar per nom o correu electrònic...",
+    "search_placeholder": "Cercar per nom, email, DNI o telèfon...",
     "table_user": "Usuari",
     "table_role": "Rol",
     "table_dni_phone": "DNI / Telèfon",
@@ -54,13 +55,6 @@
     "postal_code": "Codi Postal",
     "country": "País",
     "password_section": "Seguretat i Contrasenya",
-    "password": "Nova Contrasenya (Opcional)",
-    "password_hint": "Deixa-ho en blanc si no vols modificar la contrasenya actual.",
-    "cancel": "Cancel·lar",
-    "saving": "Desant...",
-    "save": "Desar Canvis",
-    "new_user": "+ Nou Usuari",
-    "create_modal_title": "Donar d'alta nou usuari",
     "password": "Contrasenya Temporal",
     "password_hint": "Contrasenya inicial per a l'accés de l'usuari a la plataforma.",
     "birth_date": "Data de Naixement",
@@ -68,7 +62,6 @@
     "delete_confirm_title": "Eliminar usuari",
     "delete_confirm_message": "Estàs segur que vols eliminar permanentment aquest usuari? Aquesta acció no es pot desfer.",
     "deleting": "Eliminant...",
-    "search_placeholder": "Cerca per nom, email, DNI o telèfon...",
     "filter_role": "Filtrar per rol",
     "all_roles": "Tots els rols",
     "table_name": "Nom",
@@ -77,9 +70,12 @@
     "table_birth_date": "Data Naix.",
     "expanded_info": "Informació addicional de l'usuari",
     "no_birth_date": "Sense data",
-    "table_role": "Rol",
     "table_dni": "DNI / Passaport",
-    "no_phone": "Sense telèfon"
+    "new_user": "+ Nou usuari",
+    "create_title": "Donar d'alta nou usuari",
+    "save": "Desar Usuari",
+    "cancel": "Cancel·lar",
+    "saving": "Desant..."
   },
   "students": {
     "title": "Gestió d'Alumnes",
@@ -100,7 +96,22 @@
     "save": "Desar Alumne",
     "no_students": "No hi ha alumnes registrats.",
     "active": "Actiu",
-    "address_section": "Adreça Postal"
+    "address_section": "Adreça Postal",
+    "form": {
+      "existing_user_toggle": "L'usuari ja existeix al sistema?",
+      "select_user_title": "Seleccionar Usuari Base *",
+      "select_user_placeholder": "-- Cerca usuari per email o nom --",
+      "select_user_help": "En seleccionar un usuari, es pre-carregaran les seves dades. En desar, s'actualitzaran si hi ha canvis i se li afegirà el rol d'Alumne.",
+      "personal_data_title": "Dades Personals de l'Alumne",
+      "guardian_title": "Dades del Tutor Legal (Pare / Mare)",
+      "guardian_required_badge": "Obligatori per minoria d'edat",
+      "guardian_help": "En desar, el sistema crearà automàticament un usuari associat amb el rol PARENT per gestionar els permisos legals i de facturació.",
+      "guardian_first_name": "Nom del Tutor *",
+      "guardian_last_name": "Cognoms del Tutor *",
+      "guardian_email": "Email del Tutor *",
+      "guardian_phone": "Telèfon d'Emergència *",
+      "guardian_dni": "DNI / Passaport del Tutor *"
+    }
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -111,5 +122,59 @@
     "error": "Credencials invàlides o error de connexió",
     "show_password": "Mostra la contrasenya",
     "hide_password": "Amaga la contrasenya"
+  },
+  "disciplines": {
+    "title": "Disciplines i Programes",
+    "subtitle": "Gestió de programes marcials i jerarquies de cinturons",
+    "new_discipline": "Nova Disciplina",
+    "name_label": "Nom",
+    "desc_label": "Descripció",
+    "programs_header": "Programes de Formació",
+    "years": "anys",
+    "no_programs": "No hi ha programes registrats per a aquesta disciplina.",
+    "create_title": "Crear Disciplina",
+    "edit_title": "Editar Disciplina",
+    "cancel": "Cancel·lar",
+    "save": "Desar",
+    "saving": "Desant...",
+    "loading": "Carregant disciplines...",
+    "error": "Error en carregar les disciplines",
+    "no_data": "No s'han trobat disciplines registrades.",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "belts": {
+    "create_title": "Afegir Cinturó",
+    "edit_title": "Editar Cinturó",
+    "name_label": "Nom del Cinturó",
+    "order_label": "Ordre Jeràrquic",
+    "max_stripes": "Graus Màx.",
+    "min_months": "Mín. Mesos",
+    "min_hours": "Hores Mínimes",
+    "add_belt": "Afegir Cinturó",
+    "cancel": "Cancel·lar",
+    "save": "Desar",
+    "saving": "Desant...",
+    "edit_belt": "Editar Cinturó",
+    "delete": "Eliminar",
+    "names": {
+      "white": "Cinturó Blanc",
+      "blue": "Cinturó Blau",
+      "purple": "Cinturó Lila",
+      "brown": "Cinturó Marró",
+      "black": "Cinturó Negre",
+      "grey_white": "Gris / Blanc",
+      "solid_grey": "Gris Sòlid",
+      "grey_black": "Gris / Negre",
+      "yellow_white": "Groc / Blanc",
+      "solid_yellow": "Groc Sòlid",
+      "yellow_black": "Groc / Negre",
+      "green_white": "Verd / Blanc",
+      "solid_green": "Verd Sòlid",
+      "green_black": "Verd / Negre"
+    }
+  },
+  "common": {
+    "confirm_delete": "Estàs segur que vols eliminar permanentment aquest element? Aquesta acció no es pot desfer."
   }
 }

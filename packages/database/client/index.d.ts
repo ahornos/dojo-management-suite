@@ -3380,7 +3380,6 @@ export namespace Prisma {
     postalCode: string | null
     country: string | null
     isActive: boolean | null
-    role: $Enums.Role | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3400,7 +3399,6 @@ export namespace Prisma {
     postalCode: string | null
     country: string | null
     isActive: boolean | null
-    role: $Enums.Role | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3420,7 +3418,7 @@ export namespace Prisma {
     postalCode: number
     country: number
     isActive: number
-    role: number
+    roles: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3442,7 +3440,6 @@ export namespace Prisma {
     postalCode?: true
     country?: true
     isActive?: true
-    role?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3462,7 +3459,6 @@ export namespace Prisma {
     postalCode?: true
     country?: true
     isActive?: true
-    role?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3482,7 +3478,7 @@ export namespace Prisma {
     postalCode?: true
     country?: true
     isActive?: true
-    role?: true
+    roles?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3575,7 +3571,7 @@ export namespace Prisma {
     postalCode: string | null
     country: string | null
     isActive: boolean
-    role: $Enums.Role
+    roles: $Enums.Role[]
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -3612,7 +3608,7 @@ export namespace Prisma {
     postalCode?: boolean
     country?: boolean
     isActive?: boolean
-    role?: boolean
+    roles?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     studentProfile?: boolean | User$studentProfileArgs<ExtArgs>
@@ -3638,7 +3634,7 @@ export namespace Prisma {
     postalCode?: boolean
     country?: boolean
     isActive?: boolean
-    role?: boolean
+    roles?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3658,7 +3654,7 @@ export namespace Prisma {
     postalCode?: boolean
     country?: boolean
     isActive?: boolean
-    role?: boolean
+    roles?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -3715,7 +3711,10 @@ export namespace Prisma {
        * Account status flag for access control
        */
       isActive: boolean
-      role: $Enums.Role
+      /**
+       * A user can hold multiple roles simultaneously (e.g., ADMIN_STAFF and STUDENT)
+       */
+      roles: $Enums.Role[]
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4130,7 +4129,7 @@ export namespace Prisma {
     readonly postalCode: FieldRef<"User", 'String'>
     readonly country: FieldRef<"User", 'String'>
     readonly isActive: FieldRef<"User", 'Boolean'>
-    readonly role: FieldRef<"User", 'Role'>
+    readonly roles: FieldRef<"User", 'Role[]'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -4564,13 +4563,6 @@ export namespace Prisma {
   export type StudentProfileMinAggregateOutputType = {
     id: string | null
     userId: string | null
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4578,13 +4570,6 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateOutputType = {
     id: string | null
     userId: string | null
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4592,13 +4577,6 @@ export namespace Prisma {
   export type StudentProfileCountAggregateOutputType = {
     id: number
     userId: number
-    birthDate: number
-    phone: number
-    address: number
-    city: number
-    state: number
-    postalCode: number
-    country: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4608,13 +4586,6 @@ export namespace Prisma {
   export type StudentProfileMinAggregateInputType = {
     id?: true
     userId?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4622,13 +4593,6 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateInputType = {
     id?: true
     userId?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4636,13 +4600,6 @@ export namespace Prisma {
   export type StudentProfileCountAggregateInputType = {
     id?: true
     userId?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4723,13 +4680,6 @@ export namespace Prisma {
   export type StudentProfileGroupByOutputType = {
     id: string
     userId: string
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
     createdAt: Date
     updatedAt: Date
     _count: StudentProfileCountAggregateOutputType | null
@@ -4754,13 +4704,6 @@ export namespace Prisma {
   export type StudentProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4780,13 +4723,6 @@ export namespace Prisma {
   export type StudentProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4795,13 +4731,6 @@ export namespace Prisma {
   export type StudentProfileSelectScalar = {
     id?: boolean
     userId?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -4842,13 +4771,9 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      birthDate: Date | null
-      phone: string | null
-      address: string | null
-      city: string | null
-      state: string | null
-      postalCode: string | null
-      country: string | null
+      /**
+       * Academic metadata
+       */
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["studentProfile"]>
@@ -5257,13 +5182,6 @@ export namespace Prisma {
   interface StudentProfileFieldRefs {
     readonly id: FieldRef<"StudentProfile", 'String'>
     readonly userId: FieldRef<"StudentProfile", 'String'>
-    readonly birthDate: FieldRef<"StudentProfile", 'DateTime'>
-    readonly phone: FieldRef<"StudentProfile", 'String'>
-    readonly address: FieldRef<"StudentProfile", 'String'>
-    readonly city: FieldRef<"StudentProfile", 'String'>
-    readonly state: FieldRef<"StudentProfile", 'String'>
-    readonly postalCode: FieldRef<"StudentProfile", 'String'>
-    readonly country: FieldRef<"StudentProfile", 'String'>
     readonly createdAt: FieldRef<"StudentProfile", 'DateTime'>
     readonly updatedAt: FieldRef<"StudentProfile", 'DateTime'>
   }
@@ -26613,7 +26531,7 @@ export namespace Prisma {
     postalCode: 'postalCode',
     country: 'country',
     isActive: 'isActive',
-    role: 'role',
+    roles: 'roles',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -26624,13 +26542,6 @@ export namespace Prisma {
   export const StudentProfileScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
-    birthDate: 'birthDate',
-    phone: 'phone',
-    address: 'address',
-    city: 'city',
-    state: 'state',
-    postalCode: 'postalCode',
-    country: 'country',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -26997,16 +26908,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Role'
+   * Reference to a field of type 'Role[]'
    */
-  export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+  export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
     
 
 
   /**
-   * Reference to a field of type 'Role[]'
+   * Reference to a field of type 'Role'
    */
-  export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
+  export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
     
 
 
@@ -27206,7 +27117,7 @@ export namespace Prisma {
     postalCode?: StringNullableFilter<"User"> | string | null
     country?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
-    role?: EnumRoleFilter<"User"> | $Enums.Role
+    roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
@@ -27231,7 +27142,7 @@ export namespace Prisma {
     postalCode?: SortOrderInput | SortOrder
     country?: SortOrderInput | SortOrder
     isActive?: SortOrder
-    role?: SortOrder
+    roles?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
@@ -27259,7 +27170,7 @@ export namespace Prisma {
     postalCode?: StringNullableFilter<"User"> | string | null
     country?: StringNullableFilter<"User"> | string | null
     isActive?: BoolFilter<"User"> | boolean
-    role?: EnumRoleFilter<"User"> | $Enums.Role
+    roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
@@ -27284,7 +27195,7 @@ export namespace Prisma {
     postalCode?: SortOrderInput | SortOrder
     country?: SortOrderInput | SortOrder
     isActive?: SortOrder
-    role?: SortOrder
+    roles?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -27310,7 +27221,7 @@ export namespace Prisma {
     postalCode?: StringNullableWithAggregatesFilter<"User"> | string | null
     country?: StringNullableWithAggregatesFilter<"User"> | string | null
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
-    role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
+    roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -27321,13 +27232,6 @@ export namespace Prisma {
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
     id?: StringFilter<"StudentProfile"> | string
     userId?: StringFilter<"StudentProfile"> | string
-    birthDate?: DateTimeNullableFilter<"StudentProfile"> | Date | string | null
-    phone?: StringNullableFilter<"StudentProfile"> | string | null
-    address?: StringNullableFilter<"StudentProfile"> | string | null
-    city?: StringNullableFilter<"StudentProfile"> | string | null
-    state?: StringNullableFilter<"StudentProfile"> | string | null
-    postalCode?: StringNullableFilter<"StudentProfile"> | string | null
-    country?: StringNullableFilter<"StudentProfile"> | string | null
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -27346,13 +27250,6 @@ export namespace Prisma {
   export type StudentProfileOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    birthDate?: SortOrderInput | SortOrder
-    phone?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    city?: SortOrderInput | SortOrder
-    state?: SortOrderInput | SortOrder
-    postalCode?: SortOrderInput | SortOrder
-    country?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -27374,13 +27271,6 @@ export namespace Prisma {
     AND?: StudentProfileWhereInput | StudentProfileWhereInput[]
     OR?: StudentProfileWhereInput[]
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
-    birthDate?: DateTimeNullableFilter<"StudentProfile"> | Date | string | null
-    phone?: StringNullableFilter<"StudentProfile"> | string | null
-    address?: StringNullableFilter<"StudentProfile"> | string | null
-    city?: StringNullableFilter<"StudentProfile"> | string | null
-    state?: StringNullableFilter<"StudentProfile"> | string | null
-    postalCode?: StringNullableFilter<"StudentProfile"> | string | null
-    country?: StringNullableFilter<"StudentProfile"> | string | null
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
@@ -27399,13 +27289,6 @@ export namespace Prisma {
   export type StudentProfileOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    birthDate?: SortOrderInput | SortOrder
-    phone?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    city?: SortOrderInput | SortOrder
-    state?: SortOrderInput | SortOrder
-    postalCode?: SortOrderInput | SortOrder
-    country?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: StudentProfileCountOrderByAggregateInput
@@ -27419,13 +27302,6 @@ export namespace Prisma {
     NOT?: StudentProfileScalarWhereWithAggregatesInput | StudentProfileScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StudentProfile"> | string
     userId?: StringWithAggregatesFilter<"StudentProfile"> | string
-    birthDate?: DateTimeNullableWithAggregatesFilter<"StudentProfile"> | Date | string | null
-    phone?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
-    address?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
-    city?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
-    state?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
-    postalCode?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
-    country?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StudentProfile"> | Date | string
   }
@@ -28864,7 +28740,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
@@ -28889,7 +28765,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
@@ -28914,7 +28790,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
@@ -28939,7 +28815,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -28964,7 +28840,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28984,7 +28860,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29004,20 +28880,13 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentProfileCreateInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -29036,13 +28905,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -29059,13 +28921,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -29084,13 +28939,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -29108,26 +28956,12 @@ export namespace Prisma {
   export type StudentProfileCreateManyInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type StudentProfileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29135,13 +28969,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30660,11 +30487,12 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type EnumRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
+  export type EnumRoleNullableListFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel> | null
+    has?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel> | null
+    hasEvery?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
+    hasSome?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -30728,7 +30556,7 @@ export namespace Prisma {
     postalCode?: SortOrder
     country?: SortOrder
     isActive?: SortOrder
-    role?: SortOrder
+    roles?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30748,7 +30576,6 @@ export namespace Prisma {
     postalCode?: SortOrder
     country?: SortOrder
     isActive?: SortOrder
-    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30768,7 +30595,6 @@ export namespace Prisma {
     postalCode?: SortOrder
     country?: SortOrder
     isActive?: SortOrder
-    role?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30829,16 +30655,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRoleFilter<$PrismaModel>
-    _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -30943,13 +30759,6 @@ export namespace Prisma {
   export type StudentProfileCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30957,13 +30766,6 @@ export namespace Prisma {
   export type StudentProfileMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30971,13 +30773,6 @@ export namespace Prisma {
   export type StudentProfileMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -32175,6 +31970,10 @@ export namespace Prisma {
     isActive?: SortOrder
   }
 
+  export type UserCreaterolesInput = {
+    set: $Enums.Role[]
+  }
+
   export type StudentProfileCreateNestedOneWithoutUserInput = {
     create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
@@ -32257,8 +32056,9 @@ export namespace Prisma {
     set?: boolean
   }
 
-  export type EnumRoleFieldUpdateOperationsInput = {
-    set?: $Enums.Role
+  export type UserUpdaterolesInput = {
+    set?: $Enums.Role[]
+    push?: $Enums.Role | $Enums.Role[]
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -33753,13 +33553,6 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
-  export type NestedEnumRoleFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
-  }
-
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -33847,16 +33640,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type NestedEnumRoleWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
-    in?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    notIn?: $Enums.Role[] | ListEnumRoleFieldRefInput<$PrismaModel>
-    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRoleFilter<$PrismaModel>
-    _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -34180,13 +33963,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutUserInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
@@ -34203,13 +33979,6 @@ export namespace Prisma {
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -34347,13 +34116,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
@@ -34370,13 +34132,6 @@ export namespace Prisma {
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -34504,7 +34259,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
@@ -34528,7 +34283,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
@@ -34834,7 +34589,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
@@ -34858,7 +34613,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
@@ -35137,7 +34892,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
@@ -35161,7 +34916,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
@@ -35221,7 +34976,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
@@ -35245,7 +35000,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -35272,13 +35027,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutGuardiansInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -35296,13 +35044,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
@@ -35351,13 +35092,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -35375,13 +35109,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
@@ -35664,13 +35391,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutRanksInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -35688,13 +35408,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutRanksInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -35751,13 +35464,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -35775,13 +35481,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -35828,13 +35527,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutAttendancesInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -35852,13 +35544,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutAttendancesInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -35890,13 +35575,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -35914,13 +35592,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -35936,13 +35607,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -35960,13 +35624,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutUpdateRequestsInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -36000,7 +35657,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
@@ -36024,7 +35681,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
@@ -36051,13 +35708,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -36075,13 +35725,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -36121,7 +35764,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
@@ -36145,7 +35788,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -36156,13 +35799,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutGraduationRequestsInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -36180,13 +35816,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutGraduationRequestsInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -36220,7 +35849,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
@@ -36244,7 +35873,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
@@ -36273,7 +35902,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
@@ -36297,7 +35926,7 @@ export namespace Prisma {
     postalCode?: string | null
     country?: string | null
     isActive?: boolean
-    role?: $Enums.Role
+    roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
@@ -36324,13 +35953,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -36348,13 +35970,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -36394,7 +36009,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
@@ -36418,7 +36033,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -36453,7 +36068,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
@@ -36477,7 +36092,7 @@ export namespace Prisma {
     postalCode?: NullableStringFieldUpdateOperationsInput | string | null
     country?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -36574,13 +36189,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentFeesInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -36598,13 +36206,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutStudentFeesInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -36665,13 +36266,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentFeesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -36689,13 +36283,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutStudentFeesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -36786,13 +36373,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentDiscountsInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -36810,13 +36390,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutStudentDiscountsInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -36883,13 +36456,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -36907,13 +36473,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -36970,13 +36529,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutSubscriptionsInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -36994,13 +36546,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutSubscriptionsInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -37061,13 +36606,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -37085,13 +36623,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -37288,13 +36819,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutBankMandatesInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -37312,13 +36836,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutBankMandatesInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -37380,13 +36897,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutBankMandatesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -37404,13 +36914,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutBankMandatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
@@ -37676,13 +37179,6 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutLicensesInput = {
     id?: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
@@ -37700,13 +37196,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutLicensesInput = {
     id?: string
     userId: string
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
@@ -37755,13 +37244,6 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutLicensesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
@@ -37779,13 +37261,6 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutLicensesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput

@@ -1,6 +1,7 @@
 /**
  * @file CreateUserModal.tsx
- * @description Modal component containing the form to create a new system user.
+ * @description Modal component containing the form to create a new system user 
+ * with support for assigning multiple simultaneous system roles.
  */
 
 import { useState } from 'react';
@@ -18,10 +19,19 @@ interface CreateUserModalProps {
   isPending: boolean;
 }
 
+const AVAILABLE_ROLES = [
+  'SUPER_ADMIN',
+  'ADMIN_STAFF',
+  'SPORTS_TECHNICAL_DIRECTOR',
+  'INSTRUCTOR',
+  'STUDENT',
+  'PARENT',
+];
+
 const emptyFormState: UserFormPayload = {
   firstName: '', lastName: '', email: '', password: '', dni: '', birthDate: '',
   phone: '', address: '', city: '', state: '', postalCode: '', country: 'ES',
-  role: 'STUDENT', isActive: true,
+  roles: ['STUDENT'], isActive: true,
 };
 
 export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: CreateUserModalProps): JSX.Element | null {
@@ -30,11 +40,22 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
 
   if (!isOpen) return null;
 
+  const handleRoleToggle = (role: string) => {
+    setNewUser((prev) => {
+      const currentRoles = prev.roles || [];
+      if (currentRoles.includes(role)) {
+        // Keep at least one role assigned
+        if (currentRoles.length === 1) return prev;
+        return { ...prev, roles: currentRoles.filter((r) => r !== role) };
+      } else {
+        return { ...prev, roles: [...currentRoles, role] };
+      }
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(newUser);
-    // Reset state after successful submit is typically handled by closing the modal, 
-    // but we can ensure it's clean for the next opening.
     setNewUser(emptyFormState); 
   };
 
@@ -84,25 +105,33 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="create-role">{t('users.role')}</Label>
-                <select id="create-role" value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-                  <option value="ADMIN_STAFF">ADMIN_STAFF</option>
-                  <option value="SPORTS_TECHNICAL_DIRECTOR">SPORTS_TECHNICAL_DIRECTOR</option>
-                  <option value="INSTRUCTOR">INSTRUCTOR</option>
-                  <option value="STUDENT">STUDENT</option>
-                  <option value="PARENT">PARENT</option>
-                </select>
+            {/* Multi-Role Selection Section */}
+            <div className="space-y-2 border-t pt-4">
+              <Label className="text-sm font-semibold text-gray-800">{t('users.role')} (Select one or more)</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                {AVAILABLE_ROLES.map((role) => {
+                  const isChecked = newUser.roles?.includes(role);
+                  return (
+                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleRoleToggle(role)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      />
+                      <span>{role}</span>
+                    </label>
+                  );
+                })}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="create-status">{t('users.status_label')}</Label>
-                <select id="create-status" value={newUser.isActive ? 'true' : 'false'} onChange={(e) => setNewUser({ ...newUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="true">{t('users.active')}</option>
-                  <option value="false">{t('users.inactive')}</option>
-                </select>
-              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="create-status">{t('users.status_label')}</Label>
+              <select id="create-status" value={newUser.isActive ? 'true' : 'false'} onChange={(e) => setNewUser({ ...newUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="true">{t('users.active')}</option>
+                <option value="false">{t('users.inactive')}</option>
+              </select>
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-3">

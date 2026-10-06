@@ -1,7 +1,7 @@
 /**
  * @file useUsers.ts
- * @description Custom hook encapsulating all TanStack Query logic for the Users module.
- * Manages fetching, creating, updating, and deleting users.
+ * @description Custom hook encapsulating all TanStack Query logic for the Users module[cite: 38].
+ * Manages fetching, creating, updating, and deleting users with multi-role support.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -33,6 +33,7 @@ export function useUsers() {
     mutationFn: async (payload: UserFormPayload) => {
       const { id, ...data } = payload;
       if (!data.password || data.password.trim() === '') delete data.password;
+      
       const response = await apiClient.patch(`/auth/users/${id}`, data);
       return response.data;
     },
@@ -52,7 +53,7 @@ export function useUsers() {
   });
 
   return {
-    users: fetchUsers.data,
+    users: fetchUsers.data || [],
     isLoading: fetchUsers.isLoading,
     error: fetchUsers.error,
     createMutation,

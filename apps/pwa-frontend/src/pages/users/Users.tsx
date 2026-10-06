@@ -1,8 +1,7 @@
 /**
  * @file Users.tsx
- * @description Administrative dashboard view orchestrator.
- * Acts as the controller uniting network state (useUsers hook), filter controls,
- * the interactive data table, and modal interactions.
+ * @description Administrative user management view orchestrator[cite: 36].
+ * Integrates filtering, data table view, and screen-based form navigation for creating/editing.
  */
 
 import { useState } from 'react';
@@ -12,8 +11,7 @@ import { UserFormPayload } from './types';
 import { useUsers } from './useUsers';
 import { UserFilters } from './UserFilters';
 import { UserTable } from './UserTable';
-import { CreateUserModal } from './CreateUserModal';
-import { EditUserModal } from './EditUserModal';
+import { UserForm } from './UserForm';
 import { DeleteUserModal } from './DeleteUserModal';
 
 export function Users(): JSX.Element {
@@ -26,8 +24,8 @@ export function Users(): JSX.Element {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   
-  // Modal Management States
-  const [isCreating, setIsCreating] = useState<boolean>(false);
+  // Screen View & Deletion States ('list' | 'create' | 'edit')
+  const [formMode, setFormMode] = useState<'list' | 'create' | 'edit'>('list');
   const [editingUser, setEditingUser] = useState<UserFormPayload | null>(null);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
@@ -54,69 +52,86 @@ export function Users(): JSX.Element {
       state: user.state || '',
       postalCode: user.postalCode || '',
       country: user.country || 'ES',
-      role: user.role || 'STUDENT',
+      roles: Array.isArray(user.roles) ? user.roles : [user.role || 'STUDENT'],
       isActive: user.isActive ?? true,
       password: '',
     });
+    setFormMode('edit');
   };
+
+  const handleFormSubmit = (data: UserFormPayload) => {
+    if (formMode === 'create') {
+      createMutation.mutate(data, {
+        onSuccess: () => setFormMode('list'),
+      });
+    } else if (formMode === 'edit') {
+      updateMutation.mutate(data, {
+        onSuccess: () => {
+          setFormMode('list');
+          setEditingUser(null);
+        },
+      });
+    }
+  };
+
+  if (isLoading) return <div className="p-6">{t('users.loading')}</div>;
+  if (error) return <div className="p-6 text-red-500">{t('users.error')}</div>;
 
   return (
     <div className="space-y-6">
       {/* Header Actions */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">{t('users.title')}</h1>
           <p className="text-sm text-gray-500">{t('users.subtitle')}</p>
         </div>
-        <Button onClick={() => setIsCreating(true)}>
-          {t('users.new_user')}
-        </Button>
+        {formMode === 'list' && (
+          <Button onClick={() => setFormMode('create')} className="bg-blue-600 text-white hover:bg-blue-700">
+            {t('users.new_user')}
+          </Button>
+        )}
       </div>
 
-      {/* Filter Controls */}
-      <UserFilters 
-        searchTerm={searchTerm} 
-        onSearchChange={setSearchTerm} 
-        selectedRoles={selectedRoles} 
-        onRoleToggle={handleRoleToggle} 
-      />
+      {formMode !== 'list' ? (
+        <UserForm
+          initialData={formMode === 'edit' ? editingUser : null}
+          onSubmit={handleFormSubmit}
+          onCancel={() => {
+            setFormMode('list');
+            setEditingUser(null);
+          }}
+          isPending={createMutation.isPending || updateMutation.isPending}
+        />
+      ) : (
+        <>
+          {/* Filter Controls */}
+          <UserFilters 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+            selectedRoles={selectedRoles} 
+            onRoleToggle={handleRoleToggle} 
+          />
 
-      {/* Primary Data Display */}
-      <UserTable 
-        users={users}
-        isLoading={isLoading}
-        error={error}
-        searchTerm={searchTerm}
-        selectedRoles={selectedRoles}
-        onEdit={handleEditInit}
-        onDelete={setUserToDelete}
-      />
+          {/* Primary Data Display */}
+          <UserTable 
+            users={users}
+            isLoading={isLoading}
+            error={error}
+            searchTerm={searchTerm}
+            selectedRoles={selectedRoles}
+            onEdit={handleEditInit}
+            onDelete={setUserToDelete}
+          />
+        </>
+      )}
 
-      {/* Interactive Modals */}
-      <CreateUserModal 
-        isOpen={isCreating} 
-        onClose={() => setIsCreating(false)} 
-        onSubmit={(data) => {
-          createMutation.mutate(data);
-          setIsCreating(false);
-        }} 
-        isPending={createMutation.isPending} 
-      />
-      
-      <EditUserModal 
-        user={editingUser} 
-        onClose={() => setEditingUser(null)} 
-        onSubmit={(data) => {
-          updateMutation.mutate(data);
-          setEditingUser(null);
-        }} 
-        isPending={updateMutation.isPending} 
-      />
-      
+      {/* Delete Confirmation Modal */}
       <DeleteUserModal 
         isOpen={!!userToDelete} 
         onClose={() => setUserToDelete(null)} 
-        onConfirm={() => userToDelete && deleteMutation.mutate(userToDelete)} 
+        onConfirm={() => userToDelete && deleteMutation.mutate(userToDelete, {
+          onSuccess: () => setUserToDelete(null)
+        })} 
         isPending={deleteMutation.isPending} 
       />
     </div>

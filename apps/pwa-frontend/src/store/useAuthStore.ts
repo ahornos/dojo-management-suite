@@ -4,12 +4,12 @@ import { persist } from 'zustand/middleware';
 /**
  * @file useAuthStore.ts
  * @description Global state management for authentication and multi-tenant resolution 
- * using Zustand. Includes persistence to local storage to maintain sessions.
+ * using Zustand[cite: 35]. Includes persistence to local storage to maintain sessions.
  */
 
 /**
  * Extracts the tenant (school) identifier dynamically from the current URL hostname
- * or falls back to the default environment configuration.
+ * or falls back to the default environment configuration[cite: 35].
  * 
  * @function resolveTenantId
  * @returns {string} The resolved tenant ID.
@@ -27,19 +27,19 @@ const resolveTenantId = (): string => {
 
 /**
  * @interface UserPayload
- * @description Represents the authenticated user's profile metadata.
+ * @description Represents the authenticated user's profile metadata, supporting multiple roles[cite: 35].
  */
 export interface UserPayload {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  roles: string[]; // Updated from singular 'role' to support multi-role arrays
 }
 
 /**
  * @interface AuthState
- * @description Defines the structure of the authentication global state store.
+ * @description Defines the structure of the authentication global state store[cite: 35].
  */
 export interface AuthState {
   token: string | null;
@@ -50,8 +50,8 @@ export interface AuthState {
 }
 
 /**
- * Zustand hook for accessing and mutating the authentication state.
- * State is automatically persisted to `localStorage` under the key 'dms-auth-storage'.
+ * Zustand hook for accessing and mutating the authentication state[cite: 35].
+ * State is automatically persisted to `localStorage` under the key 'dms-auth-storage'[cite: 35].
  * 
  * @constant useAuthStore
  */

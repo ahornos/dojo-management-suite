@@ -2,6 +2,7 @@
  * @file auth.service.ts
  * @description Handles user authentication business logic including registration, 
  * credential validation, password hashing, JWT generation, and administrative user management.
+ * Fully supports Role-Based Access Control (RBAC) with multiple roles per user.
  */
 
 import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from '@nestjs/common';
@@ -24,6 +25,7 @@ export class AuthService {
    * 
    * @param {RegisterDto} dto - Registration payload.
    * @returns {Promise<Object>} Created user profile excluding password hash.
+   * @throws {BadRequestException} If the email is already registered.
    */
   async register(dto: RegisterDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -42,7 +44,7 @@ export class AuthService {
         passwordHash: hashedPassword,
         firstName: dto.firstName,
         lastName: dto.lastName,
-        role: dto.role || Role.STUDENT,
+        roles: dto.roles || [Role.STUDENT],
       },
     });
 
@@ -58,6 +60,7 @@ export class AuthService {
    * 
    * @param {LoginDto} dto - Login payload.
    * @returns {Promise<Object>} Access token and user metadata.
+   * @throws {UnauthorizedException} On invalid credentials.
    */
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
@@ -74,7 +77,8 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    // Embed the roles array into the JWT payload for API Gateway authorization
+    const payload = { sub: user.id, email: user.email, roles: user.roles };
     const accessToken = this.jwtService.sign(payload);
 
     return {
@@ -84,7 +88,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role,
+        roles: user.roles,
       },
     };
   }
@@ -93,7 +97,7 @@ export class AuthService {
    * Creates a new user account administratively from the management dashboard.
    * Includes validation for email and DNI uniqueness.
    * 
-   * @param {any} dto - Payload containing user details, personal data, and roles.
+   * @param {any} dto - Payload containing user details, personal data, and roles array.
    * @returns {Promise<Object>} The created user record excluding password hash.
    * @throws {BadRequestException} If the email or DNI is already registered.
    */
@@ -115,7 +119,7 @@ export class AuthService {
       }
     }
 
-    // Encrypt the provided password or default to a safe temporary one if somehow bypassed
+    // Encrypt the provided password or default to a safe temporary one
     const hashedPassword = await bcrypt.hash(dto.password || 'TemporaryPassword123!', 10);
 
     const newUser = await this.prisma.user.create({
@@ -132,7 +136,7 @@ export class AuthService {
         state: dto.state || null,
         postalCode: dto.postalCode || null,
         country: dto.country || 'ES',
-        role: dto.role || Role.STUDENT,
+        roles: dto.roles || [Role.STUDENT],
         isActive: dto.isActive ?? true,
       },
     });
@@ -158,11 +162,12 @@ export class AuthService {
   }
 
   /**
-   * Updates user profile data, including personal info, address, role, status, and optional password reset.
+   * Updates user profile data, including personal info, address, roles array, status, and optional password reset.
    * 
    * @param {string} id - User unique identifier.
    * @param {any} dto - Payload with updated fields.
    * @returns {Promise<Object>} Updated user record.
+   * @throws {NotFoundException} If user is not found.
    */
   async updateUser(id: string, dto: any) {
     const user = await this.prisma.user.findUnique({
@@ -186,10 +191,12 @@ export class AuthService {
       postalCode: dto.postalCode || null,
       country: dto.country || 'ES',
       isActive: dto.isActive,
-      role: dto.role,
     };
 
-    // Golden Standard: Allow admin to reset password if provided in update payload
+    if (dto.roles && Array.isArray(dto.roles)) {
+      updateData.roles = dto.roles;
+    }
+
     if (dto.password && dto.password.trim() !== '') {
       updateData.passwordHash = await bcrypt.hash(dto.password, 10);
     }
@@ -211,6 +218,7 @@ export class AuthService {
    * 
    * @param {string} id - User unique identifier.
    * @returns {Promise<Object>} Deletion success message.
+   * @throws {NotFoundException} If user is not found.
    */
   async removeUser(id: string) {
     const user = await this.prisma.user.findUnique({

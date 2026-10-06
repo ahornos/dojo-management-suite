@@ -1,3 +1,10 @@
+/**
+ * @file api-gateway.e2e-spec.ts
+ * @description End-to-end integration tests for the API Gateway.
+ * Validates request proxying across microservices domains (Academic and Financial) 
+ * and central error propagation.
+ */
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
@@ -6,10 +13,6 @@ import { of, throwError } from 'rxjs';
 import { AppModule } from '../src/app.module';
 import { GlobalExceptionFilter } from '../src/common/filters/global-exception.filter';
 
-/**
- * @file api-gateway.e2e-spec.ts
- * @description End-to-end integration tests for the API Gateway.
- */
 describe('API Gateway (E2E)', () => {
   let app: INestApplication;
   let httpService: HttpService;
@@ -43,7 +46,7 @@ describe('API Gateway (E2E)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Default mock behavior for successful proxy
+    // Default mock behavior for successful proxy responses
     jest.spyOn(httpService, 'request').mockImplementation(() =>
       of({
         status: 200,
@@ -56,9 +59,10 @@ describe('API Gateway (E2E)', () => {
   });
 
   describe('Academic Domain Routing', () => {
-    it('should successfully proxy a request to /api/graduations', async () => {
+    it('should successfully proxy a request to /api/academic/graduations', async () => {
+      // Updated route to match the centralized academic prefix
       const response: any = await request(app.getHttpServer())
-        .post('/api/graduations')
+        .post('/api/academic/graduations')
         .set('Authorization', 'Bearer mock-jwt-token')
         .set('X-School-Id', 'dojo-central-uuid')
         .send({ studentProfileId: 'student-uuid', proposedBeltId: 'belt-uuid' });
@@ -88,7 +92,7 @@ describe('API Gateway (E2E)', () => {
 
   describe('Exception Handling & Propagation', () => {
     it('should propagate 400 Bad Request when the downstream microservice rejects a payload', async () => {
-      // Simulate the downstream microservice throwing a validation error
+      // Simulate downstream microservice throwing a validation error
       jest.spyOn(httpService, 'request').mockImplementationOnce(() => {
         const error: any = new Error('Bad Request from Downstream');
         error.isAxiosError = true;

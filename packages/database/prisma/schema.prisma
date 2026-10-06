@@ -101,7 +101,10 @@ model User {
   postalCode   String?   /// Postal or zip code
   country      String?   @default("ES") /// ISO 3166-1 alpha-2 country code
   isActive     Boolean   @default(true) /// Account status flag for access control
-  role         Role      @default(STUDENT)
+  
+  /// A user can hold multiple roles simultaneously (e.g., ADMIN_STAFF and STUDENT)
+  roles        Role[]    @default([STUDENT])
+  
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
@@ -118,13 +121,8 @@ model User {
 model StudentProfile {
   id         String    @id @default(uuid())
   userId     String    @unique
-  birthDate  DateTime?
-  phone      String?
-  address    String?
-  city       String?
-  state      String?
-  postalCode String?
-  country    String?   @default("ES")
+  
+  /// Academic metadata
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 

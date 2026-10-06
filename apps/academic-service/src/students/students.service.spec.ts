@@ -1,13 +1,15 @@
+/**
+ * @file students.service.spec.ts
+ * @group unit
+ * @description Unit tests for StudentsService covering data isolation and profile update workflows.
+ * Updated to handle array-based roles for authorization checks.
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import { StudentsService } from './students.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Role } from '@dms/shared-types';
 
-/**
- * @group unit
- * @description Unit tests for StudentsService covering data isolation and profile update workflows.
- */
 describe('StudentsService', () => {
   let service: StudentsService;
   let prisma: PrismaService;
@@ -44,8 +46,9 @@ describe('StudentsService', () => {
     it('should throw NotFoundException if student profile does not exist', async () => {
       mockPrisma.studentProfile.findUnique.mockResolvedValue(null);
 
+      // Note: Passing 'roles' array instead of 'role'
       await expect(
-        service.findOne('non-existent-id', { role: Role.SUPER_ADMIN, userId: 'admin-user' }),
+        service.findOne('non-existent-id', { roles: [Role.SUPER_ADMIN], userId: 'admin-user' }),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -56,8 +59,19 @@ describe('StudentsService', () => {
       });
 
       await expect(
-        service.findOne('student-profile-1', { role: Role.STUDENT, userId: 'stranger-user-id' }),
+        service.findOne('student-profile-1', { roles: [Role.STUDENT], userId: 'stranger-user-id' }),
       ).rejects.toThrow(ForbiddenException);
+    });
+    
+    it('should allow viewing if user is owner', async () => {
+      mockPrisma.studentProfile.findUnique.mockResolvedValue({
+        id: 'student-profile-1',
+        userId: 'owner-user-id',
+      });
+
+      const result = await service.findOne('student-profile-1', { roles: [Role.STUDENT], userId: 'owner-user-id' });
+      expect(result).toBeDefined();
+      expect(result.id).toEqual('student-profile-1');
     });
   });
 });

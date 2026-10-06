@@ -1,7 +1,7 @@
 /**
  * @file UserTable.tsx
  * @description Presentational component rendering the complex expandable user table.
- * Handles internal sorting, row expansion, and complex data filtering.
+ * Handles internal sorting, row expansion, and multi-role filtering.
  */
 
 import { useState, Fragment } from 'react';
@@ -53,7 +53,11 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
     const filtered = users.filter((u: any) => {
       const searchTarget = `${u.firstName} ${u.lastName} ${u.email} ${u.dni || ''} ${u.phone || ''}`.toLowerCase();
       const matchesSearch = searchTarget.includes(searchTerm.toLowerCase());
-      const matchesRole = selectedRoles.length > 0 ? selectedRoles.includes(u.role) : true;
+      
+      // Check if user roles array matches any selected filter role
+      const userRoles = Array.isArray(u.roles) ? u.roles : [u.role || 'STUDENT'];
+      const matchesRole = selectedRoles.length > 0 ? selectedRoles.some((r) => userRoles.includes(r)) : true;
+      
       return matchesSearch && matchesRole;
     });
 
@@ -77,13 +81,6 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
 
       if (valA < valB) return -1 * dirMultiplier;
       if (valA > valB) return 1 * dirMultiplier;
-
-      if (key === 'firstName') {
-        const lastA = (a.lastName || '').toLowerCase();
-        const lastB = (b.lastName || '').toLowerCase();
-        if (lastA < lastB) return -1 * dirMultiplier;
-        if (lastA > lastB) return 1 * dirMultiplier;
-      }
 
       return 0;
     });
@@ -121,7 +118,7 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
               <SortableHeader label="users.table_name" sortKey="firstName" />
               <SortableHeader label="users.table_last_name" sortKey="lastName" />
               <SortableHeader label="users.table_email" sortKey="email" />
-              <SortableHeader label="users.table_role" sortKey="role" />
+              <SortableHeader label="users.table_role" sortKey="roles" />
               <SortableHeader label="users.table_birth_date" sortKey="birthDate" />
               <SortableHeader label="users.table_dni" sortKey="dni" />
               <SortableHeader label="users.table_status" sortKey="isActive" />
@@ -136,70 +133,77 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
                 <td colSpan={8} className="px-6 py-4 text-center text-gray-500">No hay usuarios encontrados.</td>
               </tr>
             ) : (
-              processedUsers.map((user: any) => (
-                <Fragment key={user.id}>
-                  <tr 
-                    className={`hover:bg-gray-50 cursor-pointer transition-colors ${expandedUserId === user.id ? 'bg-blue-50/50' : ''}`}
-                    onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.firstName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{user.lastName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRoleBadgeColor(user.role)}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : <span className="text-gray-400 italic">{t('users.no_birth_date')}</span>}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.dni || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {user.isActive ? t('users.active') : t('users.inactive')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); onEdit(user); }}>
-                        <Pencil className="h-4 w-4 text-blue-600" />
-                      </Button>
-                      <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600 border-red-200" onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </td>
-                  </tr>
-
-                  {expandedUserId === user.id && (
-                    <tr>
-                      <td colSpan={8} className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-md shadow-inner border border-gray-100">
-                          <div>
-                            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.phone')}</h4>
-                            <div className="space-y-1">
-                              <p className="text-sm text-gray-600">{user.phone || t('users.no_phone')}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="md:col-span-2">
-                            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.address')}</h4>
-                            <p className="text-sm text-gray-900">
-                              {user.address ? (
-                                <>
-                                  {user.address}<br />
-                                  {user.postalCode} {user.city}<br />
-                                  {user.state}, {user.country}
-                                </>
-                              ) : (
-                                <span className="text-gray-400 italic">No hay dirección registrada.</span>
-                              )}
-                            </p>
-                          </div>
+              processedUsers.map((user: any) => {
+                const userRoles = Array.isArray(user.roles) ? user.roles : [user.role || 'STUDENT'];
+                return (
+                  <Fragment key={user.id}>
+                    <tr 
+                      className={`hover:bg-gray-50 cursor-pointer transition-colors ${expandedUserId === user.id ? 'bg-blue-50/50' : ''}`}
+                      onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.firstName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{user.lastName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-wrap gap-1">
+                          {userRoles.map((r: string) => (
+                            <span key={r} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRoleBadgeColor(r)}`}>
+                              {r}
+                            </span>
+                          ))}
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : <span className="text-gray-400 italic">{t('users.no_birth_date')}</span>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.dni || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {user.isActive ? t('users.active') : t('users.inactive')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); onEdit(user); }}>
+                          <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600 border-red-200" onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}>
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </td>
                     </tr>
-                  )}
-                </Fragment>
-              ))
+
+                    {expandedUserId === user.id && (
+                      <tr>
+                        <td colSpan={8} className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-md shadow-inner border border-gray-100">
+                            <div>
+                              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.phone')}</h4>
+                              <div className="space-y-1">
+                                <p className="text-sm text-gray-600">{user.phone || t('users.no_phone')}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="md:col-span-2">
+                              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.address')}</h4>
+                              <p className="text-sm text-gray-900">
+                                {user.address ? (
+                                  <>
+                                    {user.address}<br />
+                                    {user.postalCode} {user.city}<br />
+                                    {user.state}, {user.country}
+                                  </>
+                                ) : (
+                                  <span className="text-gray-400 italic">No hay dirección registrada.</span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })
             )}
           </tbody>
         </table>

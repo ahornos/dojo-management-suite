@@ -1,6 +1,7 @@
 /**
  * @file types.ts
  * @description Shared TypeScript interfaces for the user management module.
+ * Supports multi-role user configurations.
  */
 
 export interface UserFormPayload {
@@ -17,6 +18,6 @@ export interface UserFormPayload {
   state: string;
   postalCode: string;
   country: string;
-  role: string;
+  roles: string[];
   isActive: boolean;
 }

@@ -67,7 +67,7 @@ apiClient.interceptors.response.use(
   (response) => {
     // Defensive check: If the API Gateway swallows a 401/403 and returns it as a 200 OK body
     if (response.data && (response.data.statusCode === 401 || response.data.statusCode === 403)) {
-      useAuthStore.getState().clearAuth();
+      useAuthStore.getState().logout(); // Fixed: use logout instead of clearAuth
       localStorage.removeItem('token');
       
       if (window.location.pathname !== '/login') {
@@ -81,7 +81,7 @@ apiClient.interceptors.response.use(
   (error) => {
     // Standard HTTP error handling
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      useAuthStore.getState().clearAuth();
+      useAuthStore.getState().logout(); // Fixed: use logout instead of clearAuth
       localStorage.removeItem('token');
 
       if (window.location.pathname !== '/login') {

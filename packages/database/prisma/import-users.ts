@@ -3,10 +3,9 @@
  * @description Dynamic seed script to populate the database with users from a provided CSV file.
  * Accepts the CSV file path as a CLI argument, strictly validates the header structure, 
  * checks for existing users by email to prevent overwriting, handles duplicate DNIs gracefully,
- * securely hashes passwords, and maps the data to the Prisma schema including birth dates.
+ * securely hashes passwords, and maps roles as an array to align with the Prisma schema.
  */
 
-// IMPORTANTE: Importamos desde la ruta custom generada "../client" según tu schema.prisma
 import { PrismaClient, Role } from '../client';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -71,7 +70,6 @@ async function importUsers(filePath: string): Promise<void> {
     fs.createReadStream(filePath)
       .pipe(csvParser())
       .on('headers', (headers: string[]) => {
-        // Validate CSV structure before processing data
         const missingHeaders = EXPECTED_HEADERS.filter(
           (requiredHeader) => !headers.includes(requiredHeader)
         );
@@ -105,7 +103,6 @@ async function importUsers(filePath: string): Promise<void> {
         continue;
       }
 
-      // Check if user already exists to prevent data duplication
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -115,19 +112,17 @@ async function importUsers(filePath: string): Promise<void> {
         continue;
       }
 
-      // Check if DNI already exists in the database to avoid P2002 unique constraint error
       let dniToSave = row['ID / Passport']?.trim() || null;
       if (dniToSave && dniToSave !== '') {
         const existingDni = await prisma.user.findUnique({
           where: { dni: dniToSave },
         });
         if (existingDni) {
-          console.warn(`⚠️  Warning: DNI '${dniToSave}' for user ${email} is already registered. Setting DNI to null for this record.`);
+          console.warn(`⚠️  Warning: DNI '${dniToSave}' for user ${email} is already registered. Setting DNI to null.`);
           dniToSave = null;
         }
       }
 
-      // Safely parse the birth date if provided
       let parsedBirthDate: Date | null = null;
       const rawBirthDate = row.birthDate?.trim();
       if (rawBirthDate && rawBirthDate !== '') {
@@ -139,19 +134,20 @@ async function importUsers(filePath: string): Promise<void> {
         }
       }
 
-      // Hash the initial password from the CSV, or fallback to a secure default
       const saltRounds = 10;
       const plainPassword = row['Init password']?.trim() || 'FoxJiuJitsu2026!';
       const passwordHash = await bcrypt.hash(plainPassword, saltRounds);
 
-      // Create the new user mapping CSV headers to Prisma Schema fields
+      const parsedRole = (row.Role?.trim() as Role) || Role.STUDENT;
+
+      // Create the new user mapping CSV headers to Prisma Schema fields (using roles array)
       await prisma.user.create({
         data: {
           firstName: row.Name?.trim() || 'Unknown',
           lastName: row['Surname/s']?.trim() || 'Unknown',
           email: email,
           passwordHash: passwordHash,
-          role: (row.Role?.trim() as Role) || Role.STUDENT,
+          roles: [parsedRole], // Updated to array format to match schema
           dni: dniToSave,
           birthDate: parsedBirthDate,
           phone: row.Phone?.trim() || null,
@@ -164,7 +160,7 @@ async function importUsers(filePath: string): Promise<void> {
         },
       });
 
-      console.log(`✅ Created: ${row.Name} ${row['Surname/s']} (${email}) -> Role: ${row.Role}`);
+      console.log(`✅ Created: ${row.Name} ${row['Surname/s']} (${email}) -> Roles: [${parsedRole}]`);
     } catch (error) {
       console.error(`❌ Error importing user ${row.Email}:`, error);
     }

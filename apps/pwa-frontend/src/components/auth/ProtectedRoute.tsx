@@ -1,6 +1,6 @@
 /**
  * @file ProtectedRoute.tsx
- * @description Advanced route guard component supporting authentication and Role-Based Access Control (RBAC).
+ * @description Advanced route guard component supporting authentication and Role-Based Access Control (RBAC)[cite: 36].
  */
 
 import { Navigate, Outlet } from 'react-router-dom';
@@ -11,31 +11,33 @@ interface ProtectedRouteProps {
 }
 
 /**
- * Intercepts navigation to private routes.
- * Validates session existence and verifies if the user's role matches permitted roles.
+ * Intercepts navigation to private routes[cite: 36].
+ * Validates session existence and verifies if any of the user's roles match permitted roles[cite: 36].
  * 
  * @component
- * @param {ProtectedRouteProps} props - Configuration rules for the route guard.
- * @returns {React.ReactElement} The protected child components or a redirection.
+ * @param {ProtectedRouteProps} props - Configuration rules for the route guard[cite: 36].
+ * @returns {React.ReactElement} The protected child components or a redirection[cite: 36].
  */
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const token = useAuthStore((state) => state.token) || localStorage.getItem('token');
   const user = useAuthStore((state) => state.user);
 
-  // 1. Check basic authentication
+  // 1. Check basic authentication[cite: 36]
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  // 2. Check RBAC permissions if roles are specified
+  // 2. Check RBAC permissions against the user's roles array if restricted
   if (allowedRoles && allowedRoles.length > 0) {
-    const userRole = user?.role || 'STUDENT';
-    if (!allowedRoles.includes(userRole)) {
-      // Redirect unauthorized users to a safe default view (e.g., dashboard)
+    const userRoles = user?.roles || ['STUDENT'];
+    const hasPermission = userRoles.some((role) => allowedRoles.includes(role));
+    
+    if (!hasPermission) {
+      // Redirect unauthorized users to a safe default view (e.g., dashboard)[cite: 36]
       return <Navigate to="/dashboard" replace />;
     }
   }
 
-  // Render child routes if validation succeeds
+  // Render child routes if validation succeeds[cite: 36]
   return <Outlet />;
 };

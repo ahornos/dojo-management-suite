@@ -1,6 +1,7 @@
 /**
  * @file EditUserModal.tsx
- * @description Modal component containing the form to update an existing system user.
+ * @description Modal component containing the form to update an existing system user
+ * with multi-role support.
  */
 
 import { useState, useEffect } from 'react';
@@ -12,11 +13,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserFormPayload } from './types';
 
 interface EditUserModalProps {
-  user: UserFormPayload | null;
+  user: any | null;
   onClose: () => void;
   onSubmit: (data: UserFormPayload) => void;
   isPending: boolean;
 }
+
+const AVAILABLE_ROLES = [
+  'SUPER_ADMIN',
+  'ADMIN_STAFF',
+  'SPORTS_TECHNICAL_DIRECTOR',
+  'INSTRUCTOR',
+  'STUDENT',
+  'PARENT',
+];
 
 export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserModalProps): JSX.Element | null {
   const { t } = useTranslation();
@@ -25,11 +35,41 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
   // Sync state when the passed user object changes (modal opens)
   useEffect(() => {
     if (user) {
-      setEditingUser({ ...user });
+      setEditingUser({
+        id: user.id,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        dni: user.dni || '',
+        birthDate: user.birthDate ? user.birthDate.substring(0, 10) : '',
+        phone: user.phone || '',
+        address: user.address || '',
+        city: user.city || '',
+        state: user.state || '',
+        postalCode: user.postalCode || '',
+        country: user.country || 'ES',
+        // Ensure roles is correctly handled as an array, fallback to single role or STUDENT
+        roles: Array.isArray(user.roles) ? user.roles : [user.role || 'STUDENT'],
+        isActive: user.isActive ?? true,
+        password: '',
+      });
     }
   }, [user]);
 
   if (!user || !editingUser) return null;
+
+  const handleRoleToggle = (role: string) => {
+    setEditingUser((prev) => {
+      if (!prev) return prev;
+      const currentRoles = prev.roles || [];
+      if (currentRoles.includes(role)) {
+        if (currentRoles.length === 1) return prev; // Keep at least one role
+        return { ...prev, roles: currentRoles.filter((r) => r !== role) };
+      } else {
+        return { ...prev, roles: [...currentRoles, role] };
+      }
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,25 +117,33 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-role">{t('users.role')}</Label>
-                <select id="edit-role" value={editingUser.role} onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-                  <option value="ADMIN_STAFF">ADMIN_STAFF</option>
-                  <option value="SPORTS_TECHNICAL_DIRECTOR">SPORTS_TECHNICAL_DIRECTOR</option>
-                  <option value="INSTRUCTOR">INSTRUCTOR</option>
-                  <option value="STUDENT">STUDENT</option>
-                  <option value="PARENT">PARENT</option>
-                </select>
+            {/* Multi-Role Selection Section */}
+            <div className="space-y-2 border-t pt-4">
+              <Label className="text-sm font-semibold text-gray-800">{t('users.role')} (Select one or more)</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                {AVAILABLE_ROLES.map((role) => {
+                  const isChecked = editingUser.roles?.includes(role);
+                  return (
+                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleRoleToggle(role)}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      />
+                      <span>{role}</span>
+                    </label>
+                  );
+                })}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-status">{t('users.status_label')}</Label>
-                <select id="edit-status" value={editingUser.isActive ? 'true' : 'false'} onChange={(e) => setEditingUser({ ...editingUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="true">{t('users.active')}</option>
-                  <option value="false">{t('users.inactive')}</option>
-                </select>
-              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-status">{t('users.status_label')}</Label>
+              <select id="edit-status" value={editingUser.isActive ? 'true' : 'false'} onChange={(e) => setEditingUser({ ...editingUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="true">{t('users.active')}</option>
+                <option value="false">{t('users.inactive')}</option>
+              </select>
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-3">

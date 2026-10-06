@@ -1,11 +1,13 @@
-import { IsString, IsEmail, IsNotEmpty, IsEnum, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '@dms/shared-types';
-
 /**
  * @file register.dto.ts
  * @description Data Transfer Object for user registration.
+ * Validates incoming data for creating a new user account, supporting multiple roles.
  */
+
+import { IsString, IsEmail, IsNotEmpty, IsEnum, MinLength, IsArray, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Role } from '@dms/shared-types';
+
 export class RegisterDto {
   @ApiProperty({ description: 'User email address', example: 'user@dojo.com' })
   @IsEmail()
@@ -27,7 +29,14 @@ export class RegisterDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ description: 'System role assigned to the user', enum: Role, example: Role.STUDENT })
-  @IsEnum(Role)
-  role: Role;
+  @ApiPropertyOptional({ 
+    description: 'System roles assigned to the user', 
+    enum: Role, 
+    isArray: true, 
+    example: [Role.STUDENT] 
+  })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Role, { each: true })
+  roles?: Role[];
 }

@@ -3,6 +3,7 @@
     "title": "DMS Workspace",
     "dashboard": "Dashboard",
     "users": "Usuarios",
+    "disciplines": "Disciplinas",
     "students": "Alumnos",
     "attendances": "Asistencia",
     "graduations": "Graduaciones",
@@ -26,7 +27,7 @@
   "users": {
     "title": "Gestión de Usuarios",
     "subtitle": "Administra las cuentas de acceso, roles y datos personales del personal y socios.",
-    "search_placeholder": "Buscar por nombre o correo electrónico...",
+    "search_placeholder": "Buscar por nombre, email, DNI o teléfono...",
     "table_user": "Usuario",
     "table_role": "Rol",
     "table_dni_phone": "DNI / Teléfono",
@@ -54,13 +55,6 @@
     "postal_code": "Código Postal",
     "country": "País",
     "password_section": "Seguridad y Contraseña",
-    "password": "Nueva Contraseña (Opcional)",
-    "password_hint": "Déjalo en blanco si no deseas modificar la contraseña actual.",
-    "cancel": "Cancelar",
-    "saving": "Guardando...",
-    "save": "Guardar Cambios",
-    "new_user": "+ Nuevo Usuario",
-    "create_modal_title": "Dar de alta nuevo usuario",
     "password": "Contraseña Temporal",
     "password_hint": "Contraseña inicial para el acceso del usuario a la plataforma.",
     "birth_date": "Fecha de Nacimiento",
@@ -68,7 +62,6 @@
     "delete_confirm_title": "Eliminar usuario",
     "delete_confirm_message": "¿Estás seguro de que deseas eliminar permanentemente a este usuario? Esta acción no se puede deshacer.",
     "deleting": "Eliminando...",
-    "search_placeholder": "Buscar por nombre, email, DNI o teléfono...",
     "filter_role": "Filtrar por rol",
     "all_roles": "Todos los roles",
     "table_name": "Nombre",
@@ -77,9 +70,12 @@
     "table_birth_date": "Fecha Nac.",
     "expanded_info": "Información adicional del usuario",
     "no_birth_date": "Sin fecha",
-    "table_role": "Rol",
     "table_dni": "DNI / Pasaporte",
-    "no_phone": "Sin teléfono"
+    "new_user": "+ Nuevo usuario",
+    "create_title": "Dar de alta nuevo usuario",
+    "save": "Guardar Usuario",
+    "cancel": "Cancelar",
+    "saving": "Guardando..."
   },
   "students": {
     "title": "Gestión de Alumnos",
@@ -100,7 +96,22 @@
     "save": "Guardar Alumno",
     "no_students": "No hay alumnos registrados.",
     "active": "Activo",
-    "address_section": "Dirección Postal"
+    "address_section": "Dirección Postal",
+    "form": {
+      "existing_user_toggle": "¿El usuario ya existe en el sistema?",
+      "select_user_title": "Seleccionar Usuario Base *",
+      "select_user_placeholder": "-- Buscar usuario por email o nombre --",
+      "select_user_help": "Al seleccionar un usuario, se pre-cargarán sus datos. Al guardar, se actualizarán si hay cambios y se le añadirá el rol de Alumno.",
+      "personal_data_title": "Datos Personales del Alumno",
+      "guardian_title": "Datos del Tutor Legal (Padre / Madre)",
+      "guardian_required_badge": "Obligatorio por minoría de edad",
+      "guardian_help": "Al guardar, el sistema creará automáticamente un usuario asociado con el rol PARENT para gestionar los permisos legales y de facturación.",
+      "guardian_first_name": "Nombre del Tutor *",
+      "guardian_last_name": "Apellidos del Tutor *",
+      "guardian_email": "Email del Tutor *",
+      "guardian_phone": "Teléfono de Emergencia *",
+      "guardian_dni": "DNI / Pasaporte del Tutor *"
+    }
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -111,5 +122,59 @@
     "error": "Credenciales inválidas o error de conexión",
     "show_password": "Mostrar contraseña",
     "hide_password": "Ocultar contraseña"
+  },
+  "disciplines": {
+    "title": "Disciplines y Programas",
+    "subtitle": "Gestión de programas marciales y jerarquías de cinturones",
+    "new_discipline": "Nueva Disciplina",
+    "name_label": "Nombre",
+    "desc_label": "Descripción",
+    "programs_header": "Programas de Formación",
+    "years": "años",
+    "no_programs": "No hay programas registrados para esta disciplina.",
+    "create_title": "Crear Disciplina",
+    "edit_title": "Editar Disciplina",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "loading": "Cargando disciplinas...",
+    "error": "Error al cargar las disciplinas",
+    "no_data": "No se encontraron disciplinas registradas.",
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "belts": {
+    "create_title": "Añadir Cinturón",
+    "edit_title": "Editar Cinturón",
+    "name_label": "Nombre del Cinturón",
+    "order_label": "Orden Jerárquico",
+    "max_stripes": "Grados Máx.",
+    "min_months": "Mín. Meses",
+    "min_hours": "Mín. Horas",
+    "add_belt": "Añadir Cinturón",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "edit_belt": "Editar Cinturón",
+    "delete": "Eliminar",
+    "names": {
+      "white": "Cinturón Blanco",
+      "blue": "Cinturón Azul",
+      "purple": "Cinturón Morado",
+      "brown": "Cinturón Marrón",
+      "black": "Cinturón Negro",
+      "grey_white": "Gris / Blanco",
+      "solid_grey": "Gris Sólido",
+      "grey_black": "Gris / Negro",
+      "yellow_white": "Amarillo / Blanco",
+      "solid_yellow": "Amarillo Sólido",
+      "yellow_black": "Amarillo / Negro",
+      "green_white": "Verde / Blanco",
+      "solid_green": "Verde Sólido",
+      "green_black": "Verde / Negro"
+    }
+  },
+  "common": {
+    "confirm_delete": "¿Estás seguro de que deseas eliminar este elemento?"
   }
 }

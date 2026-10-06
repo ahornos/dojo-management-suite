@@ -5,7 +5,11 @@
   "types": "./client/index.d.ts",
   "scripts": {
     "db:generate": "prisma generate",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -13,6 +17,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/node": "^20.19.43",
     "csv-parser": "^3.2.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2"

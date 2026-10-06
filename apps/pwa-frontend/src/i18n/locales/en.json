@@ -3,6 +3,7 @@
     "title": "DMS Workspace",
     "dashboard": "Dashboard",
     "users": "Users",
+    "disciplines": "Disciplines",
     "students": "Students",
     "attendances": "Attendances",
     "graduations": "Graduations",
@@ -26,7 +27,7 @@
   "users": {
     "title": "User Management",
     "subtitle": "Manage access accounts, roles, and personal data of staff and members.",
-    "search_placeholder": "Search by name or email...",
+    "search_placeholder": "Search by name, email, DNI, or phone...",
     "table_user": "User",
     "table_role": "Role",
     "table_dni_phone": "DNI / Phone",
@@ -54,13 +55,6 @@
     "postal_code": "Postal Code",
     "country": "Country",
     "password_section": "Security & Password",
-    "password": "New Password (Optional)",
-    "password_hint": "Leave blank if you do not want to change the current password.",
-    "cancel": "Cancel",
-    "saving": "Saving...",
-    "save": "Save Changes",
-    "new_user": "+ New User",
-    "create_modal_title": "Register New User",
     "password": "Temporary Password",
     "password_hint": "Initial password for the user to access the platform.",
     "birth_date": "Birth Date",
@@ -68,7 +62,6 @@
     "delete_confirm_title": "Delete User",
     "delete_confirm_message": "Are you sure you want to permanently delete this user? This action cannot be undone.",
     "deleting": "Deleting...",
-    "search_placeholder": "Search by name, email, DNI, or phone...",
     "filter_role": "Filter by role",
     "all_roles": "All roles",
     "table_name": "Name",
@@ -77,9 +70,12 @@
     "table_birth_date": "Birth Date",
     "expanded_info": "Additional user information",
     "no_birth_date": "No date",
-    "table_role": "Role",
     "table_dni": "ID / Passport",
-    "no_phone": "No phone"
+    "new_user": "+ New user",
+    "create_title": "Register New User",
+    "save": "Save User",
+    "cancel": "Cancel",
+    "saving": "Saving..."
   },
   "students": {
     "title": "Student Management",
@@ -100,7 +96,22 @@
     "save": "Save Student",
     "no_students": "No students registered.",
     "active": "Active",
-    "address_section": "Postal Address"
+    "address_section": "Postal Address",
+    "form": {
+      "existing_user_toggle": "Does the user already exist in the system?",
+      "select_user_title": "Select Base User *",
+      "select_user_placeholder": "-- Search user by email or name --",
+      "select_user_help": "By selecting a user, their data will be pre-loaded. Upon saving, changes will be updated and the Student role will be added.",
+      "personal_data_title": "Student's Personal Data",
+      "guardian_title": "Legal Guardian Data (Parent / Guardian)",
+      "guardian_required_badge": "Required for minors",
+      "guardian_help": "Upon saving, the system will automatically create an associated user with the PARENT role to manage legal and billing permissions.",
+      "guardian_first_name": "Guardian's First Name *",
+      "guardian_last_name": "Guardian's Last Name *",
+      "guardian_email": "Guardian's Email *",
+      "guardian_phone": "Emergency Phone *",
+      "guardian_dni": "Guardian's ID / Passport *"
+    }
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -111,5 +122,59 @@
     "error": "Invalid credentials or connection error",
     "show_password": "Show password",
     "hide_password": "Hide password"
+  },
+  "disciplines": {
+    "title": "Disciplines & Programs",
+    "subtitle": "Management of martial programs and belt hierarchies",
+    "new_discipline": "New Discipline",
+    "name_label": "Name",
+    "desc_label": "Description",
+    "programs_header": "Training Programs",
+    "years": "years",
+    "no_programs": "No programs registered for this discipline.",
+    "create_title": "Create Discipline",
+    "edit_title": "Edit Discipline",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "loading": "Loading disciplines...",
+    "error": "Error loading disciplines",
+    "no_data": "No registered disciplines found.",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "belts": {
+    "create_title": "Add Belt",
+    "edit_title": "Edit Belt",
+    "name_label": "Belt Name",
+    "order_label": "Hierarchical Order",
+    "max_stripes": "Max Stripes",
+    "min_months": "Min Months",
+    "min_hours": "Min Hours",
+    "add_belt": "Add Belt",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "edit_belt": "Edit Belt",
+    "delete": "Delete",
+    "names": {
+      "white": "White Belt",
+      "blue": "Blue Belt",
+      "purple": "Purple Belt",
+      "brown": "Brown Belt",
+      "black": "Black Belt",
+      "grey_white": "Grey/White Belt",
+      "solid_grey": "Solid Grey Belt",
+      "grey_black": "Grey/Black Belt",
+      "yellow_white": "Yellow/White Belt",
+      "solid_yellow": "Solid Yellow Belt",
+      "yellow_black": "Yellow/Black Belt",
+      "green_white": "Green/White Belt",
+      "solid_green": "Solid Green Belt",
+      "green_black": "Green/Black Belt"
+    }
+  },
+  "common": {
+    "confirm_delete": "Are you sure you want to permanently delete this item?"
   }
 }

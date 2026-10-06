@@ -12,7 +12,8 @@ import { MainLayout } from './components/layout/MainLayout';
 // Module Views
 import Login from '@/pages/login/Login';
 import Users from '@/pages/users/Users';
-import Students from './pages/Students'; 
+import Disciplines from '@/pages/disciplines/Disciplines';
+import Students from '@/pages/students/Students';
 
 /**
  * Placeholder component for the Dashboard view.
@@ -73,7 +74,12 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
               <Route path="/users" element={<Users />} />
             </Route>
-            <Route path="/students" element={<Students />} />
+            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'SPORTS_TECHNICAL_DIRECTOR']} />}>
+              <Route path="/disciplines" element={<Disciplines />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'INSTRUCTOR']} />}>
+              <Route path="/students" element={<Students />} />
+            </Route>
             
             <Route path="/attendances" element={<Attendances />} />
             <Route path="/graduations" element={<Graduations />} />
