@@ -15,7 +15,9 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 /**
  * Model User
- * 
+ * ---------------------------------------------------------
+ * Core Identity & Users
+ * ---------------------------------------------------------
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
@@ -23,6 +25,13 @@ export type User = $Result.DefaultSelection<Prisma.$UserPayload>
  * 
  */
 export type StudentProfile = $Result.DefaultSelection<Prisma.$StudentProfilePayload>
+/**
+ * Model StudentStatusHistory
+ * ---------------------------------------------------------
+ * Student Lifecycle Audit Log
+ * ---------------------------------------------------------
+ */
+export type StudentStatusHistory = $Result.DefaultSelection<Prisma.$StudentStatusHistoryPayload>
 /**
  * Model Guardian
  * 
@@ -35,7 +44,9 @@ export type Guardian = $Result.DefaultSelection<Prisma.$GuardianPayload>
 export type StudentGuardian = $Result.DefaultSelection<Prisma.$StudentGuardianPayload>
 /**
  * Model Discipline
- * 
+ * ---------------------------------------------------------
+ * Academy Configuration (Disciplines & Ranks)
+ * ---------------------------------------------------------
  */
 export type Discipline = $Result.DefaultSelection<Prisma.$DisciplinePayload>
 /**
@@ -50,7 +61,9 @@ export type DisciplineProgram = $Result.DefaultSelection<Prisma.$DisciplineProgr
 export type BeltRank = $Result.DefaultSelection<Prisma.$BeltRankPayload>
 /**
  * Model StudentRank
- * 
+ * ---------------------------------------------------------
+ * Academic Records (Ranks & Attendances)
+ * ---------------------------------------------------------
  */
 export type StudentRank = $Result.DefaultSelection<Prisma.$StudentRankPayload>
 /**
@@ -60,7 +73,9 @@ export type StudentRank = $Result.DefaultSelection<Prisma.$StudentRankPayload>
 export type Attendance = $Result.DefaultSelection<Prisma.$AttendancePayload>
 /**
  * Model ProfileUpdateRequest
- * 
+ * ---------------------------------------------------------
+ * Approval Workflows (IAM & Validation)
+ * ---------------------------------------------------------
  */
 export type ProfileUpdateRequest = $Result.DefaultSelection<Prisma.$ProfileUpdateRequestPayload>
 /**
@@ -70,7 +85,9 @@ export type ProfileUpdateRequest = $Result.DefaultSelection<Prisma.$ProfileUpdat
 export type GraduationRequest = $Result.DefaultSelection<Prisma.$GraduationRequestPayload>
 /**
  * Model FeeTier
- * 
+ * ---------------------------------------------------------
+ * Billing, Subscriptions & Financial Engine
+ * ---------------------------------------------------------
  */
 export type FeeTier = $Result.DefaultSelection<Prisma.$FeeTierPayload>
 /**
@@ -95,7 +112,9 @@ export type StudentDiscount = $Result.DefaultSelection<Prisma.$StudentDiscountPa
 export type StudentSubscription = $Result.DefaultSelection<Prisma.$StudentSubscriptionPayload>
 /**
  * Model CashRegisterSession
- * 
+ * ---------------------------------------------------------
+ * Daily Cash Register Submodule
+ * ---------------------------------------------------------
  */
 export type CashRegisterSession = $Result.DefaultSelection<Prisma.$CashRegisterSessionPayload>
 /**
@@ -105,7 +124,9 @@ export type CashRegisterSession = $Result.DefaultSelection<Prisma.$CashRegisterS
 export type CashTransaction = $Result.DefaultSelection<Prisma.$CashTransactionPayload>
 /**
  * Model BankMandate
- * 
+ * ---------------------------------------------------------
+ * Bank Remittance Submodule (SEPA / Caixabank Integration)
+ * ---------------------------------------------------------
  */
 export type BankMandate = $Result.DefaultSelection<Prisma.$BankMandatePayload>
 /**
@@ -120,7 +141,9 @@ export type RemittanceBatch = $Result.DefaultSelection<Prisma.$RemittanceBatchPa
 export type RemittanceItem = $Result.DefaultSelection<Prisma.$RemittanceItemPayload>
 /**
  * Model Federation
- * 
+ * ---------------------------------------------------------
+ * Federations & Licenses (Foundation)
+ * ---------------------------------------------------------
  */
 export type Federation = $Result.DefaultSelection<Prisma.$FederationPayload>
 /**
@@ -143,6 +166,16 @@ export namespace $Enums {
 };
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const StudentStatus: {
+  TRIAL: 'TRIAL',
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  DROPPED: 'DROPPED'
+};
+
+export type StudentStatus = (typeof StudentStatus)[keyof typeof StudentStatus]
 
 
 export const RequestStatus: {
@@ -233,6 +266,10 @@ export type RemittanceItemStatus = (typeof RemittanceItemStatus)[keyof typeof Re
 export type Role = $Enums.Role
 
 export const Role: typeof $Enums.Role
+
+export type StudentStatus = $Enums.StudentStatus
+
+export const StudentStatus: typeof $Enums.StudentStatus
 
 export type RequestStatus = $Enums.RequestStatus
 
@@ -412,6 +449,16 @@ export class PrismaClient<
     * ```
     */
   get studentProfile(): Prisma.StudentProfileDelegate<ExtArgs>;
+
+  /**
+   * `prisma.studentStatusHistory`: Exposes CRUD operations for the **StudentStatusHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StudentStatusHistories
+    * const studentStatusHistories = await prisma.studentStatusHistory.findMany()
+    * ```
+    */
+  get studentStatusHistory(): Prisma.StudentStatusHistoryDelegate<ExtArgs>;
 
   /**
    * `prisma.guardian`: Exposes CRUD operations for the **Guardian** model.
@@ -1065,6 +1112,7 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     StudentProfile: 'StudentProfile',
+    StudentStatusHistory: 'StudentStatusHistory',
     Guardian: 'Guardian',
     StudentGuardian: 'StudentGuardian',
     Discipline: 'Discipline',
@@ -1101,7 +1149,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
+      modelProps: "user" | "studentProfile" | "studentStatusHistory" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1242,6 +1290,76 @@ export namespace Prisma {
           count: {
             args: Prisma.StudentProfileCountArgs<ExtArgs>
             result: $Utils.Optional<StudentProfileCountAggregateOutputType> | number
+          }
+        }
+      }
+      StudentStatusHistory: {
+        payload: Prisma.$StudentStatusHistoryPayload<ExtArgs>
+        fields: Prisma.StudentStatusHistoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StudentStatusHistoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StudentStatusHistoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          findFirst: {
+            args: Prisma.StudentStatusHistoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StudentStatusHistoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          findMany: {
+            args: Prisma.StudentStatusHistoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>[]
+          }
+          create: {
+            args: Prisma.StudentStatusHistoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          createMany: {
+            args: Prisma.StudentStatusHistoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StudentStatusHistoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>[]
+          }
+          delete: {
+            args: Prisma.StudentStatusHistoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          update: {
+            args: Prisma.StudentStatusHistoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.StudentStatusHistoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StudentStatusHistoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.StudentStatusHistoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StudentStatusHistoryPayload>
+          }
+          aggregate: {
+            args: Prisma.StudentStatusHistoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStudentStatusHistory>
+          }
+          groupBy: {
+            args: Prisma.StudentStatusHistoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StudentStatusHistoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StudentStatusHistoryCountArgs<ExtArgs>
+            result: $Utils.Optional<StudentStatusHistoryCountAggregateOutputType> | number
           }
         }
       }
@@ -2879,12 +2997,14 @@ export namespace Prisma {
     reviewedUpdates: number
     proposedGraduations: number
     approvedGraduations: number
+    statusChanges: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reviewedUpdates?: boolean | UserCountOutputTypeCountReviewedUpdatesArgs
     proposedGraduations?: boolean | UserCountOutputTypeCountProposedGraduationsArgs
     approvedGraduations?: boolean | UserCountOutputTypeCountApprovedGraduationsArgs
+    statusChanges?: boolean | UserCountOutputTypeCountStatusChangesArgs
   }
 
   // Custom InputTypes
@@ -2919,12 +3039,20 @@ export namespace Prisma {
     where?: GraduationRequestWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStatusChangesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentStatusHistoryWhereInput
+  }
+
 
   /**
    * Count Type StudentProfileCountOutputType
    */
 
   export type StudentProfileCountOutputType = {
+    statusHistory: number
     guardians: number
     ranks: number
     attendances: number
@@ -2938,6 +3066,7 @@ export namespace Prisma {
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    statusHistory?: boolean | StudentProfileCountOutputTypeCountStatusHistoryArgs
     guardians?: boolean | StudentProfileCountOutputTypeCountGuardiansArgs
     ranks?: boolean | StudentProfileCountOutputTypeCountRanksArgs
     attendances?: boolean | StudentProfileCountOutputTypeCountAttendancesArgs
@@ -2959,6 +3088,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the StudentProfileCountOutputType
      */
     select?: StudentProfileCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * StudentProfileCountOutputType without action
+   */
+  export type StudentProfileCountOutputTypeCountStatusHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentStatusHistoryWhereInput
   }
 
   /**
@@ -3616,6 +3752,7 @@ export namespace Prisma {
     reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
     proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
     approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
+    statusChanges?: boolean | User$statusChangesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3665,6 +3802,7 @@ export namespace Prisma {
     reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
     proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
     approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
+    statusChanges?: boolean | User$statusChangesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3677,6 +3815,10 @@ export namespace Prisma {
       reviewedUpdates: Prisma.$ProfileUpdateRequestPayload<ExtArgs>[]
       proposedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
       approvedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
+      /**
+       * Track which staff member executed a status change
+       */
+      statusChanges: Prisma.$StudentStatusHistoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3687,33 +3829,12 @@ export namespace Prisma {
       dni: string | null
       birthDate: Date | null
       phone: string | null
-      /**
-       * Street address, building number, and apartment/door
-       */
       address: string | null
-      /**
-       * City or municipality
-       */
       city: string | null
-      /**
-       * State, province, or region
-       */
       state: string | null
-      /**
-       * Postal or zip code
-       */
       postalCode: string | null
-      /**
-       * ISO 3166-1 alpha-2 country code
-       */
       country: string | null
-      /**
-       * Account status flag for access control
-       */
       isActive: boolean
-      /**
-       * A user can hold multiple roles simultaneously (e.g., ADMIN_STAFF and STUDENT)
-       */
       roles: $Enums.Role[]
       createdAt: Date
       updatedAt: Date
@@ -4086,6 +4207,7 @@ export namespace Prisma {
     reviewedUpdates<T extends User$reviewedUpdatesArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewedUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfileUpdateRequestPayload<ExtArgs>, T, "findMany"> | Null>
     proposedGraduations<T extends User$proposedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$proposedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
     approvedGraduations<T extends User$approvedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
+    statusChanges<T extends User$statusChangesArgs<ExtArgs> = {}>(args?: Subset<T, User$statusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4536,6 +4658,26 @@ export namespace Prisma {
   }
 
   /**
+   * User.statusChanges
+   */
+  export type User$statusChangesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    where?: StudentStatusHistoryWhereInput
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4563,6 +4705,7 @@ export namespace Prisma {
   export type StudentProfileMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    status: $Enums.StudentStatus | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4570,6 +4713,7 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    status: $Enums.StudentStatus | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4577,6 +4721,8 @@ export namespace Prisma {
   export type StudentProfileCountAggregateOutputType = {
     id: number
     userId: number
+    status: number
+    emergencyContacts: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4586,6 +4732,7 @@ export namespace Prisma {
   export type StudentProfileMinAggregateInputType = {
     id?: true
     userId?: true
+    status?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4593,6 +4740,7 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateInputType = {
     id?: true
     userId?: true
+    status?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4600,6 +4748,8 @@ export namespace Prisma {
   export type StudentProfileCountAggregateInputType = {
     id?: true
     userId?: true
+    status?: true
+    emergencyContacts?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4680,6 +4830,8 @@ export namespace Prisma {
   export type StudentProfileGroupByOutputType = {
     id: string
     userId: string
+    status: $Enums.StudentStatus
+    emergencyContacts: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: StudentProfileCountAggregateOutputType | null
@@ -4704,9 +4856,12 @@ export namespace Prisma {
   export type StudentProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    status?: boolean
+    emergencyContacts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    statusHistory?: boolean | StudentProfile$statusHistoryArgs<ExtArgs>
     guardians?: boolean | StudentProfile$guardiansArgs<ExtArgs>
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
@@ -4723,6 +4878,8 @@ export namespace Prisma {
   export type StudentProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    status?: boolean
+    emergencyContacts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4731,12 +4888,15 @@ export namespace Prisma {
   export type StudentProfileSelectScalar = {
     id?: boolean
     userId?: boolean
+    status?: boolean
+    emergencyContacts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
   export type StudentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    statusHistory?: boolean | StudentProfile$statusHistoryArgs<ExtArgs>
     guardians?: boolean | StudentProfile$guardiansArgs<ExtArgs>
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
@@ -4757,6 +4917,7 @@ export namespace Prisma {
     name: "StudentProfile"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      statusHistory: Prisma.$StudentStatusHistoryPayload<ExtArgs>[]
       guardians: Prisma.$StudentGuardianPayload<ExtArgs>[]
       ranks: Prisma.$StudentRankPayload<ExtArgs>[]
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
@@ -4772,8 +4933,13 @@ export namespace Prisma {
       id: string
       userId: string
       /**
-       * Academic metadata
+       * Student Lifecycle Management
        */
+      status: $Enums.StudentStatus
+      /**
+       * Array of lightweight JSON objects: { name, phone, relationship, customRelationship }
+       */
+      emergencyContacts: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["studentProfile"]>
@@ -5141,6 +5307,7 @@ export namespace Prisma {
   export interface Prisma__StudentProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    statusHistory<T extends StudentProfile$statusHistoryArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$statusHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findMany"> | Null>
     guardians<T extends StudentProfile$guardiansArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$guardiansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentGuardianPayload<ExtArgs>, T, "findMany"> | Null>
     ranks<T extends StudentProfile$ranksArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$ranksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentRankPayload<ExtArgs>, T, "findMany"> | Null>
     attendances<T extends StudentProfile$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany"> | Null>
@@ -5182,6 +5349,8 @@ export namespace Prisma {
   interface StudentProfileFieldRefs {
     readonly id: FieldRef<"StudentProfile", 'String'>
     readonly userId: FieldRef<"StudentProfile", 'String'>
+    readonly status: FieldRef<"StudentProfile", 'StudentStatus'>
+    readonly emergencyContacts: FieldRef<"StudentProfile", 'Json'>
     readonly createdAt: FieldRef<"StudentProfile", 'DateTime'>
     readonly updatedAt: FieldRef<"StudentProfile", 'DateTime'>
   }
@@ -5502,6 +5671,26 @@ export namespace Prisma {
   }
 
   /**
+   * StudentProfile.statusHistory
+   */
+  export type StudentProfile$statusHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    where?: StudentStatusHistoryWhereInput
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
+  }
+
+  /**
    * StudentProfile.guardians
    */
   export type StudentProfile$guardiansArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5713,6 +5902,984 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StudentProfileInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model StudentStatusHistory
+   */
+
+  export type AggregateStudentStatusHistory = {
+    _count: StudentStatusHistoryCountAggregateOutputType | null
+    _min: StudentStatusHistoryMinAggregateOutputType | null
+    _max: StudentStatusHistoryMaxAggregateOutputType | null
+  }
+
+  export type StudentStatusHistoryMinAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    previousStatus: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus | null
+    reason: string | null
+    changedById: string | null
+    createdAt: Date | null
+  }
+
+  export type StudentStatusHistoryMaxAggregateOutputType = {
+    id: string | null
+    studentProfileId: string | null
+    previousStatus: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus | null
+    reason: string | null
+    changedById: string | null
+    createdAt: Date | null
+  }
+
+  export type StudentStatusHistoryCountAggregateOutputType = {
+    id: number
+    studentProfileId: number
+    previousStatus: number
+    newStatus: number
+    reason: number
+    changedById: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type StudentStatusHistoryMinAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    previousStatus?: true
+    newStatus?: true
+    reason?: true
+    changedById?: true
+    createdAt?: true
+  }
+
+  export type StudentStatusHistoryMaxAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    previousStatus?: true
+    newStatus?: true
+    reason?: true
+    changedById?: true
+    createdAt?: true
+  }
+
+  export type StudentStatusHistoryCountAggregateInputType = {
+    id?: true
+    studentProfileId?: true
+    previousStatus?: true
+    newStatus?: true
+    reason?: true
+    changedById?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type StudentStatusHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentStatusHistory to aggregate.
+     */
+    where?: StudentStatusHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentStatusHistories to fetch.
+     */
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentStatusHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentStatusHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StudentStatusHistories
+    **/
+    _count?: true | StudentStatusHistoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StudentStatusHistoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StudentStatusHistoryMaxAggregateInputType
+  }
+
+  export type GetStudentStatusHistoryAggregateType<T extends StudentStatusHistoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateStudentStatusHistory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStudentStatusHistory[P]>
+      : GetScalarType<T[P], AggregateStudentStatusHistory[P]>
+  }
+
+
+
+
+  export type StudentStatusHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StudentStatusHistoryWhereInput
+    orderBy?: StudentStatusHistoryOrderByWithAggregationInput | StudentStatusHistoryOrderByWithAggregationInput[]
+    by: StudentStatusHistoryScalarFieldEnum[] | StudentStatusHistoryScalarFieldEnum
+    having?: StudentStatusHistoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StudentStatusHistoryCountAggregateInputType | true
+    _min?: StudentStatusHistoryMinAggregateInputType
+    _max?: StudentStatusHistoryMaxAggregateInputType
+  }
+
+  export type StudentStatusHistoryGroupByOutputType = {
+    id: string
+    studentProfileId: string
+    previousStatus: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason: string | null
+    changedById: string | null
+    createdAt: Date
+    _count: StudentStatusHistoryCountAggregateOutputType | null
+    _min: StudentStatusHistoryMinAggregateOutputType | null
+    _max: StudentStatusHistoryMaxAggregateOutputType | null
+  }
+
+  type GetStudentStatusHistoryGroupByPayload<T extends StudentStatusHistoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StudentStatusHistoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StudentStatusHistoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StudentStatusHistoryGroupByOutputType[P]>
+            : GetScalarType<T[P], StudentStatusHistoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StudentStatusHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    previousStatus?: boolean
+    newStatus?: boolean
+    reason?: boolean
+    changedById?: boolean
+    createdAt?: boolean
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
+  }, ExtArgs["result"]["studentStatusHistory"]>
+
+  export type StudentStatusHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    studentProfileId?: boolean
+    previousStatus?: boolean
+    newStatus?: boolean
+    reason?: boolean
+    changedById?: boolean
+    createdAt?: boolean
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
+  }, ExtArgs["result"]["studentStatusHistory"]>
+
+  export type StudentStatusHistorySelectScalar = {
+    id?: boolean
+    studentProfileId?: boolean
+    previousStatus?: boolean
+    newStatus?: boolean
+    reason?: boolean
+    changedById?: boolean
+    createdAt?: boolean
+  }
+
+  export type StudentStatusHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
+  }
+  export type StudentStatusHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
+  }
+
+  export type $StudentStatusHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StudentStatusHistory"
+    objects: {
+      studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
+      changedBy: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      studentProfileId: string
+      previousStatus: $Enums.StudentStatus | null
+      newStatus: $Enums.StudentStatus
+      reason: string | null
+      changedById: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["studentStatusHistory"]>
+    composites: {}
+  }
+
+  type StudentStatusHistoryGetPayload<S extends boolean | null | undefined | StudentStatusHistoryDefaultArgs> = $Result.GetResult<Prisma.$StudentStatusHistoryPayload, S>
+
+  type StudentStatusHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StudentStatusHistoryFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StudentStatusHistoryCountAggregateInputType | true
+    }
+
+  export interface StudentStatusHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentStatusHistory'], meta: { name: 'StudentStatusHistory' } }
+    /**
+     * Find zero or one StudentStatusHistory that matches the filter.
+     * @param {StudentStatusHistoryFindUniqueArgs} args - Arguments to find a StudentStatusHistory
+     * @example
+     * // Get one StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StudentStatusHistoryFindUniqueArgs>(args: SelectSubset<T, StudentStatusHistoryFindUniqueArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one StudentStatusHistory that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {StudentStatusHistoryFindUniqueOrThrowArgs} args - Arguments to find a StudentStatusHistory
+     * @example
+     * // Get one StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StudentStatusHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentStatusHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first StudentStatusHistory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryFindFirstArgs} args - Arguments to find a StudentStatusHistory
+     * @example
+     * // Get one StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StudentStatusHistoryFindFirstArgs>(args?: SelectSubset<T, StudentStatusHistoryFindFirstArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first StudentStatusHistory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryFindFirstOrThrowArgs} args - Arguments to find a StudentStatusHistory
+     * @example
+     * // Get one StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StudentStatusHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentStatusHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more StudentStatusHistories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StudentStatusHistories
+     * const studentStatusHistories = await prisma.studentStatusHistory.findMany()
+     * 
+     * // Get first 10 StudentStatusHistories
+     * const studentStatusHistories = await prisma.studentStatusHistory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const studentStatusHistoryWithIdOnly = await prisma.studentStatusHistory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StudentStatusHistoryFindManyArgs>(args?: SelectSubset<T, StudentStatusHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a StudentStatusHistory.
+     * @param {StudentStatusHistoryCreateArgs} args - Arguments to create a StudentStatusHistory.
+     * @example
+     * // Create one StudentStatusHistory
+     * const StudentStatusHistory = await prisma.studentStatusHistory.create({
+     *   data: {
+     *     // ... data to create a StudentStatusHistory
+     *   }
+     * })
+     * 
+     */
+    create<T extends StudentStatusHistoryCreateArgs>(args: SelectSubset<T, StudentStatusHistoryCreateArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many StudentStatusHistories.
+     * @param {StudentStatusHistoryCreateManyArgs} args - Arguments to create many StudentStatusHistories.
+     * @example
+     * // Create many StudentStatusHistories
+     * const studentStatusHistory = await prisma.studentStatusHistory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StudentStatusHistoryCreateManyArgs>(args?: SelectSubset<T, StudentStatusHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StudentStatusHistories and returns the data saved in the database.
+     * @param {StudentStatusHistoryCreateManyAndReturnArgs} args - Arguments to create many StudentStatusHistories.
+     * @example
+     * // Create many StudentStatusHistories
+     * const studentStatusHistory = await prisma.studentStatusHistory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StudentStatusHistories and only return the `id`
+     * const studentStatusHistoryWithIdOnly = await prisma.studentStatusHistory.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StudentStatusHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentStatusHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a StudentStatusHistory.
+     * @param {StudentStatusHistoryDeleteArgs} args - Arguments to delete one StudentStatusHistory.
+     * @example
+     * // Delete one StudentStatusHistory
+     * const StudentStatusHistory = await prisma.studentStatusHistory.delete({
+     *   where: {
+     *     // ... filter to delete one StudentStatusHistory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StudentStatusHistoryDeleteArgs>(args: SelectSubset<T, StudentStatusHistoryDeleteArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one StudentStatusHistory.
+     * @param {StudentStatusHistoryUpdateArgs} args - Arguments to update one StudentStatusHistory.
+     * @example
+     * // Update one StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StudentStatusHistoryUpdateArgs>(args: SelectSubset<T, StudentStatusHistoryUpdateArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more StudentStatusHistories.
+     * @param {StudentStatusHistoryDeleteManyArgs} args - Arguments to filter StudentStatusHistories to delete.
+     * @example
+     * // Delete a few StudentStatusHistories
+     * const { count } = await prisma.studentStatusHistory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StudentStatusHistoryDeleteManyArgs>(args?: SelectSubset<T, StudentStatusHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StudentStatusHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StudentStatusHistories
+     * const studentStatusHistory = await prisma.studentStatusHistory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StudentStatusHistoryUpdateManyArgs>(args: SelectSubset<T, StudentStatusHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one StudentStatusHistory.
+     * @param {StudentStatusHistoryUpsertArgs} args - Arguments to update or create a StudentStatusHistory.
+     * @example
+     * // Update or create a StudentStatusHistory
+     * const studentStatusHistory = await prisma.studentStatusHistory.upsert({
+     *   create: {
+     *     // ... data to create a StudentStatusHistory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StudentStatusHistory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StudentStatusHistoryUpsertArgs>(args: SelectSubset<T, StudentStatusHistoryUpsertArgs<ExtArgs>>): Prisma__StudentStatusHistoryClient<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of StudentStatusHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryCountArgs} args - Arguments to filter StudentStatusHistories to count.
+     * @example
+     * // Count the number of StudentStatusHistories
+     * const count = await prisma.studentStatusHistory.count({
+     *   where: {
+     *     // ... the filter for the StudentStatusHistories we want to count
+     *   }
+     * })
+    **/
+    count<T extends StudentStatusHistoryCountArgs>(
+      args?: Subset<T, StudentStatusHistoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StudentStatusHistoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StudentStatusHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StudentStatusHistoryAggregateArgs>(args: Subset<T, StudentStatusHistoryAggregateArgs>): Prisma.PrismaPromise<GetStudentStatusHistoryAggregateType<T>>
+
+    /**
+     * Group by StudentStatusHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StudentStatusHistoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StudentStatusHistoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StudentStatusHistoryGroupByArgs['orderBy'] }
+        : { orderBy?: StudentStatusHistoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StudentStatusHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentStatusHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StudentStatusHistory model
+   */
+  readonly fields: StudentStatusHistoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StudentStatusHistory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StudentStatusHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    changedBy<T extends StudentStatusHistory$changedByArgs<ExtArgs> = {}>(args?: Subset<T, StudentStatusHistory$changedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StudentStatusHistory model
+   */ 
+  interface StudentStatusHistoryFieldRefs {
+    readonly id: FieldRef<"StudentStatusHistory", 'String'>
+    readonly studentProfileId: FieldRef<"StudentStatusHistory", 'String'>
+    readonly previousStatus: FieldRef<"StudentStatusHistory", 'StudentStatus'>
+    readonly newStatus: FieldRef<"StudentStatusHistory", 'StudentStatus'>
+    readonly reason: FieldRef<"StudentStatusHistory", 'String'>
+    readonly changedById: FieldRef<"StudentStatusHistory", 'String'>
+    readonly createdAt: FieldRef<"StudentStatusHistory", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StudentStatusHistory findUnique
+   */
+  export type StudentStatusHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentStatusHistory to fetch.
+     */
+    where: StudentStatusHistoryWhereUniqueInput
+  }
+
+  /**
+   * StudentStatusHistory findUniqueOrThrow
+   */
+  export type StudentStatusHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentStatusHistory to fetch.
+     */
+    where: StudentStatusHistoryWhereUniqueInput
+  }
+
+  /**
+   * StudentStatusHistory findFirst
+   */
+  export type StudentStatusHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentStatusHistory to fetch.
+     */
+    where?: StudentStatusHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentStatusHistories to fetch.
+     */
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentStatusHistories.
+     */
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentStatusHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentStatusHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentStatusHistories.
+     */
+    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * StudentStatusHistory findFirstOrThrow
+   */
+  export type StudentStatusHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentStatusHistory to fetch.
+     */
+    where?: StudentStatusHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentStatusHistories to fetch.
+     */
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StudentStatusHistories.
+     */
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentStatusHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentStatusHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StudentStatusHistories.
+     */
+    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * StudentStatusHistory findMany
+   */
+  export type StudentStatusHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which StudentStatusHistories to fetch.
+     */
+    where?: StudentStatusHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StudentStatusHistories to fetch.
+     */
+    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StudentStatusHistories.
+     */
+    cursor?: StudentStatusHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StudentStatusHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StudentStatusHistories.
+     */
+    skip?: number
+    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * StudentStatusHistory create
+   */
+  export type StudentStatusHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StudentStatusHistory.
+     */
+    data: XOR<StudentStatusHistoryCreateInput, StudentStatusHistoryUncheckedCreateInput>
+  }
+
+  /**
+   * StudentStatusHistory createMany
+   */
+  export type StudentStatusHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StudentStatusHistories.
+     */
+    data: StudentStatusHistoryCreateManyInput | StudentStatusHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StudentStatusHistory createManyAndReturn
+   */
+  export type StudentStatusHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many StudentStatusHistories.
+     */
+    data: StudentStatusHistoryCreateManyInput | StudentStatusHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StudentStatusHistory update
+   */
+  export type StudentStatusHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StudentStatusHistory.
+     */
+    data: XOR<StudentStatusHistoryUpdateInput, StudentStatusHistoryUncheckedUpdateInput>
+    /**
+     * Choose, which StudentStatusHistory to update.
+     */
+    where: StudentStatusHistoryWhereUniqueInput
+  }
+
+  /**
+   * StudentStatusHistory updateMany
+   */
+  export type StudentStatusHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StudentStatusHistories.
+     */
+    data: XOR<StudentStatusHistoryUpdateManyMutationInput, StudentStatusHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which StudentStatusHistories to update
+     */
+    where?: StudentStatusHistoryWhereInput
+  }
+
+  /**
+   * StudentStatusHistory upsert
+   */
+  export type StudentStatusHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StudentStatusHistory to update in case it exists.
+     */
+    where: StudentStatusHistoryWhereUniqueInput
+    /**
+     * In case the StudentStatusHistory found by the `where` argument doesn't exist, create a new StudentStatusHistory with this data.
+     */
+    create: XOR<StudentStatusHistoryCreateInput, StudentStatusHistoryUncheckedCreateInput>
+    /**
+     * In case the StudentStatusHistory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StudentStatusHistoryUpdateInput, StudentStatusHistoryUncheckedUpdateInput>
+  }
+
+  /**
+   * StudentStatusHistory delete
+   */
+  export type StudentStatusHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
+    /**
+     * Filter which StudentStatusHistory to delete.
+     */
+    where: StudentStatusHistoryWhereUniqueInput
+  }
+
+  /**
+   * StudentStatusHistory deleteMany
+   */
+  export type StudentStatusHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StudentStatusHistories to delete
+     */
+    where?: StudentStatusHistoryWhereInput
+  }
+
+  /**
+   * StudentStatusHistory.changedBy
+   */
+  export type StudentStatusHistory$changedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * StudentStatusHistory without action
+   */
+  export type StudentStatusHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StudentStatusHistory
+     */
+    select?: StudentStatusHistorySelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StudentStatusHistoryInclude<ExtArgs> | null
   }
 
 
@@ -26542,11 +27709,26 @@ export namespace Prisma {
   export const StudentProfileScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    status: 'status',
+    emergencyContacts: 'emergencyContacts',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type StudentProfileScalarFieldEnum = (typeof StudentProfileScalarFieldEnum)[keyof typeof StudentProfileScalarFieldEnum]
+
+
+  export const StudentStatusHistoryScalarFieldEnum: {
+    id: 'id',
+    studentProfileId: 'studentProfileId',
+    previousStatus: 'previousStatus',
+    newStatus: 'newStatus',
+    reason: 'reason',
+    changedById: 'changedById',
+    createdAt: 'createdAt'
+  };
+
+  export type StudentStatusHistoryScalarFieldEnum = (typeof StudentStatusHistoryScalarFieldEnum)[keyof typeof StudentStatusHistoryScalarFieldEnum]
 
 
   export const GuardianScalarFieldEnum: {
@@ -26827,19 +28009,19 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-  export const JsonNullValueInput: {
-    JsonNull: typeof JsonNull
-  };
-
-  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
   export const NullableJsonNullValueInput: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull
   };
 
   export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -26922,6 +28104,27 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'StudentStatus'
+   */
+  export type EnumStudentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StudentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'StudentStatus[]'
+   */
+  export type ListEnumStudentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StudentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -26932,13 +28135,6 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
     
 
 
@@ -27125,6 +28321,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestListRelationFilter
     proposedGraduations?: GraduationRequestListRelationFilter
     approvedGraduations?: GraduationRequestListRelationFilter
+    statusChanges?: StudentStatusHistoryListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -27150,6 +28347,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestOrderByRelationAggregateInput
     proposedGraduations?: GraduationRequestOrderByRelationAggregateInput
     approvedGraduations?: GraduationRequestOrderByRelationAggregateInput
+    statusChanges?: StudentStatusHistoryOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -27178,6 +28376,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestListRelationFilter
     proposedGraduations?: GraduationRequestListRelationFilter
     approvedGraduations?: GraduationRequestListRelationFilter
+    statusChanges?: StudentStatusHistoryListRelationFilter
   }, "id" | "email" | "dni">
 
   export type UserOrderByWithAggregationInput = {
@@ -27232,9 +28431,12 @@ export namespace Prisma {
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
     id?: StringFilter<"StudentProfile"> | string
     userId?: StringFilter<"StudentProfile"> | string
+    status?: EnumStudentStatusFilter<"StudentProfile"> | $Enums.StudentStatus
+    emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
+    statusHistory?: StudentStatusHistoryListRelationFilter
     guardians?: StudentGuardianListRelationFilter
     ranks?: StudentRankListRelationFilter
     attendances?: AttendanceListRelationFilter
@@ -27250,9 +28452,12 @@ export namespace Prisma {
   export type StudentProfileOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
+    status?: SortOrder
+    emergencyContacts?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    statusHistory?: StudentStatusHistoryOrderByRelationAggregateInput
     guardians?: StudentGuardianOrderByRelationAggregateInput
     ranks?: StudentRankOrderByRelationAggregateInput
     attendances?: AttendanceOrderByRelationAggregateInput
@@ -27271,9 +28476,12 @@ export namespace Prisma {
     AND?: StudentProfileWhereInput | StudentProfileWhereInput[]
     OR?: StudentProfileWhereInput[]
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
+    status?: EnumStudentStatusFilter<"StudentProfile"> | $Enums.StudentStatus
+    emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
     user?: XOR<UserRelationFilter, UserWhereInput>
+    statusHistory?: StudentStatusHistoryListRelationFilter
     guardians?: StudentGuardianListRelationFilter
     ranks?: StudentRankListRelationFilter
     attendances?: AttendanceListRelationFilter
@@ -27289,6 +28497,8 @@ export namespace Prisma {
   export type StudentProfileOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
+    status?: SortOrder
+    emergencyContacts?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: StudentProfileCountOrderByAggregateInput
@@ -27302,8 +28512,78 @@ export namespace Prisma {
     NOT?: StudentProfileScalarWhereWithAggregatesInput | StudentProfileScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StudentProfile"> | string
     userId?: StringWithAggregatesFilter<"StudentProfile"> | string
+    status?: EnumStudentStatusWithAggregatesFilter<"StudentProfile"> | $Enums.StudentStatus
+    emergencyContacts?: JsonNullableWithAggregatesFilter<"StudentProfile">
     createdAt?: DateTimeWithAggregatesFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StudentProfile"> | Date | string
+  }
+
+  export type StudentStatusHistoryWhereInput = {
+    AND?: StudentStatusHistoryWhereInput | StudentStatusHistoryWhereInput[]
+    OR?: StudentStatusHistoryWhereInput[]
+    NOT?: StudentStatusHistoryWhereInput | StudentStatusHistoryWhereInput[]
+    id?: StringFilter<"StudentStatusHistory"> | string
+    studentProfileId?: StringFilter<"StudentStatusHistory"> | string
+    previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
+    reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
+    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    changedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }
+
+  export type StudentStatusHistoryOrderByWithRelationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    previousStatus?: SortOrderInput | SortOrder
+    newStatus?: SortOrder
+    reason?: SortOrderInput | SortOrder
+    changedById?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    studentProfile?: StudentProfileOrderByWithRelationInput
+    changedBy?: UserOrderByWithRelationInput
+  }
+
+  export type StudentStatusHistoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: StudentStatusHistoryWhereInput | StudentStatusHistoryWhereInput[]
+    OR?: StudentStatusHistoryWhereInput[]
+    NOT?: StudentStatusHistoryWhereInput | StudentStatusHistoryWhereInput[]
+    studentProfileId?: StringFilter<"StudentStatusHistory"> | string
+    previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
+    reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
+    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    changedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type StudentStatusHistoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    previousStatus?: SortOrderInput | SortOrder
+    newStatus?: SortOrder
+    reason?: SortOrderInput | SortOrder
+    changedById?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: StudentStatusHistoryCountOrderByAggregateInput
+    _max?: StudentStatusHistoryMaxOrderByAggregateInput
+    _min?: StudentStatusHistoryMinOrderByAggregateInput
+  }
+
+  export type StudentStatusHistoryScalarWhereWithAggregatesInput = {
+    AND?: StudentStatusHistoryScalarWhereWithAggregatesInput | StudentStatusHistoryScalarWhereWithAggregatesInput[]
+    OR?: StudentStatusHistoryScalarWhereWithAggregatesInput[]
+    NOT?: StudentStatusHistoryScalarWhereWithAggregatesInput | StudentStatusHistoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StudentStatusHistory"> | string
+    studentProfileId?: StringWithAggregatesFilter<"StudentStatusHistory"> | string
+    previousStatus?: EnumStudentStatusNullableWithAggregatesFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusWithAggregatesFilter<"StudentStatusHistory"> | $Enums.StudentStatus
+    reason?: StringNullableWithAggregatesFilter<"StudentStatusHistory"> | string | null
+    changedById?: StringNullableWithAggregatesFilter<"StudentStatusHistory"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"StudentStatusHistory"> | Date | string
   }
 
   export type GuardianWhereInput = {
@@ -28748,6 +30028,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -28773,6 +30054,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUpdateInput = {
@@ -28798,6 +30080,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -28823,6 +30106,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -28887,9 +30171,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -28905,8 +30192,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -28921,9 +30211,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -28939,8 +30232,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -28956,12 +30252,16 @@ export namespace Prisma {
   export type StudentProfileCreateManyInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type StudentProfileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -28969,8 +30269,78 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryCreateInput = {
+    id?: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    createdAt?: Date | string
+    studentProfile: StudentProfileCreateNestedOneWithoutStatusHistoryInput
+    changedBy?: UserCreateNestedOneWithoutStatusChangesInput
+  }
+
+  export type StudentStatusHistoryUncheckedCreateInput = {
+    id?: string
+    studentProfileId: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    changedById?: string | null
+    createdAt?: Date | string
+  }
+
+  export type StudentStatusHistoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput
+    changedBy?: UserUpdateOneWithoutStatusChangesNestedInput
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryCreateManyInput = {
+    id?: string
+    studentProfileId: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    changedById?: string | null
+    createdAt?: Date | string
+  }
+
+  export type StudentStatusHistoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GuardianCreateInput = {
@@ -30528,6 +31898,12 @@ export namespace Prisma {
     none?: GraduationRequestWhereInput
   }
 
+  export type StudentStatusHistoryListRelationFilter = {
+    every?: StudentStatusHistoryWhereInput
+    some?: StudentStatusHistoryWhereInput
+    none?: StudentStatusHistoryWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -30538,6 +31914,10 @@ export namespace Prisma {
   }
 
   export type GraduationRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StudentStatusHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -30671,6 +32051,35 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type EnumStudentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStudentStatusFilter<$PrismaModel> | $Enums.StudentStatus
+  }
+  export type JsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type UserRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -30759,6 +32168,8 @@ export namespace Prisma {
   export type StudentProfileCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    status?: SortOrder
+    emergencyContacts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30766,6 +32177,7 @@ export namespace Prisma {
   export type StudentProfileMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -30773,8 +32185,101 @@ export namespace Prisma {
   export type StudentProfileMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type EnumStudentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStudentStatusWithAggregatesFilter<$PrismaModel> | $Enums.StudentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStudentStatusFilter<$PrismaModel>
+    _max?: NestedEnumStudentStatusFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumStudentStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumStudentStatusNullableFilter<$PrismaModel> | $Enums.StudentStatus | null
+  }
+
+  export type StudentProfileRelationFilter = {
+    is?: StudentProfileWhereInput
+    isNot?: StudentProfileWhereInput
+  }
+
+  export type UserNullableRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type StudentStatusHistoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    previousStatus?: SortOrder
+    newStatus?: SortOrder
+    reason?: SortOrder
+    changedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StudentStatusHistoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    previousStatus?: SortOrder
+    newStatus?: SortOrder
+    reason?: SortOrder
+    changedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StudentStatusHistoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    studentProfileId?: SortOrder
+    previousStatus?: SortOrder
+    newStatus?: SortOrder
+    reason?: SortOrder
+    changedById?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumStudentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumStudentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.StudentStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
   }
 
   export type GuardianCountOrderByAggregateInput = {
@@ -30793,11 +32298,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
-  }
-
-  export type StudentProfileRelationFilter = {
-    is?: StudentProfileWhereInput
-    isNot?: StudentProfileWhereInput
   }
 
   export type GuardianRelationFilter = {
@@ -31076,11 +32576,6 @@ export namespace Prisma {
     not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
   }
 
-  export type UserNullableRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
-  }
-
   export type ProfileUpdateRequestCountOrderByAggregateInput = {
     id?: SortOrder
     studentProfileId?: SortOrder
@@ -31222,28 +32717,6 @@ export namespace Prisma {
     gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
-  export type JsonNullableFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type FeeTierCountOrderByAggregateInput = {
     id?: SortOrder
@@ -31298,31 +32771,6 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type DecimalNullableFilter<$PrismaModel = never> = {
@@ -32007,6 +33455,13 @@ export namespace Prisma {
     connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
+  export type StudentStatusHistoryCreateNestedManyWithoutChangedByInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
+    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+  }
+
   export type StudentProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
@@ -32038,6 +33493,13 @@ export namespace Prisma {
     connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
     createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
     connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
+  }
+
+  export type StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
+    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -32127,6 +33589,20 @@ export namespace Prisma {
     deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
+  export type StudentStatusHistoryUpdateManyWithoutChangedByNestedInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
+    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
+    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
+    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
+    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput | StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput[]
+    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+  }
+
   export type StudentProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
@@ -32189,10 +33665,31 @@ export namespace Prisma {
     deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
+  export type StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
+    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
+    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
+    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
+    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput | StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput[]
+    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutStudentProfileInput = {
     create?: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutStudentProfileInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentStatusHistoryCreateManyStudentProfileInputEnvelope
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
   }
 
   export type StudentGuardianCreateNestedManyWithoutStudentInput = {
@@ -32265,6 +33762,13 @@ export namespace Prisma {
     connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
   }
 
+  export type StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
+    createMany?: StudentStatusHistoryCreateManyStudentProfileInputEnvelope
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+  }
+
   export type StudentGuardianUncheckedCreateNestedManyWithoutStudentInput = {
     create?: XOR<StudentGuardianCreateWithoutStudentInput, StudentGuardianUncheckedCreateWithoutStudentInput> | StudentGuardianCreateWithoutStudentInput[] | StudentGuardianUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: StudentGuardianCreateOrConnectWithoutStudentInput | StudentGuardianCreateOrConnectWithoutStudentInput[]
@@ -32335,12 +33839,30 @@ export namespace Prisma {
     connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
   }
 
+  export type EnumStudentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.StudentStatus
+  }
+
   export type UserUpdateOneRequiredWithoutStudentProfileNestedInput = {
     create?: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
     connectOrCreate?: UserCreateOrConnectWithoutStudentProfileInput
     upsert?: UserUpsertWithoutStudentProfileInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStudentProfileInput, UserUpdateWithoutStudentProfileInput>, UserUncheckedUpdateWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentStatusHistoryCreateManyStudentProfileInputEnvelope
+    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutStudentProfileInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput | StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
   }
 
   export type StudentGuardianUpdateManyWithoutStudentNestedInput = {
@@ -32483,6 +34005,20 @@ export namespace Prisma {
     deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
   }
 
+  export type StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput = {
+    create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
+    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
+    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput[]
+    createMany?: StudentStatusHistoryCreateManyStudentProfileInputEnvelope
+    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
+    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutStudentProfileInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutStudentProfileInput[]
+    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput | StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput[]
+    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+  }
+
   export type StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput = {
     create?: XOR<StudentGuardianCreateWithoutStudentInput, StudentGuardianUncheckedCreateWithoutStudentInput> | StudentGuardianCreateWithoutStudentInput[] | StudentGuardianUncheckedCreateWithoutStudentInput[]
     connectOrCreate?: StudentGuardianCreateOrConnectWithoutStudentInput | StudentGuardianCreateOrConnectWithoutStudentInput[]
@@ -32621,6 +34157,40 @@ export namespace Prisma {
     update?: BankMandateUpdateWithWhereUniqueWithoutStudentInput | BankMandateUpdateWithWhereUniqueWithoutStudentInput[]
     updateMany?: BankMandateUpdateManyWithWhereWithoutStudentInput | BankMandateUpdateManyWithWhereWithoutStudentInput[]
     deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
+  }
+
+  export type StudentProfileCreateNestedOneWithoutStatusHistoryInput = {
+    create?: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStatusHistoryInput
+    connect?: StudentProfileWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutStatusChangesInput = {
+    create?: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStatusChangesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type NullableEnumStudentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.StudentStatus | null
+  }
+
+  export type StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput = {
+    create?: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
+    connectOrCreate?: StudentProfileCreateOrConnectWithoutStatusHistoryInput
+    upsert?: StudentProfileUpsertWithoutStatusHistoryInput
+    connect?: StudentProfileWhereUniqueInput
+    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStatusHistoryInput, StudentProfileUpdateWithoutStatusHistoryInput>, StudentProfileUncheckedUpdateWithoutStatusHistoryInput>
+  }
+
+  export type UserUpdateOneWithoutStatusChangesNestedInput = {
+    create?: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStatusChangesInput
+    upsert?: UserUpsertWithoutStatusChangesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStatusChangesInput, UserUpdateWithoutStatusChangesInput>, UserUncheckedUpdateWithoutStatusChangesInput>
   }
 
   export type UserCreateNestedOneWithoutGuardianProfileInput = {
@@ -33656,6 +35226,62 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedEnumStudentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStudentStatusFilter<$PrismaModel> | $Enums.StudentStatus
+  }
+
+  export type NestedEnumStudentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStudentStatusWithAggregatesFilter<$PrismaModel> | $Enums.StudentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStudentStatusFilter<$PrismaModel>
+    _max?: NestedEnumStudentStatusFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumStudentStatusNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumStudentStatusNullableFilter<$PrismaModel> | $Enums.StudentStatus | null
+  }
+
+  export type NestedEnumStudentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel> | null
+    in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumStudentStatusNullableWithAggregatesFilter<$PrismaModel> | $Enums.StudentStatus | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
+    _max?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -33774,28 +35400,6 @@ export namespace Prisma {
     _sum?: NestedDecimalFilter<$PrismaModel>
     _min?: NestedDecimalFilter<$PrismaModel>
     _max?: NestedDecimalFilter<$PrismaModel>
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedDecimalNullableFilter<$PrismaModel = never> = {
@@ -33963,8 +35567,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutUserInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -33979,8 +35586,11 @@ export namespace Prisma {
 
   export type StudentProfileUncheckedCreateWithoutUserInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -34103,6 +35713,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StudentStatusHistoryCreateWithoutChangedByInput = {
+    id?: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    createdAt?: Date | string
+    studentProfile: StudentProfileCreateNestedOneWithoutStatusHistoryInput
+  }
+
+  export type StudentStatusHistoryUncheckedCreateWithoutChangedByInput = {
+    id?: string
+    studentProfileId: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    createdAt?: Date | string
+  }
+
+  export type StudentStatusHistoryCreateOrConnectWithoutChangedByInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    create: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput>
+  }
+
+  export type StudentStatusHistoryCreateManyChangedByInputEnvelope = {
+    data: StudentStatusHistoryCreateManyChangedByInput | StudentStatusHistoryCreateManyChangedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type StudentProfileUpsertWithoutUserInput = {
     update: XOR<StudentProfileUpdateWithoutUserInput, StudentProfileUncheckedUpdateWithoutUserInput>
     create: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
@@ -34116,8 +35754,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -34132,8 +35773,11 @@ export namespace Prisma {
 
   export type StudentProfileUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -34244,6 +35888,35 @@ export namespace Prisma {
     data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutApprovedByInput>
   }
 
+  export type StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    update: XOR<StudentStatusHistoryUpdateWithoutChangedByInput, StudentStatusHistoryUncheckedUpdateWithoutChangedByInput>
+    create: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput>
+  }
+
+  export type StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    data: XOR<StudentStatusHistoryUpdateWithoutChangedByInput, StudentStatusHistoryUncheckedUpdateWithoutChangedByInput>
+  }
+
+  export type StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput = {
+    where: StudentStatusHistoryScalarWhereInput
+    data: XOR<StudentStatusHistoryUpdateManyMutationInput, StudentStatusHistoryUncheckedUpdateManyWithoutChangedByInput>
+  }
+
+  export type StudentStatusHistoryScalarWhereInput = {
+    AND?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+    OR?: StudentStatusHistoryScalarWhereInput[]
+    NOT?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+    id?: StringFilter<"StudentStatusHistory"> | string
+    studentProfileId?: StringFilter<"StudentStatusHistory"> | string
+    previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
+    reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
+  }
+
   export type UserCreateWithoutStudentProfileInput = {
     id?: string
     email: string
@@ -34266,6 +35939,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateWithoutStudentProfileInput = {
@@ -34290,11 +35964,40 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserCreateOrConnectWithoutStudentProfileInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryCreateWithoutStudentProfileInput = {
+    id?: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    createdAt?: Date | string
+    changedBy?: UserCreateNestedOneWithoutStatusChangesInput
+  }
+
+  export type StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput = {
+    id?: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    changedById?: string | null
+    createdAt?: Date | string
+  }
+
+  export type StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    create: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryCreateManyStudentProfileInputEnvelope = {
+    data: StudentStatusHistoryCreateManyStudentProfileInput | StudentStatusHistoryCreateManyStudentProfileInput[]
+    skipDuplicates?: boolean
   }
 
   export type StudentGuardianCreateWithoutStudentInput = {
@@ -34596,6 +36299,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStudentProfileInput = {
@@ -34620,6 +36324,23 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
+  }
+
+  export type StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    update: XOR<StudentStatusHistoryUpdateWithoutStudentProfileInput, StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput>
+    create: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryUpdateWithWhereUniqueWithoutStudentProfileInput = {
+    where: StudentStatusHistoryWhereUniqueInput
+    data: XOR<StudentStatusHistoryUpdateWithoutStudentProfileInput, StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput = {
+    where: StudentStatusHistoryScalarWhereInput
+    data: XOR<StudentStatusHistoryUpdateManyMutationInput, StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileInput>
   }
 
   export type StudentGuardianUpsertWithWhereUniqueWithoutStudentInput = {
@@ -34877,6 +36598,214 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
   }
 
+  export type StudentProfileCreateWithoutStatusHistoryInput = {
+    id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutStudentProfileInput
+    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
+    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileUncheckedCreateWithoutStatusHistoryInput = {
+    id?: string
+    userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
+    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
+    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
+    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
+    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
+    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
+    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
+    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
+    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
+  }
+
+  export type StudentProfileCreateOrConnectWithoutStatusHistoryInput = {
+    where: StudentProfileWhereUniqueInput
+    create: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
+  }
+
+  export type UserCreateWithoutStatusChangesInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    firstName: string
+    lastName: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    isActive?: boolean
+    roles?: UserCreaterolesInput | $Enums.Role[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
+    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
+    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
+    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+  }
+
+  export type UserUncheckedCreateWithoutStatusChangesInput = {
+    id?: string
+    email: string
+    passwordHash: string
+    firstName: string
+    lastName: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    isActive?: boolean
+    roles?: UserCreaterolesInput | $Enums.Role[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
+    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
+    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
+    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+  }
+
+  export type UserCreateOrConnectWithoutStatusChangesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
+  }
+
+  export type StudentProfileUpsertWithoutStatusHistoryInput = {
+    update: XOR<StudentProfileUpdateWithoutStatusHistoryInput, StudentProfileUncheckedUpdateWithoutStatusHistoryInput>
+    create: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
+    where?: StudentProfileWhereInput
+  }
+
+  export type StudentProfileUpdateToOneWithWhereWithoutStatusHistoryInput = {
+    where?: StudentProfileWhereInput
+    data: XOR<StudentProfileUpdateWithoutStatusHistoryInput, StudentProfileUncheckedUpdateWithoutStatusHistoryInput>
+  }
+
+  export type StudentProfileUpdateWithoutStatusHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
+    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
+  }
+
+  export type StudentProfileUncheckedUpdateWithoutStatusHistoryInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
+    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
+    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
+    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
+    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
+    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
+    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
+    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
+  }
+
+  export type UserUpsertWithoutStatusChangesInput = {
+    update: XOR<UserUpdateWithoutStatusChangesInput, UserUncheckedUpdateWithoutStatusChangesInput>
+    create: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutStatusChangesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutStatusChangesInput, UserUncheckedUpdateWithoutStatusChangesInput>
+  }
+
+  export type UserUpdateWithoutStatusChangesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | $Enums.Role[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
+    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
+    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
+    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStatusChangesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    roles?: UserUpdaterolesInput | $Enums.Role[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
+    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
+    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
+    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+  }
+
   export type UserCreateWithoutGuardianProfileInput = {
     id?: string
     email: string
@@ -34899,6 +36828,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateWithoutGuardianProfileInput = {
@@ -34923,6 +36853,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserCreateOrConnectWithoutGuardianProfileInput = {
@@ -34983,6 +36914,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGuardianProfileInput = {
@@ -35007,6 +36939,7 @@ export namespace Prisma {
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type StudentGuardianUpsertWithWhereUniqueWithoutGuardianInput = {
@@ -35027,9 +36960,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutGuardiansInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
@@ -35044,8 +36980,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
@@ -35092,9 +37031,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
@@ -35109,8 +37051,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
@@ -35391,9 +37336,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutRanksInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
@@ -35408,8 +37356,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutRanksInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
@@ -35464,9 +37415,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
@@ -35481,8 +37435,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
@@ -35527,9 +37484,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutAttendancesInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
@@ -35544,8 +37504,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutAttendancesInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
@@ -35575,9 +37538,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
@@ -35592,8 +37558,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
@@ -35607,9 +37576,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -35624,8 +37596,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutUpdateRequestsInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -35664,6 +37639,7 @@ export namespace Prisma {
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateWithoutReviewedUpdatesInput = {
@@ -35688,6 +37664,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
     approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserCreateOrConnectWithoutReviewedUpdatesInput = {
@@ -35708,9 +37685,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -35725,8 +37705,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -35771,6 +37754,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReviewedUpdatesInput = {
@@ -35795,13 +37779,17 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
     approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type StudentProfileCreateWithoutGraduationRequestsInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -35816,8 +37804,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutGraduationRequestsInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -35856,6 +37847,7 @@ export namespace Prisma {
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
     approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateWithoutProposedGraduationsInput = {
@@ -35880,6 +37872,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
     approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserCreateOrConnectWithoutProposedGraduationsInput = {
@@ -35909,6 +37902,7 @@ export namespace Prisma {
     guardianProfile?: GuardianCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
+    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateWithoutApprovedGraduationsInput = {
@@ -35933,6 +37927,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
     proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
+    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserCreateOrConnectWithoutApprovedGraduationsInput = {
@@ -35953,9 +37948,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -35970,8 +37968,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -36016,6 +38017,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
     approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProposedGraduationsInput = {
@@ -36040,6 +38042,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
     approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUpsertWithoutApprovedGraduationsInput = {
@@ -36075,6 +38078,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
+    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedGraduationsInput = {
@@ -36099,6 +38103,7 @@ export namespace Prisma {
     guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
     reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
     proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
+    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type StudentFeeCreateWithoutFeeTierInput = {
@@ -36189,9 +38194,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentFeesInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -36206,8 +38214,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutStudentFeesInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -36266,9 +38277,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentFeesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -36283,8 +38297,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutStudentFeesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -36373,9 +38390,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentDiscountsInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -36390,8 +38410,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutStudentDiscountsInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -36456,9 +38479,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -36473,8 +38499,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -36529,9 +38558,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutSubscriptionsInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -36546,8 +38578,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutSubscriptionsInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -36606,9 +38641,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -36623,8 +38661,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -36819,9 +38860,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutBankMandatesInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -36836,8 +38880,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutBankMandatesInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -36897,9 +38944,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutBankMandatesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -36914,8 +38964,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutBankMandatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -37179,9 +39232,12 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutLicensesInput = {
     id?: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutStudentProfileInput
+    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -37196,8 +39252,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedCreateWithoutLicensesInput = {
     id?: string
     userId: string
+    status?: $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
@@ -37244,9 +39303,12 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutLicensesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
+    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -37261,8 +39323,11 @@ export namespace Prisma {
   export type StudentProfileUncheckedUpdateWithoutLicensesInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
@@ -37323,6 +39388,15 @@ export namespace Prisma {
     proposedStripes?: number | null
     proposedById: string
     status?: $Enums.RequestStatus
+    createdAt?: Date | string
+  }
+
+  export type StudentStatusHistoryCreateManyChangedByInput = {
+    id?: string
+    studentProfileId: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
     createdAt?: Date | string
   }
 
@@ -37413,6 +39487,42 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StudentStatusHistoryUpdateWithoutChangedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    studentProfile?: StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateWithoutChangedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateManyWithoutChangedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryCreateManyStudentProfileInput = {
+    id?: string
+    previousStatus?: $Enums.StudentStatus | null
+    newStatus: $Enums.StudentStatus
+    reason?: string | null
+    changedById?: string | null
+    createdAt?: Date | string
+  }
+
   export type StudentGuardianCreateManyStudentInput = {
     guardianId: string
     relationship?: string | null
@@ -37493,6 +39603,33 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type StudentStatusHistoryUpdateWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    changedBy?: UserUpdateOneWithoutStatusChangesNestedInput
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
+    reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentGuardianUpdateWithoutStudentInput = {
@@ -38184,6 +40321,10 @@ export namespace Prisma {
      * @deprecated Use StudentProfileDefaultArgs instead
      */
     export type StudentProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentProfileDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StudentStatusHistoryDefaultArgs instead
+     */
+    export type StudentStatusHistoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentStatusHistoryDefaultArgs<ExtArgs>
     /**
      * @deprecated Use GuardianDefaultArgs instead
      */

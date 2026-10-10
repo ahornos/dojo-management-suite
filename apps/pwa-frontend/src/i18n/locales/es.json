@@ -111,6 +111,18 @@
       "guardian_email": "Email del Tutor *",
       "guardian_phone": "Teléfono de Emergencia *",
       "guardian_dni": "DNI / Pasaporte del Tutor *"
+    },
+    "table_age": "Edad",
+    "table_discipline": "Disciplina(s)",
+    "table_belt": "Cinturón / Grado",
+    "table_emergency": "Contacto Emergencia",
+    "filter_age": "Filtrar por edad",
+    "all_ages": "Todas las edades",
+    "age_groups": {
+      "kids": "Kids (3-6 años)",
+      "infantil": "Infantil (7-12 años)",
+      "juvenil": "Juvenil (13-15 años)",
+      "adults": "Adultos (16+ años)"
     }
   },
   "login": {

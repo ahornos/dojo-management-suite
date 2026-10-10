@@ -15,7 +15,6 @@ datasource db {
 /// ---------------------------------------------------------
 /// Enums
 /// ---------------------------------------------------------
-
 enum Role {
   SUPER_ADMIN
   ADMIN_STAFF
@@ -29,6 +28,14 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+/// Lifecycle status of a student within the academy
+enum StudentStatus {
+  TRIAL
+  ACTIVE
+  PAUSED
+  DROPPED
 }
 
 enum DiscountType {
@@ -85,7 +92,6 @@ enum RemittanceItemStatus {
 /// ---------------------------------------------------------
 /// Core Identity & Users
 /// ---------------------------------------------------------
-
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -95,38 +101,43 @@ model User {
   dni          String?   @unique
   birthDate    DateTime?
   phone        String?
-  address      String?   /// Street address, building number, and apartment/door
-  city         String?   /// City or municipality
-  state        String?   /// State, province, or region
-  postalCode   String?   /// Postal or zip code
-  country      String?   @default("ES") /// ISO 3166-1 alpha-2 country code
-  isActive     Boolean   @default(true) /// Account status flag for access control
-  
-  /// A user can hold multiple roles simultaneously (e.g., ADMIN_STAFF and STUDENT)
+  address      String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?   @default("ES")
+  isActive     Boolean   @default(true)
   roles        Role[]    @default([STUDENT])
-  
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   studentProfile      StudentProfile?
   guardianProfile     Guardian?
-
   reviewedUpdates     ProfileUpdateRequest[] @relation("ProfileUpdateReviewer")
   proposedGraduations GraduationRequest[]    @relation("ProposedGraduations")
   approvedGraduations GraduationRequest[]    @relation("ApprovedGraduations")
+  
+  /// Track which staff member executed a status change
+  statusChanges       StudentStatusHistory[] @relation("StatusChanger")
 
   @@map("users")
 }
 
 model StudentProfile {
-  id         String    @id @default(uuid())
-  userId     String    @unique
+  id                String    @id @default(uuid())
+  userId            String    @unique
   
-  /// Academic metadata
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  /// Student Lifecycle Management
+  status            StudentStatus @default(ACTIVE)
+  
+  /// Array of lightweight JSON objects: { name, phone, relationship, customRelationship }
+  emergencyContacts Json?     @default("[]")
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statusHistory      StudentStatusHistory[]
   guardians          StudentGuardian[]
   ranks              StudentRank[]
   attendances        Attendance[]
@@ -139,6 +150,24 @@ model StudentProfile {
   bankMandates       BankMandate[]
 
   @@map("student_profiles")
+}
+
+/// ---------------------------------------------------------
+/// Student Lifecycle Audit Log
+/// ---------------------------------------------------------
+model StudentStatusHistory {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  previousStatus   StudentStatus?
+  newStatus        StudentStatus
+  reason           String?        @db.Text
+  changedById      String?
+  createdAt        DateTime       @default(now())
+
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  changedBy        User?          @relation("StatusChanger", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@map("student_status_history")
 }
 
 model Guardian {
@@ -167,14 +196,12 @@ model StudentGuardian {
 /// ---------------------------------------------------------
 /// Academy Configuration (Disciplines & Ranks)
 /// ---------------------------------------------------------
-
 model Discipline {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
 
   programs    DisciplineProgram[]
-
   @@map("disciplines")
 }
 
@@ -187,7 +214,6 @@ model DisciplineProgram {
 
   discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
   beltRanks    BeltRank[]
-
   @@map("discipline_programs")
 }
 
@@ -202,14 +228,12 @@ model BeltRank {
 
   program             DisciplineProgram @relation(fields: [disciplineProgramId], references: [id], onDelete: Cascade)
   studentRanks        StudentRank[]
-
   @@map("belt_ranks")
 }
 
 /// ---------------------------------------------------------
 /// Academic Records (Ranks & Attendances)
 /// ---------------------------------------------------------
-
 model StudentRank {
   id               String   @id @default(uuid())
   studentProfileId String
@@ -221,7 +245,6 @@ model StudentRank {
 
   student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   beltRank         BeltRank       @relation(fields: [beltRankId], references: [id])
-
   @@map("student_ranks")
 }
 
@@ -232,14 +255,12 @@ model Attendance {
   countedForRank   Boolean  @default(true)
 
   student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-
   @@map("attendances")
 }
 
 /// ---------------------------------------------------------
 /// Approval Workflows (IAM & Validation)
 /// ---------------------------------------------------------
-
 model ProfileUpdateRequest {
   id               String        @id @default(uuid())
   studentProfileId String
@@ -251,7 +272,6 @@ model ProfileUpdateRequest {
 
   studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   reviewer         User?          @relation("ProfileUpdateReviewer", fields: [reviewedById], references: [id])
-
   @@map("profile_update_requests")
 }
 
@@ -268,14 +288,12 @@ model GraduationRequest {
   studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   proposedBy       User           @relation("ProposedGraduations", fields: [proposedById], references: [id])
   approvedBy       User?          @relation("ApprovedGraduations", fields: [approvedById], references: [id])
-
   @@map("graduation_requests")
 }
 
 /// ---------------------------------------------------------
 /// Billing, Subscriptions & Financial Engine
 /// ---------------------------------------------------------
-
 model FeeTier {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -288,7 +306,6 @@ model FeeTier {
 
   studentFees   StudentFee[]
   subscriptions StudentSubscription[]
-
   @@map("fee_tiers")
 }
 
@@ -305,7 +322,6 @@ model StudentFee {
 
   student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   feeTier          FeeTier?       @relation(fields: [feeTierId], references: [id])
-
   @@index([studentProfileId])
   @@map("student_fees")
 }
@@ -325,7 +341,6 @@ model Discount {
   updatedAt   DateTime          @updatedAt
 
   studentDiscounts StudentDiscount[]
-
   @@map("discounts")
 }
 
@@ -338,7 +353,6 @@ model StudentDiscount {
 
   studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   discount         Discount       @relation(fields: [discountId], references: [id], onDelete: Cascade)
-
   @@unique([studentProfileId, discountId])
   @@map("student_discounts")
 }
@@ -351,14 +365,12 @@ model StudentSubscription {
 
   student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   feeTier          FeeTier        @relation(fields: [feeTierId], references: [id])
-
   @@map("student_subscriptions")
 }
 
 /// ---------------------------------------------------------
 /// Daily Cash Register Submodule
 /// ---------------------------------------------------------
-
 model CashRegisterSession {
   id                     String            @id @default(uuid())
   openedById             String
@@ -375,7 +387,6 @@ model CashRegisterSession {
   updatedAt              DateTime          @updatedAt
 
   transactions           CashTransaction[]
-
   @@map("cash_register_sessions")
 }
 
@@ -392,7 +403,6 @@ model CashTransaction {
   createdAt        DateTime          @default(now())
 
   session          CashRegisterSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
   @@index([sessionId])
   @@index([studentProfileId])
   @@map("cash_transactions")
@@ -401,7 +411,6 @@ model CashTransaction {
 /// ---------------------------------------------------------
 /// Bank Remittance Submodule (SEPA / Caixabank Integration)
 /// ---------------------------------------------------------
-
 model BankMandate {
   id               String   @id @default(uuid())
   studentProfileId String
@@ -415,7 +424,6 @@ model BankMandate {
 
   student          StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   remittanceItems  RemittanceItem[]
-
   @@map("bank_mandates")
 }
 
@@ -432,7 +440,6 @@ model RemittanceBatch {
   updatedAt       DateTime         @updatedAt
 
   items           RemittanceItem[]
-
   @@map("remittance_batches")
 }
 
@@ -448,21 +455,18 @@ model RemittanceItem {
 
   batch           RemittanceBatch      @relation(fields: [batchId], references: [id], onDelete: Cascade)
   mandate         BankMandate          @relation(fields: [mandateId], references: [id])
-
   @@map("remittance_items")
 }
 
 /// ---------------------------------------------------------
 /// Federations & Licenses (Foundation)
 /// ---------------------------------------------------------
-
 model Federation {
   id       String @id @default(uuid())
   name     String
   country  String
 
   licenses StudentLicense[]
-
   @@map("federations")
 }
 
@@ -476,6 +480,5 @@ model StudentLicense {
 
   student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   federation       Federation     @relation(fields: [federationId], references: [id])
-
   @@map("student_licenses")
 }

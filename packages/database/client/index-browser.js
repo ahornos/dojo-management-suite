@@ -145,8 +145,20 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.StudentProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  status: 'status',
+  emergencyContacts: 'emergencyContacts',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StudentStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  studentProfileId: 'studentProfileId',
+  previousStatus: 'previousStatus',
+  newStatus: 'newStatus',
+  reason: 'reason',
+  changedById: 'changedById',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.GuardianScalarFieldEnum = {
@@ -361,12 +373,12 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -392,6 +404,13 @@ exports.Role = exports.$Enums.Role = {
   INSTRUCTOR: 'INSTRUCTOR',
   STUDENT: 'STUDENT',
   PARENT: 'PARENT'
+};
+
+exports.StudentStatus = exports.$Enums.StudentStatus = {
+  TRIAL: 'TRIAL',
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  DROPPED: 'DROPPED'
 };
 
 exports.RequestStatus = exports.$Enums.RequestStatus = {
@@ -454,6 +473,7 @@ exports.RemittanceItemStatus = exports.$Enums.RemittanceItemStatus = {
 exports.Prisma.ModelName = {
   User: 'User',
   StudentProfile: 'StudentProfile',
+  StudentStatusHistory: 'StudentStatusHistory',
   Guardian: 'Guardian',
   StudentGuardian: 'StudentGuardian',
   Discipline: 'Discipline',

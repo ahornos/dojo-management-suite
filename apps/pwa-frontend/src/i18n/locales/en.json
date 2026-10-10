@@ -111,6 +111,18 @@
       "guardian_email": "Guardian's Email *",
       "guardian_phone": "Emergency Phone *",
       "guardian_dni": "Guardian's ID / Passport *"
+    },
+    "table_age": "Age",
+    "table_discipline": "Discipline(s)",
+    "table_belt": "Belt / Rank",
+    "table_emergency": "Emergency Contact",
+    "filter_age": "Filter by age",
+    "all_ages": "All ages",
+    "age_groups": {
+      "kids": "Kids (3-6 years)",
+      "infantil": "Child (7-12 years)",
+      "juvenil": "Juvenile (13-15 years)",
+      "adults": "Adults (16+ years)"
     }
   },
   "login": {

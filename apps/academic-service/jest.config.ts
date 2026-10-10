@@ -1,6 +1,11 @@
-import { Config } from 'jest';
+/**
+ * @file jest.config.ts
+ * @description Jest configuration file for academic-service.
+ * Mocks @nestjs/swagger during tests and restricts ts-jest to only transform .ts files
+ * to prevent warnings from pre-compiled local monorepo packages (database, shared-types).
+ */
 
-const config: Config = {
+export default {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: 'src',
   testRegex: '.*\\.spec\\.ts$',
@@ -10,7 +15,7 @@ const config: Config = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  transformIgnorePatterns: ['node_modules/(?!(@nestjs/jwt))'],
+  moduleNameMapper: {
+    '^@nestjs/swagger$': '<rootDir>/../test/__mocks__/swagger.mock.ts',
+  },
 };
-
-export default config;

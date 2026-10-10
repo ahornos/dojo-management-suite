@@ -1,21 +1,34 @@
 /**
  * @file types.ts
  * @description Shared TypeScript interfaces for Student Profiles, Guardians, and Belts.
+ * Introduces EmergencyContactPayload for lightweight non-user contacts.
  */
 
 export interface GuardianPayload {
   id?: string;
-  userId: string;
+  isExistingUser?: boolean;
+  userId?: string | null;
   firstName: string;
   lastName: string;
+  email: string;
+  phone: string;
+  dni: string;
+  relationship?: string;
+  customRelationship?: string;
+}
+
+export interface EmergencyContactPayload {
+  name: string;
   phone: string;
   relationship: string;
+  customRelationship?: string;
 }
 
 export interface StudentRankPayload {
   id: string;
   beltRankId: string;
-  beltName: string; // E.g., 'Blue Belt'
+  disciplineName: string;
+  beltName: string;
   currentStripes: number;
   maxStripes: number;
   accumulatedHours: number;
@@ -32,28 +45,38 @@ export interface StudentProfileResponse {
     lastName: string;
     email: string;
     dni?: string;
+    phone?: string;
   };
   birthDate?: string;
   phone?: string;
   address?: string;
   city?: string;
+  state?: string;
   postalCode?: string;
   country?: string;
-  emergencyContactName?: string; // Derived from Guardian for minors, or direct contact for adults
-  emergencyContactPhone?: string;
-  activeRank?: StudentRankPayload;
-  federationLicense?: string;
+  emergencyContacts?: EmergencyContactPayload[];
+  ranks?: StudentRankPayload[];
+  guardians?: any[];
 }
 
 export interface CreateStudentPayload {
-  userId: string; // The selected base user
-  birthDate?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  postalCode?: string;
-  country?: string;
-  guardians?: GuardianPayload[]; // Required if under 18
-  emergencyContactName?: string; // For adults
-  emergencyContactPhone?: string; // For adults
+  isExistingUser: boolean;
+  userId?: string | null;
+  userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    dni?: string;
+    phone?: string;
+    birthDate?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+  };
+  isMinor: boolean;
+  guardians?: GuardianPayload[];
+  emergencyContacts?: EmergencyContactPayload[];
+  disciplines?: any[];
 }

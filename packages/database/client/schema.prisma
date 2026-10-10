@@ -15,7 +15,6 @@ datasource db {
 /// ---------------------------------------------------------
 /// Enums
 /// ---------------------------------------------------------
-
 enum Role {
   SUPER_ADMIN
   ADMIN_STAFF
@@ -29,6 +28,14 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+/// Lifecycle status of a student within the academy
+enum StudentStatus {
+  TRIAL
+  ACTIVE
+  PAUSED
+  DROPPED
 }
 
 enum DiscountType {
@@ -85,7 +92,6 @@ enum RemittanceItemStatus {
 /// ---------------------------------------------------------
 /// Core Identity & Users
 /// ---------------------------------------------------------
-
 model User {
   id           String    @id @default(uuid())
   email        String    @unique
@@ -95,25 +101,24 @@ model User {
   dni          String?   @unique
   birthDate    DateTime?
   phone        String?
-  address      String? /// Street address, building number, and apartment/door
-  city         String? /// City or municipality
-  state        String? /// State, province, or region
-  postalCode   String? /// Postal or zip code
-  country      String?   @default("ES") /// ISO 3166-1 alpha-2 country code
-  isActive     Boolean   @default(true) /// Account status flag for access control
+  address      String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?   @default("ES")
+  isActive     Boolean   @default(true)
+  roles        Role[]    @default([STUDENT])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  /// A user can hold multiple roles simultaneously (e.g., ADMIN_STAFF and STUDENT)
-  roles Role[] @default([STUDENT])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  studentProfile  StudentProfile?
-  guardianProfile Guardian?
-
+  studentProfile      StudentProfile?
+  guardianProfile     Guardian?
   reviewedUpdates     ProfileUpdateRequest[] @relation("ProfileUpdateReviewer")
   proposedGraduations GraduationRequest[]    @relation("ProposedGraduations")
   approvedGraduations GraduationRequest[]    @relation("ApprovedGraduations")
+
+  /// Track which staff member executed a status change
+  statusChanges StudentStatusHistory[] @relation("StatusChanger")
 
   @@map("users")
 }
@@ -122,11 +127,17 @@ model StudentProfile {
   id     String @id @default(uuid())
   userId String @unique
 
-  /// Academic metadata
+  /// Student Lifecycle Management
+  status StudentStatus @default(ACTIVE)
+
+  /// Array of lightweight JSON objects: { name, phone, relationship, customRelationship }
+  emergencyContacts Json? @default("[]")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statusHistory      StudentStatusHistory[]
   guardians          StudentGuardian[]
   ranks              StudentRank[]
   attendances        Attendance[]
@@ -139,6 +150,24 @@ model StudentProfile {
   bankMandates       BankMandate[]
 
   @@map("student_profiles")
+}
+
+/// ---------------------------------------------------------
+/// Student Lifecycle Audit Log
+/// ---------------------------------------------------------
+model StudentStatusHistory {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  previousStatus   StudentStatus?
+  newStatus        StudentStatus
+  reason           String?        @db.Text
+  changedById      String?
+  createdAt        DateTime       @default(now())
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  changedBy      User?          @relation("StatusChanger", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@map("student_status_history")
 }
 
 model Guardian {
@@ -167,7 +196,6 @@ model StudentGuardian {
 /// ---------------------------------------------------------
 /// Academy Configuration (Disciplines & Ranks)
 /// ---------------------------------------------------------
-
 model Discipline {
   id          String  @id @default(uuid())
   name        String  @unique
@@ -209,7 +237,6 @@ model BeltRank {
 /// ---------------------------------------------------------
 /// Academic Records (Ranks & Attendances)
 /// ---------------------------------------------------------
-
 model StudentRank {
   id               String   @id @default(uuid())
   studentProfileId String
@@ -239,7 +266,6 @@ model Attendance {
 /// ---------------------------------------------------------
 /// Approval Workflows (IAM & Validation)
 /// ---------------------------------------------------------
-
 model ProfileUpdateRequest {
   id               String        @id @default(uuid())
   studentProfileId String
@@ -275,7 +301,6 @@ model GraduationRequest {
 /// ---------------------------------------------------------
 /// Billing, Subscriptions & Financial Engine
 /// ---------------------------------------------------------
-
 model FeeTier {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -358,7 +383,6 @@ model StudentSubscription {
 /// ---------------------------------------------------------
 /// Daily Cash Register Submodule
 /// ---------------------------------------------------------
-
 model CashRegisterSession {
   id                     String            @id @default(uuid())
   openedById             String
@@ -401,7 +425,6 @@ model CashTransaction {
 /// ---------------------------------------------------------
 /// Bank Remittance Submodule (SEPA / Caixabank Integration)
 /// ---------------------------------------------------------
-
 model BankMandate {
   id               String   @id @default(uuid())
   studentProfileId String
@@ -455,7 +478,6 @@ model RemittanceItem {
 /// ---------------------------------------------------------
 /// Federations & Licenses (Foundation)
 /// ---------------------------------------------------------
-
 model Federation {
   id      String @id @default(uuid())
   name    String

@@ -1,7 +1,7 @@
 /**
  * @file PersonalDataSection.tsx
- * @description Renders the core personal information fields for a student.
- * Highlights the birthdate field if the user is a minor.
+ * @description Renders the core personal information fields for a student, 
+ * including full address, state/province, and country details.
  */
 
 import { useTranslation } from 'react-i18next';
@@ -69,6 +69,17 @@ export function PersonalDataSection({ formData, onChange, isMinor }: PersonalDat
         <div className="space-y-2">
           <Label htmlFor="postalCode">{t('users.postal_code')}</Label>
           <Input id="postalCode" value={formData.postalCode} onChange={(e) => onChange('postalCode', e.target.value)} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+        <div className="space-y-2">
+          <Label htmlFor="state">{t('users.state')}</Label>
+          <Input id="state" value={formData.state || ''} onChange={(e) => onChange('state', e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="country">{t('users.country')}</Label>
+          <Input id="country" maxLength={2} value={formData.country || 'ES'} onChange={(e) => onChange('country', e.target.value.toUpperCase())} />
         </div>
       </div>
     </div>

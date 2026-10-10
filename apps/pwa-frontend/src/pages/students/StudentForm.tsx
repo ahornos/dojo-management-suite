@@ -1,25 +1,36 @@
 /**
  * @file StudentForm.tsx
- * @description Smart form orchestrator for Student creation. Manages state for
- * existing vs new users, computes dynamic age validation, and integrates sub-components.
+ * @description Smart form orchestrator for Student creation and editing. 
+ * Manages state initialization for existing records, computes dynamic age validation,
+ * and handles multiple guardians and location metadata.
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserSelector } from './components/UserSelector';
 import { PersonalDataSection } from './components/PersonalDataSection';
 import { GuardianSection } from './components/GuardianSection';
+import { StudentProfileResponse } from './types';
 
 interface StudentFormProps {
   availableUsers: any[];
   onSubmit: (data: any) => void;
   onCancel: () => void;
   isPending: boolean;
+  mode?: 'create' | 'edit';
+  initialData?: StudentProfileResponse | null;
 }
 
-export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: StudentFormProps) {
+export function StudentForm({ 
+  availableUsers, 
+  onSubmit, 
+  onCancel, 
+  isPending, 
+  mode = 'create', 
+  initialData 
+}: StudentFormProps) {
   const { t } = useTranslation();
   
   const [isExistingUser, setIsExistingUser] = useState(false);
@@ -27,12 +38,33 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
 
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', dni: '', phone: '',
-    birthDate: '', address: '', city: '', postalCode: '', country: 'ES',
+    birthDate: '', address: '', city: '', state: '', postalCode: '', country: 'ES',
   });
 
-  const [parentData, setParentData] = useState({
-    firstName: '', lastName: '', email: '', phone: '', dni: '',
-  });
+  const [guardians, setGuardians] = useState([
+    { isExistingUser: false, userId: '', firstName: '', lastName: '', email: '', phone: '', dni: '' }
+  ]);
+
+  // Load initial data if in edit mode
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      setFormData({
+        firstName: initialData.user?.firstName || '',
+        lastName: initialData.user?.lastName || '',
+        email: initialData.user?.email || '',
+        dni: initialData.user?.dni || '',
+        phone: initialData.phone || '',
+        birthDate: initialData.birthDate ? new Date(initialData.birthDate).toISOString().split('T')[0] : '',
+        address: initialData.address || '',
+        city: initialData.city || '',
+        state: initialData.state || '',
+        postalCode: initialData.postalCode || '',
+        country: initialData.country || 'ES',
+      });
+      // Note: If guardians are retrieved from the API, they would be mapped here.
+      // Assuming empty or existing mapping logic based on your backend response.
+    }
+  }, [mode, initialData]);
 
   // Calculate age dynamically to show Parent section
   const isMinor = useMemo(() => {
@@ -51,11 +83,11 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
         firstName: user.firstName || '', lastName: user.lastName || '', email: user.email || '',
         dni: user.dni || '', phone: user.phone || '',
         birthDate: user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '',
-        address: user.address || '', city: user.city || '',
+        address: user.address || '', city: user.city || '', state: user.state || '',
         postalCode: user.postalCode || '', country: user.country || 'ES',
       });
     } else {
-      setFormData({ firstName: '', lastName: '', email: '', dni: '', phone: '', birthDate: '', address: '', city: '', postalCode: '', country: 'ES' });
+      setFormData({ firstName: '', lastName: '', email: '', dni: '', phone: '', birthDate: '', address: '', city: '', state: '', postalCode: '', country: 'ES' });
     }
   };
 
@@ -63,18 +95,69 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleParentDataChange = (field: string, value: string) => {
-    setParentData((prev) => ({ ...prev, [field]: value }));
+  const handleGuardianChange = (index: number, field: string, value: string) => {
+    setGuardians((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleGuardianAdd = () => {
+    if (guardians.length < 2) {
+      setGuardians((prev) => [...prev, { isExistingUser: false, userId: '', firstName: '', lastName: '', email: '', phone: '', dni: '' }]);
+    }
+  };
+
+  const handleGuardianRemove = (index: number) => {
+    setGuardians((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleGuardianToggleExisting = (index: number, checked: boolean) => {
+    setGuardians((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], isExistingUser: checked, userId: '' };
+      return updated;
+    });
+  };
+
+  const handleGuardianSelectUser = (index: number, userId: string) => {
+    setGuardians((prev) => {
+      const updated = [...prev];
+      const user = availableUsers.find((u) => u.id === userId);
+      if (user) {
+        updated[index] = {
+          ...updated[index],
+          userId,
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          dni: user.dni || '',
+        };
+      } else {
+        updated[index] = { ...updated[index], userId: '', firstName: '', lastName: '', email: '', phone: '', dni: '' };
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
-      isExistingUser,
-      userId: isExistingUser ? selectedUserId : null,
+      isExistingUser: mode === 'create' ? isExistingUser : true, // In edit mode, the user always exists
+      userId: mode === 'create' ? (isExistingUser ? selectedUserId : null) : initialData?.userId,
       userData: formData,
       isMinor,
-      parentData: isMinor ? parentData : null, 
+      guardians: isMinor ? guardians.map(g => ({
+        isExistingUser: g.isExistingUser,
+        userId: g.isExistingUser ? g.userId : null,
+        firstName: g.firstName,
+        lastName: g.lastName,
+        email: g.email,
+        phone: g.phone,
+        dni: g.dni,
+      })) : null,
     };
     onSubmit(payload);
   };
@@ -82,19 +165,24 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
   return (
     <Card className="max-w-4xl shadow-md border-gray-200">
       <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
-        <CardTitle className="text-xl text-gray-800">{t('students.create_title')}</CardTitle>
+        <CardTitle className="text-xl text-gray-800">
+          {mode === 'create' ? t('students.create_title') : t('users.edit_modal_title')}
+        </CardTitle>
       </CardHeader>
       
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-8">
           
-          <UserSelector 
-            isExistingUser={isExistingUser}
-            onToggleExisting={(checked) => { setIsExistingUser(checked); setSelectedUserId(''); }}
-            selectedUserId={selectedUserId}
-            onSelectUser={handleUserSelect}
-            availableUsers={availableUsers}
-          />
+          {/* Only show User Selector if we are creating a new student */}
+          {mode === 'create' && (
+            <UserSelector 
+              isExistingUser={isExistingUser}
+              onToggleExisting={(checked) => { setIsExistingUser(checked); setSelectedUserId(''); }}
+              selectedUserId={selectedUserId}
+              onSelectUser={handleUserSelect}
+              availableUsers={availableUsers}
+            />
+          )}
 
           <PersonalDataSection 
             formData={formData} 
@@ -103,8 +191,13 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
           />
 
           <GuardianSection 
-            parentData={parentData} 
-            onChange={handleParentDataChange} 
+            guardians={guardians}
+            onChange={handleGuardianChange}
+            onAdd={handleGuardianAdd}
+            onRemove={handleGuardianRemove}
+            onToggleExisting={handleGuardianToggleExisting}
+            onSelectUser={handleGuardianSelectUser}
+            availableUsers={availableUsers}
             isMinor={isMinor} 
           />
 
@@ -112,7 +205,7 @@ export function StudentForm({ availableUsers, onSubmit, onCancel, isPending }: S
             <Button type="button" variant="outline" onClick={onCancel}>
               {t('students.cancel')}
             </Button>
-            <Button type="submit" disabled={isPending || (isExistingUser && !selectedUserId)}>
+            <Button type="submit" disabled={isPending || (mode === 'create' && isExistingUser && !selectedUserId)}>
               {isPending ? t('students.saving') : t('students.save')}
             </Button>
           </div>
