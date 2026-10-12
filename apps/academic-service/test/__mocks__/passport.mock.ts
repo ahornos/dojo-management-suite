@@ -8,7 +8,7 @@ export const AuthGuard = (type: string) => {
       
       // If no authorization header is provided, reject with 401 Unauthorized
       if (!authHeader) {
-        throw new UnauthorizedException('No token provided');
+        throw new UnauthorizedException('INVALID_OR_MISSING_TOKEN');
       }
       
       return true;

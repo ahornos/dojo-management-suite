@@ -11,4 +11,12 @@ export class JwtModule {
       exports: [JwtService],
     };
   }
+
+  static registerAsync() {
+    return {
+      module: JwtModule,
+      providers: [JwtService],
+      exports: [JwtService],
+    };
+  }
 }

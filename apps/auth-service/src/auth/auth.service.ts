@@ -10,7 +10,10 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@dms/shared-types';
+import { Prisma } from '@dms/database/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -33,7 +36,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new BadRequestException('El correo electrónico ya está registrado');
+      throw new BadRequestException('EMAIL_ALREADY_REGISTERED');
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
@@ -44,7 +47,8 @@ export class AuthService {
         passwordHash: hashedPassword,
         firstName: dto.firstName,
         lastName: dto.lastName,
-        roles: dto.roles || [Role.STUDENT],
+        // Public sign-up is always least-privileged; elevated roles require an admin via createUser.
+        roles: [Role.STUDENT],
       },
     });
 
@@ -68,13 +72,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('INVALID_CREDENTIALS');
     }
 
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('INVALID_CREDENTIALS');
     }
 
     // Embed the roles array into the JWT payload for API Gateway authorization
@@ -97,25 +101,25 @@ export class AuthService {
    * Creates a new user account administratively from the management dashboard.
    * Includes validation for email and DNI uniqueness.
    * 
-   * @param {any} dto - Payload containing user details, personal data, and roles array.
+   * @param {CreateUserDto} dto - Validated payload containing user details, personal data, and roles array.
    * @returns {Promise<Object>} The created user record excluding password hash.
    * @throws {BadRequestException} If the email or DNI is already registered.
    */
-  async createUser(dto: any) {
+  async createUser(dto: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
     if (existingUser) {
-      throw new BadRequestException('El correo electrónico ya está registrado');
+      throw new BadRequestException('EMAIL_ALREADY_REGISTERED');
     }
 
-    if (dto.dni && dto.dni.trim() !== '') {
+    if (dto.dni?.trim()) {
       const existingDni = await this.prisma.user.findUnique({
         where: { dni: dto.dni },
       });
       if (existingDni) {
-        throw new BadRequestException('El DNI ya está registrado en el sistema');
+        throw new BadRequestException('DNI_ALREADY_REGISTERED');
       }
     }
 
@@ -165,20 +169,20 @@ export class AuthService {
    * Updates user profile data, including personal info, address, roles array, status, and optional password reset.
    * 
    * @param {string} id - User unique identifier.
-   * @param {any} dto - Payload with updated fields.
+   * @param {UpdateUserDto} dto - Validated payload with the fields to update.
    * @returns {Promise<Object>} Updated user record.
    * @throws {NotFoundException} If user is not found.
    */
-  async updateUser(id: string, dto: any) {
+  async updateUser(id: string, dto: UpdateUserDto) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
 
     if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('USER_NOT_FOUND');
     }
 
-    const updateData: any = {
+    const updateData: Prisma.UserUpdateInput = {
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
@@ -193,11 +197,11 @@ export class AuthService {
       isActive: dto.isActive,
     };
 
-    if (dto.roles && Array.isArray(dto.roles)) {
+    if (dto.roles) {
       updateData.roles = dto.roles;
     }
 
-    if (dto.password && dto.password.trim() !== '') {
+    if (dto.password?.trim()) {
       updateData.passwordHash = await bcrypt.hash(dto.password, 10);
     }
 
@@ -226,7 +230,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('USER_NOT_FOUND');
     }
 
     await this.prisma.user.delete({

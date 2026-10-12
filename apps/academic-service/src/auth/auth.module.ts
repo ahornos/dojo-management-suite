@@ -1,20 +1,15 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 
 /**
  * @class AuthModule
- * @description Lightweight auth module for token verification. 
- * Does not issue tokens, only validates them using the shared JWT_SECRET.
+ * @description Lightweight auth module for token verification.
+ * Does not issue tokens; `JwtStrategy` validates them with the shared `JWT_SECRET`
+ * obtained from the global ConfigModule (no fallback secret).
  */
 @Module({
-  imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'super-secret-jwt-key-change-in-production',
-    }),
-  ],
+  imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
   providers: [JwtStrategy],
   exports: [PassportModule],
 })

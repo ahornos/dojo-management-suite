@@ -10,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Role } from '@dms/shared-types';
+import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
@@ -80,6 +81,24 @@ describe('AuthService', () => {
       expect(result.user).not.toHaveProperty('passwordHash');
     });
 
+    it('should always persist [Role.STUDENT] even if the payload smuggles elevated roles', async () => {
+      const dto = {
+        email: 'attacker@dojo.com',
+        password: 'securePassword123',
+        firstName: 'Eve',
+        lastName: 'Mallory',
+        roles: [Role.SUPER_ADMIN],
+      };
+
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+      mockPrismaService.user.create.mockResolvedValue({ id: 'uuid-evil', ...dto, passwordHash: 'h', roles: [Role.STUDENT] });
+
+      await service.register(dto as any);
+
+      const createArgs = mockPrismaService.user.create.mock.calls[0][0];
+      expect(createArgs.data.roles).toEqual([Role.STUDENT]);
+    });
+
     it('should throw BadRequestException if email already exists', async () => {
       const dto = {
         email: 'existing@dojo.com',
@@ -143,6 +162,121 @@ describe('AuthService', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).not.toHaveProperty('passwordHash');
       expect(result[0]).toHaveProperty('email', 'user1@dojo.com');
+    });
+  });
+
+  describe('login (invalid password)', () => {
+    it('should throw UnauthorizedException when the password does not match', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: 'uuid-1', email: 'a@dojo.com', passwordHash: await bcrypt.hash('right-password', 4), roles: [Role.STUDENT],
+      });
+
+      await expect(service.login({ email: 'a@dojo.com', password: 'wrong-password' })).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('createUser', () => {
+    const dto: CreateUserDto = {
+      email: 'new@dojo.com',
+      firstName: 'New',
+      lastName: 'User',
+      dni: '12345678Z',
+      birthDate: '1990-05-21',
+      roles: [Role.INSTRUCTOR],
+      password: 'SecurePassword123!',
+    };
+
+    it('creates the user hashing the password and normalising optional fields', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+      mockPrismaService.user.create.mockImplementation(async ({ data }) => ({ id: 'uuid-new', ...data }));
+
+      const result = await service.createUser(dto);
+
+      const data = mockPrismaService.user.create.mock.calls[0][0].data;
+      expect(await bcrypt.compare('SecurePassword123!', data.passwordHash)).toBe(true);
+      expect(data).toMatchObject({
+        email: 'new@dojo.com', roles: [Role.INSTRUCTOR], isActive: true, country: 'ES',
+        phone: null, address: null, birthDate: new Date('1990-05-21'),
+      });
+      expect(result.user).not.toHaveProperty('passwordHash');
+    });
+
+    it('falls back to the STUDENT role and a temporary password when omitted', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+      mockPrismaService.user.create.mockImplementation(async ({ data }) => ({ id: 'uuid-new', ...data }));
+
+      await service.createUser({ email: 'x@dojo.com', firstName: 'X', lastName: 'Y' });
+
+      const data = mockPrismaService.user.create.mock.calls[0][0].data;
+      expect(data.roles).toEqual([Role.STUDENT]);
+      expect(data.dni).toBeNull();
+      expect(data.birthDate).toBeNull();
+      expect(data.passwordHash).toEqual(expect.any(String));
+    });
+
+    it('rejects a duplicated email', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce({ id: 'other' });
+
+      await expect(service.createUser(dto)).rejects.toThrow(BadRequestException);
+      expect(mockPrismaService.user.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a duplicated DNI', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'other' });
+
+      await expect(service.createUser(dto)).rejects.toThrow(BadRequestException);
+      expect(mockPrismaService.user.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateUser', () => {
+    it('updates personal data, roles and re-hashes a provided password', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+      mockPrismaService.user.update.mockImplementation(async ({ data }) => ({ id: 'u1', ...data }));
+
+      const result = await service.updateUser('u1', {
+        firstName: 'Ann', roles: [Role.ADMIN_STAFF], password: 'NewPassword123!', birthDate: '1991-01-02', isActive: false,
+      });
+
+      const data = mockPrismaService.user.update.mock.calls[0][0].data;
+      expect(data).toMatchObject({ firstName: 'Ann', roles: [Role.ADMIN_STAFF], isActive: false, birthDate: new Date('1991-01-02') });
+      expect(await bcrypt.compare('NewPassword123!', data.passwordHash)).toBe(true);
+      expect(result.user).not.toHaveProperty('passwordHash');
+    });
+
+    it('does not touch roles or password when they are not provided', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+      mockPrismaService.user.update.mockImplementation(async ({ data }) => ({ id: 'u1', ...data }));
+
+      await service.updateUser('u1', { firstName: 'Ann' });
+
+      const data = mockPrismaService.user.update.mock.calls[0][0].data;
+      expect(data).not.toHaveProperty('roles');
+      expect(data).not.toHaveProperty('passwordHash');
+      expect(data.birthDate).toBeUndefined();
+    });
+
+    it('throws NotFoundException for an unknown user', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.updateUser('missing', {})).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('removeUser', () => {
+    it('deletes an existing user', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({ id: 'u1' });
+
+      await service.removeUser('u1');
+
+      expect(mockPrismaService.user.delete).toHaveBeenCalledWith({ where: { id: 'u1' } });
+    });
+
+    it('throws NotFoundException for an unknown user', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.removeUser('missing')).rejects.toThrow(NotFoundException);
+      expect(mockPrismaService.user.delete).not.toHaveBeenCalled();
     });
   });
 });

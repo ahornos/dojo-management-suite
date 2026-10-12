@@ -13,7 +13,10 @@ const config: Config = {
   transformIgnorePatterns: ['node_modules/(?!(@nestjs/jwt))'],
   moduleNameMapper: {
     '^@dms/database(.*)$': '<rootDir>/../../../packages/database$1',
-    '^@dms/shared-types(.*)$': '<rootDir>/../../../packages/shared-types/src$1',
+    '^@dms/shared-types$': '<rootDir>/../../../packages/shared-types/src/index.ts',
+    '^@dms/shared-types/(.*)$': '<rootDir>/../../../packages/shared-types/src/$1',
+    '^@dms/shared-auth$': '<rootDir>/../../../packages/shared-auth/src/index.ts',
+    '^@dms/shared-auth/(.*)$': '<rootDir>/../../../packages/shared-auth/src/$1',
     '^@nestjs/jwt$': '<rootDir>/src/auth/__mocks__/@nestjs/jwt.ts',
   },
 };

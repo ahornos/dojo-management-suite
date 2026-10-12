@@ -7,25 +7,16 @@ export const AuthGuard = (type: string) => {
       const authHeader = request.headers['authorization'] || request.headers['Authorization'];
       
       if (!authHeader) {
-        throw new UnauthorizedException('No token provided');
+        throw new UnauthorizedException('INVALID_OR_MISSING_TOKEN');
       }
 
-      const token = authHeader.replace('Bearer ', '');
-      
-      // Dynamically extract role from our smart mock token structure
-      let role = 'SUPER_ADMIN';
-      let sub = 'admin-uuid';
-      if (token.includes('STUDENT')) {
-        role = 'STUDENT';
-        sub = 'student-uuid';
-      }
-
+      // Unit-test stub only (real strategy is exercised by e2e): inject the production `req.user` shape.
       request.user = {
-        sub,
-        email: `${role.toLowerCase()}@dojo.com`,
-        role,
+        userId: 'mock-user-id',
+        email: 'mock@dojo.com',
+        roles: ['SUPER_ADMIN'],
       };
-      
+
       return true;
     }
   }

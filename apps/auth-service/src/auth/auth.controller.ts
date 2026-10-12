@@ -4,11 +4,15 @@
  * and administrative user account management within the auth-service microservice.
  */
 
-import { Controller, Get, Post, Patch, Delete, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from '@dms/shared-types';
+import { JwtAuthGuard, RolesGuard, Roles } from '@dms/shared-auth';
 
 @ApiTags('Auth & Users')
 @Controller('auth')
@@ -47,14 +51,18 @@ export class AuthController {
   /**
    * Creates a new system user administratively (Staff/Admin utility).
    * 
-   * @param {any} dto - Payload containing user registration details and personal info.
+   * @param {CreateUserDto} dto - Validated payload containing user details and personal info.
    * @returns {Promise<Object>} The newly created user record.
    */
   @Post('users')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new user account (Admin only)' })
   @ApiResponse({ status: 201, description: 'User successfully created.' })
-  async createUser(@Body() dto: any) {
+  @ApiResponse({ status: 401, description: 'Missing or invalid bearer token.' })
+  @ApiResponse({ status: 403, description: 'Caller lacks SUPER_ADMIN or ADMIN_STAFF role.' })
+  async createUser(@Body() dto: CreateUserDto) {
     return this.authService.createUser(dto);
   }
 
@@ -64,6 +72,8 @@ export class AuthController {
    * @returns {Promise<Array>} List of user profiles excluding sensitive password hashes.
    */
   @Get('users')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Retrieve all system users (Admin only)' })
   @ApiResponse({ status: 200, description: 'Returns the array of users.' })
@@ -75,14 +85,16 @@ export class AuthController {
    * Updates an existing user's profile and administrative data.
    * 
    * @param {string} id - The UUID of the user.
-   * @param {any} dto - Payload containing updated personal info and roles.
+   * @param {UpdateUserDto} dto - Validated payload containing updated personal info and roles.
    * @returns {Promise<Object>} The updated user record.
    */
   @Patch('users/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user profile and details' })
   @ApiResponse({ status: 200, description: 'User successfully updated.' })
-  async updateUser(@Param('id') id: string, @Body() dto: any) {
+  async updateUser(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     return this.authService.updateUser(id, dto);
   }
 
@@ -93,6 +105,8 @@ export class AuthController {
    * @returns {Promise<Object>} Confirmation message.
    */
   @Delete('users/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete or deactivate a user account' })
   @ApiResponse({ status: 200, description: 'User successfully deleted/deactivated.' })

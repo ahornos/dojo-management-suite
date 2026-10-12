@@ -1,12 +1,13 @@
 /**
  * @file register.dto.ts
- * @description Data Transfer Object for user registration.
- * Validates incoming data for creating a new user account, supporting multiple roles.
+ * @description Data Transfer Object for PUBLIC user registration.
+ * Deliberately exposes no `roles` field: self-registered accounts are always STUDENT, and any
+ * attempt to send `roles` is rejected by the global `ValidationPipe` (`forbidNonWhitelisted`).
+ * Privileged accounts must be created through the guarded `/auth/users` endpoint.
  */
 
-import { IsString, IsEmail, IsNotEmpty, IsEnum, MinLength, IsArray, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Role } from '@dms/shared-types';
+import { IsString, IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
   @ApiProperty({ description: 'User email address', example: 'user@dojo.com' })
@@ -28,15 +29,4 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
-
-  @ApiPropertyOptional({ 
-    description: 'System roles assigned to the user', 
-    enum: Role, 
-    isArray: true, 
-    example: [Role.STUDENT] 
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(Role, { each: true })
-  roles?: Role[];
 }
