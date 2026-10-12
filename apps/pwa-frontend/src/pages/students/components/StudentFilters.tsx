@@ -19,10 +19,10 @@ export function StudentFilters({ searchTerm, onSearchChange, selectedAgeGroups, 
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg shadow-sm border border-border">
       <div className="w-full sm:w-1/2 md:w-1/3">
         <Input
-          placeholder={t('students.search_placeholder', 'Search by name, last name, DNI or phone...')}
+          placeholder={t('students.search_placeholder')}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full"
@@ -30,7 +30,7 @@ export function StudentFilters({ searchTerm, onSearchChange, selectedAgeGroups, 
       </div>
       
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm font-medium text-gray-500 mr-2">{t('students.filter_age')}:</span>
+        <span className="text-sm font-medium text-muted-foreground mr-2">{t('students.filter_age')}:</span>
         
         <Badge 
           variant={selectedAgeGroups.length === 0 ? "default" : "outline"}

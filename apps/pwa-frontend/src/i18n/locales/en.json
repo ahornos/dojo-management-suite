@@ -11,7 +11,12 @@
   },
   "header": {
     "control_panel": "Control Panel",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "language": "Language",
+    "fallback_name": "Administrator",
+    "lang_es": "Español",
+    "lang_ca": "Català",
+    "lang_en": "English"
   },
   "footer": {
     "rights": "All rights reserved."
@@ -75,7 +80,20 @@
     "create_title": "Register New User",
     "save": "Save User",
     "cancel": "Cancel",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "personal_section": "Personal information",
+    "select_roles": "Select one or more roles assigned to this account.",
+    "select_roles_label": "System role (select one or more)",
+    "status_security": "Account status & security",
+    "roles": {
+      "SUPER_ADMIN": "Super admin",
+      "ADMIN_STAFF": "Admin staff",
+      "SPORTS_TECHNICAL_DIRECTOR": "Sports technical director",
+      "INSTRUCTOR": "Instructor",
+      "STUDENT": "Student",
+      "PARENT": "Parent"
+    },
+    "no_users": "No users found."
   },
   "students": {
     "title": "Student Management",
@@ -110,7 +128,38 @@
       "guardian_last_name": "Guardian's Last Name *",
       "guardian_email": "Guardian's Email *",
       "guardian_phone": "Emergency Phone *",
-      "guardian_dni": "Guardian's ID / Passport *"
+      "guardian_dni": "Guardian's ID / Passport *",
+      "guardians_title": "Legal guardians",
+      "guardians_help": "Required for minors. You can add more than one guardian.",
+      "add_guardian": "Add guardian",
+      "guardian_n": "Guardian {{n}}",
+      "unlink": "Unlink",
+      "link_existing_user": "Link an existing user",
+      "linked_user": "Linked user (ID: {{id}}...)",
+      "search_user": "Search user",
+      "select_user": "Select a user...",
+      "relationship": "Relationship",
+      "select_relationship": "Select the relationship...",
+      "specify_relationship": "Specify relationship",
+      "relationship_placeholder": "e.g. Grandmother",
+      "emergency_title": "Emergency contacts",
+      "emergency_help": "Optional. Who should we call in an emergency?",
+      "add_contact": "Add contact",
+      "contact_n": "Contact {{n}}",
+      "contact_name": "Full name",
+      "contact_name_placeholder": "e.g. Carlos López",
+      "contact_phone_placeholder": "e.g. +34 600 000 000",
+      "no_disciplines": "No disciplines are configured in the system.",
+      "initial_belt": "Starting belt / rank",
+      "default_belt": "Default (lowest belt)",
+      "stripes": "Number of stripes",
+      "unlink_guardian_title": "Unlink guardian",
+      "unlink_guardian_message": "Unlink this guardian from the student? The user account will not be deleted; only the relationship is removed.",
+      "unlink_guardian_confirm": "Unlink guardian",
+      "unlink_contact_title": "Unlink contact",
+      "unlink_contact_message": "Unlink this contact from the student? The user account will not be deleted; they will no longer appear as an emergency contact or guardian.",
+      "unlink_contact_confirm": "Unlink contact",
+      "linked_user_note": "Linked user (ID: {{id}}...)"
     },
     "table_age": "Age",
     "table_discipline": "Discipline(s)",
@@ -123,7 +172,15 @@
       "infantil": "Child (7-12 years)",
       "juvenil": "Juvenile (13-15 years)",
       "adults": "Adults (16+ years)"
-    }
+    },
+    "dni": "ID / Passport",
+    "edit_title": "Edit student",
+    "user_id": "ID: {{id}}...",
+    "table_discipline_ranks": "Discipline(s) & ranks",
+    "no_discipline": "No discipline / rank",
+    "no_emergency": "Not registered",
+    "no_phone": "No phone",
+    "search_placeholder": "Search by name, last name, ID, or phone..."
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -133,7 +190,8 @@
     "submit": "Sign In",
     "error": "Invalid credentials or connection error",
     "show_password": "Show password",
-    "hide_password": "Hide password"
+    "hide_password": "Hide password",
+    "email_placeholder": "you@academy.com"
   },
   "disciplines": {
     "title": "Disciplines & Programs",
@@ -153,7 +211,10 @@
     "error": "Error loading disciplines",
     "no_data": "No registered disciplines found.",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "no_belts": "No belt ranks registered.",
+    "name_placeholder": "e.g. Brazilian Jiu-Jitsu",
+    "desc_placeholder": "e.g. Grappling-focused martial art"
   },
   "belts": {
     "create_title": "Add Belt",
@@ -184,9 +245,74 @@
       "green_white": "Green/White Belt",
       "solid_green": "Solid Green Belt",
       "green_black": "Green/Black Belt"
-    }
+    },
+    "stripes_short": "Stripes: {{count}}",
+    "months_short": "{{count}} mos",
+    "hours_short": "{{count}} hrs",
+    "name_placeholder": "e.g. White Belt",
+    "stripes_count_one": "{{count}} stripe",
+    "stripes_count_other": "{{count}} stripes"
   },
   "common": {
-    "confirm_delete": "Are you sure you want to permanently delete this item?"
+    "confirm_delete": "Are you sure you want to permanently delete this item?",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "note": "Note"
+  },
+  "relationships": {
+    "father": "Father",
+    "mother": "Mother",
+    "sibling": "Sibling",
+    "partner": "Partner",
+    "friend": "Friend",
+    "legal_guardian": "Legal guardian",
+    "relative": "Relative",
+    "other": "Other",
+    "other_specify": "Other (specify)"
+  },
+  "errors": {
+    "EMAIL_ALREADY_REGISTERED": "This email is already registered.",
+    "INVALID_CREDENTIALS": "Invalid email or password.",
+    "DNI_ALREADY_REGISTERED": "This ID number is already registered.",
+    "USER_NOT_FOUND": "User not found.",
+    "USER_ALREADY_EXISTS": "A user with this identity already exists.",
+    "USER_DNI_ALREADY_REGISTERED": "This ID number is already registered.",
+    "USER_CREATION_DATA_INCOMPLETE": "The user data is incomplete.",
+    "INVALID_OR_MISSING_INTERNAL_API_KEY": "Invalid or missing internal API key.",
+    "INVALID_OR_MISSING_TOKEN": "Invalid or missing session token.",
+    "FORBIDDEN": "You do not have permission to perform this action.",
+    "UNAUTHORIZED": "Your session has expired. Please sign in again.",
+    "VALIDATION_FAILED": "Please check the form and try again.",
+    "STUDENT_PROFILE_NOT_FOUND": "Student profile not found.",
+    "STUDENT_PROFILE_ALREADY_EXISTS": "This user already has a student profile.",
+    "STUDENT_HAS_NO_ACTIVE_RANK": "The student has no active belt rank.",
+    "STUDENT_ACTIVE_RANK_NOT_FOUND": "No active rank was found for this student.",
+    "STUDENT_ALREADY_HIGHEST_RANK": "The student is already at the highest belt of the program.",
+    "STUDENT_AT_INITIAL_RANK": "Cannot roll back: the student is at their initial rank.",
+    "ATTENDANCE_NOT_FOUND": "Attendance record not found.",
+    "DISCIPLINE_NOT_FOUND": "Discipline not found.",
+    "DISCIPLINE_NAME_ALREADY_EXISTS": "A discipline with this name already exists.",
+    "CASH_SESSION_ALREADY_OPEN": "There is already an open cash session.",
+    "OPEN_CASH_SESSION_NOT_FOUND": "No open cash session was found.",
+    "CASH_SESSION_NOT_FOUND": "Cash session not found.",
+    "CASH_TRANSACTION_NOT_FOUND": "Cash transaction not found.",
+    "MANDATE_ALREADY_EXISTS": "A mandate with this reference already exists.",
+    "REMITTANCE_BATCH_ALREADY_EXISTS": "A remittance batch with this reference already exists.",
+    "ACTIVE_MANDATE_NOT_FOUND": "Active bank mandate not found.",
+    "REMITTANCE_BATCH_NOT_FOUND": "Remittance batch not found.",
+    "REMITTANCE_ITEM_NOT_FOUND": "Remittance item not found.",
+    "DEBTOR_IDENTITY_NOT_FOUND": "The debtor identity could not be resolved.",
+    "MASS_UPDATE_REQUIRES_PERCENTAGE_OR_FIXED_AMOUNT": "Provide a percentage or a fixed amount.",
+    "MASS_UPDATE_RESULTS_IN_NEGATIVE_AMOUNT": "The update would result in a negative fee.",
+    "INVALID_MONETARY_AMOUNT": "Enter a valid non-negative amount with up to two decimals.",
+    "UPSTREAM_TIMEOUT": "The service took too long to respond.",
+    "UPSTREAM_UNAVAILABLE": "The service is temporarily unavailable.",
+    "INTERNAL_SERVER_ERROR": "An unexpected error occurred.",
+    "AUTH_SERVICE_UNAVAILABLE": "The identity service is temporarily unavailable.",
+    "USER_DIRECTORY_REQUEST_REJECTED": "The identity request was rejected.",
+    "USER_CONFLICT": "The identity already exists.",
+    "MISSING_AUTHENTICATED_USER": "You must be signed in.",
+    "INSUFFICIENT_ROLE": "Your role cannot perform this action.",
+    "USER_NOT_AUTHENTICATED": "You must be signed in."
   }
 }

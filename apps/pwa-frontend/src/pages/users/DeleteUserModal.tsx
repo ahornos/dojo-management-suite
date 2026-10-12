@@ -14,6 +14,12 @@ interface DeleteUserModalProps {
   isPending: boolean;
 }
 
+/**
+ * Confirmation dialog for permanently deleting a user account.
+ *
+ * @param {DeleteUserModalProps} props - Visibility, confirm/cancel handlers, and pending flag.
+ * @returns {JSX.Element | null} The modal, or `null` when closed.
+ */
 export function DeleteUserModal({ isOpen, onClose, onConfirm, isPending }: DeleteUserModalProps): JSX.Element | null {
   const { t } = useTranslation();
 
@@ -21,12 +27,12 @@ export function DeleteUserModal({ isOpen, onClose, onConfirm, isPending }: Delet
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-md bg-white shadow-xl">
+      <Card className="w-full max-w-md bg-card shadow-xl">
         <CardHeader>
-          <CardTitle className="text-red-600">{t('users.delete_confirm_title')}</CardTitle>
+          <CardTitle className="text-destructive">{t('users.delete_confirm_title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 mb-6">{t('users.delete_confirm_message')}</p>
+          <p className="text-sm text-muted-foreground mb-6">{t('users.delete_confirm_message')}</p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={onClose} disabled={isPending}>
               {t('users.cancel')}

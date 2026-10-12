@@ -46,6 +46,12 @@ export interface StudentProfileResponse {
     email: string;
     dni?: string;
     phone?: string;
+    birthDate?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
   };
   birthDate?: string;
   phone?: string;

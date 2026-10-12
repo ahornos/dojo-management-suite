@@ -7,6 +7,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 import { DisciplinePayload, BeltRankPayload } from './types';
 
+/**
+ * Loads martial disciplines and exposes mutations for disciplines and belt ranks.
+ *
+ * @returns {{ disciplines: unknown[]; isLoading: boolean; error: unknown; createDiscipline: unknown; updateDiscipline: unknown; deleteDiscipline: unknown; saveBeltRank: unknown; deleteBeltRank: unknown }} Query state and mutations keyed on `['disciplines']`.
+ */
 export function useDisciplines() {
   const queryClient = useQueryClient();
 

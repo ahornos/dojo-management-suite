@@ -24,18 +24,30 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 };
 
+/**
+ * Maps a role enum to semantic badge classes.
+ *
+ * @param {string} role - Stored role enum.
+ * @returns {string} Tailwind class list for the badge.
+ */
 const getRoleBadgeColor = (role: string): string => {
   switch (role) {
-    case 'SUPER_ADMIN': return 'bg-purple-100 text-purple-800 border-purple-200';
-    case 'ADMIN_STAFF': return 'bg-blue-100 text-blue-800 border-blue-200';
-    case 'SPORTS_TECHNICAL_DIRECTOR': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-    case 'INSTRUCTOR': return 'bg-teal-100 text-teal-800 border-teal-200';
-    case 'STUDENT': return 'bg-slate-100 text-slate-800 border-slate-200';
-    case 'PARENT': return 'bg-orange-100 text-orange-800 border-orange-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'SUPER_ADMIN': return 'bg-belt-purple/15 text-foreground border-belt-purple/40';
+    case 'ADMIN_STAFF': return 'bg-primary/15 text-primary border-primary/30';
+    case 'SPORTS_TECHNICAL_DIRECTOR': return 'bg-secondary text-secondary-foreground border-border';
+    case 'INSTRUCTOR': return 'bg-accent text-accent-foreground border-border';
+    case 'STUDENT': return 'bg-muted text-muted-foreground border-border';
+    case 'PARENT': return 'bg-warning/15 text-warning border-warning/40';
+    default: return 'bg-muted text-foreground border-border';
   }
 };
 
+/**
+ * Sortable, expandable users table with role badges and row actions.
+ *
+ * @param {UserTableProps} props - Users, filters, and edit/delete handlers.
+ * @returns {JSX.Element} The users data table.
+ */
 export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, onEdit, onDelete }: UserTableProps): JSX.Element {
   const { t } = useTranslation();
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
@@ -90,12 +102,12 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
 
   const SortableHeader = ({ label, sortKey }: { label: string, sortKey: string }) => (
     <th 
-      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none group transition-colors"
+      className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:bg-muted select-none group transition-colors"
       onClick={() => handleSort(sortKey)}
     >
       <div className="flex items-center space-x-1">
         <span>{t(label)}</span>
-        <span className="text-gray-400 group-hover:text-gray-600">
+        <span className="text-muted-foreground group-hover:text-muted-foreground">
           {sortConfig.key === sortKey ? (
             sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
           ) : (
@@ -106,14 +118,14 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
     </th>
   );
 
-  if (isLoading) return <div className="p-6 text-center text-gray-500 bg-white rounded-lg shadow">{t('users.loading')}</div>;
-  if (error) return <div className="p-6 text-center text-red-600 bg-white rounded-lg shadow">{t('users.error')}</div>;
+  if (isLoading) return <div className="p-6 text-center text-muted-foreground bg-card rounded-lg shadow">{t('users.loading')}</div>;
+  if (error) return <div className="p-6 text-center text-destructive bg-card rounded-lg shadow">{t('users.error')}</div>;
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+    <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
               <SortableHeader label="users.table_name" sortKey="firstName" />
               <SortableHeader label="users.table_last_name" sortKey="lastName" />
@@ -122,15 +134,15 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
               <SortableHeader label="users.table_birth_date" sortKey="birthDate" />
               <SortableHeader label="users.table_dni" sortKey="dni" />
               <SortableHeader label="users.table_status" sortKey="isActive" />
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {t('users.table_actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {processedUsers.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-4 text-center text-gray-500">No hay usuarios encontrados.</td>
+                <td colSpan={8} className="px-6 py-4 text-center text-muted-foreground">{t('users.no_users')}</td>
               </tr>
             ) : (
               processedUsers.map((user: any) => {
@@ -138,54 +150,54 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
                 return (
                   <Fragment key={user.id}>
                     <tr 
-                      className={`hover:bg-gray-50 cursor-pointer transition-colors ${expandedUserId === user.id ? 'bg-blue-50/50' : ''}`}
+                      className={`hover:bg-muted cursor-pointer transition-colors ${expandedUserId === user.id ? 'bg-primary/10' : ''}`}
                       onClick={() => setExpandedUserId(expandedUserId === user.id ? null : user.id)}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.firstName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{user.lastName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{user.firstName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{user.lastName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{user.email}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-wrap gap-1">
                           {userRoles.map((r: string) => (
                             <span key={r} className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full border ${getRoleBadgeColor(r)}`}>
-                              {r}
+                              {t(`users.roles.${r}`)}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : <span className="text-gray-400 italic">{t('users.no_birth_date')}</span>}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : <span className="text-muted-foreground italic">{t('users.no_birth_date')}</span>}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.dni || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{user.dni || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? 'bg-primary/15 text-primary' : 'bg-destructive/15 text-destructive'}`}>
                           {user.isActive ? t('users.active') : t('users.inactive')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <Button variant="outline" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); onEdit(user); }}>
-                          <Pencil className="h-4 w-4 text-blue-600" />
+                          <Pencil className="h-4 w-4 text-primary" />
                         </Button>
-                        <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600 border-red-200" onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}>
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                        <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive border-destructive/40" onClick={(e) => { e.stopPropagation(); onDelete(user.id); }}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </td>
                     </tr>
 
                     {expandedUserId === user.id && (
                       <tr>
-                        <td colSpan={8} className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-md shadow-inner border border-gray-100">
+                        <td colSpan={8} className="px-6 py-4 bg-muted border-b border-border">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-card rounded-md shadow-inner border border-border">
                             <div>
-                              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.phone')}</h4>
+                              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('users.phone')}</h4>
                               <div className="space-y-1">
-                                <p className="text-sm text-gray-600">{user.phone || t('users.no_phone')}</p>
+                                <p className="text-sm text-muted-foreground">{user.phone || t('users.no_phone')}</p>
                               </div>
                             </div>
                             
                             <div className="md:col-span-2">
-                              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{t('users.address')}</h4>
-                              <p className="text-sm text-gray-900">
+                              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{t('users.address')}</h4>
+                              <p className="text-sm text-foreground">
                                 {user.address ? (
                                   <>
                                     {user.address}<br />
@@ -193,7 +205,7 @@ export function UserTable({ users, isLoading, error, searchTerm, selectedRoles, 
                                     {user.state}, {user.country}
                                   </>
                                 ) : (
-                                  <span className="text-gray-400 italic">No hay dirección registrada.</span>
+                                  <span className="text-muted-foreground italic">No hay dirección registrada.</span>
                                 )}
                               </p>
                             </div>

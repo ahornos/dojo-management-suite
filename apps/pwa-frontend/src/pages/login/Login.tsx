@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/useAuthStore";
 import { apiClient } from "@/lib/api";
+import { translateApiError } from "@/lib/errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,14 +45,14 @@ export function Login(): JSX.Element {
       
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || t('login.error'));
+      setError(translateApiError(t, err, 'login.error'));
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background relative px-4">
       {error && (
-        <div className="absolute top-10 flex items-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-red-600 rounded-md shadow-lg animate-in fade-in slide-in-from-top-5">
+        <div className="absolute top-10 flex items-center gap-2 px-4 py-3 text-sm font-semibold text-destructive-foreground bg-destructive rounded-md shadow-lg animate-in fade-in slide-in-from-top-5">
           <AlertCircle className="h-5 w-5" />
           <span>{error}</span>
         </div>
@@ -72,7 +73,7 @@ export function Login(): JSX.Element {
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="superadmin@fox-jiujitsu-academy.com"
+                placeholder={t('login.email_placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

@@ -27,8 +27,8 @@ export function UserSelector({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 w-max">
-        <Label htmlFor="user-toggle" className="text-sm font-medium text-gray-700 cursor-pointer">
+      <div className="flex items-center gap-3 bg-card px-4 py-2 rounded-lg shadow-sm border border-border w-max">
+        <Label htmlFor="user-toggle" className="text-sm font-medium text-foreground cursor-pointer">
           {t('students.form.existing_user_toggle')}
         </Label>
         <Switch
@@ -39,8 +39,8 @@ export function UserSelector({
       </div>
 
       {isExistingUser && (
-        <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 space-y-2 animate-in fade-in">
-          <Label htmlFor="userSelect" className="text-blue-900 font-semibold">
+        <div className="bg-primary/10 p-4 rounded-lg border border-primary/20 space-y-2 animate-in fade-in">
+          <Label htmlFor="userSelect" className="text-primary font-semibold">
             {t('students.form.select_user_title')}
           </Label>
           <select
@@ -48,16 +48,16 @@ export function UserSelector({
             required={isExistingUser}
             value={selectedUserId}
             onChange={(e) => onSelectUser(e.target.value)}
-            className="w-full px-3 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white text-sm"
+            className="w-full px-3 py-2 border border-primary/30 rounded-lg focus:ring-2 focus:ring-ring focus:outline-none bg-card text-sm"
           >
             <option value="">{t('students.form.select_user_placeholder')}</option>
             {availableUsers.map((user) => (
               <option key={user.id} value={user.id}>
-                {user.firstName} {user.lastName} ({user.email}) - {user.dni || 'No DNI'}
+                {user.firstName} {user.lastName} ({user.email}) - {user.dni || t('users.no_dni')}
               </option>
             ))}
           </select>
-          <p className="text-xs text-blue-700">
+          <p className="text-xs text-primary">
             {t('students.form.select_user_help')}
           </p>
         </div>

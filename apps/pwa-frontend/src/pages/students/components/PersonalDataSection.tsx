@@ -19,7 +19,7 @@ export function PersonalDataSection({ formData, onChange, isMinor }: PersonalDat
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+      <h3 className="text-lg font-semibold text-foreground border-b pb-2">
         {t('students.form.personal_data_title')}
       </h3>
       
@@ -41,14 +41,14 @@ export function PersonalDataSection({ formData, onChange, isMinor }: PersonalDat
           <Input id="dni" value={formData.dni} onChange={(e) => onChange('dni', e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="birthDate" className="text-blue-700 font-semibold">{t('users.birth_date')} *</Label>
+          <Label htmlFor="birthDate" className="text-primary font-semibold">{t('users.birth_date')} *</Label>
           <Input 
             id="birthDate" 
             type="date" 
             required 
             value={formData.birthDate} 
             onChange={(e) => onChange('birthDate', e.target.value)} 
-            className={isMinor ? 'border-amber-400 focus:ring-amber-500 bg-amber-50/30' : ''}
+            className={isMinor ? 'border-warning focus:ring-warning bg-warning/10' : ''}
           />
         </div>
         <div className="space-y-2">

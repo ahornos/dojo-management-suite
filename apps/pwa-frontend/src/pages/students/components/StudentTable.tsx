@@ -99,20 +99,20 @@ export function StudentTable({ students, isLoading, error, searchTerm, selectedA
     });
   };
 
-  if (isLoading) return <div className="p-6 text-center text-gray-500 bg-white rounded-lg shadow">{t('students.loading')}</div>;
-  if (error) return <div className="p-6 text-center text-red-600 bg-white rounded-lg shadow">{t('students.error')}</div>;
+  if (isLoading) return <div className="p-6 text-center text-muted-foreground bg-card rounded-lg shadow">{t('students.loading')}</div>;
+  if (error) return <div className="p-6 text-center text-destructive bg-card rounded-lg shadow">{t('students.error')}</div>;
 
   const processedStudents = getProcessedStudents();
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+    <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-border">
           <StudentTableHeaders sortConfig={sortConfig} onSort={handleSort} />
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {processedStudents.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">{t('students.no_students')}</td>
+                <td colSpan={6} className="px-6 py-4 text-center text-muted-foreground">{t('students.no_students')}</td>
               </tr>
             ) : (
               processedStudents.map((student) => (

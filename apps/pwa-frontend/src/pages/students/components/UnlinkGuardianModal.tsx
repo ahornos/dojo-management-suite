@@ -22,25 +22,23 @@ export function UnlinkGuardianModal({ isOpen, onClose, onConfirm }: UnlinkGuardi
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-md bg-white shadow-xl border-orange-200">
+      <Card className="w-full max-w-md bg-card shadow-xl border-warning/40">
         <CardHeader className="flex flex-row items-center gap-3">
-          <div className="bg-orange-100 p-2 rounded-full">
-            <AlertTriangle className="w-6 h-6 text-orange-600" />
+          <div className="bg-warning/15 p-2 rounded-full">
+            <AlertTriangle className="w-6 h-6 text-warning" />
           </div>
-          <CardTitle className="text-gray-800 text-lg">Desligar Tutor</CardTitle>
+          <CardTitle className="text-foreground text-lg">{t('students.form.unlink_guardian_title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-            ¿Estás seguro de que deseas desligar a este tutor? 
-            <br/><br/>
-            <strong>Nota:</strong> El usuario <u>no será eliminado</u> del sistema, simplemente dejará de estar asociado a este estudiante.
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            {t('students.form.unlink_guardian_message')}
           </p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={onClose}>
               {t('users.cancel')}
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white" onClick={onConfirm}>
-              Desligar Tutor
+            <Button className="bg-warning hover:bg-warning/90 text-warning-foreground" onClick={onConfirm}>
+              {t('students.form.unlink_guardian_confirm')}
             </Button>
           </div>
         </CardContent>

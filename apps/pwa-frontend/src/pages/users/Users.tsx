@@ -1,6 +1,6 @@
 /**
  * @file Users.tsx
- * @description Administrative user management view orchestrator[cite: 36].
+ * @description Administrative user management view orchestrator.
  * Integrates filtering, data table view, and screen-based form navigation for creating/editing.
  */
 
@@ -14,6 +14,11 @@ import { UserTable } from './UserTable';
 import { UserForm } from './UserForm';
 import { DeleteUserModal } from './DeleteUserModal';
 
+/**
+ * Users administration page: list, filter, create, edit, and delete accounts.
+ *
+ * @returns {JSX.Element} The users workspace.
+ */
 export function Users(): JSX.Element {
   const { t } = useTranslation();
   
@@ -75,18 +80,18 @@ export function Users(): JSX.Element {
   };
 
   if (isLoading) return <div className="p-6">{t('users.loading')}</div>;
-  if (error) return <div className="p-6 text-red-500">{t('users.error')}</div>;
+  if (error) return <div className="p-6 text-destructive">{t('users.error')}</div>;
 
   return (
     <div className="space-y-6">
       {/* Header Actions */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center bg-card p-6 rounded-lg shadow-sm border border-border">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">{t('users.title')}</h1>
-          <p className="text-sm text-gray-500">{t('users.subtitle')}</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{t('users.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('users.subtitle')}</p>
         </div>
         {formMode === 'list' && (
-          <Button onClick={() => setFormMode('create')} className="bg-blue-600 text-white hover:bg-blue-700">
+          <Button onClick={() => setFormMode('create')} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {t('users.new_user')}
           </Button>
         )}

@@ -14,6 +14,11 @@ import { StudentTable } from './components/StudentTable';
 import { Button } from '@/components/ui/button';
 import { StudentProfileResponse } from './types';
 
+/**
+ * Students administration page: list, filter, create, edit, and delete profiles.
+ *
+ * @returns {JSX.Element} The students workspace.
+ */
 export default function Students() {
   const { t } = useTranslation();
   
@@ -63,12 +68,12 @@ export default function Students() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+      <div className="flex justify-between items-center bg-card p-6 rounded-lg shadow-sm border border-border">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('students.title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('students.title')}</h1>
         </div>
         {formMode === 'list' && (
-          <Button onClick={() => setFormMode('create')} className="bg-blue-600 text-white hover:bg-blue-700">
+          <Button onClick={() => setFormMode('create')} className="bg-primary text-primary-foreground hover:bg-primary/90">
             {t('students.new_student')}
           </Button>
         )}

@@ -20,6 +20,12 @@ interface BeltRankModalProps {
   isPending: boolean;
 }
 
+/**
+ * Create/edit dialog for a belt rank (order, stripes, and promotion thresholds).
+ *
+ * @param {BeltRankModalProps} props - Optional existing rank, parent program id, and submit handler.
+ * @returns {JSX.Element | null} The modal, or `null` when closed.
+ */
 export function BeltRankModal({ isOpen, beltRank, programId, onClose, onSubmit, isPending }: BeltRankModalProps): JSX.Element | null {
   const { t } = useTranslation();
   const [name, setName] = useState<string>('');
@@ -61,7 +67,7 @@ export function BeltRankModal({ isOpen, beltRank, programId, onClose, onSubmit, 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-lg bg-white shadow-xl">
+      <Card className="w-full max-w-lg bg-card shadow-xl">
         <CardHeader>
           <CardTitle>
             {beltRank ? t('belts.edit_title') : t('belts.create_title')}
@@ -76,7 +82,7 @@ export function BeltRankModal({ isOpen, beltRank, programId, onClose, onSubmit, 
                   id="belt-name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., White Belt"
+                  placeholder={t('belts.name_placeholder')}
                   required
                 />
               </div>

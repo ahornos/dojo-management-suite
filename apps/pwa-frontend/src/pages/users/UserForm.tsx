@@ -45,6 +45,12 @@ const emptyFormState: UserFormPayload = {
   isActive: true,
 };
 
+/**
+ * Full-page create/edit form for a user (personal data, roles, status, password).
+ *
+ * @param {UserFormProps} props - Optional initial values, submit/cancel handlers, and pending flag.
+ * @returns {JSX.Element} The user form card.
+ */
 export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFormProps) {
   const { t } = useTranslation();
   const isEditing = !!initialData?.id;
@@ -97,9 +103,9 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
   };
 
   return (
-    <Card className="max-w-4xl shadow-md border-gray-200 mx-auto">
-      <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
-        <CardTitle className="text-xl text-gray-800">
+    <Card className="max-w-4xl shadow-md border-border mx-auto">
+      <CardHeader className="bg-muted border-b border-border pb-4">
+        <CardTitle className="text-xl text-foreground">
           {isEditing ? t('users.edit_modal_title') : t('users.create_title')}
         </CardTitle>
       </CardHeader>
@@ -109,7 +115,7 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
           
           {/* Personal Information Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+            <h3 className="text-lg font-semibold text-foreground border-b pb-2">
               {t('students.form.personal_data_title')}
             </h3>
             
@@ -220,22 +226,22 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
 
           {/* Multi-Role Selection Section */}
           <div className="space-y-3 border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-foreground">
               {t('users.role')}
             </h3>
-            <p className="text-xs text-gray-500">Select one or more roles assigned to this user account.</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <p className="text-xs text-muted-foreground">{t('users.select_roles')}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-muted p-4 rounded-lg border border-border">
               {AVAILABLE_ROLES.map((role) => {
                 const isChecked = formData.roles?.includes(role);
                 return (
-                  <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                  <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-foreground select-none">
                     <input
                       type="checkbox"
                       checked={isChecked}
                       onChange={() => handleRoleToggle(role)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      className="rounded border-input text-primary focus:ring-ring h-4 w-4"
                     />
-                    <span>{role}</span>
+                    <span>{t(`users.roles.${role}`)}</span>
                   </label>
                 );
               })}
@@ -244,8 +250,8 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
 
           {/* Account Status & Password Section */}
           <div className="space-y-4 border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {t('users.status_label')} &amp; Security
+            <h3 className="text-lg font-semibold text-foreground">
+              {t('users.status_security')}
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,7 +261,7 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
                   id="isActive"
                   value={formData.isActive ? 'true' : 'false'}
                   onChange={(e) => handleChange('isActive', e.target.value === 'true')}
-                  className="w-full text-sm bg-white border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-sm bg-card border border-input rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="true">{t('users.active')}</option>
                   <option value="false">{t('users.inactive')}</option>
@@ -274,13 +280,13 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
                   value={formData.password || ''}
                   onChange={(e) => handleChange('password', e.target.value)}
                 />
-                <p className="text-xs text-gray-500">{t('users.password_hint')}</p>
+                <p className="text-xs text-muted-foreground">{t('users.password_hint')}</p>
               </div>
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-6 border-t border-border">
             <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
               {t('users.cancel')}
             </Button>

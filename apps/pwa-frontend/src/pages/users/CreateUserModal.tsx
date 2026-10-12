@@ -34,6 +34,12 @@ const emptyFormState: UserFormPayload = {
   roles: ['STUDENT'], isActive: true,
 };
 
+/**
+ * Modal form for registering a new user with one or more roles.
+ *
+ * @param {CreateUserModalProps} props - Visibility, submit handler, and pending flag.
+ * @returns {JSX.Element | null} The modal, or `null` when closed.
+ */
 export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: CreateUserModalProps): JSX.Element | null {
   const { t } = useTranslation();
   const [newUser, setNewUser] = useState<UserFormPayload>(emptyFormState);
@@ -61,7 +67,7 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-2xl bg-white shadow-xl my-8">
+      <Card className="w-full max-w-2xl bg-card shadow-xl my-8">
         <CardHeader>
           <CardTitle>{t('users.create_modal_title')}</CardTitle>
         </CardHeader>
@@ -86,7 +92,7 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
               <div className="space-y-2">
                 <Label htmlFor="create-password">{t('users.password')}</Label>
                 <Input id="create-password" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} required />
-                <p className="text-xs text-gray-500">{t('users.password_hint')}</p>
+                <p className="text-xs text-muted-foreground">{t('users.password_hint')}</p>
               </div>
             </div>
 
@@ -107,19 +113,19 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
 
             {/* Multi-Role Selection Section */}
             <div className="space-y-2 border-t pt-4">
-              <Label className="text-sm font-semibold text-gray-800">{t('users.role')} (Select one or more)</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              <Label className="text-sm font-semibold text-foreground">{t('users.select_roles_label')}</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-muted p-3 rounded-lg border border-border">
                 {AVAILABLE_ROLES.map((role) => {
                   const isChecked = newUser.roles?.includes(role);
                   return (
-                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-foreground select-none">
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => handleRoleToggle(role)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                        className="rounded border-input text-primary focus:ring-ring h-4 w-4"
                       />
-                      <span>{role}</span>
+                      <span>{t(`users.roles.${role}`)}</span>
                     </label>
                   );
                 })}
@@ -128,14 +134,14 @@ export function CreateUserModal({ isOpen, onClose, onSubmit, isPending }: Create
 
             <div className="space-y-2">
               <Label htmlFor="create-status">{t('users.status_label')}</Label>
-              <select id="create-status" value={newUser.isActive ? 'true' : 'false'} onChange={(e) => setNewUser({ ...newUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select id="create-status" value={newUser.isActive ? 'true' : 'false'} onChange={(e) => setNewUser({ ...newUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-muted border border-input rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="true">{t('users.active')}</option>
                 <option value="false">{t('users.inactive')}</option>
               </select>
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-700">{t('users.address_section')}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t('users.address_section')}</h3>
               <div className="space-y-2">
                 <Label htmlFor="create-address">{t('users.address')}</Label>
                 <Input id="create-address" value={newUser.address} onChange={(e) => setNewUser({ ...newUser, address: e.target.value })} />

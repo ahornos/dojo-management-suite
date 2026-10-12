@@ -73,7 +73,7 @@ apiClient.interceptors.response.use(
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
-      return Promise.reject(new Error(response.data.message || 'Unauthorized API Gateway response'));
+      return Promise.reject(new Error(response.data.message || 'UNAUTHORIZED'));
     }
     
     return response;

@@ -11,7 +11,12 @@
   },
   "header": {
     "control_panel": "Tauler de Control",
-    "logout": "Tancar Sessió"
+    "logout": "Tancar Sessió",
+    "language": "Idioma",
+    "fallback_name": "Administrador",
+    "lang_es": "Español",
+    "lang_ca": "Català",
+    "lang_en": "English"
   },
   "footer": {
     "rights": "Tots els drets reservats."
@@ -75,7 +80,20 @@
     "create_title": "Donar d'alta nou usuari",
     "save": "Desar Usuari",
     "cancel": "Cancel·lar",
-    "saving": "Desant..."
+    "saving": "Desant...",
+    "personal_section": "Informació personal",
+    "select_roles": "Selecciona un o més rols assignats a aquest compte.",
+    "select_roles_label": "Rol del sistema (tria'n un o més)",
+    "status_security": "Estat del compte i seguretat",
+    "roles": {
+      "SUPER_ADMIN": "Superadministrador",
+      "ADMIN_STAFF": "Personal d’administració",
+      "SPORTS_TECHNICAL_DIRECTOR": "Director tècnic esportiu",
+      "INSTRUCTOR": "Instructor",
+      "STUDENT": "Alumne",
+      "PARENT": "Pare/mare"
+    },
+    "no_users": "No s’han trobat usuaris."
   },
   "students": {
     "title": "Gestió d'Alumnes",
@@ -110,7 +128,38 @@
       "guardian_last_name": "Cognoms del Tutor *",
       "guardian_email": "Email del Tutor *",
       "guardian_phone": "Telèfon d'Emergència *",
-      "guardian_dni": "DNI / Passaport del Tutor *"
+      "guardian_dni": "DNI / Passaport del Tutor *",
+      "guardians_title": "Tutors legals",
+      "guardians_help": "Obligatori per a menors. Pots afegir-ne més d'un.",
+      "add_guardian": "Afegir tutor",
+      "guardian_n": "Tutor {{n}}",
+      "unlink": "Deslligar",
+      "link_existing_user": "Vincular un usuari ja existent al sistema",
+      "linked_user": "Usuari vinculat (ID: {{id}}...)",
+      "search_user": "Cercar usuari",
+      "select_user": "Selecciona un usuari...",
+      "relationship": "Relació",
+      "select_relationship": "Selecciona la figura...",
+      "specify_relationship": "Especificar figura",
+      "relationship_placeholder": "Ex. Àvia",
+      "emergency_title": "Contactes d'emergència",
+      "emergency_help": "Opcional. A qui hem d'avisar en cas d'emergència?",
+      "add_contact": "Afegir contacte",
+      "contact_n": "Contacte {{n}}",
+      "contact_name": "Nom i cognoms",
+      "contact_name_placeholder": "Ex. Carles López",
+      "contact_phone_placeholder": "Ex. +34 600 000 000",
+      "no_disciplines": "No hi ha disciplines configurades al sistema.",
+      "initial_belt": "Cinturó inicial / grau",
+      "default_belt": "Per defecte (cinturó inicial)",
+      "stripes": "Nre. de ratlles / graus",
+      "unlink_guardian_title": "Deslligar tutor",
+      "unlink_guardian_message": "Vols deslligar aquest tutor de l'alumne? El compte d'usuari no s'eliminarà; només se n'elimina la relació.",
+      "unlink_guardian_confirm": "Deslligar tutor",
+      "unlink_contact_title": "Deslligar contacte",
+      "unlink_contact_message": "Vols deslligar aquest contacte de l'alumne? El compte d'usuari no s'eliminarà; deixarà d'aparèixer com a contacte o tutor.",
+      "unlink_contact_confirm": "Deslligar contacte",
+      "linked_user_note": "Usuari vinculat (ID: {{id}}...)"
     },
     "table_age": "Edat",
     "table_discipline": "Disciplina(es)",
@@ -123,7 +172,15 @@
       "infantil": "Infantil (7-12 anys)",
       "juvenil": "Juvenil (13-15 anys)",
       "adults": "Adults (16+ anys)"
-    }
+    },
+    "dni": "DNI / Passaport",
+    "edit_title": "Editar alumne",
+    "user_id": "ID: {{id}}...",
+    "table_discipline_ranks": "Disciplina(es) i graus",
+    "no_discipline": "Sense disciplina / grau",
+    "no_emergency": "No registrat",
+    "no_phone": "Sense telèfon",
+    "search_placeholder": "Cercar per nom, cognoms, DNI o telèfon..."
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -133,7 +190,8 @@
     "submit": "Entrar",
     "error": "Credencials invàlides o error de connexió",
     "show_password": "Mostra la contrasenya",
-    "hide_password": "Amaga la contrasenya"
+    "hide_password": "Amaga la contrasenya",
+    "email_placeholder": "tu@academia.com"
   },
   "disciplines": {
     "title": "Disciplines i Programes",
@@ -153,7 +211,10 @@
     "error": "Error en carregar les disciplines",
     "no_data": "No s'han trobat disciplines registrades.",
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "no_belts": "No hi ha cinturons registrats.",
+    "name_placeholder": "p. ex. Jiu-Jitsu brasiler",
+    "desc_placeholder": "p. ex. Art marcial centrat en el grappling"
   },
   "belts": {
     "create_title": "Afegir Cinturó",
@@ -184,9 +245,74 @@
       "green_white": "Verd / Blanc",
       "solid_green": "Verd Sòlid",
       "green_black": "Verd / Negre"
-    }
+    },
+    "stripes_short": "Ratlles: {{count}}",
+    "months_short": "{{count}} mesos",
+    "hours_short": "{{count}} h",
+    "name_placeholder": "p. ex. Cinturó blanc",
+    "stripes_count_one": "{{count}} ratlla",
+    "stripes_count_other": "{{count}} ratlles"
   },
   "common": {
-    "confirm_delete": "Estàs segur que vols eliminar permanentment aquest element? Aquesta acció no es pot desfer."
+    "confirm_delete": "Estàs segur que vols eliminar permanentment aquest element? Aquesta acció no es pot desfer.",
+    "remove": "Eliminar",
+    "cancel": "Cancel·lar",
+    "note": "Nota"
+  },
+  "relationships": {
+    "father": "Pare",
+    "mother": "Mare",
+    "sibling": "Germà/na",
+    "partner": "Parella",
+    "friend": "Amic/ga",
+    "legal_guardian": "Tutor legal",
+    "relative": "Familiar",
+    "other": "Altre",
+    "other_specify": "Altre (especificar)"
+  },
+  "errors": {
+    "EMAIL_ALREADY_REGISTERED": "Aquest correu electrònic ja està registrat.",
+    "INVALID_CREDENTIALS": "Correu o contrasenya incorrectes.",
+    "DNI_ALREADY_REGISTERED": "Aquest DNI ja està registrat.",
+    "USER_NOT_FOUND": "Usuari no trobat.",
+    "USER_ALREADY_EXISTS": "Ja existeix un usuari amb aquesta identitat.",
+    "USER_DNI_ALREADY_REGISTERED": "Aquest DNI ja està registrat.",
+    "USER_CREATION_DATA_INCOMPLETE": "Falten dades per crear l'usuari.",
+    "INVALID_OR_MISSING_INTERNAL_API_KEY": "Clau interna invàlida o absent.",
+    "INVALID_OR_MISSING_TOKEN": "Token de sessió invàlid o absent.",
+    "FORBIDDEN": "No tens permís per fer aquesta acció.",
+    "UNAUTHORIZED": "La sessió ha caducat. Torna a iniciar sessió.",
+    "VALIDATION_FAILED": "Revisa el formulari i torna-ho a provar.",
+    "STUDENT_PROFILE_NOT_FOUND": "Perfil d'alumne no trobat.",
+    "STUDENT_PROFILE_ALREADY_EXISTS": "Aquest usuari ja té un perfil d'alumne.",
+    "STUDENT_HAS_NO_ACTIVE_RANK": "L'alumne no té un cinturó actiu.",
+    "STUDENT_ACTIVE_RANK_NOT_FOUND": "No s'ha trobat un grau actiu per a aquest alumne.",
+    "STUDENT_ALREADY_HIGHEST_RANK": "L'alumne ja és al cinturó més alt del programa.",
+    "STUDENT_AT_INITIAL_RANK": "No es pot retrocedir: l'alumne és al grau inicial.",
+    "ATTENDANCE_NOT_FOUND": "Registre d'assistència no trobat.",
+    "DISCIPLINE_NOT_FOUND": "Disciplina no trobada.",
+    "DISCIPLINE_NAME_ALREADY_EXISTS": "Ja existeix una disciplina amb aquest nom.",
+    "CASH_SESSION_ALREADY_OPEN": "Ja hi ha una sessió de caixa oberta.",
+    "OPEN_CASH_SESSION_NOT_FOUND": "No hi ha cap sessió de caixa oberta.",
+    "CASH_SESSION_NOT_FOUND": "Sessió de caixa no trobada.",
+    "CASH_TRANSACTION_NOT_FOUND": "Moviment de caixa no trobat.",
+    "MANDATE_ALREADY_EXISTS": "Ja existeix un mandat amb aquesta referència.",
+    "REMITTANCE_BATCH_ALREADY_EXISTS": "Ja existeix una remesa amb aquesta referència.",
+    "ACTIVE_MANDATE_NOT_FOUND": "Mandat bancari actiu no trobat.",
+    "REMITTANCE_BATCH_NOT_FOUND": "Remesa no trobada.",
+    "REMITTANCE_ITEM_NOT_FOUND": "Cobrament de remesa no trobat.",
+    "DEBTOR_IDENTITY_NOT_FOUND": "No s'ha pogut resoldre la identitat del deutor.",
+    "MASS_UPDATE_REQUIRES_PERCENTAGE_OR_FIXED_AMOUNT": "Indica un percentatge o un import fix.",
+    "MASS_UPDATE_RESULTS_IN_NEGATIVE_AMOUNT": "L'actualització deixaria una quota negativa.",
+    "INVALID_MONETARY_AMOUNT": "Introdueix un import no negatiu amb fins a dos decimals.",
+    "UPSTREAM_TIMEOUT": "El servei ha tardat massa a respondre.",
+    "UPSTREAM_UNAVAILABLE": "El servei no està disponible temporalment.",
+    "INTERNAL_SERVER_ERROR": "S'ha produït un error inesperat.",
+    "AUTH_SERVICE_UNAVAILABLE": "El servei d'identitat no està disponible.",
+    "USER_DIRECTORY_REQUEST_REJECTED": "La sol·licitud d'identitat ha estat rebutjada.",
+    "USER_CONFLICT": "La identitat ja existeix.",
+    "MISSING_AUTHENTICATED_USER": "Has d'iniciar sessió.",
+    "INSUFFICIENT_ROLE": "El teu rol no pot fer aquesta acció.",
+    "USER_NOT_AUTHENTICATED": "Has d'iniciar sessió."
   }
 }

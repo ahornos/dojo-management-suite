@@ -40,48 +40,55 @@ export const Header = () => {
     navigate('/login');
   };
 
+  /**
+   * Builds avatar initials from the authenticated user, falling back to the localized admin label.
+   *
+   * @returns {string} Two-character initials.
+   */
   const getUserInitials = () => {
-    if (!user?.firstName && !user?.lastName && !user?.email) return 'SA';
+    if (!user?.firstName && !user?.lastName && !user?.email) {
+      return t('header.fallback_name').substring(0, 2).toUpperCase();
+    }
     const identifier = (user.firstName ? `${user.firstName} ${user.lastName}` : user.email);
     return identifier.substring(0, 2).toUpperCase();
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-gray-800">{t('header.control_panel')}</h2>
+    <header className="bg-card border-b border-border h-16 flex items-center justify-between px-6 shadow-sm">
+      <h2 className="text-xl font-semibold text-foreground">{t('header.control_panel')}</h2>
       
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
-          <label htmlFor="language-select" className="text-sm text-gray-500 font-medium">
-            🌐
+          <label htmlFor="language-select" className="text-sm text-muted-foreground font-medium">
+            {t('header.language')}
           </label>
           <select
             id="language-select"
             value={i18n.language ? i18n.language.substring(0, 2) : 'es'}
             onChange={handleLanguageChange}
-            className="text-sm bg-gray-50 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-sm bg-muted border border-input rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="es">Español</option>
-            <option value="ca">Català</option>
-            <option value="en">English</option>
+            <option value="es">{t('header.lang_es')}</option>
+            <option value="ca">{t('header.lang_ca')}</option>
+            <option value="en">{t('header.lang_en')}</option>
           </select>
         </div>
 
-        <div className="flex items-center gap-3 border-l pl-6 border-gray-200">
+        <div className="flex items-center gap-3 border-l pl-6 border-border">
           <div className="text-sm text-right">
-            <p className="font-bold text-gray-700">
-              {user?.firstName ? `${user.firstName} ${user.lastName}` : 'Super Admin'}
+            <p className="font-bold text-foreground">
+              {user?.firstName ? `${user.firstName} ${user.lastName}` : t('header.fallback_name')}
             </p>
-            <p className="text-gray-500 text-xs">
-              {user?.email || 'admin@dojo.com'}
-            </p>
+            {user?.email && (
+              <p className="text-muted-foreground text-xs">{user.email}</p>
+            )}
           </div>
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+          <div className="h-10 w-10 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold">
             {getUserInitials()}
           </div>
           <button 
             onClick={handleLogout}
-            className="ml-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors font-medium"
+            className="ml-2 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors font-medium"
           >
             {t('header.logout')}
           </button>

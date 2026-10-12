@@ -19,6 +19,12 @@ interface DisciplineModalProps {
   isPending: boolean;
 }
 
+/**
+ * Create/edit dialog for a martial discipline (name and description).
+ *
+ * @param {DisciplineModalProps} props - Optional existing discipline, submit handler, and pending flag.
+ * @returns {JSX.Element | null} The modal, or `null` when closed.
+ */
 export function DisciplineModal({ isOpen, discipline, onClose, onSubmit, isPending }: DisciplineModalProps): JSX.Element | null {
   const { t } = useTranslation();
   const [name, setName] = useState<string>('');
@@ -47,7 +53,7 @@ export function DisciplineModal({ isOpen, discipline, onClose, onSubmit, isPendi
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-lg bg-white shadow-xl">
+      <Card className="w-full max-w-lg bg-card shadow-xl">
         <CardHeader>
           <CardTitle>
             {discipline ? t('disciplines.edit_title') : t('disciplines.create_title')}
@@ -61,7 +67,7 @@ export function DisciplineModal({ isOpen, discipline, onClose, onSubmit, isPendi
                 id="discipline-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Brazilian Jiu-Jitsu"
+                placeholder={t('disciplines.name_placeholder')}
                 required
               />
             </div>
@@ -71,7 +77,7 @@ export function DisciplineModal({ isOpen, discipline, onClose, onSubmit, isPendi
                 id="discipline-desc"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="e.g., Gentle art focusing on grappling"
+                placeholder={t('disciplines.desc_placeholder')}
               />
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t">

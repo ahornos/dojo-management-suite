@@ -21,7 +21,7 @@ import Students from '@/pages/students/Students';
  */
 const Dashboard = () => {
   const { t } = useTranslation();
-  return <div className="bg-white p-6 rounded-lg shadow">{t('dashboard.welcome')}</div>;
+  return <div className="bg-card p-6 rounded-lg shadow">{t('dashboard.welcome')}</div>;
 };
 
 /**
@@ -29,7 +29,7 @@ const Dashboard = () => {
  */
 const Attendances = () => {
   const { t } = useTranslation();
-  return <div className="bg-white p-6 rounded-lg shadow">{t('modules.attendances')}</div>;
+  return <div className="bg-card p-6 rounded-lg shadow">{t('modules.attendances')}</div>;
 };
 
 /**
@@ -37,7 +37,7 @@ const Attendances = () => {
  */
 const Graduations = () => {
   const { t } = useTranslation();
-  return <div className="bg-white p-6 rounded-lg shadow">{t('modules.graduations')}</div>;
+  return <div className="bg-card p-6 rounded-lg shadow">{t('modules.graduations')}</div>;
 };
 
 /**
@@ -45,7 +45,7 @@ const Graduations = () => {
  */
 const Financial = () => {
   const { t } = useTranslation();
-  return <div className="bg-white p-6 rounded-lg shadow">{t('modules.financial')}</div>;
+  return <div className="bg-card p-6 rounded-lg shadow">{t('modules.financial')}</div>;
 };
 
 /**

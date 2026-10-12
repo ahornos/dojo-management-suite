@@ -1,6 +1,6 @@
 /**
  * @file ProtectedRoute.tsx
- * @description Advanced route guard component supporting authentication and Role-Based Access Control (RBAC)[cite: 36].
+ * @description Advanced route guard component supporting authentication and Role-Based Access Control (RBAC).
  */
 
 import { Navigate, Outlet } from 'react-router-dom';
@@ -11,18 +11,18 @@ interface ProtectedRouteProps {
 }
 
 /**
- * Intercepts navigation to private routes[cite: 36].
- * Validates session existence and verifies if any of the user's roles match permitted roles[cite: 36].
+ * Intercepts navigation to private routes.
+ * Validates session existence and verifies if any of the user's roles match permitted roles.
  * 
  * @component
- * @param {ProtectedRouteProps} props - Configuration rules for the route guard[cite: 36].
- * @returns {React.ReactElement} The protected child components or a redirection[cite: 36].
+ * @param {ProtectedRouteProps} props - Configuration rules for the route guard.
+ * @returns {React.ReactElement} The protected child components or a redirection.
  */
 export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const token = useAuthStore((state) => state.token) || localStorage.getItem('token');
   const user = useAuthStore((state) => state.user);
 
-  // 1. Check basic authentication[cite: 36]
+  // 1. Check basic authentication
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -33,11 +33,11 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     const hasPermission = userRoles.some((role) => allowedRoles.includes(role));
     
     if (!hasPermission) {
-      // Redirect unauthorized users to a safe default view (e.g., dashboard)[cite: 36]
+      // Redirect unauthorized users to a safe default view (e.g., dashboard)
       return <Navigate to="/dashboard" replace />;
     }
   }
 
-  // Render child routes if validation succeeds[cite: 36]
+  // Render child routes if validation succeeds
   return <Outlet />;
 };

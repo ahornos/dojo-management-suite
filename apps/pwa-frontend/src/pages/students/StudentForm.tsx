@@ -163,9 +163,9 @@ export function StudentForm({
   };
 
   return (
-    <Card className="max-w-4xl shadow-md border-gray-200">
-      <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
-        <CardTitle className="text-xl text-gray-800">
+    <Card className="max-w-4xl shadow-md border-border">
+      <CardHeader className="bg-muted border-b border-border pb-4">
+        <CardTitle className="text-xl text-foreground">
           {mode === 'create' ? t('students.create_title') : t('users.edit_modal_title')}
         </CardTitle>
       </CardHeader>
@@ -201,7 +201,7 @@ export function StudentForm({
             isMinor={isMinor} 
           />
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-6 border-t border-border">
             <Button type="button" variant="outline" onClick={onCancel}>
               {t('students.cancel')}
             </Button>

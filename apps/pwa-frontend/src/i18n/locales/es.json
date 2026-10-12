@@ -11,7 +11,12 @@
   },
   "header": {
     "control_panel": "Panel de Control",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "language": "Idioma",
+    "fallback_name": "Administrador",
+    "lang_es": "Español",
+    "lang_ca": "Català",
+    "lang_en": "English"
   },
   "footer": {
     "rights": "Todos los derechos reservados."
@@ -75,7 +80,20 @@
     "create_title": "Dar de alta nuevo usuario",
     "save": "Guardar Usuario",
     "cancel": "Cancelar",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "personal_section": "Información personal",
+    "select_roles": "Selecciona uno o más roles asignados a esta cuenta.",
+    "select_roles_label": "Rol del sistema (elige uno o más)",
+    "status_security": "Estado de la cuenta y seguridad",
+    "roles": {
+      "SUPER_ADMIN": "Superadministrador",
+      "ADMIN_STAFF": "Personal de administración",
+      "SPORTS_TECHNICAL_DIRECTOR": "Director técnico deportivo",
+      "INSTRUCTOR": "Instructor",
+      "STUDENT": "Alumno",
+      "PARENT": "Padre/madre"
+    },
+    "no_users": "No se encontraron usuarios."
   },
   "students": {
     "title": "Gestión de Alumnos",
@@ -110,7 +128,38 @@
       "guardian_last_name": "Apellidos del Tutor *",
       "guardian_email": "Email del Tutor *",
       "guardian_phone": "Teléfono de Emergencia *",
-      "guardian_dni": "DNI / Pasaporte del Tutor *"
+      "guardian_dni": "DNI / Pasaporte del Tutor *",
+      "guardians_title": "Tutores legales",
+      "guardians_help": "Obligatorio para menores. Puedes añadir varios tutores.",
+      "add_guardian": "Añadir tutor",
+      "guardian_n": "Tutor {{n}}",
+      "unlink": "Desligar",
+      "link_existing_user": "Vincular un usuario ya existente en el sistema",
+      "linked_user": "Usuario vinculado (ID: {{id}}...)",
+      "search_user": "Buscar usuario",
+      "select_user": "Selecciona un usuario...",
+      "relationship": "Relación",
+      "select_relationship": "Selecciona la figura...",
+      "specify_relationship": "Especificar figura",
+      "relationship_placeholder": "Ej. Abuela",
+      "emergency_title": "Contactos de emergencia",
+      "emergency_help": "Opcional. Añade a quién avisar en caso de emergencia.",
+      "add_contact": "Añadir contacto",
+      "contact_n": "Contacto {{n}}",
+      "contact_name": "Nombre y apellidos",
+      "contact_name_placeholder": "Ej. Carlos López",
+      "contact_phone_placeholder": "Ej. +34 600 000 000",
+      "no_disciplines": "No hay disciplinas configuradas en el sistema.",
+      "initial_belt": "Cinturón inicial / grado",
+      "default_belt": "Por defecto (cinturón inicial)",
+      "stripes": "N.º de rayas / grados",
+      "unlink_guardian_title": "Desligar tutor",
+      "unlink_guardian_message": "¿Desligar a este tutor del alumno? La cuenta de usuario no se eliminará; solo se quita la relación.",
+      "unlink_guardian_confirm": "Desligar tutor",
+      "unlink_contact_title": "Desligar contacto",
+      "unlink_contact_message": "¿Desligar a este contacto del alumno? La cuenta de usuario no se eliminará; dejará de aparecer como contacto o tutor.",
+      "unlink_contact_confirm": "Desligar contacto",
+      "linked_user_note": "Usuario vinculado (ID: {{id}}...)"
     },
     "table_age": "Edad",
     "table_discipline": "Disciplina(s)",
@@ -123,7 +172,15 @@
       "infantil": "Infantil (7-12 años)",
       "juvenil": "Juvenil (13-15 años)",
       "adults": "Adultos (16+ años)"
-    }
+    },
+    "dni": "DNI / Pasaporte",
+    "edit_title": "Editar alumno",
+    "user_id": "ID: {{id}}...",
+    "table_discipline_ranks": "Disciplina(s) y grados",
+    "no_discipline": "Sin disciplina / grado",
+    "no_emergency": "No registrado",
+    "no_phone": "Sin teléfono",
+    "search_placeholder": "Buscar por nombre, apellidos, DNI o teléfono..."
   },
   "login": {
     "title": "Dojo Management Suite",
@@ -133,7 +190,8 @@
     "submit": "Entrar",
     "error": "Credenciales inválidas o error de conexión",
     "show_password": "Mostrar contraseña",
-    "hide_password": "Ocultar contraseña"
+    "hide_password": "Ocultar contraseña",
+    "email_placeholder": "tu@academia.com"
   },
   "disciplines": {
     "title": "Disciplines y Programas",
@@ -153,7 +211,10 @@
     "error": "Error al cargar las disciplinas",
     "no_data": "No se encontraron disciplinas registradas.",
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "no_belts": "No hay cinturones registrados.",
+    "name_placeholder": "p. ej. Jiu-Jitsu brasileño",
+    "desc_placeholder": "p. ej. Arte marcial centrado en el grappling"
   },
   "belts": {
     "create_title": "Añadir Cinturón",
@@ -184,9 +245,74 @@
       "green_white": "Verde / Blanco",
       "solid_green": "Verde Sólido",
       "green_black": "Verde / Negro"
-    }
+    },
+    "stripes_short": "Rayas: {{count}}",
+    "months_short": "{{count}} mes",
+    "hours_short": "{{count}} h",
+    "name_placeholder": "p. ej. Cinturón blanco",
+    "stripes_count_one": "{{count}} raya",
+    "stripes_count_other": "{{count}} rayas"
   },
   "common": {
-    "confirm_delete": "¿Estás seguro de que deseas eliminar este elemento?"
+    "confirm_delete": "¿Estás seguro de que deseas eliminar este elemento?",
+    "remove": "Eliminar",
+    "cancel": "Cancelar",
+    "note": "Nota"
+  },
+  "relationships": {
+    "father": "Padre",
+    "mother": "Madre",
+    "sibling": "Hermano/a",
+    "partner": "Pareja",
+    "friend": "Amigo/a",
+    "legal_guardian": "Tutor legal",
+    "relative": "Familiar",
+    "other": "Otro",
+    "other_specify": "Otro (especificar)"
+  },
+  "errors": {
+    "EMAIL_ALREADY_REGISTERED": "Este correo electrónico ya está registrado.",
+    "INVALID_CREDENTIALS": "Correo o contraseña incorrectos.",
+    "DNI_ALREADY_REGISTERED": "Este DNI ya está registrado.",
+    "USER_NOT_FOUND": "Usuario no encontrado.",
+    "USER_ALREADY_EXISTS": "Ya existe un usuario con esta identidad.",
+    "USER_DNI_ALREADY_REGISTERED": "Este DNI ya está registrado.",
+    "USER_CREATION_DATA_INCOMPLETE": "Faltan datos para crear el usuario.",
+    "INVALID_OR_MISSING_INTERNAL_API_KEY": "Clave interna inválida o ausente.",
+    "INVALID_OR_MISSING_TOKEN": "Token de sesión inválido o ausente.",
+    "FORBIDDEN": "No tienes permiso para realizar esta acción.",
+    "UNAUTHORIZED": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+    "VALIDATION_FAILED": "Revisa el formulario e inténtalo de nuevo.",
+    "STUDENT_PROFILE_NOT_FOUND": "Perfil de alumno no encontrado.",
+    "STUDENT_PROFILE_ALREADY_EXISTS": "Este usuario ya tiene un perfil de alumno.",
+    "STUDENT_HAS_NO_ACTIVE_RANK": "El alumno no tiene un cinturón activo.",
+    "STUDENT_ACTIVE_RANK_NOT_FOUND": "No se encontró un grado activo para este alumno.",
+    "STUDENT_ALREADY_HIGHEST_RANK": "El alumno ya está en el cinturón más alto del programa.",
+    "STUDENT_AT_INITIAL_RANK": "No se puede retroceder: el alumno está en su grado inicial.",
+    "ATTENDANCE_NOT_FOUND": "Registro de asistencia no encontrado.",
+    "DISCIPLINE_NOT_FOUND": "Disciplina no encontrada.",
+    "DISCIPLINE_NAME_ALREADY_EXISTS": "Ya existe una disciplina con este nombre.",
+    "CASH_SESSION_ALREADY_OPEN": "Ya hay una sesión de caja abierta.",
+    "OPEN_CASH_SESSION_NOT_FOUND": "No hay ninguna sesión de caja abierta.",
+    "CASH_SESSION_NOT_FOUND": "Sesión de caja no encontrada.",
+    "CASH_TRANSACTION_NOT_FOUND": "Movimiento de caja no encontrado.",
+    "MANDATE_ALREADY_EXISTS": "Ya existe un mandato con esta referencia.",
+    "REMITTANCE_BATCH_ALREADY_EXISTS": "Ya existe una remesa con esta referencia.",
+    "ACTIVE_MANDATE_NOT_FOUND": "Mandato bancario activo no encontrado.",
+    "REMITTANCE_BATCH_NOT_FOUND": "Remesa no encontrada.",
+    "REMITTANCE_ITEM_NOT_FOUND": "Cobro de remesa no encontrado.",
+    "DEBTOR_IDENTITY_NOT_FOUND": "No se pudo resolver la identidad del deudor.",
+    "MASS_UPDATE_REQUIRES_PERCENTAGE_OR_FIXED_AMOUNT": "Indica un porcentaje o un importe fijo.",
+    "MASS_UPDATE_RESULTS_IN_NEGATIVE_AMOUNT": "La actualización dejaría una cuota negativa.",
+    "INVALID_MONETARY_AMOUNT": "Introduce un importe no negativo con hasta dos decimales.",
+    "UPSTREAM_TIMEOUT": "El servicio tardó demasiado en responder.",
+    "UPSTREAM_UNAVAILABLE": "El servicio no está disponible temporalmente.",
+    "INTERNAL_SERVER_ERROR": "Se ha producido un error inesperado.",
+    "AUTH_SERVICE_UNAVAILABLE": "El servicio de identidad no está disponible.",
+    "USER_DIRECTORY_REQUEST_REJECTED": "La solicitud de identidad fue rechazada.",
+    "USER_CONFLICT": "La identidad ya existe.",
+    "MISSING_AUTHENTICATED_USER": "Debes iniciar sesión.",
+    "INSUFFICIENT_ROLE": "Tu rol no puede realizar esta acción.",
+    "USER_NOT_AUTHENTICATED": "Debes iniciar sesión."
   }
 }

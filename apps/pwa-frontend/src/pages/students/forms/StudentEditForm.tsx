@@ -114,13 +114,13 @@ export function StudentEditForm({ initialData, availableUsers, availableDiscipli
   };
 
   return (
-    <Card className="max-w-4xl shadow-md border-gray-200">
-      <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
+    <Card className="max-w-4xl shadow-md border-border">
+      <CardHeader className="bg-muted border-b border-border pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl text-gray-800">{t('users.edit_modal_title')}</CardTitle>
-          <div className="flex items-center gap-2 text-sm text-gray-500 bg-white px-3 py-1 rounded-full border shadow-sm">
+          <CardTitle className="text-xl text-foreground">{t('students.edit_title')}</CardTitle>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-card px-3 py-1 rounded-full border shadow-sm">
             <UserCircle className="w-4 h-4" />
-            <span>ID: <span className="font-mono text-gray-900">{initialData.userId.slice(0, 8)}...</span></span>
+            <span>{t('students.user_id', { id: initialData.userId.slice(0, 8) })}</span>
           </div>
         </div>
       </CardHeader>
@@ -152,7 +152,7 @@ export function StudentEditForm({ initialData, availableUsers, availableDiscipli
             isMinor={isMinor} 
           />
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-6 border-t border-border">
             <Button type="button" variant="outline" onClick={onCancel}>{t('students.cancel')}</Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? t('students.saving') : t('students.save')}

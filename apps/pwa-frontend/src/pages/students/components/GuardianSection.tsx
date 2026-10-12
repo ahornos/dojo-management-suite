@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { PlusCircle, Trash2, UserCircle } from 'lucide-react';
 import { UnlinkGuardianModal } from './UnlinkGuardianModal';
+import { GUARDIAN_RELATIONSHIP_OPTIONS } from '@/lib/relationships';
 
 interface GuardianData {
   isExistingUser: boolean;
@@ -35,14 +36,6 @@ interface GuardianSectionProps {
   availableUsers: any[];
   isMinor: boolean;
 }
-
-const RELATIONSHIP_OPTIONS = [
-  { value: 'Padre', label: 'Padre' },
-  { value: 'Madre', label: 'Madre' },
-  { value: 'Tutor Legal', label: 'Tutor Legal' },
-  { value: 'Familiar', label: 'Familiar' },
-  { value: 'Otro', label: 'Otro (Especificar)' },
-];
 
 export function GuardianSection({ 
   guardians, 
@@ -77,15 +70,15 @@ export function GuardianSection({
   };
 
   return (
-    <div className="space-y-6 pt-6 border-t border-gray-100">
+    <div className="space-y-6 pt-6 border-t border-border">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">Tutores Legales</h3>
-          <p className="text-sm text-gray-500 mt-1">Obligatorio para menores. Puedes añadir varios tutores.</p>
+          <h3 className="text-lg font-semibold text-foreground">{t('students.form.guardians_title')}</h3>
+          <p className="text-sm text-muted-foreground mt-1">{t('students.form.guardians_help')}</p>
         </div>
         <Button type="button" variant="outline" size="sm" onClick={onAdd} className="gap-2">
           <PlusCircle className="w-4 h-4" />
-          Añadir Tutor
+          {t('students.form.add_guardian')}
         </Button>
       </div>
 
@@ -94,51 +87,51 @@ export function GuardianSection({
           const isAlreadyLinked = Boolean(guardian.userId && guardian.userId.length > 0);
 
           return (
-            <div key={idx} className="p-5 border border-blue-100 bg-blue-50/30 rounded-xl space-y-4 relative">
-              <div className="flex justify-between items-center mb-2 pb-2 border-b border-blue-100/50">
-                <span className="font-semibold text-blue-800">Tutor {idx + 1}</span>
+            <div key={idx} className="p-5 border border-primary/20 bg-primary/10 rounded-xl space-y-4 relative">
+              <div className="flex justify-between items-center mb-2 pb-2 border-b border-primary/20">
+                <span className="font-semibold text-primary">{t('students.form.guardian_n', { n: idx + 1 })}</span>
                 {guardians.length > 1 && (
                   <Button 
                     type="button" 
                     variant="ghost" 
                     size="sm" 
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8"
                     onClick={() => setUnlinkIdx(idx)}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Desligar
+                    {t('students.form.unlink')}
                   </Button>
                 )}
               </div>
 
               {!isAlreadyLinked ? (
-                <div className="flex items-center space-x-2 bg-white p-3 rounded-lg border border-gray-200">
+                <div className="flex items-center space-x-2 bg-card p-3 rounded-lg border border-border">
                   <Switch
                     checked={guardian.isExistingUser}
                     onCheckedChange={(c) => onToggleExisting(idx, c)}
                     id={`existing-guardian-${idx}`}
                   />
                   <Label htmlFor={`existing-guardian-${idx}`} className="text-sm cursor-pointer">
-                    Vincular un usuario ya existente en el sistema
+                    {t('students.form.link_existing_user')}
                   </Label>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-sm text-gray-600 bg-white p-2 rounded-md border border-gray-200 w-fit">
-                  <UserCircle className="w-4 h-4 text-blue-500" />
-                  <span>Usuario vinculado (ID: <span className="font-mono text-gray-900">{guardian.userId?.slice(0, 8)}...</span>)</span>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-card p-2 rounded-md border border-border w-fit">
+                  <UserCircle className="w-4 h-4 text-primary" />
+                  <span>{t('students.form.linked_user_note', { id: guardian.userId?.slice(0, 8) })}</span>
                 </div>
               )}
 
               {guardian.isExistingUser && !isAlreadyLinked && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2 md:col-span-2">
-                    <Label>Buscar Usuario</Label>
+                    <Label>{t('students.form.search_user')}</Label>
                     <select
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       value={guardian.userId || ''}
                       onChange={(e) => onSelectUser(idx, e.target.value)}
                     >
-                      <option value="">Selecciona un usuario...</option>
+                      <option value="">{t('students.form.select_user')}</option>
                       {availableUsers.map((u) => (
                         <option key={u.id} value={u.id}>
                           {u.firstName} {u.lastName} ({u.email})
@@ -151,30 +144,30 @@ export function GuardianSection({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Figura (Relación)</Label>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    value={guardian.relationship === 'Otro' || (guardian.relationship && !RELATIONSHIP_OPTIONS.find(o => o.value === guardian.relationship)) ? 'Otro' : guardian.relationship || ''}
-                    onChange={(e) => handleRelationshipChange(idx, e.target.value)}
-                    required
-                  >
-                    <option value="" disabled>Selecciona la figura...</option>
-                    {RELATIONSHIP_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
+                    <Label>{t('students.form.relationship')}</Label>
+                    <select
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      value={guardian.relationship === 'Otro' || (guardian.relationship && !GUARDIAN_RELATIONSHIP_OPTIONS.find(o => o.value === guardian.relationship)) ? 'Otro' : guardian.relationship || ''}
+                      onChange={(e) => handleRelationshipChange(idx, e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>{t('students.form.select_relationship')}</option>
+                      {GUARDIAN_RELATIONSHIP_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{t(opt.labelKey)}</option>
+                      ))}
+                    </select>
                 </div>
 
-                {(guardian.relationship === 'Otro' || (guardian.relationship && !RELATIONSHIP_OPTIONS.find(o => o.value === guardian.relationship))) && (
+                {(guardian.relationship === 'Otro' || (guardian.relationship && !GUARDIAN_RELATIONSHIP_OPTIONS.find(o => o.value === guardian.relationship))) && (
                   <div className="space-y-2">
-                    <Label>Especificar Figura</Label>
+                    <Label>{t('students.form.specify_relationship')}</Label>
                     <Input 
                       value={guardian.customRelationship !== undefined ? guardian.customRelationship : guardian.relationship} 
                       onChange={(e) => {
                         onChange(idx, 'customRelationship', e.target.value);
                         onChange(idx, 'relationship', e.target.value);
                       }} 
-                      placeholder="Ej. Abuela"
+                      placeholder={t('students.form.relationship_placeholder')}
                       required 
                     />
                   </div>

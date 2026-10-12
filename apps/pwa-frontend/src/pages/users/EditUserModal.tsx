@@ -28,6 +28,12 @@ const AVAILABLE_ROLES = [
   'PARENT',
 ];
 
+/**
+ * Modal form for updating an existing user (roles, personal data, optional password).
+ *
+ * @param {EditUserModalProps} props - User being edited, submit handler, and pending flag.
+ * @returns {JSX.Element | null} The modal, or `null` when no user is selected.
+ */
 export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserModalProps): JSX.Element | null {
   const { t } = useTranslation();
   const [editingUser, setEditingUser] = useState<UserFormPayload | null>(null);
@@ -78,7 +84,7 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <Card className="w-full max-w-2xl bg-white shadow-xl my-8">
+      <Card className="w-full max-w-2xl bg-card shadow-xl my-8">
         <CardHeader>
           <CardTitle>{t('users.edit_modal_title')}</CardTitle>
         </CardHeader>
@@ -119,19 +125,19 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
 
             {/* Multi-Role Selection Section */}
             <div className="space-y-2 border-t pt-4">
-              <Label className="text-sm font-semibold text-gray-800">{t('users.role')} (Select one or more)</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              <Label className="text-sm font-semibold text-foreground">{t('users.select_roles_label')}</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-muted p-3 rounded-lg border border-border">
                 {AVAILABLE_ROLES.map((role) => {
                   const isChecked = editingUser.roles?.includes(role);
                   return (
-                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                    <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-foreground select-none">
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => handleRoleToggle(role)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                        className="rounded border-input text-primary focus:ring-ring h-4 w-4"
                       />
-                      <span>{role}</span>
+                      <span>{t(`users.roles.${role}`)}</span>
                     </label>
                   );
                 })}
@@ -140,14 +146,14 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
 
             <div className="space-y-2">
               <Label htmlFor="edit-status">{t('users.status_label')}</Label>
-              <select id="edit-status" value={editingUser.isActive ? 'true' : 'false'} onChange={(e) => setEditingUser({ ...editingUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-gray-50 border border-gray-300 rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select id="edit-status" value={editingUser.isActive ? 'true' : 'false'} onChange={(e) => setEditingUser({ ...editingUser, isActive: e.target.value === 'true' })} className="w-full text-sm bg-muted border border-input rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="true">{t('users.active')}</option>
                 <option value="false">{t('users.inactive')}</option>
               </select>
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-700">{t('users.address_section')}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t('users.address_section')}</h3>
               <div className="space-y-2">
                 <Label htmlFor="edit-address">{t('users.address')}</Label>
                 <Input id="edit-address" value={editingUser.address} onChange={(e) => setEditingUser({ ...editingUser, address: e.target.value })} />
@@ -175,11 +181,11 @@ export function EditUserModal({ user, onClose, onSubmit, isPending }: EditUserMo
             </div>
 
             <div className="border-t pt-4 mt-4 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-700">{t('users.password_section')}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{t('users.password_section')}</h3>
               <div className="space-y-2">
                 <Label htmlFor="edit-password">{t('users.password')}</Label>
                 <Input id="edit-password" type="password" placeholder="••••••••" value={editingUser.password || ''} onChange={(e) => setEditingUser({ ...editingUser, password: e.target.value })} />
-                <p className="text-xs text-gray-500">{t('users.password_hint')}</p>
+                <p className="text-xs text-muted-foreground">{t('users.password_hint')}</p>
               </div>
             </div>
 

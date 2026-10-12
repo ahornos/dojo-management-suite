@@ -9,6 +9,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 import { StudentProfileResponse, CreateStudentPayload } from './types';
 
+/**
+ * Loads student profiles plus lookup datasets (users, disciplines) and exposes CRUD mutations.
+ *
+ * @returns {{ students: StudentProfileResponse[]; isLoading: boolean; error: unknown; availableUsers: unknown[]; availableDisciplines: unknown[]; isUsersLoading: boolean; createStudent: unknown; updateStudent: unknown; deleteStudent: unknown }} Query state and mutations for the Students module.
+ */
 export function useStudents() {
   const queryClient = useQueryClient();
 

@@ -24,14 +24,16 @@ const AVAILABLE_ROLES = [
 ];
 
 /**
- * Filter component for the Users table.
- * Includes a text search and a visual multi-select badge group for roles.
+ * Search and role-badge filters for the users table.
+ *
+ * @param {UserFiltersProps} props - Current search term, selected roles, and change handlers.
+ * @returns {JSX.Element} The filter toolbar.
  */
 export function UserFilters({ searchTerm, onSearchChange, selectedRoles, onRoleToggle }: UserFiltersProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg shadow-sm border border-border">
       <div className="w-full sm:w-1/2 md:w-1/3">
         <Input
           placeholder={t('users.search_placeholder')}
@@ -43,7 +45,7 @@ export function UserFilters({ searchTerm, onSearchChange, selectedRoles, onRoleT
       
       {/* Visual Multi-Select for Roles */}
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm font-medium text-gray-500 mr-2">{t('users.filter_role')}:</span>
+        <span className="text-sm font-medium text-muted-foreground mr-2">{t('users.filter_role')}:</span>
         
         {/* "All Roles" acts as a reset button */}
         <Badge 
@@ -61,7 +63,7 @@ export function UserFilters({ searchTerm, onSearchChange, selectedRoles, onRoleT
             className="cursor-pointer transition-colors"
             onClick={() => onRoleToggle(role)}
           >
-            {role}
+            {t(`users.roles.${role}`)}
           </Badge>
         ))}
       </div>

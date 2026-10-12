@@ -86,9 +86,9 @@ export function StudentCreateForm({ availableUsers, availableDisciplines, onSubm
   };
 
   return (
-    <Card className="max-w-4xl shadow-md border-gray-200">
-      <CardHeader className="bg-gray-50 border-b border-gray-100 pb-4">
-        <CardTitle className="text-xl text-gray-800">{t('students.create_title')}</CardTitle>
+    <Card className="max-w-4xl shadow-md border-border">
+      <CardHeader className="bg-muted border-b border-border pb-4">
+        <CardTitle className="text-xl text-foreground">{t('students.create_title')}</CardTitle>
       </CardHeader>
       
       <CardContent className="pt-6">
@@ -119,7 +119,7 @@ export function StudentCreateForm({ availableUsers, availableDisciplines, onSubm
             isMinor={isMinor} 
           />
 
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+          <div className="flex justify-end gap-3 pt-6 border-t border-border">
             <Button type="button" variant="outline" onClick={onCancel}>{t('students.cancel')}</Button>
             <Button type="submit" disabled={isPending || (isExistingUser && !selectedUserId)}>
               {isPending ? t('students.saving') : t('students.save')}
