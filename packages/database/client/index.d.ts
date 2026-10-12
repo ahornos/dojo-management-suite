@@ -2990,64 +2990,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    reviewedUpdates: number
-    proposedGraduations: number
-    approvedGraduations: number
-    statusChanges: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    reviewedUpdates?: boolean | UserCountOutputTypeCountReviewedUpdatesArgs
-    proposedGraduations?: boolean | UserCountOutputTypeCountProposedGraduationsArgs
-    approvedGraduations?: boolean | UserCountOutputTypeCountApprovedGraduationsArgs
-    statusChanges?: boolean | UserCountOutputTypeCountStatusChangesArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountReviewedUpdatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ProfileUpdateRequestWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountProposedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: GraduationRequestWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountApprovedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: GraduationRequestWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountStatusChangesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentStatusHistoryWhereInput
-  }
-
-
-  /**
    * Count Type StudentProfileCountOutputType
    */
 
@@ -3747,13 +3689,6 @@ export namespace Prisma {
     roles?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    studentProfile?: boolean | User$studentProfileArgs<ExtArgs>
-    guardianProfile?: boolean | User$guardianProfileArgs<ExtArgs>
-    reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
-    proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
-    approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
-    statusChanges?: boolean | User$statusChangesArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3796,30 +3731,10 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    studentProfile?: boolean | User$studentProfileArgs<ExtArgs>
-    guardianProfile?: boolean | User$guardianProfileArgs<ExtArgs>
-    reviewedUpdates?: boolean | User$reviewedUpdatesArgs<ExtArgs>
-    proposedGraduations?: boolean | User$proposedGraduationsArgs<ExtArgs>
-    approvedGraduations?: boolean | User$approvedGraduationsArgs<ExtArgs>
-    statusChanges?: boolean | User$statusChangesArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {
-      studentProfile: Prisma.$StudentProfilePayload<ExtArgs> | null
-      guardianProfile: Prisma.$GuardianPayload<ExtArgs> | null
-      reviewedUpdates: Prisma.$ProfileUpdateRequestPayload<ExtArgs>[]
-      proposedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
-      approvedGraduations: Prisma.$GraduationRequestPayload<ExtArgs>[]
-      /**
-       * Track which staff member executed a status change
-       */
-      statusChanges: Prisma.$StudentStatusHistoryPayload<ExtArgs>[]
-    }
+    objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
       email: string
@@ -4202,12 +4117,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    studentProfile<T extends User$studentProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$studentProfileArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    guardianProfile<T extends User$guardianProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$guardianProfileArgs<ExtArgs>>): Prisma__GuardianClient<$Result.GetResult<Prisma.$GuardianPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
-    reviewedUpdates<T extends User$reviewedUpdatesArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewedUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfileUpdateRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    proposedGraduations<T extends User$proposedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$proposedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    approvedGraduations<T extends User$approvedGraduationsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedGraduationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    statusChanges<T extends User$statusChangesArgs<ExtArgs> = {}>(args?: Subset<T, User$statusChangesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4267,10 +4176,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -4285,10 +4190,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -4302,10 +4203,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -4351,10 +4248,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -4399,10 +4292,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -4441,10 +4330,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -4486,10 +4371,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The data needed to update a User.
      */
     data: XOR<UserUpdateInput, UserUncheckedUpdateInput>
@@ -4522,10 +4403,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -4548,10 +4425,6 @@ export namespace Prisma {
      */
     select?: UserSelect<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -4568,116 +4441,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.studentProfile
-   */
-  export type User$studentProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentProfile
-     */
-    select?: StudentProfileSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentProfileInclude<ExtArgs> | null
-    where?: StudentProfileWhereInput
-  }
-
-  /**
-   * User.guardianProfile
-   */
-  export type User$guardianProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Guardian
-     */
-    select?: GuardianSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GuardianInclude<ExtArgs> | null
-    where?: GuardianWhereInput
-  }
-
-  /**
-   * User.reviewedUpdates
-   */
-  export type User$reviewedUpdatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ProfileUpdateRequest
-     */
-    select?: ProfileUpdateRequestSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ProfileUpdateRequestInclude<ExtArgs> | null
-    where?: ProfileUpdateRequestWhereInput
-    orderBy?: ProfileUpdateRequestOrderByWithRelationInput | ProfileUpdateRequestOrderByWithRelationInput[]
-    cursor?: ProfileUpdateRequestWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ProfileUpdateRequestScalarFieldEnum | ProfileUpdateRequestScalarFieldEnum[]
-  }
-
-  /**
-   * User.proposedGraduations
-   */
-  export type User$proposedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the GraduationRequest
-     */
-    select?: GraduationRequestSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GraduationRequestInclude<ExtArgs> | null
-    where?: GraduationRequestWhereInput
-    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
-    cursor?: GraduationRequestWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
-  }
-
-  /**
-   * User.approvedGraduations
-   */
-  export type User$approvedGraduationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the GraduationRequest
-     */
-    select?: GraduationRequestSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GraduationRequestInclude<ExtArgs> | null
-    where?: GraduationRequestWhereInput
-    orderBy?: GraduationRequestOrderByWithRelationInput | GraduationRequestOrderByWithRelationInput[]
-    cursor?: GraduationRequestWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: GraduationRequestScalarFieldEnum | GraduationRequestScalarFieldEnum[]
-  }
-
-  /**
-   * User.statusChanges
-   */
-  export type User$statusChangesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentStatusHistory
-     */
-    select?: StudentStatusHistorySelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentStatusHistoryInclude<ExtArgs> | null
-    where?: StudentStatusHistoryWhereInput
-    orderBy?: StudentStatusHistoryOrderByWithRelationInput | StudentStatusHistoryOrderByWithRelationInput[]
-    cursor?: StudentStatusHistoryWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StudentStatusHistoryScalarFieldEnum | StudentStatusHistoryScalarFieldEnum[]
-  }
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4685,10 +4448,6 @@ export namespace Prisma {
      * Select specific fields to fetch from the User
      */
     select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -4860,7 +4619,6 @@ export namespace Prisma {
     emergencyContacts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
     statusHistory?: boolean | StudentProfile$statusHistoryArgs<ExtArgs>
     guardians?: boolean | StudentProfile$guardiansArgs<ExtArgs>
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
@@ -4882,7 +4640,6 @@ export namespace Prisma {
     emergencyContacts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
   export type StudentProfileSelectScalar = {
@@ -4895,7 +4652,6 @@ export namespace Prisma {
   }
 
   export type StudentProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
     statusHistory?: boolean | StudentProfile$statusHistoryArgs<ExtArgs>
     guardians?: boolean | StudentProfile$guardiansArgs<ExtArgs>
     ranks?: boolean | StudentProfile$ranksArgs<ExtArgs>
@@ -4909,14 +4665,11 @@ export namespace Prisma {
     bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
+  export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $StudentProfilePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentProfile"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
       statusHistory: Prisma.$StudentStatusHistoryPayload<ExtArgs>[]
       guardians: Prisma.$StudentGuardianPayload<ExtArgs>[]
       ranks: Prisma.$StudentRankPayload<ExtArgs>[]
@@ -4931,6 +4684,9 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Logical reference to the identity owned by auth-service (no physical FK; resolve over HTTP)
+       */
       userId: string
       /**
        * Student Lifecycle Management
@@ -5306,7 +5062,6 @@ export namespace Prisma {
    */
   export interface Prisma__StudentProfileClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     statusHistory<T extends StudentProfile$statusHistoryArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$statusHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentStatusHistoryPayload<ExtArgs>, T, "findMany"> | Null>
     guardians<T extends StudentProfile$guardiansArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$guardiansArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentGuardianPayload<ExtArgs>, T, "findMany"> | Null>
     ranks<T extends StudentProfile$ranksArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$ranksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentRankPayload<ExtArgs>, T, "findMany"> | Null>
@@ -5574,10 +5329,6 @@ export namespace Prisma {
      */
     data: StudentProfileCreateManyInput | StudentProfileCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentProfileIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6086,7 +5837,6 @@ export namespace Prisma {
     changedById?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
   }, ExtArgs["result"]["studentStatusHistory"]>
 
   export type StudentStatusHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -6098,7 +5848,6 @@ export namespace Prisma {
     changedById?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
   }, ExtArgs["result"]["studentStatusHistory"]>
 
   export type StudentStatusHistorySelectScalar = {
@@ -6113,18 +5862,15 @@ export namespace Prisma {
 
   export type StudentStatusHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
   }
   export type StudentStatusHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    changedBy?: boolean | StudentStatusHistory$changedByArgs<ExtArgs>
   }
 
   export type $StudentStatusHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentStatusHistory"
     objects: {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
-      changedBy: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6132,6 +5878,9 @@ export namespace Prisma {
       previousStatus: $Enums.StudentStatus | null
       newStatus: $Enums.StudentStatus
       reason: string | null
+      /**
+       * Logical reference to the actor in auth-service (no physical FK).
+       */
       changedById: string | null
       createdAt: Date
     }, ExtArgs["result"]["studentStatusHistory"]>
@@ -6499,7 +6248,6 @@ export namespace Prisma {
   export interface Prisma__StudentStatusHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    changedBy<T extends StudentStatusHistory$changedByArgs<ExtArgs> = {}>(args?: Subset<T, StudentStatusHistory$changedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6854,21 +6602,6 @@ export namespace Prisma {
   }
 
   /**
-   * StudentStatusHistory.changedBy
-   */
-  export type StudentStatusHistory$changedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-  }
-
-  /**
    * StudentStatusHistory without action
    */
   export type StudentStatusHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7031,7 +6764,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     createdAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
     students?: boolean | Guardian$studentsArgs<ExtArgs>
     _count?: boolean | GuardianCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["guardian"]>
@@ -7040,7 +6772,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     createdAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["guardian"]>
 
   export type GuardianSelectScalar = {
@@ -7050,22 +6781,21 @@ export namespace Prisma {
   }
 
   export type GuardianInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
     students?: boolean | Guardian$studentsArgs<ExtArgs>
     _count?: boolean | GuardianCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type GuardianIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
-  }
+  export type GuardianIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $GuardianPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Guardian"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
       students: Prisma.$StudentGuardianPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Logical reference to the identity owned by auth-service (no physical FK; resolve over HTTP)
+       */
       userId: string
       createdAt: Date
     }, ExtArgs["result"]["guardian"]>
@@ -7432,7 +7162,6 @@ export namespace Prisma {
    */
   export interface Prisma__GuardianClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     students<T extends Guardian$studentsArgs<ExtArgs> = {}>(args?: Subset<T, Guardian$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentGuardianPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -7687,10 +7416,6 @@ export namespace Prisma {
      */
     data: GuardianCreateManyInput | GuardianCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: GuardianIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -13782,7 +13507,6 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    reviewer?: boolean | ProfileUpdateRequest$reviewerArgs<ExtArgs>
   }, ExtArgs["result"]["profileUpdateRequest"]>
 
   export type ProfileUpdateRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13794,7 +13518,6 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    reviewer?: boolean | ProfileUpdateRequest$reviewerArgs<ExtArgs>
   }, ExtArgs["result"]["profileUpdateRequest"]>
 
   export type ProfileUpdateRequestSelectScalar = {
@@ -13809,24 +13532,24 @@ export namespace Prisma {
 
   export type ProfileUpdateRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    reviewer?: boolean | ProfileUpdateRequest$reviewerArgs<ExtArgs>
   }
   export type ProfileUpdateRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    reviewer?: boolean | ProfileUpdateRequest$reviewerArgs<ExtArgs>
   }
 
   export type $ProfileUpdateRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ProfileUpdateRequest"
     objects: {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
-      reviewer: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       studentProfileId: string
       requestedChanges: Prisma.JsonValue
       status: $Enums.RequestStatus
+      /**
+       * Logical reference to the reviewer in auth-service (no physical FK).
+       */
       reviewedById: string | null
       createdAt: Date
       updatedAt: Date
@@ -14195,7 +13918,6 @@ export namespace Prisma {
   export interface Prisma__ProfileUpdateRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    reviewer<T extends ProfileUpdateRequest$reviewerArgs<ExtArgs> = {}>(args?: Subset<T, ProfileUpdateRequest$reviewerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14550,21 +14272,6 @@ export namespace Prisma {
   }
 
   /**
-   * ProfileUpdateRequest.reviewer
-   */
-  export type ProfileUpdateRequest$reviewerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-  }
-
-  /**
    * ProfileUpdateRequest without action
    */
   export type ProfileUpdateRequestDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14802,8 +14509,6 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }, ExtArgs["result"]["graduationRequest"]>
 
   export type GraduationRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14816,8 +14521,6 @@ export namespace Prisma {
     status?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }, ExtArgs["result"]["graduationRequest"]>
 
   export type GraduationRequestSelectScalar = {
@@ -14833,27 +14536,24 @@ export namespace Prisma {
 
   export type GraduationRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }
   export type GraduationRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
-    proposedBy?: boolean | UserDefaultArgs<ExtArgs>
-    approvedBy?: boolean | GraduationRequest$approvedByArgs<ExtArgs>
   }
 
   export type $GraduationRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "GraduationRequest"
     objects: {
       studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
-      proposedBy: Prisma.$UserPayload<ExtArgs>
-      approvedBy: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       studentProfileId: string
       proposedBeltId: string | null
       proposedStripes: number | null
+      /**
+       * Logical references to identities in auth-service (no physical FK).
+       */
       proposedById: string
       approvedById: string | null
       status: $Enums.RequestStatus
@@ -15223,8 +14923,6 @@ export namespace Prisma {
   export interface Prisma__GraduationRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    proposedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
-    approvedBy<T extends GraduationRequest$approvedByArgs<ExtArgs> = {}>(args?: Subset<T, GraduationRequest$approvedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -15577,21 +15275,6 @@ export namespace Prisma {
      * Filter which GraduationRequests to delete
      */
     where?: GraduationRequestWhereInput
-  }
-
-  /**
-   * GraduationRequest.approvedBy
-   */
-  export type GraduationRequest$approvedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
   }
 
   /**
@@ -28316,12 +27999,6 @@ export namespace Prisma {
     roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
-    guardianProfile?: XOR<GuardianNullableRelationFilter, GuardianWhereInput> | null
-    reviewedUpdates?: ProfileUpdateRequestListRelationFilter
-    proposedGraduations?: GraduationRequestListRelationFilter
-    approvedGraduations?: GraduationRequestListRelationFilter
-    statusChanges?: StudentStatusHistoryListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -28342,12 +28019,6 @@ export namespace Prisma {
     roles?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    studentProfile?: StudentProfileOrderByWithRelationInput
-    guardianProfile?: GuardianOrderByWithRelationInput
-    reviewedUpdates?: ProfileUpdateRequestOrderByRelationAggregateInput
-    proposedGraduations?: GraduationRequestOrderByRelationAggregateInput
-    approvedGraduations?: GraduationRequestOrderByRelationAggregateInput
-    statusChanges?: StudentStatusHistoryOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -28371,12 +28042,6 @@ export namespace Prisma {
     roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    studentProfile?: XOR<StudentProfileNullableRelationFilter, StudentProfileWhereInput> | null
-    guardianProfile?: XOR<GuardianNullableRelationFilter, GuardianWhereInput> | null
-    reviewedUpdates?: ProfileUpdateRequestListRelationFilter
-    proposedGraduations?: GraduationRequestListRelationFilter
-    approvedGraduations?: GraduationRequestListRelationFilter
-    statusChanges?: StudentStatusHistoryListRelationFilter
   }, "id" | "email" | "dni">
 
   export type UserOrderByWithAggregationInput = {
@@ -28435,7 +28100,6 @@ export namespace Prisma {
     emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
     statusHistory?: StudentStatusHistoryListRelationFilter
     guardians?: StudentGuardianListRelationFilter
     ranks?: StudentRankListRelationFilter
@@ -28456,7 +28120,6 @@ export namespace Prisma {
     emergencyContacts?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    user?: UserOrderByWithRelationInput
     statusHistory?: StudentStatusHistoryOrderByRelationAggregateInput
     guardians?: StudentGuardianOrderByRelationAggregateInput
     ranks?: StudentRankOrderByRelationAggregateInput
@@ -28480,7 +28143,6 @@ export namespace Prisma {
     emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
     updatedAt?: DateTimeFilter<"StudentProfile"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
     statusHistory?: StudentStatusHistoryListRelationFilter
     guardians?: StudentGuardianListRelationFilter
     ranks?: StudentRankListRelationFilter
@@ -28530,7 +28192,6 @@ export namespace Prisma {
     changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    changedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
   export type StudentStatusHistoryOrderByWithRelationInput = {
@@ -28542,7 +28203,6 @@ export namespace Prisma {
     changedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
-    changedBy?: UserOrderByWithRelationInput
   }
 
   export type StudentStatusHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -28557,7 +28217,6 @@ export namespace Prisma {
     changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    changedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type StudentStatusHistoryOrderByWithAggregationInput = {
@@ -28593,7 +28252,6 @@ export namespace Prisma {
     id?: StringFilter<"Guardian"> | string
     userId?: StringFilter<"Guardian"> | string
     createdAt?: DateTimeFilter<"Guardian"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
     students?: StudentGuardianListRelationFilter
   }
 
@@ -28601,7 +28259,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
-    user?: UserOrderByWithRelationInput
     students?: StudentGuardianOrderByRelationAggregateInput
   }
 
@@ -28612,7 +28269,6 @@ export namespace Prisma {
     OR?: GuardianWhereInput[]
     NOT?: GuardianWhereInput | GuardianWhereInput[]
     createdAt?: DateTimeFilter<"Guardian"> | Date | string
-    user?: XOR<UserRelationFilter, UserWhereInput>
     students?: StudentGuardianListRelationFilter
   }, "id" | "userId">
 
@@ -28990,7 +28646,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
     updatedAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    reviewer?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
   export type ProfileUpdateRequestOrderByWithRelationInput = {
@@ -29002,7 +28657,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
-    reviewer?: UserOrderByWithRelationInput
   }
 
   export type ProfileUpdateRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -29017,7 +28671,6 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
     updatedAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    reviewer?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type ProfileUpdateRequestOrderByWithAggregationInput = {
@@ -29059,8 +28712,6 @@ export namespace Prisma {
     status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
     createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    proposedBy?: XOR<UserRelationFilter, UserWhereInput>
-    approvedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }
 
   export type GraduationRequestOrderByWithRelationInput = {
@@ -29073,8 +28724,6 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
-    proposedBy?: UserOrderByWithRelationInput
-    approvedBy?: UserOrderByWithRelationInput
   }
 
   export type GraduationRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -29090,8 +28739,6 @@ export namespace Prisma {
     status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
     createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
-    proposedBy?: XOR<UserRelationFilter, UserWhereInput>
-    approvedBy?: XOR<UserNullableRelationFilter, UserWhereInput> | null
   }, "id">
 
   export type GraduationRequestOrderByWithAggregationInput = {
@@ -30023,12 +29670,6 @@ export namespace Prisma {
     roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -30049,12 +29690,6 @@ export namespace Prisma {
     roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
     updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
   }
 
   export type UserUpdateInput = {
@@ -30075,12 +29710,6 @@ export namespace Prisma {
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -30101,12 +29730,6 @@ export namespace Prisma {
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -30171,11 +29794,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -30211,11 +29834,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -30260,6 +29883,7 @@ export namespace Prisma {
 
   export type StudentProfileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30280,9 +29904,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    changedById?: string | null
     createdAt?: Date | string
     studentProfile: StudentProfileCreateNestedOneWithoutStatusHistoryInput
-    changedBy?: UserCreateNestedOneWithoutStatusChangesInput
   }
 
   export type StudentStatusHistoryUncheckedCreateInput = {
@@ -30300,9 +29924,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput
-    changedBy?: UserUpdateOneWithoutStatusChangesNestedInput
   }
 
   export type StudentStatusHistoryUncheckedUpdateInput = {
@@ -30330,6 +29954,7 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -30345,8 +29970,8 @@ export namespace Prisma {
 
   export type GuardianCreateInput = {
     id?: string
+    userId: string
     createdAt?: Date | string
-    user: UserCreateNestedOneWithoutGuardianProfileInput
     students?: StudentGuardianCreateNestedManyWithoutGuardianInput
   }
 
@@ -30359,8 +29984,8 @@ export namespace Prisma {
 
   export type GuardianUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutGuardianProfileNestedInput
     students?: StudentGuardianUpdateManyWithoutGuardianNestedInput
   }
 
@@ -30379,6 +30004,7 @@ export namespace Prisma {
 
   export type GuardianUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -30726,10 +30352,10 @@ export namespace Prisma {
     id?: string
     requestedChanges: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     studentProfile: StudentProfileCreateNestedOneWithoutUpdateRequestsInput
-    reviewer?: UserCreateNestedOneWithoutReviewedUpdatesInput
   }
 
   export type ProfileUpdateRequestUncheckedCreateInput = {
@@ -30746,10 +30372,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     requestedChanges?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneRequiredWithoutUpdateRequestsNestedInput
-    reviewer?: UserUpdateOneWithoutReviewedUpdatesNestedInput
   }
 
   export type ProfileUpdateRequestUncheckedUpdateInput = {
@@ -30776,6 +30402,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     requestedChanges?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30794,11 +30421,11 @@ export namespace Prisma {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
+    proposedById: string
+    approvedById?: string | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
     studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
-    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
   }
 
   export type GraduationRequestUncheckedCreateInput = {
@@ -30816,11 +30443,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
+    proposedById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
-    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
   }
 
   export type GraduationRequestUncheckedUpdateInput = {
@@ -30849,6 +30476,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
+    proposedById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -31876,49 +31505,9 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type StudentProfileNullableRelationFilter = {
-    is?: StudentProfileWhereInput | null
-    isNot?: StudentProfileWhereInput | null
-  }
-
-  export type GuardianNullableRelationFilter = {
-    is?: GuardianWhereInput | null
-    isNot?: GuardianWhereInput | null
-  }
-
-  export type ProfileUpdateRequestListRelationFilter = {
-    every?: ProfileUpdateRequestWhereInput
-    some?: ProfileUpdateRequestWhereInput
-    none?: ProfileUpdateRequestWhereInput
-  }
-
-  export type GraduationRequestListRelationFilter = {
-    every?: GraduationRequestWhereInput
-    some?: GraduationRequestWhereInput
-    none?: GraduationRequestWhereInput
-  }
-
-  export type StudentStatusHistoryListRelationFilter = {
-    every?: StudentStatusHistoryWhereInput
-    some?: StudentStatusHistoryWhereInput
-    none?: StudentStatusHistoryWhereInput
-  }
-
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
-  }
-
-  export type ProfileUpdateRequestOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type GraduationRequestOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type StudentStatusHistoryOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -32080,9 +31669,10 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type UserRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type StudentStatusHistoryListRelationFilter = {
+    every?: StudentStatusHistoryWhereInput
+    some?: StudentStatusHistoryWhereInput
+    none?: StudentStatusHistoryWhereInput
   }
 
   export type StudentGuardianListRelationFilter = {
@@ -32101,6 +31691,18 @@ export namespace Prisma {
     every?: AttendanceWhereInput
     some?: AttendanceWhereInput
     none?: AttendanceWhereInput
+  }
+
+  export type ProfileUpdateRequestListRelationFilter = {
+    every?: ProfileUpdateRequestWhereInput
+    some?: ProfileUpdateRequestWhereInput
+    none?: ProfileUpdateRequestWhereInput
+  }
+
+  export type GraduationRequestListRelationFilter = {
+    every?: GraduationRequestWhereInput
+    some?: GraduationRequestWhereInput
+    none?: GraduationRequestWhereInput
   }
 
   export type StudentSubscriptionListRelationFilter = {
@@ -32133,6 +31735,10 @@ export namespace Prisma {
     none?: BankMandateWhereInput
   }
 
+  export type StudentStatusHistoryOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type StudentGuardianOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -32142,6 +31748,14 @@ export namespace Prisma {
   }
 
   export type AttendanceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProfileUpdateRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type GraduationRequestOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -32235,11 +31849,6 @@ export namespace Prisma {
   export type StudentProfileRelationFilter = {
     is?: StudentProfileWhereInput
     isNot?: StudentProfileWhereInput
-  }
-
-  export type UserNullableRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
   }
 
   export type StudentStatusHistoryCountOrderByAggregateInput = {
@@ -33422,86 +33031,6 @@ export namespace Prisma {
     set: $Enums.Role[]
   }
 
-  export type StudentProfileCreateNestedOneWithoutUserInput = {
-    create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
-  export type GuardianCreateNestedOneWithoutUserInput = {
-    create?: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-    connectOrCreate?: GuardianCreateOrConnectWithoutUserInput
-    connect?: GuardianWhereUniqueInput
-  }
-
-  export type ProfileUpdateRequestCreateNestedManyWithoutReviewerInput = {
-    create?: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput> | ProfileUpdateRequestCreateWithoutReviewerInput[] | ProfileUpdateRequestUncheckedCreateWithoutReviewerInput[]
-    connectOrCreate?: ProfileUpdateRequestCreateOrConnectWithoutReviewerInput | ProfileUpdateRequestCreateOrConnectWithoutReviewerInput[]
-    createMany?: ProfileUpdateRequestCreateManyReviewerInputEnvelope
-    connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-  }
-
-  export type GraduationRequestCreateNestedManyWithoutProposedByInput = {
-    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
-    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-  }
-
-  export type GraduationRequestCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
-    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-  }
-
-  export type StudentStatusHistoryCreateNestedManyWithoutChangedByInput = {
-    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
-    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
-    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
-    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-  }
-
-  export type StudentProfileUncheckedCreateNestedOneWithoutUserInput = {
-    create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
-  export type GuardianUncheckedCreateNestedOneWithoutUserInput = {
-    create?: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-    connectOrCreate?: GuardianCreateOrConnectWithoutUserInput
-    connect?: GuardianWhereUniqueInput
-  }
-
-  export type ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput = {
-    create?: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput> | ProfileUpdateRequestCreateWithoutReviewerInput[] | ProfileUpdateRequestUncheckedCreateWithoutReviewerInput[]
-    connectOrCreate?: ProfileUpdateRequestCreateOrConnectWithoutReviewerInput | ProfileUpdateRequestCreateOrConnectWithoutReviewerInput[]
-    createMany?: ProfileUpdateRequestCreateManyReviewerInputEnvelope
-    connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-  }
-
-  export type GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput = {
-    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
-    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-  }
-
-  export type GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
-    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-  }
-
-  export type StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput = {
-    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
-    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
-    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
-    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-  }
-
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -33525,164 +33054,6 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
-  }
-
-  export type StudentProfileUpdateOneWithoutUserNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
-    upsert?: StudentProfileUpsertWithoutUserInput
-    disconnect?: StudentProfileWhereInput | boolean
-    delete?: StudentProfileWhereInput | boolean
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutUserInput, StudentProfileUpdateWithoutUserInput>, StudentProfileUncheckedUpdateWithoutUserInput>
-  }
-
-  export type GuardianUpdateOneWithoutUserNestedInput = {
-    create?: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-    connectOrCreate?: GuardianCreateOrConnectWithoutUserInput
-    upsert?: GuardianUpsertWithoutUserInput
-    disconnect?: GuardianWhereInput | boolean
-    delete?: GuardianWhereInput | boolean
-    connect?: GuardianWhereUniqueInput
-    update?: XOR<XOR<GuardianUpdateToOneWithWhereWithoutUserInput, GuardianUpdateWithoutUserInput>, GuardianUncheckedUpdateWithoutUserInput>
-  }
-
-  export type ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput = {
-    create?: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput> | ProfileUpdateRequestCreateWithoutReviewerInput[] | ProfileUpdateRequestUncheckedCreateWithoutReviewerInput[]
-    connectOrCreate?: ProfileUpdateRequestCreateOrConnectWithoutReviewerInput | ProfileUpdateRequestCreateOrConnectWithoutReviewerInput[]
-    upsert?: ProfileUpdateRequestUpsertWithWhereUniqueWithoutReviewerInput | ProfileUpdateRequestUpsertWithWhereUniqueWithoutReviewerInput[]
-    createMany?: ProfileUpdateRequestCreateManyReviewerInputEnvelope
-    set?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    disconnect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    delete?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    update?: ProfileUpdateRequestUpdateWithWhereUniqueWithoutReviewerInput | ProfileUpdateRequestUpdateWithWhereUniqueWithoutReviewerInput[]
-    updateMany?: ProfileUpdateRequestUpdateManyWithWhereWithoutReviewerInput | ProfileUpdateRequestUpdateManyWithWhereWithoutReviewerInput[]
-    deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
-  }
-
-  export type GraduationRequestUpdateManyWithoutProposedByNestedInput = {
-    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
-    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput | GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput[]
-    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
-    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    update?: GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput | GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput[]
-    updateMany?: GraduationRequestUpdateManyWithWhereWithoutProposedByInput | GraduationRequestUpdateManyWithWhereWithoutProposedByInput[]
-    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-  }
-
-  export type GraduationRequestUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
-    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
-    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    update?: GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: GraduationRequestUpdateManyWithWhereWithoutApprovedByInput | GraduationRequestUpdateManyWithWhereWithoutApprovedByInput[]
-    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-  }
-
-  export type StudentStatusHistoryUpdateManyWithoutChangedByNestedInput = {
-    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
-    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
-    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
-    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
-    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
-    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput | StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput[]
-    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
-  }
-
-  export type StudentProfileUncheckedUpdateOneWithoutUserNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutUserInput
-    upsert?: StudentProfileUpsertWithoutUserInput
-    disconnect?: StudentProfileWhereInput | boolean
-    delete?: StudentProfileWhereInput | boolean
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutUserInput, StudentProfileUpdateWithoutUserInput>, StudentProfileUncheckedUpdateWithoutUserInput>
-  }
-
-  export type GuardianUncheckedUpdateOneWithoutUserNestedInput = {
-    create?: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-    connectOrCreate?: GuardianCreateOrConnectWithoutUserInput
-    upsert?: GuardianUpsertWithoutUserInput
-    disconnect?: GuardianWhereInput | boolean
-    delete?: GuardianWhereInput | boolean
-    connect?: GuardianWhereUniqueInput
-    update?: XOR<XOR<GuardianUpdateToOneWithWhereWithoutUserInput, GuardianUpdateWithoutUserInput>, GuardianUncheckedUpdateWithoutUserInput>
-  }
-
-  export type ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput = {
-    create?: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput> | ProfileUpdateRequestCreateWithoutReviewerInput[] | ProfileUpdateRequestUncheckedCreateWithoutReviewerInput[]
-    connectOrCreate?: ProfileUpdateRequestCreateOrConnectWithoutReviewerInput | ProfileUpdateRequestCreateOrConnectWithoutReviewerInput[]
-    upsert?: ProfileUpdateRequestUpsertWithWhereUniqueWithoutReviewerInput | ProfileUpdateRequestUpsertWithWhereUniqueWithoutReviewerInput[]
-    createMany?: ProfileUpdateRequestCreateManyReviewerInputEnvelope
-    set?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    disconnect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    delete?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    connect?: ProfileUpdateRequestWhereUniqueInput | ProfileUpdateRequestWhereUniqueInput[]
-    update?: ProfileUpdateRequestUpdateWithWhereUniqueWithoutReviewerInput | ProfileUpdateRequestUpdateWithWhereUniqueWithoutReviewerInput[]
-    updateMany?: ProfileUpdateRequestUpdateManyWithWhereWithoutReviewerInput | ProfileUpdateRequestUpdateManyWithWhereWithoutReviewerInput[]
-    deleteMany?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
-  }
-
-  export type GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput = {
-    create?: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput> | GraduationRequestCreateWithoutProposedByInput[] | GraduationRequestUncheckedCreateWithoutProposedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutProposedByInput | GraduationRequestCreateOrConnectWithoutProposedByInput[]
-    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput | GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput[]
-    createMany?: GraduationRequestCreateManyProposedByInputEnvelope
-    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    update?: GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput | GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput[]
-    updateMany?: GraduationRequestUpdateManyWithWhereWithoutProposedByInput | GraduationRequestUpdateManyWithWhereWithoutProposedByInput[]
-    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-  }
-
-  export type GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput> | GraduationRequestCreateWithoutApprovedByInput[] | GraduationRequestUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: GraduationRequestCreateOrConnectWithoutApprovedByInput | GraduationRequestCreateOrConnectWithoutApprovedByInput[]
-    upsert?: GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: GraduationRequestCreateManyApprovedByInputEnvelope
-    set?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    disconnect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    delete?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
-    update?: GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput | GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: GraduationRequestUpdateManyWithWhereWithoutApprovedByInput | GraduationRequestUpdateManyWithWhereWithoutApprovedByInput[]
-    deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-  }
-
-  export type StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput = {
-    create?: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput> | StudentStatusHistoryCreateWithoutChangedByInput[] | StudentStatusHistoryUncheckedCreateWithoutChangedByInput[]
-    connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutChangedByInput | StudentStatusHistoryCreateOrConnectWithoutChangedByInput[]
-    upsert?: StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
-    createMany?: StudentStatusHistoryCreateManyChangedByInputEnvelope
-    set?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    disconnect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    delete?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    connect?: StudentStatusHistoryWhereUniqueInput | StudentStatusHistoryWhereUniqueInput[]
-    update?: StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput | StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
-    updateMany?: StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput | StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput[]
-    deleteMany?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
-  }
-
-  export type UserCreateNestedOneWithoutStudentProfileInput = {
-    create?: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStudentProfileInput
-    connect?: UserWhereUniqueInput
   }
 
   export type StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput = {
@@ -33841,14 +33212,6 @@ export namespace Prisma {
 
   export type EnumStudentStatusFieldUpdateOperationsInput = {
     set?: $Enums.StudentStatus
-  }
-
-  export type UserUpdateOneRequiredWithoutStudentProfileNestedInput = {
-    create?: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStudentProfileInput
-    upsert?: UserUpsertWithoutStudentProfileInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStudentProfileInput, UserUpdateWithoutStudentProfileInput>, UserUncheckedUpdateWithoutStudentProfileInput>
   }
 
   export type StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput = {
@@ -34165,12 +33528,6 @@ export namespace Prisma {
     connect?: StudentProfileWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutStatusChangesInput = {
-    create?: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStatusChangesInput
-    connect?: UserWhereUniqueInput
-  }
-
   export type NullableEnumStudentStatusFieldUpdateOperationsInput = {
     set?: $Enums.StudentStatus | null
   }
@@ -34181,22 +33538,6 @@ export namespace Prisma {
     upsert?: StudentProfileUpsertWithoutStatusHistoryInput
     connect?: StudentProfileWhereUniqueInput
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStatusHistoryInput, StudentProfileUpdateWithoutStatusHistoryInput>, StudentProfileUncheckedUpdateWithoutStatusHistoryInput>
-  }
-
-  export type UserUpdateOneWithoutStatusChangesNestedInput = {
-    create?: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutStatusChangesInput
-    upsert?: UserUpsertWithoutStatusChangesInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStatusChangesInput, UserUpdateWithoutStatusChangesInput>, UserUncheckedUpdateWithoutStatusChangesInput>
-  }
-
-  export type UserCreateNestedOneWithoutGuardianProfileInput = {
-    create?: XOR<UserCreateWithoutGuardianProfileInput, UserUncheckedCreateWithoutGuardianProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutGuardianProfileInput
-    connect?: UserWhereUniqueInput
   }
 
   export type StudentGuardianCreateNestedManyWithoutGuardianInput = {
@@ -34211,14 +33552,6 @@ export namespace Prisma {
     connectOrCreate?: StudentGuardianCreateOrConnectWithoutGuardianInput | StudentGuardianCreateOrConnectWithoutGuardianInput[]
     createMany?: StudentGuardianCreateManyGuardianInputEnvelope
     connect?: StudentGuardianWhereUniqueInput | StudentGuardianWhereUniqueInput[]
-  }
-
-  export type UserUpdateOneRequiredWithoutGuardianProfileNestedInput = {
-    create?: XOR<UserCreateWithoutGuardianProfileInput, UserUncheckedCreateWithoutGuardianProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutGuardianProfileInput
-    upsert?: UserUpsertWithoutGuardianProfileInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGuardianProfileInput, UserUpdateWithoutGuardianProfileInput>, UserUncheckedUpdateWithoutGuardianProfileInput>
   }
 
   export type StudentGuardianUpdateManyWithoutGuardianNestedInput = {
@@ -34487,12 +33820,6 @@ export namespace Prisma {
     connect?: StudentProfileWhereUniqueInput
   }
 
-  export type UserCreateNestedOneWithoutReviewedUpdatesInput = {
-    create?: XOR<UserCreateWithoutReviewedUpdatesInput, UserUncheckedCreateWithoutReviewedUpdatesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutReviewedUpdatesInput
-    connect?: UserWhereUniqueInput
-  }
-
   export type EnumRequestStatusFieldUpdateOperationsInput = {
     set?: $Enums.RequestStatus
   }
@@ -34505,32 +33832,10 @@ export namespace Prisma {
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutUpdateRequestsInput, StudentProfileUpdateWithoutUpdateRequestsInput>, StudentProfileUncheckedUpdateWithoutUpdateRequestsInput>
   }
 
-  export type UserUpdateOneWithoutReviewedUpdatesNestedInput = {
-    create?: XOR<UserCreateWithoutReviewedUpdatesInput, UserUncheckedCreateWithoutReviewedUpdatesInput>
-    connectOrCreate?: UserCreateOrConnectWithoutReviewedUpdatesInput
-    upsert?: UserUpsertWithoutReviewedUpdatesInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReviewedUpdatesInput, UserUpdateWithoutReviewedUpdatesInput>, UserUncheckedUpdateWithoutReviewedUpdatesInput>
-  }
-
   export type StudentProfileCreateNestedOneWithoutGraduationRequestsInput = {
     create?: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutGraduationRequestsInput
     connect?: StudentProfileWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutProposedGraduationsInput = {
-    create?: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutProposedGraduationsInput
-    connect?: UserWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutApprovedGraduationsInput = {
-    create?: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedGraduationsInput
-    connect?: UserWhereUniqueInput
   }
 
   export type NullableIntFieldUpdateOperationsInput = {
@@ -34547,24 +33852,6 @@ export namespace Prisma {
     upsert?: StudentProfileUpsertWithoutGraduationRequestsInput
     connect?: StudentProfileWhereUniqueInput
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutGraduationRequestsInput, StudentProfileUpdateWithoutGraduationRequestsInput>, StudentProfileUncheckedUpdateWithoutGraduationRequestsInput>
-  }
-
-  export type UserUpdateOneRequiredWithoutProposedGraduationsNestedInput = {
-    create?: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutProposedGraduationsInput
-    upsert?: UserUpsertWithoutProposedGraduationsInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProposedGraduationsInput, UserUpdateWithoutProposedGraduationsInput>, UserUncheckedUpdateWithoutProposedGraduationsInput>
-  }
-
-  export type UserUpdateOneWithoutApprovedGraduationsNestedInput = {
-    create?: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedGraduationsInput
-    upsert?: UserUpsertWithoutApprovedGraduationsInput
-    disconnect?: UserWhereInput | boolean
-    delete?: UserWhereInput | boolean
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovedGraduationsInput, UserUpdateWithoutApprovedGraduationsInput>, UserUncheckedUpdateWithoutApprovedGraduationsInput>
   }
 
   export type StudentFeeCreateNestedManyWithoutFeeTierInput = {
@@ -35565,420 +34852,13 @@ export namespace Prisma {
     _max?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
   }
 
-  export type StudentProfileCreateWithoutUserInput = {
-    id?: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileUncheckedCreateWithoutUserInput = {
-    id?: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileCreateOrConnectWithoutUserInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-  }
-
-  export type GuardianCreateWithoutUserInput = {
-    id?: string
-    createdAt?: Date | string
-    students?: StudentGuardianCreateNestedManyWithoutGuardianInput
-  }
-
-  export type GuardianUncheckedCreateWithoutUserInput = {
-    id?: string
-    createdAt?: Date | string
-    students?: StudentGuardianUncheckedCreateNestedManyWithoutGuardianInput
-  }
-
-  export type GuardianCreateOrConnectWithoutUserInput = {
-    where: GuardianWhereUniqueInput
-    create: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-  }
-
-  export type ProfileUpdateRequestCreateWithoutReviewerInput = {
-    id?: string
-    requestedChanges: JsonNullValueInput | InputJsonValue
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutUpdateRequestsInput
-  }
-
-  export type ProfileUpdateRequestUncheckedCreateWithoutReviewerInput = {
-    id?: string
-    studentProfileId: string
-    requestedChanges: JsonNullValueInput | InputJsonValue
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type ProfileUpdateRequestCreateOrConnectWithoutReviewerInput = {
-    where: ProfileUpdateRequestWhereUniqueInput
-    create: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput>
-  }
-
-  export type ProfileUpdateRequestCreateManyReviewerInputEnvelope = {
-    data: ProfileUpdateRequestCreateManyReviewerInput | ProfileUpdateRequestCreateManyReviewerInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type GraduationRequestCreateWithoutProposedByInput = {
-    id?: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
-  }
-
-  export type GraduationRequestUncheckedCreateWithoutProposedByInput = {
-    id?: string
-    studentProfileId: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    approvedById?: string | null
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-  }
-
-  export type GraduationRequestCreateOrConnectWithoutProposedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    create: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput>
-  }
-
-  export type GraduationRequestCreateManyProposedByInputEnvelope = {
-    data: GraduationRequestCreateManyProposedByInput | GraduationRequestCreateManyProposedByInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type GraduationRequestCreateWithoutApprovedByInput = {
-    id?: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutGraduationRequestsInput
-    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
-  }
-
-  export type GraduationRequestUncheckedCreateWithoutApprovedByInput = {
-    id?: string
-    studentProfileId: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    proposedById: string
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-  }
-
-  export type GraduationRequestCreateOrConnectWithoutApprovedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    create: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput>
-  }
-
-  export type GraduationRequestCreateManyApprovedByInputEnvelope = {
-    data: GraduationRequestCreateManyApprovedByInput | GraduationRequestCreateManyApprovedByInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type StudentStatusHistoryCreateWithoutChangedByInput = {
-    id?: string
-    previousStatus?: $Enums.StudentStatus | null
-    newStatus: $Enums.StudentStatus
-    reason?: string | null
-    createdAt?: Date | string
-    studentProfile: StudentProfileCreateNestedOneWithoutStatusHistoryInput
-  }
-
-  export type StudentStatusHistoryUncheckedCreateWithoutChangedByInput = {
-    id?: string
-    studentProfileId: string
-    previousStatus?: $Enums.StudentStatus | null
-    newStatus: $Enums.StudentStatus
-    reason?: string | null
-    createdAt?: Date | string
-  }
-
-  export type StudentStatusHistoryCreateOrConnectWithoutChangedByInput = {
-    where: StudentStatusHistoryWhereUniqueInput
-    create: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput>
-  }
-
-  export type StudentStatusHistoryCreateManyChangedByInputEnvelope = {
-    data: StudentStatusHistoryCreateManyChangedByInput | StudentStatusHistoryCreateManyChangedByInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type StudentProfileUpsertWithoutUserInput = {
-    update: XOR<StudentProfileUpdateWithoutUserInput, StudentProfileUncheckedUpdateWithoutUserInput>
-    create: XOR<StudentProfileCreateWithoutUserInput, StudentProfileUncheckedCreateWithoutUserInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutUserInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutUserInput, StudentProfileUncheckedUpdateWithoutUserInput>
-  }
-
-  export type StudentProfileUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
-  }
-
-  export type GuardianUpsertWithoutUserInput = {
-    update: XOR<GuardianUpdateWithoutUserInput, GuardianUncheckedUpdateWithoutUserInput>
-    create: XOR<GuardianCreateWithoutUserInput, GuardianUncheckedCreateWithoutUserInput>
-    where?: GuardianWhereInput
-  }
-
-  export type GuardianUpdateToOneWithWhereWithoutUserInput = {
-    where?: GuardianWhereInput
-    data: XOR<GuardianUpdateWithoutUserInput, GuardianUncheckedUpdateWithoutUserInput>
-  }
-
-  export type GuardianUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    students?: StudentGuardianUpdateManyWithoutGuardianNestedInput
-  }
-
-  export type GuardianUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    students?: StudentGuardianUncheckedUpdateManyWithoutGuardianNestedInput
-  }
-
-  export type ProfileUpdateRequestUpsertWithWhereUniqueWithoutReviewerInput = {
-    where: ProfileUpdateRequestWhereUniqueInput
-    update: XOR<ProfileUpdateRequestUpdateWithoutReviewerInput, ProfileUpdateRequestUncheckedUpdateWithoutReviewerInput>
-    create: XOR<ProfileUpdateRequestCreateWithoutReviewerInput, ProfileUpdateRequestUncheckedCreateWithoutReviewerInput>
-  }
-
-  export type ProfileUpdateRequestUpdateWithWhereUniqueWithoutReviewerInput = {
-    where: ProfileUpdateRequestWhereUniqueInput
-    data: XOR<ProfileUpdateRequestUpdateWithoutReviewerInput, ProfileUpdateRequestUncheckedUpdateWithoutReviewerInput>
-  }
-
-  export type ProfileUpdateRequestUpdateManyWithWhereWithoutReviewerInput = {
-    where: ProfileUpdateRequestScalarWhereInput
-    data: XOR<ProfileUpdateRequestUpdateManyMutationInput, ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerInput>
-  }
-
-  export type ProfileUpdateRequestScalarWhereInput = {
-    AND?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
-    OR?: ProfileUpdateRequestScalarWhereInput[]
-    NOT?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
-    id?: StringFilter<"ProfileUpdateRequest"> | string
-    studentProfileId?: StringFilter<"ProfileUpdateRequest"> | string
-    requestedChanges?: JsonFilter<"ProfileUpdateRequest">
-    status?: EnumRequestStatusFilter<"ProfileUpdateRequest"> | $Enums.RequestStatus
-    reviewedById?: StringNullableFilter<"ProfileUpdateRequest"> | string | null
-    createdAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
-    updatedAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
-  }
-
-  export type GraduationRequestUpsertWithWhereUniqueWithoutProposedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    update: XOR<GraduationRequestUpdateWithoutProposedByInput, GraduationRequestUncheckedUpdateWithoutProposedByInput>
-    create: XOR<GraduationRequestCreateWithoutProposedByInput, GraduationRequestUncheckedCreateWithoutProposedByInput>
-  }
-
-  export type GraduationRequestUpdateWithWhereUniqueWithoutProposedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    data: XOR<GraduationRequestUpdateWithoutProposedByInput, GraduationRequestUncheckedUpdateWithoutProposedByInput>
-  }
-
-  export type GraduationRequestUpdateManyWithWhereWithoutProposedByInput = {
-    where: GraduationRequestScalarWhereInput
-    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutProposedByInput>
-  }
-
-  export type GraduationRequestScalarWhereInput = {
-    AND?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-    OR?: GraduationRequestScalarWhereInput[]
-    NOT?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
-    id?: StringFilter<"GraduationRequest"> | string
-    studentProfileId?: StringFilter<"GraduationRequest"> | string
-    proposedBeltId?: StringNullableFilter<"GraduationRequest"> | string | null
-    proposedStripes?: IntNullableFilter<"GraduationRequest"> | number | null
-    proposedById?: StringFilter<"GraduationRequest"> | string
-    approvedById?: StringNullableFilter<"GraduationRequest"> | string | null
-    status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
-    createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
-  }
-
-  export type GraduationRequestUpsertWithWhereUniqueWithoutApprovedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    update: XOR<GraduationRequestUpdateWithoutApprovedByInput, GraduationRequestUncheckedUpdateWithoutApprovedByInput>
-    create: XOR<GraduationRequestCreateWithoutApprovedByInput, GraduationRequestUncheckedCreateWithoutApprovedByInput>
-  }
-
-  export type GraduationRequestUpdateWithWhereUniqueWithoutApprovedByInput = {
-    where: GraduationRequestWhereUniqueInput
-    data: XOR<GraduationRequestUpdateWithoutApprovedByInput, GraduationRequestUncheckedUpdateWithoutApprovedByInput>
-  }
-
-  export type GraduationRequestUpdateManyWithWhereWithoutApprovedByInput = {
-    where: GraduationRequestScalarWhereInput
-    data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutApprovedByInput>
-  }
-
-  export type StudentStatusHistoryUpsertWithWhereUniqueWithoutChangedByInput = {
-    where: StudentStatusHistoryWhereUniqueInput
-    update: XOR<StudentStatusHistoryUpdateWithoutChangedByInput, StudentStatusHistoryUncheckedUpdateWithoutChangedByInput>
-    create: XOR<StudentStatusHistoryCreateWithoutChangedByInput, StudentStatusHistoryUncheckedCreateWithoutChangedByInput>
-  }
-
-  export type StudentStatusHistoryUpdateWithWhereUniqueWithoutChangedByInput = {
-    where: StudentStatusHistoryWhereUniqueInput
-    data: XOR<StudentStatusHistoryUpdateWithoutChangedByInput, StudentStatusHistoryUncheckedUpdateWithoutChangedByInput>
-  }
-
-  export type StudentStatusHistoryUpdateManyWithWhereWithoutChangedByInput = {
-    where: StudentStatusHistoryScalarWhereInput
-    data: XOR<StudentStatusHistoryUpdateManyMutationInput, StudentStatusHistoryUncheckedUpdateManyWithoutChangedByInput>
-  }
-
-  export type StudentStatusHistoryScalarWhereInput = {
-    AND?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
-    OR?: StudentStatusHistoryScalarWhereInput[]
-    NOT?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
-    id?: StringFilter<"StudentStatusHistory"> | string
-    studentProfileId?: StringFilter<"StudentStatusHistory"> | string
-    previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
-    newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
-    reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
-    changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
-    createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
-  }
-
-  export type UserCreateWithoutStudentProfileInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserUncheckedCreateWithoutStudentProfileInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserCreateOrConnectWithoutStudentProfileInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
-  }
-
   export type StudentStatusHistoryCreateWithoutStudentProfileInput = {
     id?: string
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    changedById?: string | null
     createdAt?: Date | string
-    changedBy?: UserCreateNestedOneWithoutStatusChangesInput
   }
 
   export type StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput = {
@@ -36074,9 +34954,9 @@ export namespace Prisma {
     id?: string
     requestedChanges: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    reviewer?: UserCreateNestedOneWithoutReviewedUpdatesInput
   }
 
   export type ProfileUpdateRequestUncheckedCreateWithoutStudentProfileInput = {
@@ -36102,10 +34982,10 @@ export namespace Prisma {
     id?: string
     proposedBeltId?: string | null
     proposedStripes?: number | null
+    proposedById: string
+    approvedById?: string | null
     status?: $Enums.RequestStatus
     createdAt?: Date | string
-    proposedBy: UserCreateNestedOneWithoutProposedGraduationsInput
-    approvedBy?: UserCreateNestedOneWithoutApprovedGraduationsInput
   }
 
   export type GraduationRequestUncheckedCreateWithoutStudentProfileInput = {
@@ -36266,67 +35146,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserUpsertWithoutStudentProfileInput = {
-    update: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
-    create: XOR<UserCreateWithoutStudentProfileInput, UserUncheckedCreateWithoutStudentProfileInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutStudentProfileInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutStudentProfileInput, UserUncheckedUpdateWithoutStudentProfileInput>
-  }
-
-  export type UserUpdateWithoutStudentProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutStudentProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
-  }
-
   export type StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput = {
     where: StudentStatusHistoryWhereUniqueInput
     update: XOR<StudentStatusHistoryUpdateWithoutStudentProfileInput, StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput>
@@ -36341,6 +35160,19 @@ export namespace Prisma {
   export type StudentStatusHistoryUpdateManyWithWhereWithoutStudentProfileInput = {
     where: StudentStatusHistoryScalarWhereInput
     data: XOR<StudentStatusHistoryUpdateManyMutationInput, StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileInput>
+  }
+
+  export type StudentStatusHistoryScalarWhereInput = {
+    AND?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+    OR?: StudentStatusHistoryScalarWhereInput[]
+    NOT?: StudentStatusHistoryScalarWhereInput | StudentStatusHistoryScalarWhereInput[]
+    id?: StringFilter<"StudentStatusHistory"> | string
+    studentProfileId?: StringFilter<"StudentStatusHistory"> | string
+    previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
+    newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
+    reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
   }
 
   export type StudentGuardianUpsertWithWhereUniqueWithoutStudentInput = {
@@ -36439,6 +35271,19 @@ export namespace Prisma {
     data: XOR<ProfileUpdateRequestUpdateManyMutationInput, ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileInput>
   }
 
+  export type ProfileUpdateRequestScalarWhereInput = {
+    AND?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
+    OR?: ProfileUpdateRequestScalarWhereInput[]
+    NOT?: ProfileUpdateRequestScalarWhereInput | ProfileUpdateRequestScalarWhereInput[]
+    id?: StringFilter<"ProfileUpdateRequest"> | string
+    studentProfileId?: StringFilter<"ProfileUpdateRequest"> | string
+    requestedChanges?: JsonFilter<"ProfileUpdateRequest">
+    status?: EnumRequestStatusFilter<"ProfileUpdateRequest"> | $Enums.RequestStatus
+    reviewedById?: StringNullableFilter<"ProfileUpdateRequest"> | string | null
+    createdAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
+    updatedAt?: DateTimeFilter<"ProfileUpdateRequest"> | Date | string
+  }
+
   export type GraduationRequestUpsertWithWhereUniqueWithoutStudentProfileInput = {
     where: GraduationRequestWhereUniqueInput
     update: XOR<GraduationRequestUpdateWithoutStudentProfileInput, GraduationRequestUncheckedUpdateWithoutStudentProfileInput>
@@ -36453,6 +35298,20 @@ export namespace Prisma {
   export type GraduationRequestUpdateManyWithWhereWithoutStudentProfileInput = {
     where: GraduationRequestScalarWhereInput
     data: XOR<GraduationRequestUpdateManyMutationInput, GraduationRequestUncheckedUpdateManyWithoutStudentProfileInput>
+  }
+
+  export type GraduationRequestScalarWhereInput = {
+    AND?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
+    OR?: GraduationRequestScalarWhereInput[]
+    NOT?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
+    id?: StringFilter<"GraduationRequest"> | string
+    studentProfileId?: StringFilter<"GraduationRequest"> | string
+    proposedBeltId?: StringNullableFilter<"GraduationRequest"> | string | null
+    proposedStripes?: IntNullableFilter<"GraduationRequest"> | number | null
+    proposedById?: StringFilter<"GraduationRequest"> | string
+    approvedById?: StringNullableFilter<"GraduationRequest"> | string | null
+    status?: EnumRequestStatusFilter<"GraduationRequest"> | $Enums.RequestStatus
+    createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
   }
 
   export type StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput = {
@@ -36600,11 +35459,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStatusHistoryInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -36641,61 +35500,6 @@ export namespace Prisma {
     create: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
   }
 
-  export type UserCreateWithoutStatusChangesInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-  }
-
-  export type UserUncheckedCreateWithoutStatusChangesInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-  }
-
-  export type UserCreateOrConnectWithoutStatusChangesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
-  }
-
   export type StudentProfileUpsertWithoutStatusHistoryInput = {
     update: XOR<StudentProfileUpdateWithoutStatusHistoryInput, StudentProfileUncheckedUpdateWithoutStatusHistoryInput>
     create: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
@@ -36709,11 +35513,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStatusHistoryInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -36745,122 +35549,6 @@ export namespace Prisma {
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
-  export type UserUpsertWithoutStatusChangesInput = {
-    update: XOR<UserUpdateWithoutStatusChangesInput, UserUncheckedUpdateWithoutStatusChangesInput>
-    create: XOR<UserCreateWithoutStatusChangesInput, UserUncheckedCreateWithoutStatusChangesInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutStatusChangesInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutStatusChangesInput, UserUncheckedUpdateWithoutStatusChangesInput>
-  }
-
-  export type UserUpdateWithoutStatusChangesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutStatusChangesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-  }
-
-  export type UserCreateWithoutGuardianProfileInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserUncheckedCreateWithoutGuardianProfileInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserCreateOrConnectWithoutGuardianProfileInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutGuardianProfileInput, UserUncheckedCreateWithoutGuardianProfileInput>
-  }
-
   export type StudentGuardianCreateWithoutGuardianInput = {
     relationship?: string | null
     student: StudentProfileCreateNestedOneWithoutGuardiansInput
@@ -36881,67 +35569,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserUpsertWithoutGuardianProfileInput = {
-    update: XOR<UserUpdateWithoutGuardianProfileInput, UserUncheckedUpdateWithoutGuardianProfileInput>
-    create: XOR<UserCreateWithoutGuardianProfileInput, UserUncheckedCreateWithoutGuardianProfileInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutGuardianProfileInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutGuardianProfileInput, UserUncheckedUpdateWithoutGuardianProfileInput>
-  }
-
-  export type UserUpdateWithoutGuardianProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutGuardianProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
-  }
-
   export type StudentGuardianUpsertWithWhereUniqueWithoutGuardianInput = {
     where: StudentGuardianWhereUniqueInput
     update: XOR<StudentGuardianUpdateWithoutGuardianInput, StudentGuardianUncheckedUpdateWithoutGuardianInput>
@@ -36960,11 +35587,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutGuardiansInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -37003,8 +35630,8 @@ export namespace Prisma {
 
   export type GuardianCreateWithoutStudentsInput = {
     id?: string
+    userId: string
     createdAt?: Date | string
-    user: UserCreateNestedOneWithoutGuardianProfileInput
   }
 
   export type GuardianUncheckedCreateWithoutStudentsInput = {
@@ -37031,11 +35658,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -37080,8 +35707,8 @@ export namespace Prisma {
 
   export type GuardianUpdateWithoutStudentsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutGuardianProfileNestedInput
   }
 
   export type GuardianUncheckedUpdateWithoutStudentsInput = {
@@ -37336,11 +35963,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutRanksInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
@@ -37415,11 +36042,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
@@ -37484,11 +36111,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutAttendancesInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -37538,11 +36165,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -37576,11 +36203,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -37617,61 +36244,6 @@ export namespace Prisma {
     create: XOR<StudentProfileCreateWithoutUpdateRequestsInput, StudentProfileUncheckedCreateWithoutUpdateRequestsInput>
   }
 
-  export type UserCreateWithoutReviewedUpdatesInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserUncheckedCreateWithoutReviewedUpdatesInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserCreateOrConnectWithoutReviewedUpdatesInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutReviewedUpdatesInput, UserUncheckedCreateWithoutReviewedUpdatesInput>
-  }
-
   export type StudentProfileUpsertWithoutUpdateRequestsInput = {
     update: XOR<StudentProfileUpdateWithoutUpdateRequestsInput, StudentProfileUncheckedUpdateWithoutUpdateRequestsInput>
     create: XOR<StudentProfileCreateWithoutUpdateRequestsInput, StudentProfileUncheckedCreateWithoutUpdateRequestsInput>
@@ -37685,11 +36257,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -37721,74 +36293,13 @@ export namespace Prisma {
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
-  export type UserUpsertWithoutReviewedUpdatesInput = {
-    update: XOR<UserUpdateWithoutReviewedUpdatesInput, UserUncheckedUpdateWithoutReviewedUpdatesInput>
-    create: XOR<UserCreateWithoutReviewedUpdatesInput, UserUncheckedCreateWithoutReviewedUpdatesInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutReviewedUpdatesInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutReviewedUpdatesInput, UserUncheckedUpdateWithoutReviewedUpdatesInput>
-  }
-
-  export type UserUpdateWithoutReviewedUpdatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutReviewedUpdatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
-  }
-
   export type StudentProfileCreateWithoutGraduationRequestsInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -37825,116 +36336,6 @@ export namespace Prisma {
     create: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
   }
 
-  export type UserCreateWithoutProposedGraduationsInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    approvedGraduations?: GraduationRequestCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserUncheckedCreateWithoutProposedGraduationsInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    approvedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutApprovedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserCreateOrConnectWithoutProposedGraduationsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
-  }
-
-  export type UserCreateWithoutApprovedGraduationsInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestCreateNestedManyWithoutProposedByInput
-    statusChanges?: StudentStatusHistoryCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserUncheckedCreateWithoutApprovedGraduationsInput = {
-    id?: string
-    email: string
-    passwordHash: string
-    firstName: string
-    lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
-    isActive?: boolean
-    roles?: UserCreaterolesInput | $Enums.Role[]
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    studentProfile?: StudentProfileUncheckedCreateNestedOneWithoutUserInput
-    guardianProfile?: GuardianUncheckedCreateNestedOneWithoutUserInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutReviewerInput
-    proposedGraduations?: GraduationRequestUncheckedCreateNestedManyWithoutProposedByInput
-    statusChanges?: StudentStatusHistoryUncheckedCreateNestedManyWithoutChangedByInput
-  }
-
-  export type UserCreateOrConnectWithoutApprovedGraduationsInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
-  }
-
   export type StudentProfileUpsertWithoutGraduationRequestsInput = {
     update: XOR<StudentProfileUpdateWithoutGraduationRequestsInput, StudentProfileUncheckedUpdateWithoutGraduationRequestsInput>
     create: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
@@ -37948,11 +36349,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -37982,128 +36383,6 @@ export namespace Prisma {
     studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
     studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
     bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
-  }
-
-  export type UserUpsertWithoutProposedGraduationsInput = {
-    update: XOR<UserUpdateWithoutProposedGraduationsInput, UserUncheckedUpdateWithoutProposedGraduationsInput>
-    create: XOR<UserCreateWithoutProposedGraduationsInput, UserUncheckedCreateWithoutProposedGraduationsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutProposedGraduationsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutProposedGraduationsInput, UserUncheckedUpdateWithoutProposedGraduationsInput>
-  }
-
-  export type UserUpdateWithoutProposedGraduationsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    approvedGraduations?: GraduationRequestUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutProposedGraduationsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    approvedGraduations?: GraduationRequestUncheckedUpdateManyWithoutApprovedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUpsertWithoutApprovedGraduationsInput = {
-    update: XOR<UserUpdateWithoutApprovedGraduationsInput, UserUncheckedUpdateWithoutApprovedGraduationsInput>
-    create: XOR<UserCreateWithoutApprovedGraduationsInput, UserUncheckedCreateWithoutApprovedGraduationsInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutApprovedGraduationsInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutApprovedGraduationsInput, UserUncheckedUpdateWithoutApprovedGraduationsInput>
-  }
-
-  export type UserUpdateWithoutApprovedGraduationsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUpdateManyWithoutProposedByNestedInput
-    statusChanges?: StudentStatusHistoryUpdateManyWithoutChangedByNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutApprovedGraduationsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
-    firstName?: StringFieldUpdateOperationsInput | string
-    lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    roles?: UserUpdaterolesInput | $Enums.Role[]
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUncheckedUpdateOneWithoutUserNestedInput
-    guardianProfile?: GuardianUncheckedUpdateOneWithoutUserNestedInput
-    reviewedUpdates?: ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerNestedInput
-    proposedGraduations?: GraduationRequestUncheckedUpdateManyWithoutProposedByNestedInput
-    statusChanges?: StudentStatusHistoryUncheckedUpdateManyWithoutChangedByNestedInput
   }
 
   export type StudentFeeCreateWithoutFeeTierInput = {
@@ -38194,11 +36473,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentFeesInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -38277,11 +36556,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentFeesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -38390,11 +36669,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutStudentDiscountsInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -38479,11 +36758,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStudentDiscountsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -38558,11 +36837,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutSubscriptionsInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -38641,11 +36920,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -38860,11 +37139,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutBankMandatesInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -38944,11 +37223,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutBankMandatesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -39232,11 +37511,11 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutLicensesInput = {
     id?: string
+    userId: string
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutStudentProfileInput
     statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
     guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
@@ -39303,11 +37582,11 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutLicensesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutStudentProfileNestedInput
     statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
     guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
@@ -39360,158 +37639,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type ProfileUpdateRequestCreateManyReviewerInput = {
-    id?: string
-    studentProfileId: string
-    requestedChanges: JsonNullValueInput | InputJsonValue
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type GraduationRequestCreateManyProposedByInput = {
-    id?: string
-    studentProfileId: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    approvedById?: string | null
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-  }
-
-  export type GraduationRequestCreateManyApprovedByInput = {
-    id?: string
-    studentProfileId: string
-    proposedBeltId?: string | null
-    proposedStripes?: number | null
-    proposedById: string
-    status?: $Enums.RequestStatus
-    createdAt?: Date | string
-  }
-
-  export type StudentStatusHistoryCreateManyChangedByInput = {
-    id?: string
-    studentProfileId: string
-    previousStatus?: $Enums.StudentStatus | null
-    newStatus: $Enums.StudentStatus
-    reason?: string | null
-    createdAt?: Date | string
-  }
-
-  export type ProfileUpdateRequestUpdateWithoutReviewerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    requestedChanges?: JsonNullValueInput | InputJsonValue
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutUpdateRequestsNestedInput
-  }
-
-  export type ProfileUpdateRequestUncheckedUpdateWithoutReviewerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    requestedChanges?: JsonNullValueInput | InputJsonValue
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ProfileUpdateRequestUncheckedUpdateManyWithoutReviewerInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    requestedChanges?: JsonNullValueInput | InputJsonValue
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GraduationRequestUpdateWithoutProposedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
-  }
-
-  export type GraduationRequestUncheckedUpdateWithoutProposedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GraduationRequestUncheckedUpdateManyWithoutProposedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GraduationRequestUpdateWithoutApprovedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput
-    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
-  }
-
-  export type GraduationRequestUncheckedUpdateWithoutApprovedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    proposedById?: StringFieldUpdateOperationsInput | string
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type GraduationRequestUncheckedUpdateManyWithoutApprovedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
-    proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
-    proposedById?: StringFieldUpdateOperationsInput | string
-    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StudentStatusHistoryUpdateWithoutChangedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
-    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    reason?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput
-  }
-
-  export type StudentStatusHistoryUncheckedUpdateWithoutChangedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
-    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    reason?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StudentStatusHistoryUncheckedUpdateManyWithoutChangedByInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
-    newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    reason?: NullableStringFieldUpdateOperationsInput | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentStatusHistoryCreateManyStudentProfileInput = {
@@ -39610,8 +37737,8 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    changedBy?: UserUpdateOneWithoutStatusChangesNestedInput
   }
 
   export type StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput = {
@@ -39696,9 +37823,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     requestedChanges?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    reviewer?: UserUpdateOneWithoutReviewedUpdatesNestedInput
   }
 
   export type ProfileUpdateRequestUncheckedUpdateWithoutStudentProfileInput = {
@@ -39723,10 +37850,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     proposedBeltId?: NullableStringFieldUpdateOperationsInput | string | null
     proposedStripes?: NullableIntFieldUpdateOperationsInput | number | null
+    proposedById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    proposedBy?: UserUpdateOneRequiredWithoutProposedGraduationsNestedInput
-    approvedBy?: UserUpdateOneWithoutApprovedGraduationsNestedInput
   }
 
   export type GraduationRequestUncheckedUpdateWithoutStudentProfileInput = {
@@ -40265,10 +38392,6 @@ export namespace Prisma {
   /**
    * Aliases for legacy arg types
    */
-    /**
-     * @deprecated Use UserCountOutputTypeDefaultArgs instead
-     */
-    export type UserCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = UserCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use StudentProfileCountOutputTypeDefaultArgs instead
      */

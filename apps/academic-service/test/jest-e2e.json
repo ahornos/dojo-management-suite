@@ -4,12 +4,18 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.ts$": "ts-jest"
+    "^.+\\.[tj]s$": ["ts-jest", { "tsconfig": "<rootDir>/tsconfig.e2e.json" }]
   },
+  "transformIgnorePatterns": [
+    "node_modules/(?!.*@nestjs[+/](passport|jwt))",
+    "/packages/database/"
+  ],
   "moduleNameMapper": {
     "^@dms/database(.*)$": "<rootDir>/../../../packages/database$1",
-    "^@nestjs/jwt$": "<rootDir>/__mocks__/jwt.mock.ts",
-    "^@nestjs/swagger$": "<rootDir>/__mocks__/swagger.mock.ts",
-    "^@nestjs/passport$": "<rootDir>/__mocks__/passport.mock.ts"
+    "^@dms/shared-types$": "<rootDir>/../../../packages/shared-types/src/index.ts",
+    "^@dms/shared-types/(.*)$": "<rootDir>/../../../packages/shared-types/src/$1",
+    "^@dms/shared-auth$": "<rootDir>/../../../packages/shared-auth/src/index.ts",
+    "^@dms/shared-auth/(.*)$": "<rootDir>/../../../packages/shared-auth/src/$1",
+    "^@nestjs/swagger$": "<rootDir>/__mocks__/swagger.mock.ts"
   }
 }

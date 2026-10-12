@@ -2,7 +2,7 @@
  * @file seed.ts
  * @description Database seeding script to automatically provision the default 
  * SUPER_ADMIN user and foundational martial disciplines (Brazilian Jiu-Jitsu) 
- * with complete adult and kids belt hierarchies upon initial deployment[cite: 9, 10].
+ * with complete adult and kids belt hierarchies upon initial deployment.
  */
 
 import { PrismaClient, Role } from '../client';
@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('[Seed] Starting database initialization...');
 
-  // 1. Provision Default Super Admin[cite: 9, 10]
+  // 1. Provision Default Super Admin
   const adminEmail = process.env.DEFAULT_SUPER_ADMIN_EMAIL || 'superadmin@foxjiujitsuacademy.com';
   const adminPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD || 'SecurePassword123!';
   const hashedPassword = await bcrypt.hash(adminPassword, 10);

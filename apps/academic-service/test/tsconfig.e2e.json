@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // allowJs + esModuleInterop let ts-jest down-level the ESM-only @nestjs/passport and @nestjs/jwt v12.
+    "allowJs": true,
+    "esModuleInterop": true,
+    "incremental": false
+  }
+}

@@ -25,7 +25,7 @@ export class DisciplinesService {
     });
 
     if (existing) {
-      throw new ConflictException(`Discipline with name '${dto.name}' already exists.`);
+      throw new ConflictException('DISCIPLINE_NAME_ALREADY_EXISTS');
     }
 
     // Create discipline with nested programs and belt ranks atomically
@@ -103,7 +103,7 @@ export class DisciplinesService {
     });
 
     if (!discipline) {
-      throw new NotFoundException(`Discipline with ID ${id} not found.`);
+      throw new NotFoundException('DISCIPLINE_NOT_FOUND');
     }
 
     return discipline;
@@ -126,7 +126,7 @@ export class DisciplinesService {
         where: { name: dto.name },
       });
       if (existing && existing.id !== id) {
-        throw new ConflictException(`Discipline with name '${dto.name}' already exists.`);
+        throw new ConflictException('DISCIPLINE_NAME_ALREADY_EXISTS');
       }
     }
 

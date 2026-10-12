@@ -3,6 +3,8 @@
  * @description Utility to generate SEPA Direct Debit XML files (pain.008 format) for bank submission.
  */
 
+import { Prisma } from '@dms/database/client';
+
 export interface SepaBatchGenerationData {
   batchReference: string;
   executionDate: Date;
@@ -11,7 +13,7 @@ export interface SepaBatchGenerationData {
   creditorBic?: string;
   items: {
     id: string;
-    amount: number;
+    amount: Prisma.Decimal.Value;
     mandateReference: string;
     signatureDate: Date;
     debtorIban: string;
@@ -26,7 +28,7 @@ export function generateSepaXml(data: SepaBatchGenerationData): string {
   const formattedExecutionDate = data.executionDate.toISOString().split('T')[0];
   const creationDateTime = new Date().toISOString();
   
-  const totalAmount = data.items.reduce((sum, item) => sum + Number(item.amount), 0).toFixed(2);
+  const totalAmount = data.items.reduce((sum, item) => sum.plus(item.amount), new Prisma.Decimal(0)).toFixed(2);
   const numberOfTransactions = data.items.length;
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -77,7 +79,7 @@ export function generateSepaXml(data: SepaBatchGenerationData): string {
         <PmtId>
           <EndToEndId>${item.id}</EndToEndId>
         </PmtId>
-        <InstdAmt Ccy="EUR">${Number(item.amount).toFixed(2)}</InstdAmt>
+        <InstdAmt Ccy="EUR">${new Prisma.Decimal(item.amount).toFixed(2)}</InstdAmt>
         <DrctDbtTx>
           <MndtRltdInf>
             <MndtId>${item.mandateReference}</MndtId>

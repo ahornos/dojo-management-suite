@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { UsersDirectoryClient } from '../users-directory/users-directory.client';
 
 /**
  * Service responsible for handling attendance business logic,
@@ -8,7 +9,14 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
  */
 @Injectable()
 export class AttendancesService {
-  constructor(private prisma: PrismaService) {}
+  /**
+   * @param {PrismaService} prisma - Database access limited to the academic domain.
+   * @param {UsersDirectoryClient} usersClient - Resolves student identities owned by the auth-service.
+   */
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersClient: UsersDirectoryClient,
+  ) {}
 
   /**
    * Registers a new attendance entry for audit purposes and optionally 
@@ -29,7 +37,7 @@ export class AttendancesService {
     });
 
     if (!student) {
-      throw new NotFoundException(`Student profile with ID ${dto.studentProfileId} not found`);
+      throw new NotFoundException('STUDENT_PROFILE_NOT_FOUND');
     }
 
     // 2. Determine today's date boundaries to check daily rank rules
@@ -89,22 +97,30 @@ export class AttendancesService {
   }
 
   /**
-   * Retrieves all attendance records ordered by date descending.
-   * 
-   * @returns Array of attendance records including student and user details
+   * Retrieves all attendance records ordered by date descending. Student names/emails are merged in memory
+   * from a single batch call to the auth-service (the `users` table is not joined).
+   *
+   * @returns {Promise<object[]>} Attendance records with `student.user` (`firstName`, `lastName`, `email`, or `null` if unresolved).
+   * @throws {ServiceUnavailableException} If the auth-service is unreachable.
    */
   async findAll() {
-    return this.prisma.attendance.findMany({
-      include: {
-        student: {
-          include: {
-            user: {
-              select: { firstName: true, lastName: true, email: true },
-            },
-          },
-        },
-      },
+    const attendances = await this.prisma.attendance.findMany({
+      include: { student: true },
       orderBy: { date: 'desc' },
+    });
+
+    const users = await this.usersClient.findManyByIds(attendances.map((attendance) => attendance.student.userId));
+
+    return attendances.map((attendance) => {
+      const user = users.get(attendance.student.userId);
+
+      return {
+        ...attendance,
+        student: {
+          ...attendance.student,
+          user: user ? { firstName: user.firstName, lastName: user.lastName, email: user.email } : null,
+        },
+      };
     });
   }
 
@@ -120,7 +136,7 @@ export class AttendancesService {
     });
 
     if (!attendance) {
-      throw new NotFoundException(`Attendance record with ID ${id} not found`);
+      throw new NotFoundException('ATTENDANCE_NOT_FOUND');
     }
 
     return this.prisma.attendance.delete({

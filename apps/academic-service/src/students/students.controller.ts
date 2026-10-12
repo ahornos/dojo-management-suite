@@ -4,14 +4,13 @@
  * Implements data ownership, conditional approval workflows, and administrative deletions.
  */
 
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '@dms/shared-types';
+import { JwtAuthGuard, RolesGuard, Roles, CurrentUser } from '@dms/shared-auth';
+import { AuthenticatedUser, Role } from '@dms/shared-types';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { UpdateStudentDto } from './dto/update-student.dto';
 
 @ApiTags('Student Management')
 @ApiBearerAuth()
@@ -34,40 +33,41 @@ export class StudentsController {
   /**
    * @description Retrieves a specific student profile. Accessible by staff or the owner of the profile.
    * @param {string} id - The UUID of the student profile.
-   * @param {any} req - The Express request object containing the authenticated user.
-   * @returns {Promise<any>} The student profile details.
+   * @param {AuthenticatedUser} user - The authenticated caller.
+   * @returns {Promise<object>} The student profile details.
    */
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
-  async findOne(@Param('id') id: string, @Req() req: any) {
-    return this.studentsService.findOne(id, req.user);
+  async findOne(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.findOne(id, user);
   }
 
   /**
    * @description Creates a new student profile. Strictly limited to staff members.
    * @param {CreateStudentDto} createStudentDto - The payload for the new student.
+   * @param {AuthenticatedUser} user - The authenticated caller, recorded in the status audit log.
    * @returns {Promise<any>} The newly created student profile.
    */
   @Post()
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiOperation({ summary: 'Create a new student (Staff only)' })
   @ApiResponse({ status: 201, description: 'Student successfully created.' })
-  async create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentsService.create(createStudentDto);
+  async create(@Body() createStudentDto: CreateStudentDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.create(createStudentDto, user);
   }
 
   /**
    * @description Updates student data. Staff bypasses approval, whereas students generate an update request.
    * @param {string} id - The UUID of the student profile to update.
-   * @param {any} updateDto - The payload containing the updated fields.
-   * @param {any} req - The Express request object containing the authenticated user.
+   * @param {UpdateStudentDto} updateDto - The validated payload containing the updated fields.
+   * @param {AuthenticatedUser} user - The authenticated caller.
    * @returns {Promise<any>} The updated profile or the generated update request.
    */
   @Patch(':id')
   @ApiOperation({ summary: 'Update profile or propose changes' })
   @ApiResponse({ status: 200, description: 'Profile updated or request created.' })
-  async update(@Param('id') id: string, @Body() updateDto: any, @Req() req: any) {
-    return this.studentsService.updateProfile(id, updateDto, req.user);
+  async update(@Param('id') id: string, @Body() updateDto: UpdateStudentDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.updateProfile(id, updateDto, user);
   }
 
   /**
