@@ -1,5 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": "../..",
     "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,

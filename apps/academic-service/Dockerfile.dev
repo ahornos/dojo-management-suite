@@ -1,26 +1,56 @@
-FROM node:20-alpine
+# syntax=docker/dockerfile:1
+# Shared NestJS development image (auth / academic / financial).
+# Build from the monorepo root:
+#   docker build -f docker/Dockerfile.nestjs-dev --build-arg SERVICE_NAME=academic-service .
+#
+# Manifests are copied before source so `pnpm fetch` stays cached.
+# The BuildKit store mount is shared across every service image (`id=pnpm-store`).
+
+ARG SERVICE_NAME=academic-service
+
+FROM node:20-alpine AS base
+
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 \
+    DATABASE_URL=postgresql://dojo_admin:dojo_password@postgres:5432/dojo_management_suite?schema=public
 
 WORKDIR /app
 
-# Instalar dependencias del sistema necesarias para Prisma en Alpine
-RUN apk add --no-cache openssl libc6-compat
+RUN apk add --no-cache openssl libc6-compat \
+  && corepack enable \
+  && corepack prepare pnpm@9.12.1 --activate
 
-# Habilitar pnpm
-RUN corepack enable pnpm
+FROM base AS deps
 
-# Copiar archivos de configuración del workspace y dependencias raíz
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
+COPY packages/database/package.json ./packages/database/
+COPY packages/database/prisma.config.ts ./packages/database/
+COPY packages/database/prisma ./packages/database/prisma
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/shared-auth/package.json ./packages/shared-auth/
+COPY apps/auth-service/package.json ./apps/auth-service/
+COPY apps/academic-service/package.json ./apps/academic-service/
+COPY apps/financial-service/package.json ./apps/financial-service/
+COPY apps/api-gateway/package.json ./apps/api-gateway/
+COPY apps/pwa-frontend/package.json ./apps/pwa-frontend/
 
-# Copiar los paquetes compartidos y apps
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm fetch \
+    && pnpm install --frozen-lockfile --offline \
+    && pnpm --filter @dms/database db:generate
+
+FROM deps AS development
+
+ARG SERVICE_NAME
+
 COPY packages/ ./packages/
-COPY apps/ ./apps/
+COPY scripts/ ./scripts/
+COPY apps/${SERVICE_NAME}/ ./apps/${SERVICE_NAME}/
 
-# Instalar dependencias del monorepo
-RUN pnpm install
+RUN pnpm --recursive --filter "./packages/**" --if-present run build \
+    && pnpm --filter @dms/database db:generate
 
-# Establecer el directorio de trabajo en el microservicio correspondiente
-WORKDIR /app/apps/academic-service
+WORKDIR /app/apps/${SERVICE_NAME}
 
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:dev"]
+CMD ["sh", "-c", "sh /app/scripts/build-packages-writable.sh && pnpm run start:dev"]

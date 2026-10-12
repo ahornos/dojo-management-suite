@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "paths": {
+      "@dms/database": ["./packages/database/client"],
+      "@dms/database/*": ["./packages/database/*"],
+      "@dms/shared-types": ["./packages/shared-types/src/index.ts"],
+      "@dms/shared-auth": ["./packages/shared-auth/src/index.ts"]
+    }
+  }
+}

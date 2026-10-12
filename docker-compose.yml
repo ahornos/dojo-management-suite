@@ -1,11 +1,11 @@
 # ==============================================================================
-# DOJO MANAGEMENT SUITE (DMS) - DOCKER COMPOSE ORCHESTRATION
+# Dojo Management Suite — Docker Compose
+# Build context is the monorepo root so every image can read pnpm-lock.yaml
+# and workspace package.json files. Requires Docker BuildKit (Compose v2 default)
+# for the shared pnpm store cache mount (`id=pnpm-store`).
 # ==============================================================================
 
 services:
-  # ---------------------------------------------------------
-  # Database & Message Broker
-  # ---------------------------------------------------------
   postgres:
     image: postgres:15-alpine
     container_name: dms-postgres
@@ -42,13 +42,12 @@ services:
       timeout: 5s
       retries: 5
 
-  # ---------------------------------------------------------
-  # Microservices
-  # ---------------------------------------------------------
   api-gateway:
     build:
       context: .
-      dockerfile: apps/api-gateway/Dockerfile.dev
+      dockerfile: docker/Dockerfile.nestjs-dev
+      args:
+        SERVICE_NAME: api-gateway
     container_name: dms-api-gateway
     restart: unless-stopped
     ports:
@@ -56,9 +55,10 @@ services:
     volumes:
       - ./apps/api-gateway/src:/app/apps/api-gateway/src
       - ./packages:/app/packages
+      - ./scripts:/app/scripts
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
     env_file:
       - .env
-    command: pnpm --filter api-gateway start:dev
     networks:
       - dms-network
     depends_on:
@@ -69,7 +69,9 @@ services:
   auth-service:
     build:
       context: .
-      dockerfile: apps/auth-service/Dockerfile.dev
+      dockerfile: docker/Dockerfile.nestjs-dev
+      args:
+        SERVICE_NAME: auth-service
     container_name: dms-auth-service
     restart: unless-stopped
     ports:
@@ -77,6 +79,8 @@ services:
     volumes:
       - ./apps/auth-service/src:/app/apps/auth-service/src
       - ./packages:/app/packages
+      - ./scripts:/app/scripts
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
     env_file:
       - .env
     networks:
@@ -90,7 +94,9 @@ services:
   academic-service:
     build:
       context: .
-      dockerfile: apps/academic-service/Dockerfile.dev
+      dockerfile: docker/Dockerfile.nestjs-dev
+      args:
+        SERVICE_NAME: academic-service
     container_name: dms-academic-service
     restart: unless-stopped
     ports:
@@ -98,6 +104,8 @@ services:
     volumes:
       - ./apps/academic-service/src:/app/apps/academic-service/src
       - ./packages:/app/packages
+      - ./scripts:/app/scripts
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
     env_file:
       - .env
     networks:
@@ -111,7 +119,9 @@ services:
   financial-service:
     build:
       context: .
-      dockerfile: apps/financial-service/Dockerfile.dev
+      dockerfile: docker/Dockerfile.nestjs-dev
+      args:
+        SERVICE_NAME: financial-service
     container_name: dms-financial-service
     restart: unless-stopped
     ports:
@@ -119,6 +129,8 @@ services:
     volumes:
       - ./apps/financial-service/src:/app/apps/financial-service/src
       - ./packages:/app/packages
+      - ./scripts:/app/scripts
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
     env_file:
       - .env
     networks:
@@ -129,20 +141,19 @@ services:
       redis:
         condition: service_healthy
 
-  # ---------------------------------------------------------
-  # Frontend UI
-  # ---------------------------------------------------------
   pwa-frontend:
     build:
       context: .
-      dockerfile: apps/pwa-frontend/Dockerfile.dev
+      dockerfile: apps/pwa-frontend/Dockerfile
+      target: development
     container_name: dms-pwa-frontend
     restart: unless-stopped
     ports:
       - "5173:5173"
     volumes:
-      - ./apps/pwa-frontend:/app
+      - ./apps/pwa-frontend:/app/apps/pwa-frontend
       - /app/node_modules
+      - /app/apps/pwa-frontend/node_modules
     env_file:
       - .env
     networks:

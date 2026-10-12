@@ -1,26 +1,4 @@
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Instalar dependencias del sistema necesarias para Prisma en Alpine
-RUN apk add --no-cache openssl libc6-compat
-
-# Habilitar pnpm
-RUN corepack enable pnpm
-
-# Copiar archivos de configuración del workspace y dependencias raíz
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-
-# Copiar los paquetes compartidos y apps
-COPY packages/ ./packages/
-COPY apps/ ./apps/
-
-# Instalar dependencias del monorepo
-RUN pnpm install
-
-# Establecer el directorio de trabajo en el microservicio correspondiente (ej. api-gateway)
-WORKDIR /app/apps/api-gateway
-
-EXPOSE 3000
-
-CMD ["pnpm", "run", "start:dev"]
+# syntax=docker/dockerfile:1
+# Development image is the `development` target of ./Dockerfile (monorepo root context).
+#   docker build -f apps/api-gateway/Dockerfile --target development .
+ARG SERVICE_NAME=api-gateway

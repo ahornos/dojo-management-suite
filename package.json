@@ -3,10 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build:shared": "pnpm --filter @dms/shared-types build",
+    "clean:packages": "pnpm --recursive --filter \"./packages/**\" --if-present run clean",
+    "build:packages": "pnpm --recursive --filter \"./packages/**\" --if-present run build",
+    "build:shared": "pnpm --filter @dms/shared-types build && pnpm --filter @dms/shared-auth build",
     "build:auth": "pnpm --filter auth-service build",
-    "build": "pnpm --filter @dms/shared-types build && pnpm --filter auth-service build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "pnpm run clean:packages",
+    "build": "pnpm run build:packages",
+    "test": "pnpm run test:unit",
+    "test:unit": "pnpm --filter @dms/shared-auth --filter auth-service --filter academic-service --filter financial-service --filter api-gateway test",
+    "test:e2e": "pnpm --filter auth-service --filter academic-service --filter financial-service --filter api-gateway test:e2e",
+    "bootstrap": "bash scripts/bootstrap.sh"
   },
   "devDependencies": {
     "turbo": "^2.11.3"
