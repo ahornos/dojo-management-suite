@@ -19,7 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@dms/database": "workspace:*",
+    "@dms/shared-auth": "workspace:*",
     "@nestjs/axios": "^12.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
@@ -69,6 +69,8 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
+      "^@dms/shared-auth$": "<rootDir>/../../../packages/shared-auth/src/index.ts",
+      "^@dms/shared-auth/(.*)$": "<rootDir>/../../../packages/shared-auth/src/$1",
       "^@nestjs/axios$": "<rootDir>/../test/__mocks__/axios.mock.ts",
       "^@nestjs/swagger$": "<rootDir>/../test/__mocks__/swagger.mock.ts"
     }

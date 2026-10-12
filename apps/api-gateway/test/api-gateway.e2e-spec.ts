@@ -6,7 +6,7 @@
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import request = require('supertest');
 import { of, throwError } from 'rxjs';
@@ -18,6 +18,9 @@ describe('API Gateway (E2E)', () => {
   let httpService: HttpService;
 
   beforeAll(async () => {
+    // The upstream-failure test intentionally triggers the proxy's error log.
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -114,6 +117,27 @@ describe('API Gateway (E2E)', () => {
       expect(response.body.message).toEqual(
         expect.arrayContaining(['property maliciousField should not exist'])
       );
+    });
+
+    it('should answer 502 UPSTREAM_UNAVAILABLE when a non-idempotent request cannot reach the service (no replay)', async () => {
+      const requestSpy = jest.spyOn(httpService, 'request').mockImplementation(() =>
+        throwError(() => Object.assign(new Error('refused'), { isAxiosError: true, code: 'ECONNREFUSED' })),
+      );
+
+      const response: any = await request(app.getHttpServer()).post('/api/financial/discounts').send({});
+
+      expect(response.status).toBe(502);
+      expect(response.body.message).toBe('UPSTREAM_UNAVAILABLE');
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Gateway health', () => {
+    it('should expose the liveness endpoint registered by AppModule', async () => {
+      const response: any = await request(app.getHttpServer()).get('/api');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({ service: 'API Gateway', status: 'OK' });
     });
   });
 });

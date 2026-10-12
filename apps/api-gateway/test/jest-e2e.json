@@ -7,6 +7,8 @@
     "^.+\\.ts$": "ts-jest"
   },
   "moduleNameMapper": {
+    "^@dms/shared-auth$": "<rootDir>/../../../packages/shared-auth/src/index.ts",
+    "^@dms/shared-auth/(.*)$": "<rootDir>/../../../packages/shared-auth/src/$1",
     "^@nestjs/axios$": "<rootDir>/__mocks__/axios.mock.ts",
     "^@nestjs/swagger$": "<rootDir>/__mocks__/swagger.mock.ts"
   }

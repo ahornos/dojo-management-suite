@@ -1,7 +1,9 @@
 import { Controller, All, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { ProxyService } from '../proxy/proxy.service';
+import { resolveServiceUrl } from '../config/gateway.config';
 
 /**
  * @file financial.controller.ts
@@ -12,10 +14,19 @@ import { ProxyService } from '../proxy/proxy.service';
 @ApiBearerAuth()
 @Controller()
 export class FinancialController {
-  // Internal URL resolved from the environment, defaulting to the Docker service name
-  private readonly targetUrl = process.env.FINANCIAL_SERVICE_URL || 'http://financial-service:3000';
+  /** Internal base URL of the financial-service, resolved once from configuration. */
+  private readonly targetUrl: string;
 
-  constructor(private readonly proxyService: ProxyService) {}
+  /**
+   * @param {ProxyService} proxyService - Forwards requests to the downstream service.
+   * @param {ConfigService} config - Source of `FINANCIAL_SERVICE_URL`.
+   */
+  constructor(
+    private readonly proxyService: ProxyService,
+    config: ConfigService,
+  ) {
+    this.targetUrl = resolveServiceUrl(config, 'FINANCIAL_SERVICE_URL');
+  }
 
   /**
    * @description Catch-all route to forward daily cash register and POS requests.

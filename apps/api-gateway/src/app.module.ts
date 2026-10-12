@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ProxyModule } from './proxy/proxy.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AcademicController } from './academic/academic.controller';
 import { FinancialController } from './financial/financial.controller';
@@ -32,11 +34,13 @@ import { FinancialController } from './financial/financial.controller';
     ProxyModule,
   ],
   controllers: [
+    AppController,
     AuthController,
     AcademicController,
     FinancialController,
   ],
   providers: [
+    AppService,
     // 4. Bind the ThrottlerGuard globally across all API Gateway endpoints
     {
       provide: APP_GUARD,

@@ -7,7 +7,9 @@
 import { Controller, All, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { ProxyService } from '../proxy/proxy.service';
+import { resolveServiceUrl } from '../config/gateway.config';
 
 /**
  * @class AcademicController
@@ -18,10 +20,19 @@ import { ProxyService } from '../proxy/proxy.service';
 @ApiBearerAuth()
 @Controller('academic')
 export class AcademicController {
-  // Internal URL resolved from the environment, defaulting to the Docker service name or local port 3002
-  private readonly targetUrl = process.env.ACADEMIC_SERVICE_URL || 'http://localhost:3002';
+  /** Internal base URL of the academic-service, resolved once from configuration. */
+  private readonly targetUrl: string;
 
-  constructor(private readonly proxyService: ProxyService) {}
+  /**
+   * @param {ProxyService} proxyService - Forwards requests to the downstream service.
+   * @param {ConfigService} config - Source of `ACADEMIC_SERVICE_URL`.
+   */
+  constructor(
+    private readonly proxyService: ProxyService,
+    config: ConfigService,
+  ) {
+    this.targetUrl = resolveServiceUrl(config, 'ACADEMIC_SERVICE_URL');
+  }
 
   /**
    * @description Forwards all academy discipline requests to the academic service.

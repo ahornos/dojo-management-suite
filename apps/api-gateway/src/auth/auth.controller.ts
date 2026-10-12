@@ -7,7 +7,9 @@
 import { Controller, Get, Post, Patch, Delete, Req, All } from '@nestjs/common';
 import type { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { ProxyService } from '../proxy/proxy.service';
+import { resolveServiceUrl } from '../config/gateway.config';
 
 /**
  * @class AuthController
@@ -17,14 +19,19 @@ import { ProxyService } from '../proxy/proxy.service';
 @ApiTags('Authentication & Users')
 @Controller('auth')
 export class AuthController {
-  /**
-   * Resolves the internal URL from the environment, defaulting to the internal Docker service name.
-   * @private
-   * @readonly
-   */
-  private readonly targetUrl = process.env.AUTH_SERVICE_URL || 'http://auth-service:3000';
+  /** Internal base URL of the auth-service, resolved once from configuration. */
+  private readonly targetUrl: string;
 
-  constructor(private readonly proxyService: ProxyService) {}
+  /**
+   * @param {ProxyService} proxyService - Forwards requests to the downstream service.
+   * @param {ConfigService} config - Source of `AUTH_SERVICE_URL`.
+   */
+  constructor(
+    private readonly proxyService: ProxyService,
+    config: ConfigService,
+  ) {
+    this.targetUrl = resolveServiceUrl(config, 'AUTH_SERVICE_URL');
+  }
 
   /**
    * @description Proxies the login request to authenticate a user and retrieve a JWT.

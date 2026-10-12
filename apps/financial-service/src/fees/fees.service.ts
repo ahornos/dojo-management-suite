@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { Prisma } from '@dms/database/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFeeTierDto } from './dto/create-fee-tier.dto';
 import { AssignStudentFeeDto } from './dto/assign-student-fee.dto';
@@ -60,37 +61,58 @@ export class FeesService {
   }
 
   /**
-   * Performs a mass fee update across base fee tiers (percentage increase or fixed amount).
-   * 
-   * @param dto - Mass update parameters
-   * @returns List of updated fee tiers
+   * Performs a mass fee update across base fee tiers (percentage increase and/or fixed amount).
+   * Runs in one transaction: either every targeted tier is updated or none is. All arithmetic uses
+   * exact decimals and the result is rounded to 2 places (the column scale).
+   *
+   * @param {MassFeeUpdateDto} dto - Mass update parameters.
+   * @returns {Promise<Array>} List of updated fee tiers.
+   * @throws {BadRequestException} `MASS_UPDATE_REQUIRES_PERCENTAGE_OR_FIXED_AMOUNT` if neither value is given;
+   * `MASS_UPDATE_RESULTS_IN_NEGATIVE_AMOUNT` if any tier would end up below zero (transaction rolled back).
    */
   async massFeeUpdate(dto: MassFeeUpdateDto) {
     if (!dto.percentage && !dto.fixedAmount) {
-      throw new BadRequestException('Either percentage or fixedAmount must be provided for mass update.');
+      throw new BadRequestException('MASS_UPDATE_REQUIRES_PERCENTAGE_OR_FIXED_AMOUNT');
     }
 
     const whereCondition = dto.tierId ? { id: dto.tierId } : { isActive: true };
-    const tiers = await this.prisma.feeTier.findMany({ where: whereCondition });
 
-    const updates = tiers.map(async (tier) => {
-      let currentAmount = Number(tier.baseAmount);
+    return this.prisma.$transaction(async (tx) => {
+      const tiers = await tx.feeTier.findMany({ where: whereCondition });
+      const updatedTiers = [];
 
-      if (dto.percentage) {
-        currentAmount += currentAmount * (dto.percentage / 100);
+      // Sequential on purpose: an interactive transaction owns a single connection.
+      for (const tier of tiers) {
+        const newAmount = this.applyIncrease(tier.baseAmount, dto);
+
+        if (newAmount.isNegative()) {
+          throw new BadRequestException('MASS_UPDATE_RESULTS_IN_NEGATIVE_AMOUNT');
+        }
+
+        updatedTiers.push(await tx.feeTier.update({ where: { id: tier.id }, data: { baseAmount: newAmount } }));
       }
-      if (dto.fixedAmount) {
-        currentAmount += dto.fixedAmount;
-      }
 
-      return this.prisma.feeTier.update({
-        where: { id: tier.id },
-        data: {
-          baseAmount: Number(currentAmount.toFixed(2)),
-        },
-      });
+      return updatedTiers;
     });
+  }
 
-    return Promise.all(updates);
+  /**
+   * Applies the percentage and fixed increments to an amount using exact decimal arithmetic.
+   *
+   * @param {Prisma.Decimal} current - Current amount.
+   * @param {Pick<MassFeeUpdateDto, 'percentage' | 'fixedAmount'>} increase - Increments to apply.
+   * @returns {Prisma.Decimal} New amount rounded to 2 decimals (half-up).
+   */
+  private applyIncrease(current: Prisma.Decimal, increase: Pick<MassFeeUpdateDto, 'percentage' | 'fixedAmount'>): Prisma.Decimal {
+    let amount = new Prisma.Decimal(current);
+
+    if (increase.percentage) {
+      amount = amount.plus(current.times(increase.percentage).dividedBy(100));
+    }
+    if (increase.fixedAmount) {
+      amount = amount.plus(increase.fixedAmount);
+    }
+
+    return amount.toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);
   }
 }

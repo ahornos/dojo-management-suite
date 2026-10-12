@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@dms/database/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { AssignDiscountDto } from './dto/assign-discount.dto';
@@ -9,10 +10,16 @@ import { AssignDiscountDto } from './dto/assign-discount.dto';
  */
 @Injectable()
 export class DiscountsService {
+  /**
+   * @param {PrismaService} prisma - Financial-domain Prisma client.
+   */
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Registers a new financial discount rule in the system.
+   * Registers a reusable discount rule.
+   *
+   * @param {CreateDiscountDto} dto - Rule definition (code, type, value, validity window).
+   * @returns {Promise<object>} The persisted discount.
    */
   async createDiscount(dto: CreateDiscountDto) {
     return this.prisma.discount.create({
@@ -31,7 +38,10 @@ export class DiscountsService {
   }
 
   /**
-   * Assigns a discount rule to a specific student profile.
+   * Assigns a discount rule to a student profile.
+   *
+   * @param {AssignDiscountDto} dto - Student, discount, and optional expiry.
+   * @returns {Promise<object>} The persisted assignment.
    */
   async assignDiscountToStudent(dto: AssignDiscountDto) {
     return this.prisma.studentDiscount.create({
@@ -46,11 +56,11 @@ export class DiscountsService {
   /**
    * Processes all active discount rules for a student and calculates their final fee.
    * 
-   * @param studentProfileId - Target student UUID
-   * @param baseAmount - The original fee calculated by FeesModule
-   * @returns Final calculated amount avoiding negative values
+   * @param {string} studentProfileId - Target student profile UUID.
+   * @param {Prisma.Decimal} baseAmount - Original fee (exact decimal, never a JS float).
+   * @returns {Promise<Prisma.Decimal>} Final amount, rounded to 2 decimals and never negative.
    */
-  async calculateDiscountedFee(studentProfileId: string, baseAmount: number): Promise<number> {
+  async calculateDiscountedFee(studentProfileId: string, baseAmount: Prisma.Decimal): Promise<Prisma.Decimal> {
     const activeDiscounts = await this.prisma.studentDiscount.findMany({
       where: {
         studentProfileId,
@@ -60,21 +70,21 @@ export class DiscountsService {
       include: { discount: true },
     });
 
-    let finalAmount = baseAmount;
+    let finalAmount = new Prisma.Decimal(baseAmount);
 
     for (const sd of activeDiscounts) {
       const discountRule = sd.discount;
 
       if (discountRule.type === 'PERCENTAGE' && discountRule.value) {
-        finalAmount -= baseAmount * (Number(discountRule.value) / 100);
+        finalAmount = finalAmount.minus(baseAmount.times(discountRule.value).dividedBy(100));
       } else if (discountRule.type === 'FIXED_DISCOUNT' && discountRule.value) {
-        finalAmount -= Number(discountRule.value);
+        finalAmount = finalAmount.minus(discountRule.value);
       } else if (discountRule.type === 'FREE_PERIOD') {
-        finalAmount = 0;
-        break; 
+        finalAmount = new Prisma.Decimal(0);
+        break;
       }
     }
 
-    return Math.max(0, Number(finalAmount.toFixed(2)));
+    return Prisma.Decimal.max(0, finalAmount.toDecimalPlaces(2));
   }
 }

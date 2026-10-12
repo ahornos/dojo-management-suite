@@ -4,9 +4,7 @@ import { FeesService } from './fees.service';
 import { CreateFeeTierDto } from './dto/create-fee-tier.dto';
 import { AssignStudentFeeDto } from './dto/assign-student-fee.dto';
 import { MassFeeUpdateDto } from './dto/mass-fee-update.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard, Roles } from '@dms/shared-auth';
 import { Role } from '@dms/shared-types';
 
 /**
