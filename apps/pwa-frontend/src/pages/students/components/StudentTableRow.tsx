@@ -7,7 +7,9 @@ import { ChevronRight, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ageGroupLabel } from '../config/ageGroups';
 import { ageGroupForAge, calculateAge, studentBirthDate } from '../listFilters';
+import { useAgeBrackets } from '../useAgeBrackets';
 import { studentDisplayName, studentGender } from '../studentIdentity';
 import type { StudentProfileResponse } from '../types';
 import { StudentDetailPanel } from './StudentDetailPanel';
@@ -52,8 +54,9 @@ export function StudentTableRow({
   onDelete,
 }: StudentTableRowProps): JSX.Element {
   const { t } = useTranslation();
+  const { ageGroups } = useAgeBrackets();
   const age = calculateAge(studentBirthDate(student));
-  const ageGroup = ageGroupForAge(age);
+  const ageGroup = ageGroupForAge(age, ageGroups);
   const ranks = student.ranks ?? [];
 
   return (
@@ -79,7 +82,7 @@ export function StudentTableRow({
             {age !== -1 ? t('students.row.age_years', { count: age }) : '—'}
           </p>
           {ageGroup ? (
-            <p className="text-[11px] text-muted-foreground">{t(`students.age_groups_short.${ageGroup.id}`)}</p>
+            <p className="text-[11px] text-muted-foreground">{ageGroupLabel(ageGroup, t)}</p>
           ) : null}
         </td>
         <td className="px-3 py-2.5">

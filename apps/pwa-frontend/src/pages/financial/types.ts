@@ -18,6 +18,7 @@ export interface FinancialConfig {
   creditorId: string;
   iban: string;
   bic: string | null;
+  stripeAccountId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,7 +28,8 @@ export interface FinancialConfig {
  */
 export type UpdateFinancialConfigPayload = Omit<
   FinancialConfig,
-  'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'bic'
+  'id' | 'tenantId' | 'createdAt' | 'updatedAt' | 'bic' | 'stripeAccountId'
 > & {
   bic: string;
+  stripeAccountId?: string | null;
 };

@@ -16,7 +16,8 @@ import { Select } from '@/components/ui/select';
 import { LICENSE_HOLDER_TYPES, type LicenseHolderType } from '@/lib/domain-enums';
 import { translateApiError } from '@/lib/errors';
 import { useDisciplines } from '@/pages/disciplines/useDisciplines';
-import { AGE_GROUPS } from '@/pages/students/config/ageGroups';
+import { ageGroupLabel } from '@/pages/students/config/ageGroups';
+import { useAgeBrackets } from '@/pages/students/useAgeBrackets';
 import { MultiSelectFilter } from '@/pages/students/components/MultiSelectFilter';
 import { useCreateFederationCharges, useFederations } from '../federations/useFederations';
 import type { Federation, FederationSeason } from '../federations/types';
@@ -106,6 +107,7 @@ export default function BatchWizard() {
   const { preview, issueBatch } = useLicenseBatch();
   const issueSelected = useBatchIssueLicenses();
   const charges = useCreateFederationCharges();
+  const { ageGroups } = useAgeBrackets();
 
   const [federationId, setFederationId] = useState('');
   const [seasonId, setSeasonId] = useState('');
@@ -138,7 +140,7 @@ export default function BatchWizard() {
   const filters = useMemo<LicensePreviewFilters | null>(() => {
     const seasonLabel = (selectedSeason?.seasonName ?? season).trim();
     if (!federationId || !seasonLabel) return null;
-    const group = AGE_GROUPS.find((row) => row.id === ageBracket);
+    const group = ageGroups.find((row) => row.id === ageBracket);
     const yearFrom = Number.parseInt(birthYearFrom, 10);
     const yearTo = Number.parseInt(birthYearTo, 10);
     return {
@@ -165,6 +167,7 @@ export default function BatchWizard() {
     disciplineId,
     enrollmentDateBefore,
     licenseTypeId,
+    ageGroups,
   ]);
 
   /**
@@ -449,9 +452,9 @@ export default function BatchWizard() {
                 }}
               >
                 <option value="">{t('financial.licenses.filter_age_all')}</option>
-                {AGE_GROUPS.map((group) => (
+                {ageGroups.map((group) => (
                   <option key={group.id} value={group.id}>
-                    {t(group.labelKey)}
+                    {ageGroupLabel(group, t)}
                   </option>
                 ))}
                 <option value={AGE_CUSTOM}>{t('financial.licenses.filter_age_custom')}</option>

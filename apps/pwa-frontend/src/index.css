@@ -35,6 +35,26 @@
     --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
+    --topbar: 0 0% 100%;
+    --topbar-foreground: 222.2 84% 4.9%;
+    --footer: 0 0% 100%;
+    --footer-foreground: 215.4 16.3% 46.9%;
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 210 40% 98%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
+    --font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    --font-scale: 1;
+    --radius: 6px;
+    --radius-base: 6px;
+    --radius-sm: 4px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --shadow-card: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
+    --space-page: 1.5rem;
+    --space-density: 1.25rem;
+    --space-gap: 1.25rem;
+    --color-primary: #2563EB;
     --belt-white: 0 0% 100%;
     --belt-blue: 221.2 83.2% 53.3%;
     --belt-purple: 270.7 91% 32.7%;
@@ -73,6 +93,14 @@
     --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
+    --topbar: 222.2 47.4% 11.2%;
+    --topbar-foreground: 210 40% 98%;
+    --footer: 222.2 47.4% 11.2%;
+    --footer-foreground: 215 20.2% 65.1%;
+    --success: 142.1 70.6% 45.3%;
+    --success-foreground: 210 40% 98%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
     --belt-white: 0 0% 100%;
     --belt-blue: 217.2 91.2% 59.8%;
     --belt-purple: 270.7 91% 45%;
@@ -89,8 +117,82 @@
   * {
     @apply border-border;
   }
+  html {
+    font-size: calc(16px * var(--font-scale, 1));
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: var(--font-family), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /**
+   * Padded workspace surface (settings sections, page headers).
+   * Geometry tokens update instantly because these properties read :root CSS variables.
+   */
+  .dms-surface {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-density);
+    transition: border-radius 150ms ease, box-shadow 150ms ease, padding 150ms ease;
+  }
+
+  /**
+   * Unpadded card chrome. Inner header/content consume `--space-density`.
+   */
+  .dms-card {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-card);
+    transition: border-radius 150ms ease, box-shadow 150ms ease;
+  }
+
+  /**
+   * Buttons, inputs, and chips share the smaller radius step.
+   */
+  .dms-control {
+    border-radius: var(--radius-sm);
+  }
+
+  /**
+   * Semantic chip bound to live theme tokens. Avoids Tailwind utility
+   * inheritance from `.dms-surface` (card foreground leaking onto badges).
+   */
+  .dms-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius-sm);
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+    border: 1px solid transparent;
+  }
+
+  .dms-badge-success {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .dms-badge-warning {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .dms-badge-error {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+  }
+
+  .dms-badge-info {
+    background-color: hsl(var(--info));
+    color: hsl(var(--info-foreground));
   }
 }

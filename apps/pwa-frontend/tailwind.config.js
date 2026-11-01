@@ -59,6 +59,14 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -68,6 +76,14 @@ export default {
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
+        },
+        topbar: {
+          DEFAULT: "hsl(var(--topbar))",
+          foreground: "hsl(var(--topbar-foreground))",
+        },
+        footer: {
+          DEFAULT: "hsl(var(--footer))",
+          foreground: "hsl(var(--footer-foreground))",
         },
         belt: {
           white: "hsl(var(--belt-white))",
@@ -80,6 +96,29 @@ export default {
           green: "hsl(var(--belt-green))",
           red: "hsl(var(--belt-red))",
         },
+      },
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        DEFAULT: "var(--radius-base)",
+        md: "var(--radius-base)",
+        lg: "var(--radius-base)",
+        xl: "var(--radius-lg)",
+        "2xl": "var(--radius-xl)",
+      },
+      boxShadow: {
+        sm: "var(--shadow-card)",
+        DEFAULT: "var(--shadow-card)",
+        md: "var(--shadow-card)",
+        lg: "var(--shadow-card)",
+        xl: "var(--shadow-card)",
+      },
+      spacing: {
+        density: "var(--space-density)",
+        gap: "var(--space-gap)",
+        page: "var(--space-page)",
+      },
+      fontFamily: {
+        sans: ["var(--font-family)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },
   },

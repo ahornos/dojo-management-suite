@@ -22,7 +22,7 @@ interface FormSectionProps {
  */
 export function FormSection({ title, description, children, actions }: FormSectionProps) {
   return (
-    <section className="space-y-4 rounded-lg border border-border bg-card p-4 md:p-5">
+    <section className="dms-surface space-y-[var(--space-gap)]">
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold text-foreground">{title}</h3>
@@ -47,7 +47,7 @@ interface FormGridProps {
  * @returns {JSX.Element} Grid.
  */
 export function FormGrid({ children, className }: FormGridProps) {
-  return <div className={cn('grid grid-cols-1 md:grid-cols-2 gap-6', className)}>{children}</div>;
+  return <div className={cn('grid grid-cols-1 md:grid-cols-2 gap-[var(--space-gap)]', className)}>{children}</div>;
 }
 
 interface FieldProps {

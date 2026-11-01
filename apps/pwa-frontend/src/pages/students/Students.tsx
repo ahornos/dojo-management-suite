@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStudents } from './useStudents';
+import { useAgeBrackets } from './useAgeBrackets';
 import { StudentFilters } from './components/StudentFilters';
 import { StudentTable } from './components/StudentTable';
 import { TrialStudentModal } from './components/TrialStudentModal';
@@ -43,6 +44,7 @@ export default function Students() {
   } = useStudents();
   const { config } = useFinancialConfig();
   const { signMandate } = useStudentMandate({});
+  const { ageGroups } = useAgeBrackets();
 
   const [isTrialOpen, setIsTrialOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,13 +70,17 @@ export default function Students() {
 
   const visibleStudents = useMemo(
     () =>
-      filterAndSortStudents(students, {
-        searchTerm,
-        selectedAgeGroups,
-        selectedStatuses,
-        selectedDisciplines,
-      }),
-    [students, searchTerm, selectedAgeGroups, selectedStatuses, selectedDisciplines],
+      filterAndSortStudents(
+        students,
+        {
+          searchTerm,
+          selectedAgeGroups,
+          selectedStatuses,
+          selectedDisciplines,
+        },
+        ageGroups,
+      ),
+    [students, searchTerm, selectedAgeGroups, selectedStatuses, selectedDisciplines, ageGroups],
   );
 
   const filtersAreDefault = isDefaultStudentFilters({
@@ -164,6 +170,7 @@ export default function Students() {
         selectedDisciplines={selectedDisciplines}
         onDisciplinesChange={setSelectedDisciplines}
         disciplineOptions={disciplineOptions}
+        ageGroups={ageGroups}
         showClear={!filtersAreDefault}
         onClearFilters={handleClearFilters}
       />

@@ -5,6 +5,7 @@
 
 import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useAcademyTheme } from '@/pages/settings/useAcademyTheme';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -19,14 +20,15 @@ import { RouteFallback } from './RouteFallback';
  * @returns {React.ReactElement} The master layout structure.
  */
 export const MainLayout = () => {
+  useAcademyTheme();
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <div className="flex flex-col flex-1">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Header />
         
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 overflow-auto p-[var(--space-page)]">
           <Suspense fallback={<RouteFallback />}>
             <Outlet />
           </Suspense>

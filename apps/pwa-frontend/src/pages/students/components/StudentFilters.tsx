@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AGE_GROUPS } from '../config/ageGroups';
+import { AGE_GROUPS, ageGroupLabel, type AgeGroupConfig } from '../config/ageGroups';
 import { STUDENT_STATUS_OPTIONS } from '../listFilters';
 import { MultiSelectFilter } from './MultiSelectFilter';
 
@@ -23,6 +23,7 @@ interface StudentFiltersProps {
   disciplineOptions: string[];
   showClear: boolean;
   onClearFilters: () => void;
+  ageGroups?: AgeGroupConfig[];
 }
 
 /**
@@ -43,6 +44,7 @@ export function StudentFilters({
   disciplineOptions,
   showClear,
   onClearFilters,
+  ageGroups = AGE_GROUPS,
 }: StudentFiltersProps): JSX.Element {
   const { t } = useTranslation();
 
@@ -62,7 +64,7 @@ export function StudentFilters({
         emptyLabel={t('students.all_ages')}
         selected={selectedAgeGroups}
         onChange={onAgeGroupsChange}
-        options={AGE_GROUPS.map((group) => ({ value: group.id, label: t(group.labelKey) }))}
+        options={ageGroups.map((group) => ({ value: group.id, label: ageGroupLabel(group, t) }))}
       />
 
       <MultiSelectFilter

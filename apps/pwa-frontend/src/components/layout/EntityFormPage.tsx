@@ -16,7 +16,7 @@ interface EntityFormPageProps {
   /** Localized page title (create or “Edit X: Name”). */
   title: string;
   /** Form density: 3xl for sparse entities, 5xl for multi-section student/user forms. */
-  maxWidth?: 'max-w-3xl' | 'max-w-5xl';
+  maxWidth?: 'max-w-3xl' | 'max-w-5xl' | 'max-w-6xl';
   isLoading?: boolean;
   errorMessage?: string | null;
   children: ReactNode;
@@ -40,8 +40,8 @@ export function EntityFormPage({
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center gap-4 rounded-lg border border-border bg-card px-4 py-4 shadow-sm sm:px-6">
+    <div className="space-y-[var(--space-gap)]">
+      <header className="dms-surface flex items-center gap-4">
         <Button
           type="button"
           variant="outline"
@@ -56,9 +56,9 @@ export function EntityFormPage({
 
       <div className={cn('mx-auto w-full', maxWidth)}>
         {isLoading ? (
-          <p className="rounded-lg border border-border bg-card p-6 text-muted-foreground">{t('common.loading')}</p>
+          <p className="dms-surface text-muted-foreground">{t('common.loading')}</p>
         ) : errorMessage ? (
-          <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-6 text-destructive">{errorMessage}</p>
+          <p className="dms-surface border-destructive/40 bg-destructive/10 text-destructive">{errorMessage}</p>
         ) : (
           children
         )}

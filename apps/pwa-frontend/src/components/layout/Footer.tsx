@@ -15,7 +15,7 @@ export const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-card border-t border-border py-4 px-6 text-center text-sm text-muted-foreground">
+    <footer className="bg-footer text-footer-foreground border-t border-border py-4 px-6 text-center text-sm">
       <p>© {new Date().getFullYear()} Dojo Management Suite. {t('footer.rights')}</p>
     </footer>
   );

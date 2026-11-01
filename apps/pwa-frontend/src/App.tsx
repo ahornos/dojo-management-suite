@@ -16,26 +16,17 @@ const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
 const Users = lazy(() => import('@/pages/users/Users'));
 const UserCreatePage = lazy(() => import('@/pages/users/UserCreatePage'));
 const UserEditPage = lazy(() => import('@/pages/users/UserEditPage'));
-const Disciplines = lazy(() => import('@/pages/disciplines/Disciplines'));
-const DisciplineCreatePage = lazy(() => import('@/pages/disciplines/DisciplineCreatePage'));
-const DisciplineEditPage = lazy(() => import('@/pages/disciplines/DisciplineEditPage'));
 const Students = lazy(() => import('@/pages/students/Students'));
 const StudentCreatePage = lazy(() => import('@/pages/students/StudentCreatePage'));
 const StudentEditPage = lazy(() => import('@/pages/students/StudentEditPage'));
-const FinancialConfig = lazy(() => import('@/pages/financial/FinancialConfig'));
 const Federations = lazy(() => import('@/pages/financial/federations/Federations'));
 const FederationCreatePage = lazy(() => import('@/pages/financial/federations/FederationCreatePage'));
 const FederationEditPage = lazy(() => import('@/pages/financial/federations/FederationEditPage'));
 const Licenses = lazy(() => import('@/pages/financial/licenses/Licenses'));
 const BatchWizard = lazy(() => import('@/pages/financial/licenses/BatchWizard'));
-
-/**
- * Placeholder component for the Attendances view.
- */
-const Attendances = () => {
-  const { t } = useTranslation();
-  return <div className="bg-card p-6 rounded-lg shadow">{t('modules.attendances')}</div>;
-};
+const Attendances = lazy(() => import('@/pages/attendances/Attendances'));
+const AttendanceSession = lazy(() => import('@/pages/attendances/AttendanceSession'));
+const AcademySettings = lazy(() => import('@/pages/settings/AcademySettings'));
 
 /**
  * Placeholder component for the Graduations view.
@@ -53,6 +44,16 @@ const Graduations = () => {
 function LegacyFederationEditRedirect(): JSX.Element {
   const { id } = useParams<{ id: string }>();
   return <Navigate to={`/federations/${id}/edit`} replace />;
+}
+
+/**
+ * Preserves the session id when rewriting `/attendance/session/:id`.
+ *
+ * @returns {JSX.Element} Redirect to `/attendances/:id`.
+ */
+function LegacyAttendanceSessionRedirect(): JSX.Element {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/attendances/${id}`} replace />;
 }
 
 /**
@@ -80,9 +81,9 @@ function App() {
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'SPORTS_TECHNICAL_DIRECTOR']} />}>
-                <Route path="/disciplines" element={<Disciplines />} />
-                <Route path="/disciplines/new" element={<DisciplineCreatePage />} />
-                <Route path="/disciplines/:id/edit" element={<DisciplineEditPage />} />
+                <Route path="/disciplines" element={<Navigate to="/settings?tab=academic" replace />} />
+                <Route path="/disciplines/new" element={<Navigate to="/settings?tab=academic" replace />} />
+                <Route path="/disciplines/:id/edit" element={<Navigate to="/settings?tab=academic" replace />} />
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'INSTRUCTOR']} />}>
@@ -91,12 +92,25 @@ function App() {
                 <Route path="/students/:id/edit" element={<StudentEditPage />} />
               </Route>
 
-              <Route path="/attendances" element={<Attendances />} />
+              <Route
+                element={
+                  <ProtectedRoute
+                    allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'SPORTS_TECHNICAL_DIRECTOR', 'INSTRUCTOR']}
+                  />
+                }
+              >
+                <Route path="/attendances" element={<Attendances />} />
+                <Route path="/attendances/:sessionId" element={<AttendanceSession />} />
+                <Route path="/attendance" element={<Navigate to="/attendances" replace />} />
+                <Route path="/attendance/session/:id" element={<LegacyAttendanceSessionRedirect />} />
+              </Route>
               <Route path="/graduations" element={<Graduations />} />
 
               <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
-                <Route path="/financial" element={<Navigate to="/financial/config" replace />} />
-                <Route path="/financial/config" element={<FinancialConfig />} />
+                <Route path="/settings" element={<AcademySettings />} />
+                <Route path="/academy/config" element={<Navigate to="/settings" replace />} />
+                <Route path="/financial" element={<Navigate to="/settings?tab=billing" replace />} />
+                <Route path="/financial/config" element={<Navigate to="/settings?tab=billing" replace />} />
 
                 <Route path="/federations" element={<Federations />} />
                 <Route path="/federations/new" element={<FederationCreatePage />} />

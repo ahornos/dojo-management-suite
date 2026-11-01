@@ -41,11 +41,12 @@ export function studentBirthDate(student: StudentProfileResponse): string | unde
 
 /**
  * @param {number} age - Completed years, or -1 when unknown.
+ * @param {AgeGroupConfig[]} [ageGroups] - Tenant catalog (defaults to product ranges).
  * @returns {AgeGroupConfig | undefined} Matching configured bracket.
  */
-export function ageGroupForAge(age: number): AgeGroupConfig | undefined {
+export function ageGroupForAge(age: number, ageGroups: AgeGroupConfig[] = AGE_GROUPS): AgeGroupConfig | undefined {
   if (age < 0) return undefined;
-  return AGE_GROUPS.find((group) => age >= group.minAge && age <= group.maxAge);
+  return ageGroups.find((group) => age >= group.minAge && age <= group.maxAge);
 }
 
 /**
@@ -98,11 +99,13 @@ export function isDefaultStudentFilters(filters: StudentListFilters): boolean {
  *
  * @param {StudentProfileResponse[]} students - Unfiltered API rows.
  * @param {StudentListFilters} filters - Search and multi-selects.
+ * @param {AgeGroupConfig[]} [ageGroups] - Tenant catalog (defaults to product ranges).
  * @returns {StudentProfileResponse[]} Visible rows.
  */
 export function filterAndSortStudents(
   students: StudentProfileResponse[],
   filters: StudentListFilters,
+  ageGroups: AgeGroupConfig[] = AGE_GROUPS,
 ): StudentProfileResponse[] {
   const search = filters.searchTerm.trim().toLowerCase();
   const filtered = students.filter((student) => {
@@ -115,7 +118,7 @@ export function filterAndSortStudents(
     const age = calculateAge(birth);
     if (filters.selectedAgeGroups.length > 0) {
       const inBracket = filters.selectedAgeGroups.some((groupId) => {
-        const group = AGE_GROUPS.find((item) => item.id === groupId);
+        const group = ageGroups.find((item) => item.id === groupId);
         return Boolean(group && age >= group.minAge && age <= group.maxAge);
       });
       if (!inBracket) return false;

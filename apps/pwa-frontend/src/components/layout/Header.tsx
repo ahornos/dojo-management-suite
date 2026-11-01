@@ -1,12 +1,17 @@
 /**
  * @file Header.tsx
- * @description Top navigation bar containing dynamic user profile information, 
+ * @description Top navigation bar containing the sidebar rail toggle, brand, 
  * language switcher, and logout functionality.
  */
 
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tooltip } from '@/components/ui/tooltip';
+import { useAcademySettings } from '@/pages/settings/useAcademySettings';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useSidebarStore } from '@/store/useSidebarStore';
 
 /**
  * Renders the top header of the application layout.
@@ -21,6 +26,11 @@ export const Header = () => {
   
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const sidebarCollapsed = useSidebarStore((state) => state.collapsed);
+  const toggleSidebar = useSidebarStore((state) => state.toggleCollapsed);
+  const { data: academy } = useAcademySettings();
+  const brandName = academy?.tradeName || academy?.brandName || academy?.displayName;
+  const sidebarToggleLabel = sidebarCollapsed ? t('sidebar.expand') : t('sidebar.collapse');
 
   /**
    * Handles the language change event triggered by the select dropdown.
@@ -54,8 +64,33 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-card border-b border-border h-16 flex items-center justify-between px-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-foreground">{t('header.control_panel')}</h2>
+    <header className="bg-topbar text-topbar-foreground border-b border-border h-16 flex items-center justify-between px-4 shadow-[var(--shadow-card)] sm:px-6">
+      <div className="flex min-w-0 items-center gap-3">
+        <Tooltip content={sidebarToggleLabel}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            aria-expanded={!sidebarCollapsed}
+            aria-controls="dms-sidebar"
+            aria-label={sidebarToggleLabel}
+            className="shrink-0 text-topbar-foreground hover:bg-accent"
+          >
+            {sidebarCollapsed ? (
+              <PanelLeftOpen className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <PanelLeftClose className="h-5 w-5" aria-hidden="true" />
+            )}
+          </Button>
+        </Tooltip>
+        {academy?.logoUrl ? (
+          <img src={academy.logoUrl} alt="" className="h-8 max-w-[10rem] object-contain" />
+        ) : null}
+        <h2 className="truncate text-xl font-semibold">
+          {brandName || t('header.control_panel')}
+        </h2>
+      </div>
       
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
@@ -66,7 +101,7 @@ export const Header = () => {
             id="language-select"
             value={i18n.language ? i18n.language.substring(0, 2) : 'es'}
             onChange={handleLanguageChange}
-            className="text-sm bg-muted border border-input rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="text-sm bg-muted border border-input dms-control px-2 py-1 focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="es">{t('header.lang_es')}</option>
             <option value="ca">{t('header.lang_ca')}</option>
@@ -88,7 +123,7 @@ export const Header = () => {
           </div>
           <button 
             onClick={handleLogout}
-            className="ml-2 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors font-medium"
+            className="ml-2 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 dms-control transition-colors font-medium"
           >
             {t('header.logout')}
           </button>

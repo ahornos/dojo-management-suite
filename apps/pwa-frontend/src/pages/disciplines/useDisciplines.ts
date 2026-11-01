@@ -5,12 +5,12 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
-import { DisciplinePayload, BeltRankPayload } from './types';
+import { DisciplinePayload, BeltRankPayload, DisciplineProgramPayload } from './types';
 
 /**
- * Loads martial disciplines and exposes mutations for disciplines and belt ranks.
+ * Loads martial disciplines and exposes mutations for disciplines, programs, and belt ranks.
  *
- * @returns {{ disciplines: unknown[]; isLoading: boolean; error: unknown; createDiscipline: unknown; updateDiscipline: unknown; deleteDiscipline: unknown; saveBeltRank: unknown; deleteBeltRank: unknown }} Query state and mutations keyed on `['disciplines']`.
+ * @returns Query state and catalog mutations keyed on `['disciplines']`.
  */
 export function useDisciplines() {
   const queryClient = useQueryClient();
@@ -53,16 +53,34 @@ export function useDisciplines() {
     },
   });
 
+  const createProgramMutation = useMutation({
+    mutationFn: async ({ disciplineId, ...payload }: Pick<DisciplineProgramPayload, 'disciplineId' | 'name' | 'minAge' | 'maxAge'>) => {
+      const response = await apiClient.post(`/academic/disciplines/${disciplineId}/programs`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['disciplines'] });
+    },
+  });
+
+  const deleteProgramMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiClient.delete(`/academic/disciplines/programs/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['disciplines'] });
+    },
+  });
+
   const saveBeltRankMutation = useMutation({
     mutationFn: async (payload: BeltRankPayload) => {
-      const { id, ...data } = payload;
+      const { id, disciplineProgramId, ...data } = payload;
       if (id) {
-        const response = await apiClient.patch(`/academic/belt-ranks/${id}`, data);
-        return response.data;
-      } else {
-        const response = await apiClient.post('/academic/belt-ranks', payload);
+        const response = await apiClient.patch(`/academic/disciplines/belts/${id}`, data);
         return response.data;
       }
+      const response = await apiClient.post(`/academic/disciplines/programs/${disciplineProgramId}/belts`, data);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['disciplines'] });
@@ -71,7 +89,7 @@ export function useDisciplines() {
 
   const deleteBeltRankMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await apiClient.delete(`/academic/belt-ranks/${id}`);
+      const response = await apiClient.delete(`/academic/disciplines/belts/${id}`);
       return response.data;
     },
     onSuccess: () => {
@@ -86,6 +104,8 @@ export function useDisciplines() {
     createDiscipline: createDisciplineMutation,
     updateDiscipline: updateDisciplineMutation,
     deleteDiscipline: deleteDisciplineMutation,
+    createProgram: createProgramMutation,
+    deleteProgram: deleteProgramMutation,
     saveBeltRank: saveBeltRankMutation,
     deleteBeltRank: deleteBeltRankMutation,
   };
