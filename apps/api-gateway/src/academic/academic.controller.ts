@@ -82,4 +82,17 @@ export class AcademicController {
     const targetPath = req.originalUrl.replace('/api/academic', '/api');
     return this.proxyService.forwardRequest(`${this.targetUrl}${targetPath}`, req);
   }
+
+  /**
+   * Forwards affiliation license listing, expiry alerts, preview, and batch issuance.
+   *
+   * @param {Request} req - Incoming Express request.
+   * @returns {Promise<unknown>} Downstream academic-service response.
+   */
+  @All('licenses*')
+  @ApiOperation({ summary: 'Forward affiliation license requests' })
+  async proxyLicenses(@Req() req: Request) {
+    const targetPath = req.originalUrl.replace('/api/academic', '/api');
+    return this.proxyService.forwardRequest(`${this.targetUrl}${targetPath}`, req);
+  }
 }

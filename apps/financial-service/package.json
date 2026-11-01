@@ -4,8 +4,11 @@
   "description": "Financial service for Dojo Management Suite",
   "private": true,
   "scripts": {
+    "prebuild": "pnpm --workspace-root run ensure:workspace:build",
     "build": "nest build",
+    "prestart": "pnpm --workspace-root run ensure:workspace",
     "start": "nest start",
+    "prestart:dev": "pnpm --workspace-root run ensure:workspace",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

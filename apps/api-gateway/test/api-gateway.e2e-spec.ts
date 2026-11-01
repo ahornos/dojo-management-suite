@@ -18,6 +18,11 @@ describe('API Gateway (E2E)', () => {
   let httpService: HttpService;
 
   beforeAll(async () => {
+    process.env.JWT_SECRET ??= 'e2e-jwt-secret-not-a-placeholder';
+    process.env.AUTH_SERVICE_URL ??= 'http://auth-service:3000';
+    process.env.ACADEMIC_SERVICE_URL ??= 'http://academic-service:3000';
+    process.env.FINANCIAL_SERVICE_URL ??= 'http://financial-service:3000';
+
     // The upstream-failure test intentionally triggers the proxy's error log.
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 

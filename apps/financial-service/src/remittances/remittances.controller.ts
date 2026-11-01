@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Patch, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { RemittancesService } from './remittances.service';
 import { CreateBankMandateDto } from './dto/create-bank-mandate.dto';
 import { CreateRemittanceBatchDto } from './dto/create-remittance-batch.dto';
 import { UpdateRemittanceItemStatusDto } from './dto/update-remittance-item-status.dto';
-import { JwtAuthGuard, RolesGuard, Roles, CurrentUser } from '@dms/shared-auth';
+import { JwtAuthGuard, RolesGuard, Roles, CurrentUser, TenantId } from '@dms/shared-auth';
 import { Role } from '@dms/shared-types';
 
 /**
@@ -13,6 +13,7 @@ import { Role } from '@dms/shared-types';
  */
 @ApiTags('Financial - SEPA Remittances')
 @ApiBearerAuth()
+@ApiHeader({ name: 'x-school-id', required: true, description: 'Tenant (academy) identifier.' })
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('financial/remittances')
 /**
@@ -27,7 +28,7 @@ export class RemittancesController {
   /**
    * Registers a new bank mandate for a student debtor.
    *
-   * @param {CreateBankMandateDto} dto - Mandate reference, IBAN/BIC, and signature date.
+   * @param {CreateBankMandateDto} dto - Mandate reference, IBAN/BIC, account holder, and signature date.
    * @returns {Promise<object>} The persisted mandate.
    */
   @Post('mandates')
@@ -43,14 +44,19 @@ export class RemittancesController {
    *
    * @param {CreateRemittanceBatchDto} dto - Batch reference, execution date, and collection items.
    * @param {string} userId - Authenticated operator recorded as `generatedById`.
+   * @param {string} tenantId - Academy key from `x-school-id`.
    * @returns {Promise<object>} The batch with items and `xmlPreview`.
    */
   @Post('batches')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
   @ApiOperation({ summary: 'Generate a new SEPA direct debit remittance batch file' })
   @ApiResponse({ status: 201, description: 'Remittance batch successfully generated.' })
-  async generateBatch(@Body() dto: CreateRemittanceBatchDto, @CurrentUser('userId') userId: string) {
-    return this.remittancesService.generateBatch(dto, userId);
+  async generateBatch(
+    @Body() dto: CreateRemittanceBatchDto,
+    @CurrentUser('userId') userId: string,
+    @TenantId() tenantId: string,
+  ) {
+    return this.remittancesService.generateBatch(dto, userId, tenantId);
   }
 
   /**

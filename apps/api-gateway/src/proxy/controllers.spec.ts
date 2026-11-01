@@ -70,37 +70,44 @@ describe('Gateway proxy controllers', () => {
     await controller.proxyStudents(req('/api/academic/students/9'));
     await controller.proxyAttendances(req('/api/academic/attendances'));
     await controller.proxyGraduations(req('/api/academic/graduations'));
+    await controller.proxyLicenses(req('/api/academic/licenses/expiring'));
 
     expect(proxy.forwardRequest.mock.calls.map(([url]) => url)).toEqual([
       'http://academic.internal:3000/api/disciplines?x=1',
       'http://academic.internal:3000/api/students/9',
       'http://academic.internal:3000/api/attendances',
       'http://academic.internal:3000/api/graduations',
+      'http://academic.internal:3000/api/licenses/expiring',
     ]);
   });
 
   it('FinancialController forwards every financial route to FINANCIAL_SERVICE_URL', async () => {
     const controller = await build(FinancialController);
 
+    await controller.proxyConfig(req('/api/financial/config'));
     await controller.proxyCash(req('/api/financial/cash/sessions'));
     await controller.proxyFees(req('/api/financial/fees'));
+    await controller.proxyMandates(req('/api/financial/mandates'));
+    await controller.proxyMandates(req('/api/financial/mandates/mandate-1/sign'));
     await controller.proxyRemittances(req('/api/financial/remittances/batches'));
     await controller.proxyDiscounts(req('/api/financial/discounts'));
+    await controller.proxyFederations(req('/api/financial/federations'));
 
     expect(proxy.forwardRequest.mock.calls.map(([url]) => url)).toEqual([
+      'http://financial.internal:3000/api/financial/config',
       'http://financial.internal:3000/api/financial/cash/sessions',
       'http://financial.internal:3000/api/financial/fees',
+      'http://financial.internal:3000/api/financial/mandates',
+      'http://financial.internal:3000/api/financial/mandates/mandate-1/sign',
       'http://financial.internal:3000/api/financial/remittances/batches',
       'http://financial.internal:3000/api/financial/discounts',
+      'http://financial.internal:3000/api/financial/federations',
     ]);
   });
 
-  it('falls back to the default URLs when nothing is configured', async () => {
+  it('refuses to boot a proxy controller when downstream URLs are missing', async () => {
     for (const key of Object.keys(settings)) delete settings[key];
-    const controller = await build(AuthController);
 
-    await controller.login(req('/api/auth/login'));
-
-    expect(proxy.forwardRequest.mock.calls[0][0]).toBe('http://auth-service:3000/api/auth/login');
+    await expect(build(AuthController)).rejects.toThrow(/AUTH_SERVICE_URL/);
   });
 });

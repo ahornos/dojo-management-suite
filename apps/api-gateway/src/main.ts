@@ -16,6 +16,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  // Honor X-Forwarded-For from the reverse proxy so `req.ip` is the browser, not the Docker hop.
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+
   app.use(helmet());
 
   app.enableCors({

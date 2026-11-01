@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { AuthController } from './auth/auth.controller';
 import { AcademicController } from './academic/academic.controller';
 import { FinancialController } from './financial/financial.controller';
+import { validateEnv } from './config/env.validation';
 
 /**
  * @file app.module.ts
@@ -19,6 +20,8 @@ import { FinancialController } from './financial/financial.controller';
     // 1. Load global environment variables (.env)
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['../../.env', '.env'],
+      validate: validateEnv,
     }),
 
     // 2. Configure Rate Limiting (Throttler)

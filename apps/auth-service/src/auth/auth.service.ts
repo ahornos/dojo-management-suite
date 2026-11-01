@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@dms/shared-types';
 import { Prisma } from '@dms/database/client';
+import { randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -99,11 +100,11 @@ export class AuthService {
 
   /**
    * Creates a new user account administratively from the management dashboard.
-   * Includes validation for email and DNI uniqueness.
+   * Includes validation for email uniqueness.
    * 
    * @param {CreateUserDto} dto - Validated payload containing user details, personal data, and roles array.
    * @returns {Promise<Object>} The created user record excluding password hash.
-   * @throws {BadRequestException} If the email or DNI is already registered.
+   * @throws {BadRequestException} If the email is already registered.
    */
   async createUser(dto: CreateUserDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -114,17 +115,7 @@ export class AuthService {
       throw new BadRequestException('EMAIL_ALREADY_REGISTERED');
     }
 
-    if (dto.dni?.trim()) {
-      const existingDni = await this.prisma.user.findUnique({
-        where: { dni: dto.dni },
-      });
-      if (existingDni) {
-        throw new BadRequestException('DNI_ALREADY_REGISTERED');
-      }
-    }
-
-    // Encrypt the provided password or default to a safe temporary one
-    const hashedPassword = await bcrypt.hash(dto.password || 'TemporaryPassword123!', 10);
+    const hashedPassword = await bcrypt.hash(this.resolveInitialPassword(dto.password), 10);
 
     const newUser = await this.prisma.user.create({
       data: {
@@ -132,14 +123,7 @@ export class AuthService {
         passwordHash: hashedPassword,
         firstName: dto.firstName,
         lastName: dto.lastName,
-        dni: dto.dni || null,
-        birthDate: dto.birthDate ? new Date(dto.birthDate) : null,
-        phone: dto.phone || null,
-        address: dto.address || null,
-        city: dto.city || null,
-        state: dto.state || null,
-        postalCode: dto.postalCode || null,
-        country: dto.country || 'ES',
+        gender: dto.gender ?? null,
         roles: dto.roles || [Role.STUDENT],
         isActive: dto.isActive ?? true,
       },
@@ -166,7 +150,7 @@ export class AuthService {
   }
 
   /**
-   * Updates user profile data, including personal info, address, roles array, status, and optional password reset.
+   * Updates login identity fields, roles, status, and optional password reset.
    * 
    * @param {string} id - User unique identifier.
    * @param {UpdateUserDto} dto - Validated payload with the fields to update.
@@ -186,16 +170,12 @@ export class AuthService {
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
-      dni: dto.dni || null,
-      birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
-      phone: dto.phone || null,
-      address: dto.address || null,
-      city: dto.city || null,
-      state: dto.state || null,
-      postalCode: dto.postalCode || null,
-      country: dto.country || 'ES',
       isActive: dto.isActive,
     };
+
+    if (dto.gender !== undefined) {
+      updateData.gender = dto.gender;
+    }
 
     if (dto.roles) {
       updateData.roles = dto.roles;
@@ -240,5 +220,20 @@ export class AuthService {
     return {
       message: 'Usuario eliminado exitosamente',
     };
+  }
+
+  /**
+   * Uses the operator-supplied password, or a cryptographically random one when omitted
+   * (the account stays unusable until a password reset / email invite exists).
+   *
+   * @param {string | undefined} password - Optional explicit password from the admin form.
+   * @returns {string} Password to hash. Never a hardcoded default.
+   */
+  private resolveInitialPassword(password?: string): string {
+    const explicit = password?.trim();
+    if (explicit) {
+      return explicit;
+    }
+    return randomBytes(24).toString('base64url');
   }
 }

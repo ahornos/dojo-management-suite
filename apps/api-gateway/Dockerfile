@@ -11,7 +11,7 @@ WORKDIR /app
 
 RUN apk add --no-cache openssl libc6-compat \
   && corepack enable \
-  && corepack prepare pnpm@9.12.1 --activate
+  && corepack prepare pnpm@12.6.0 --activate
 
 FROM base AS deps
 

@@ -38,6 +38,23 @@ describe('GlobalExceptionFilter', () => {
     expect(body).toMatchObject({ statusCode: 400, path: '/api/x', message: ['a must be a string'] });
   });
 
+  it('forwards a proxied downstream ValidationPipe body without swallowing the array', () => {
+    const downstream = {
+      statusCode: 400,
+      error: 'Bad Request',
+      message: ['iban must be an IBAN', 'accountHolderDni should not be empty'],
+    };
+    const { status: code, body } = run(new HttpException(downstream, 400));
+
+    expect(code).toBe(400);
+    expect(body.message).toEqual(['iban must be an IBAN', 'accountHolderDni should not be empty']);
+  });
+
+  it('forwards a raw validation message array used as the HttpException body', () => {
+    const { body } = run(new HttpException(['iban must be an IBAN'], 400));
+    expect(body.message).toEqual(['iban must be an IBAN']);
+  });
+
   it('uses the exception message for plain-string HttpExceptions', () => {
     expect(run(new HttpException('MY_CODE', 409)).body.message).toBe('MY_CODE');
   });
@@ -68,6 +85,20 @@ describe('GlobalExceptionFilter', () => {
 
     expect(code).toBe(404);
     expect(body.message).toBe('NOT_FOUND');
+  });
+
+  it('propagates an Axios 400 validation array from response.data.message', () => {
+    const { status: code, body } = run({
+      isAxiosError: true,
+      message: 'Request failed with status code 400',
+      response: {
+        status: 400,
+        data: { statusCode: 400, message: ['iban must be an IBAN'] },
+      },
+    });
+
+    expect(code).toBe(400);
+    expect(body.message).toEqual(['iban must be an IBAN']);
   });
 
   it('falls back to the Axios message when the response has no message', () => {

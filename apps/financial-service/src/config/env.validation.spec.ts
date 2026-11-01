@@ -33,4 +33,13 @@ describe('validateEnv (financial-service)', () => {
   ])('throws a fatal error when JWT_SECRET is %s', (_label, value) => {
     expect(() => validateEnv({ ...validConfig(), JWT_SECRET: value })).toThrow(/JWT_SECRET/);
   });
+
+  it.each(['replace-with-a-long-random-secret', 'your-jwt-secret'])(
+    'rejects production JWT_SECRET placeholder %s',
+    (secret) => {
+      expect(() => validateEnv({ ...validConfig(), NODE_ENV: 'production', JWT_SECRET: secret })).toThrow(
+        /placeholder/,
+      );
+    },
+  );
 });

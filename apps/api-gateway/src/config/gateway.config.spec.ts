@@ -4,7 +4,7 @@
  */
 
 import { ConfigService } from '@nestjs/config';
-import { DEFAULT_ALLOWED_ORIGIN, SERVICE_URL_DEFAULTS, readNumber, resolveAllowedOrigins, resolveServiceUrl } from './gateway.config';
+import { DEFAULT_ALLOWED_ORIGIN, readNumber, resolveAllowedOrigins, resolveServiceUrl } from './gateway.config';
 
 /**
  * Builds a ConfigService double backed by a plain object.
@@ -20,8 +20,8 @@ describe('gateway.config', () => {
       expect(resolveServiceUrl(config({ AUTH_SERVICE_URL: 'http://auth:3000//' }), 'AUTH_SERVICE_URL')).toBe('http://auth:3000');
     });
 
-    it.each(['AUTH_SERVICE_URL', 'ACADEMIC_SERVICE_URL', 'FINANCIAL_SERVICE_URL'] as const)('defaults %s when unset', (key) => {
-      expect(resolveServiceUrl(config({}), key)).toBe(SERVICE_URL_DEFAULTS[key]);
+    it.each(['AUTH_SERVICE_URL', 'ACADEMIC_SERVICE_URL', 'FINANCIAL_SERVICE_URL'] as const)('throws when %s is unset', (key) => {
+      expect(() => resolveServiceUrl(config({}), key)).toThrow(new RegExp(key));
     });
   });
 

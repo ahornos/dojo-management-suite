@@ -11,16 +11,14 @@ import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
-  IsDateString,
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  Length,
   MinLength,
 } from 'class-validator';
-import { Role } from '@dms/shared-types';
+import { Gender, Role } from '@dms/shared-types';
 import { emptyToUndefined } from '../../common/transforms/empty-to-undefined';
 
 export class CreateUserDto {
@@ -29,7 +27,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiPropertyOptional({ example: 'SecurePassword123!', description: 'Initial password; a temporary one is used when omitted.' })
+  @ApiPropertyOptional({
+    example: 'SecurePassword123!',
+    description: 'Initial password. When omitted, a cryptographically random password is generated (unusable until reset).',
+  })
   @Transform(emptyToUndefined)
   @IsOptional()
   @IsString()
@@ -46,54 +47,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiPropertyOptional({ description: 'National identity number (unique).' })
+  @ApiPropertyOptional({ enum: Gender, description: 'Optional gender for competition categories and stats.' })
   @Transform(emptyToUndefined)
   @IsOptional()
-  @IsString()
-  dni?: string;
-
-  @ApiPropertyOptional({ example: '1990-05-21', description: 'ISO 8601 birth date.' })
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsDateString()
-  birthDate?: string;
-
-  @ApiPropertyOptional()
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  phone?: string;
-
-  @ApiPropertyOptional()
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  address?: string;
-
-  @ApiPropertyOptional()
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  city?: string;
-
-  @ApiPropertyOptional()
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  state?: string;
-
-  @ApiPropertyOptional()
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  postalCode?: string;
-
-  @ApiPropertyOptional({ example: 'ES', description: 'ISO 3166-1 alpha-2 country code.' })
-  @Transform(emptyToUndefined)
-  @IsOptional()
-  @IsString()
-  @Length(2, 2)
-  country?: string;
+  @IsEnum(Gender)
+  gender?: Gender;
 
   @ApiPropertyOptional({ enum: Role, isArray: true, description: 'Assigned roles; defaults to [STUDENT].' })
   @IsOptional()

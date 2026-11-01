@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, PreconditionFailedException } from '@nestjs/common';
 import { Prisma } from '@dms/database/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBankMandateDto } from './dto/create-bank-mandate.dto';
@@ -42,11 +42,13 @@ export class RemittancesService {
 
     return this.prisma.bankMandate.create({
       data: {
-        studentProfileId: dto.studentProfileId,
+        payerUserId: dto.payerUserId,
         iban: dto.iban,
         bic: dto.bic,
         mandateReference: dto.mandateReference,
         signatureDate: new Date(dto.signatureDate),
+        accountHolderName: dto.accountHolderName,
+        accountHolderDni: dto.accountHolderDni,
         isActive: dto.isActive ?? true,
       },
     });
@@ -58,11 +60,13 @@ export class RemittancesService {
    *
    * @param {CreateRemittanceBatchDto} dto - Batch reference, execution date and items to collect.
    * @param {string} userId - Identifier of the user generating the batch (audit).
+   * @param {string} tenantId - Academy key from `x-school-id`; creditor IBAN is read from TenantFinancialConfig.
    * @returns {Promise<object>} The persisted batch with its items plus an `xmlPreview` of the SEPA file.
    * @throws {BadRequestException} If the batch exists, a mandate is missing/inactive, or a debtor identity cannot be resolved.
+   * @throws {PreconditionFailedException} If the tenant has no creditor IBAN configured.
    * @throws {ServiceUnavailableException} If the auth-service is unreachable.
    */
-  async generateBatch(dto: CreateRemittanceBatchDto, userId: string) {
+  async generateBatch(dto: CreateRemittanceBatchDto, userId: string, tenantId: string) {
     const existingBatch = await this.prisma.remittanceBatch.findUnique({
       where: { batchReference: dto.batchReference },
     });
@@ -71,11 +75,12 @@ export class RemittancesService {
       throw new BadRequestException('REMITTANCE_BATCH_ALREADY_EXISTS');
     }
 
+    const creditor = await this.requireTenantCreditor(tenantId);
+
     // 1. Single query for every mandate involved (the profile is only read for its identity reference).
     const mandateIds = Array.from(new Set(dto.items.map((item) => item.mandateId)));
     const mandates = await this.prisma.bankMandate.findMany({
       where: { id: { in: mandateIds } },
-      include: { student: { select: { userId: true } } },
     });
     const mandatesById = new Map(mandates.map((mandate) => [mandate.id, mandate]));
 
@@ -88,17 +93,21 @@ export class RemittancesService {
       }
     }
 
-    // 3. Single batch call for all debtors, merged in memory below.
-    const debtors = await this.usersClient.findManyByIds(mandates.map((mandate) => mandate.student.userId));
+    // 3. Single batch call for payers (the User who owns the IBAN).
+    const debtors = await this.usersClient.findManyByIds(
+      mandates.map((mandate) => mandate.payerUserId),
+    );
 
     let totalAmount = new Prisma.Decimal(0);
     const itemsWithMandates = [];
 
     for (const item of dto.items) {
       const mandate = mandatesById.get(item.mandateId)!;
-      const debtor = debtors.get(mandate.student.userId);
+      const holderId = mandate.payerUserId;
+      const debtor = debtors.get(holderId);
+      const debtorName = mandate.accountHolderName.trim() || (debtor ? `${debtor.firstName} ${debtor.lastName}` : '');
 
-      if (!debtor) {
+      if (!debtorName) {
         throw new BadRequestException('DEBTOR_IDENTITY_NOT_FOUND');
       }
 
@@ -111,18 +120,17 @@ export class RemittancesService {
         mandateReference: mandate.mandateReference,
         signatureDate: mandate.signatureDate,
         debtorIban: mandate.iban,
-        debtorName: `${debtor.firstName} ${debtor.lastName}`,
+        debtorName,
         status: RemittanceItemStatus.PENDING,
       });
     }
 
-    // Generate the SEPA XML content (pain.008)
     const sepaXmlContent = generateSepaXml({
       batchReference: dto.batchReference,
       executionDate: new Date(dto.executionDate),
-      creditorName: 'Dojo Management Suite SL',
-      creditorIban: process.env.DOJO_CREDITOR_IBAN || 'ES9100000000000000000000',
-      creditorBic: process.env.DOJO_CREDITOR_BIC || 'DEMOESXX',
+      creditorName: creditor.legalName,
+      creditorIban: creditor.iban,
+      creditorBic: creditor.bic,
       items: itemsWithMandates,
     });
 
@@ -155,6 +163,27 @@ export class RemittancesService {
     return {
       ...batch,
       xmlPreview: sepaXmlContent, // Useful for debugging or immediate download
+    };
+  }
+
+  /**
+   * Loads the tenant SEPA creditor identity. IBAN is mandatory; there is no demo fallback.
+   *
+   * @param {string} tenantId - Academy key from `x-school-id`.
+   * @returns {Promise<{ legalName: string; iban: string; bic?: string }>} Creditor fields for pain.008.
+   * @throws {PreconditionFailedException} If the tenant config is missing or its IBAN is blank.
+   */
+  private async requireTenantCreditor(tenantId: string): Promise<{ legalName: string; iban: string; bic?: string }> {
+    const config = await this.prisma.tenantFinancialConfig.findUnique({ where: { tenantId } });
+    const iban = config?.iban?.trim() ?? '';
+    if (!config || !iban) {
+      throw new PreconditionFailedException('TENANT_CREDITOR_IBAN_MISSING');
+    }
+
+    return {
+      legalName: config.legalName.trim(),
+      iban,
+      bic: config.bic?.trim() || undefined,
     };
   }
 

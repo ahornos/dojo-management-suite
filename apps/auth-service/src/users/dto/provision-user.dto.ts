@@ -1,7 +1,7 @@
 /**
  * @file provision-user.dto.ts
  * @description Validated payload of `POST /api/internal/users/provision`.
- * The grantable role is restricted to STUDENT and PARENT so an internal caller can never mint privileged accounts.
+ * The grantable role is restricted to STUDENT, PARENT, and TRIAL so an internal caller can never mint privileged accounts.
  */
 
 import { IsEmail, IsIn, IsOptional, IsUUID } from 'class-validator';
@@ -20,6 +20,6 @@ export class ProvisionUserDto extends UpdatePersonalDataDto implements Provision
   @IsEmail()
   email?: string;
 
-  @IsIn([Role.STUDENT, Role.PARENT])
+  @IsIn([Role.STUDENT, Role.PARENT, Role.TRIAL])
   role: ProvisionableRole;
 }

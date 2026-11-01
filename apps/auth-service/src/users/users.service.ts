@@ -7,7 +7,7 @@
 
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@dms/database/client';
-import { Role, UserSummary } from '@dms/shared-types';
+import { Gender, Role, UserSummary } from '@dms/shared-types';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,10 +15,10 @@ import { ProvisionUserDto } from './dto/provision-user.dto';
 import { UpdatePersonalDataDto } from './dto/update-personal-data.dto';
 
 /** String columns that map 1:1 from the DTO to the `User` model. */
-const TEXT_FIELDS = ['firstName', 'lastName', 'phone', 'address', 'city', 'state', 'postalCode', 'country'] as const;
+const TEXT_FIELDS = ['firstName', 'lastName'] as const;
 
 /** Mutable personal-data columns shared by the create and update Prisma inputs. */
-type PersonalDataPatch = Partial<Pick<User, (typeof TEXT_FIELDS)[number] | 'dni' | 'birthDate'>>;
+type PersonalDataPatch = Partial<Pick<User, (typeof TEXT_FIELDS)[number] | 'gender'>>;
 
 /**
  * @class UsersService
@@ -48,6 +48,24 @@ export class UsersService {
   }
 
   /**
+   * Lists active users that hold at least one of the given roles.
+   *
+   * @param {Role[]} roles - Roles to match (`hasSome`).
+   * @returns {Promise<UserSummary[]>} Matching identities.
+   */
+  async findByRoles(roles: Role[]): Promise<UserSummary[]> {
+    if (roles.length === 0) {
+      return [];
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: { isActive: true, roles: { hasSome: roles } },
+      orderBy: { lastName: 'asc' },
+    });
+    return users.map((user) => this.toSummary(user));
+  }
+
+  /**
    * Finds (by id, then email) or creates a user and grants it the requested role.
    * Idempotent: repeating the call never duplicates the user nor the role. New accounts get an
    * unknown random password, so they stay unusable until a password reset.
@@ -56,11 +74,10 @@ export class UsersService {
    * @returns {Promise<UserSummary>} The resulting user.
    * @throws {NotFoundException} If `userId` is given but does not exist.
    * @throws {BadRequestException} If a new user lacks email, firstName, or lastName.
-   * @throws {ConflictException} If the DNI or email belongs to another user.
+   * @throws {ConflictException} If the email belongs to another user.
    */
   async provision(dto: ProvisionUserDto): Promise<UserSummary> {
     const existing = await this.findExisting(dto);
-    await this.assertDniAvailable(dto.dni, existing?.id);
 
     try {
       if (existing) {
@@ -83,7 +100,6 @@ export class UsersService {
           email: dto.email,
           firstName: dto.firstName,
           lastName: dto.lastName,
-          country: dto.country || 'ES',
           passwordHash,
           roles: [dto.role],
         },
@@ -105,7 +121,7 @@ export class UsersService {
    * @param {UpdatePersonalDataDto} dto - Fields to update.
    * @returns {Promise<UserSummary>} The updated user.
    * @throws {NotFoundException} If the user does not exist.
-   * @throws {ConflictException} If the DNI belongs to another user.
+   * @throws {ConflictException} If a unique constraint is violated.
    */
   async updatePersonalData(id: string, dto: UpdatePersonalDataDto): Promise<UserSummary> {
     const user = await this.prisma.user.findUnique({ where: { id } });
@@ -113,8 +129,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('USER_NOT_FOUND');
     }
-
-    await this.assertDniAvailable(dto.dni, id);
 
     const updated = await this.prisma.user.update({ where: { id }, data: this.buildPatch(dto, false) });
     return this.toSummary(updated);
@@ -142,26 +156,6 @@ export class UsersService {
   }
 
   /**
-   * Guarantees a DNI is not already registered to a different user.
-   *
-   * @param {string | undefined} dni - DNI about to be stored.
-   * @param {string | undefined} ownerId - User allowed to hold it (the one being updated).
-   * @returns {Promise<void>} Resolves when the DNI is free or already owned by `ownerId`.
-   * @throws {ConflictException} If another user holds the DNI.
-   */
-  private async assertDniAvailable(dni: string | undefined, ownerId: string | undefined): Promise<void> {
-    if (!dni) {
-      return;
-    }
-
-    const holder = await this.prisma.user.findUnique({ where: { dni } });
-
-    if (holder && holder.id !== ownerId) {
-      throw new ConflictException('USER_DNI_ALREADY_REGISTERED');
-    }
-  }
-
-  /**
    * Builds the Prisma data patch from the DTO, keeping only fields that were actually sent.
    *
    * @param {UpdatePersonalDataDto} dto - Source payload.
@@ -178,13 +172,8 @@ export class UsersService {
       }
     }
 
-    if (dto.dni !== undefined && !(skipEmpty && dto.dni === '')) {
-      // An empty DNI means "none"; storing '' would collide on the unique index.
-      patch.dni = dto.dni === '' ? null : dto.dni;
-    }
-
-    if (dto.birthDate) {
-      patch.birthDate = new Date(dto.birthDate);
+    if (dto.gender !== undefined) {
+      patch.gender = dto.gender;
     }
 
     return patch;
@@ -202,14 +191,7 @@ export class UsersService {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      dni: user.dni,
-      birthDate: user.birthDate ? user.birthDate.toISOString() : null,
-      phone: user.phone,
-      address: user.address,
-      city: user.city,
-      state: user.state,
-      postalCode: user.postalCode,
-      country: user.country,
+      gender: user.gender as Gender | null,
       isActive: user.isActive,
       roles: user.roles as Role[],
     };

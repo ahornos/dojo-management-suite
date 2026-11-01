@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, ServiceUnavailableException, Logger } from '@nestjs/common';
+import { BadRequestException, PreconditionFailedException, ServiceUnavailableException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { of, throwError } from 'rxjs';
 import { UsersDirectoryClient } from '../users-directory/users-directory.client';
@@ -47,7 +47,8 @@ describe('RemittancesService', () => {
     signatureDate: new Date('2026-01-01'),
     iban: 'ES9112345678901234567890',
     isActive: true,
-    student: { userId },
+    payerUserId: userId,
+    accountHolderName: '',
     ...overrides,
   });
 
@@ -67,6 +68,9 @@ describe('RemittancesService', () => {
     remittanceItem: {
       findUnique: jest.fn().mockResolvedValue({ id: 'item-uuid', status: RemittanceItemStatus.PENDING }),
       update: jest.fn().mockImplementation((args) => Promise.resolve({ id: args.where.id, ...args.data })),
+    },
+    tenantFinancialConfig: {
+      findUnique: jest.fn(),
     },
   };
 
@@ -95,17 +99,27 @@ describe('RemittancesService', () => {
   describe('createMandate', () => {
     it('should create a bank mandate successfully', async () => {
       const dto = {
-        studentProfileId: 'student-uuid',
+        payerUserId: '22222222-2222-4222-8222-222222222222',
         iban: 'ES9112345678901234567890',
         mandateReference: 'MANDATE-001',
         signatureDate: '2026-01-01T00:00:00.000Z',
+        accountHolderName: 'Ana Garcia',
+        accountHolderDni: '12345678Z',
       };
       const result = await service.createMandate(dto);
-      expect(result).toEqual(expect.objectContaining({ mandateReference: 'MANDATE-001' }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          mandateReference: 'MANDATE-001',
+          accountHolderName: 'Ana Garcia',
+          accountHolderDni: '12345678Z',
+          payerUserId: '22222222-2222-4222-8222-222222222222',
+        }),
+      );
     });
   });
 
   describe('generateBatch', () => {
+    const tenantId = 'fox-jiujitsu-academy';
     const dto = {
       batchReference: 'REM-2026-01',
       executionDate: '2026-04-05T00:00:00.000Z',
@@ -114,8 +128,15 @@ describe('RemittancesService', () => {
         { mandateId: 'mandate-uuid-2', amount: 30.0 },
       ],
     };
+    const runBatch = (payload = dto) => service.generateBatch(payload, 'user-uuid', tenantId);
 
     beforeEach(() => {
+      mockPrismaService.tenantFinancialConfig.findUnique.mockResolvedValue({
+        tenantId,
+        legalName: 'Academia Fox SL',
+        iban: 'ES9121000418450200051332',
+        bic: 'CAIXESBBXXX',
+      });
       mockPrismaService.bankMandate.findMany.mockResolvedValue([
         buildMandate('mandate-uuid-1', 'user-1'),
         buildMandate('mandate-uuid-2', 'user-2'),
@@ -131,7 +152,7 @@ describe('RemittancesService', () => {
     });
 
     it('should generate a remittance batch with XML preview and correct calculations', async () => {
-      const result = await service.generateBatch(dto, 'user-uuid');
+      const result = await runBatch();
 
       expect(result).toEqual(
         expect.objectContaining({
@@ -147,15 +168,31 @@ describe('RemittancesService', () => {
       expect(result.xmlPreview).toContain('REM-2026-01');
       expect(result.xmlPreview).toContain('John Doe');
       expect(result.xmlPreview).toContain('Jane Roe');
+      expect(result.xmlPreview).toContain('Academia Fox SL');
+      expect(result.xmlPreview).toContain('ES9121000418450200051332');
+      expect(result.xmlPreview).not.toContain('ES9100000000000000000000');
+    });
+
+    it('puts the stored account-holder name in the SEPA XML and looks up payerUserId once', async () => {
+      mockPrismaService.bankMandate.findMany.mockResolvedValue([
+        buildMandate('mandate-uuid-1', 'parent-1', { accountHolderName: 'Ana Garcia' }),
+        buildMandate('mandate-uuid-2', 'parent-1', { accountHolderName: 'Ana Garcia' }),
+      ]);
+      mockHttp.post.mockReturnValue(of({ data: [{ id: 'parent-1', firstName: 'Ana', lastName: 'Garcia' }] }));
+
+      const result = await runBatch();
+
+      expect(mockHttp.post.mock.calls[0][1]).toEqual({ ids: ['parent-1'] });
+      expect(result.xmlPreview).toContain('Ana Garcia');
+      expect(result.xmlPreview).not.toContain('John Doe');
     });
 
     it('resolves all mandates with one query and all debtors with ONE batch HTTP request (no N+1)', async () => {
-      await service.generateBatch(dto, 'user-uuid');
+      await runBatch();
 
       expect(mockPrismaService.bankMandate.findMany).toHaveBeenCalledTimes(1);
       expect(mockPrismaService.bankMandate.findMany).toHaveBeenCalledWith({
         where: { id: { in: ['mandate-uuid-1', 'mandate-uuid-2'] } },
-        include: { student: { select: { userId: true } } },
       });
       expect(mockHttp.post).toHaveBeenCalledTimes(1);
       expect(mockHttp.post).toHaveBeenCalledWith(
@@ -169,10 +206,10 @@ describe('RemittancesService', () => {
       mockPrismaService.bankMandate.findMany.mockResolvedValue([buildMandate('mandate-uuid-1', 'user-1')]);
       mockHttp.post.mockReturnValue(of({ data: [{ id: 'user-1', firstName: 'John', lastName: 'Doe' }] }));
 
-      const result = await service.generateBatch(
-        { ...dto, items: [{ mandateId: 'mandate-uuid-1', amount: 10 }, { mandateId: 'mandate-uuid-1', amount: 15 }] },
-        'user-uuid',
-      );
+      const result = await runBatch({
+        ...dto,
+        items: [{ mandateId: 'mandate-uuid-1', amount: 10 }, { mandateId: 'mandate-uuid-1', amount: 15 }],
+      });
 
       expect(mockPrismaService.bankMandate.findMany.mock.calls[0][0].where.id.in).toEqual(['mandate-uuid-1']);
       expect(mockHttp.post.mock.calls[0][1]).toEqual({ ids: ['user-1'] });
@@ -180,17 +217,17 @@ describe('RemittancesService', () => {
     });
 
     it('sums money exactly (0.1 + 0.2 collections)', async () => {
-      const result = await service.generateBatch(
-        { ...dto, items: [{ mandateId: 'mandate-uuid-1', amount: 0.1 }, { mandateId: 'mandate-uuid-2', amount: 0.2 }] },
-        'user-uuid',
-      );
+      const result = await runBatch({
+        ...dto,
+        items: [{ mandateId: 'mandate-uuid-1', amount: 0.1 }, { mandateId: 'mandate-uuid-2', amount: 0.2 }],
+      });
 
       expect(result.totalAmount.toString()).toBe('0.3');
       expect(result.xmlPreview).toContain('<CtrlSum>0.30</CtrlSum>');
     });
 
     it('uses collision-safe UUID-based item ids that fit the SEPA EndToEndId limit and match the stored items', async () => {
-      const result = await service.generateBatch(dto, 'user-uuid');
+      const result = await runBatch();
 
       const stored = mockPrismaService.remittanceBatch.create.mock.calls[0][0].data.items.create as { id: string }[];
       const ids = stored.map((item) => item.id);
@@ -207,7 +244,7 @@ describe('RemittancesService', () => {
     it('never relies on Math.random for identifiers', async () => {
       const randomSpy = jest.spyOn(Math, 'random');
 
-      await service.generateBatch(dto, 'user-uuid');
+      await runBatch();
 
       expect(randomSpy).not.toHaveBeenCalled();
       randomSpy.mockRestore();
@@ -216,14 +253,14 @@ describe('RemittancesService', () => {
     it('rejects a batch whose reference already exists', async () => {
       mockPrismaService.remittanceBatch.findUnique.mockResolvedValueOnce({ id: 'existing' });
 
-      await expect(service.generateBatch(dto, 'user-uuid')).rejects.toThrow(BadRequestException);
+      await expect(runBatch()).rejects.toThrow(BadRequestException);
       expect(mockPrismaService.bankMandate.findMany).not.toHaveBeenCalled();
     });
 
     it('rejects a missing mandate before calling the auth-service', async () => {
       mockPrismaService.bankMandate.findMany.mockResolvedValue([buildMandate('mandate-uuid-1', 'user-1')]);
 
-      await expect(service.generateBatch(dto, 'user-uuid')).rejects.toThrow(BadRequestException);
+      await expect(runBatch()).rejects.toThrow(BadRequestException);
       expect(mockHttp.post).not.toHaveBeenCalled();
       expect(mockPrismaService.remittanceBatch.create).not.toHaveBeenCalled();
     });
@@ -234,14 +271,14 @@ describe('RemittancesService', () => {
         buildMandate('mandate-uuid-2', 'user-2', { isActive: false }),
       ]);
 
-      await expect(service.generateBatch(dto, 'user-uuid')).rejects.toThrow(BadRequestException);
+      await expect(runBatch()).rejects.toThrow(BadRequestException);
       expect(mockHttp.post).not.toHaveBeenCalled();
     });
 
     it('rejects the batch when a debtor identity cannot be resolved', async () => {
       mockHttp.post.mockReturnValue(of({ data: [{ id: 'user-1', firstName: 'John', lastName: 'Doe' }] }));
 
-      await expect(service.generateBatch(dto, 'user-uuid')).rejects.toThrow('DEBTOR_IDENTITY_NOT_FOUND');
+      await expect(runBatch()).rejects.toThrow('DEBTOR_IDENTITY_NOT_FOUND');
       expect(mockPrismaService.remittanceBatch.create).not.toHaveBeenCalled();
     });
 
@@ -250,8 +287,24 @@ describe('RemittancesService', () => {
         throwError(() => Object.assign(new Error('unauthorized'), { isAxiosError: true, response: { status: 401, data: {} } })),
       );
 
-      await expect(service.generateBatch(dto, 'user-uuid')).rejects.toThrow(ServiceUnavailableException);
+      await expect(runBatch()).rejects.toThrow(ServiceUnavailableException);
       expect(mockPrismaService.remittanceBatch.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects generation when the tenant has no creditor IBAN', async () => {
+      mockPrismaService.tenantFinancialConfig.findUnique.mockResolvedValue({ tenantId, legalName: 'Academia Fox SL', iban: '' });
+
+      await expect(runBatch()).rejects.toThrow(PreconditionFailedException);
+      await expect(runBatch()).rejects.toThrow('TENANT_CREDITOR_IBAN_MISSING');
+      expect(mockHttp.post).not.toHaveBeenCalled();
+      expect(mockPrismaService.remittanceBatch.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects generation when the tenant financial config is missing', async () => {
+      mockPrismaService.tenantFinancialConfig.findUnique.mockResolvedValue(null);
+
+      await expect(runBatch()).rejects.toThrow(PreconditionFailedException);
+      expect(mockHttp.post).not.toHaveBeenCalled();
     });
   });
 

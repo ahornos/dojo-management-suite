@@ -15,8 +15,8 @@ import { validateEnv } from './config/env.validation';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // Service-local .env first, then the monorepo root .env used for local development.
-      envFilePath: ['.env', '../../.env'],
+      // Monorepo root is the single catalog; local `.env` is a leftover fallback only.
+      envFilePath: ['../../.env', '.env'],
       validate: validateEnv,
     }),
     PrismaModule,

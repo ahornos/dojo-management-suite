@@ -11,6 +11,7 @@ import { UserSummary } from '@dms/shared-types';
 import { InternalApiKeyGuard } from './guards/internal-api-key.guard';
 import { UsersService } from './users.service';
 import { UserBatchDto } from './dto/user-batch.dto';
+import { UserByRolesDto } from './dto/user-by-roles.dto';
 import { ProvisionUserDto } from './dto/provision-user.dto';
 import { UpdatePersonalDataDto } from './dto/update-personal-data.dto';
 
@@ -37,6 +38,18 @@ export class InternalUsersController {
   @HttpCode(HttpStatus.OK)
   batch(@Body() dto: UserBatchDto): Promise<UserSummary[]> {
     return this.usersService.findManyByIds(dto.ids);
+  }
+
+  /**
+   * Lists active users matching any of the given roles.
+   *
+   * @param {UserByRolesDto} dto - Roles to match.
+   * @returns {Promise<UserSummary[]>} Matching identities.
+   */
+  @Post('by-roles')
+  @HttpCode(HttpStatus.OK)
+  findByRoles(@Body() dto: UserByRolesDto): Promise<UserSummary[]> {
+    return this.usersService.findByRoles(dto.roles);
   }
 
   /**

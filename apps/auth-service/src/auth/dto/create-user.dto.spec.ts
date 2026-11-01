@@ -7,7 +7,7 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { Role } from '@dms/shared-types';
+import { Gender, Role } from '@dms/shared-types';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 
@@ -33,21 +33,26 @@ describe('CreateUserDto', () => {
 
   it('accepts the full management-form payload with empty optional inputs', async () => {
     const { dto, errors } = await check(CreateUserDto, {
-      ...valid, password: '', dni: '', birthDate: '', phone: '', address: '', city: '', state: '', postalCode: '',
-      country: 'ES', roles: [Role.STUDENT, Role.PARENT], isActive: true,
+      ...valid, password: '', gender: '', roles: [Role.STUDENT, Role.PARENT], isActive: true,
     });
 
     expect(errors).toEqual([]);
     expect(dto.password).toBeUndefined();
-    expect(dto.birthDate).toBeUndefined();
+    expect(dto.gender).toBeUndefined();
+  });
+
+  it('accepts optional gender and treats an empty string as omitted', async () => {
+    expect((await check(CreateUserDto, { ...valid, gender: Gender.FEMALE })).errors).toEqual([]);
+    const { dto, errors } = await check(CreateUserDto, { ...valid, gender: '' });
+    expect(errors).toEqual([]);
+    expect(dto.gender).toBeUndefined();
   });
 
   it.each([
     ['invalid email', { email: 'nope' }, 'email'],
     ['missing first name', { firstName: '' }, 'firstName'],
     ['short password', { password: 'short' }, 'password'],
-    ['malformed birth date', { birthDate: '21/05/1990' }, 'birthDate'],
-    ['bad country code', { country: 'ESP' }, 'country'],
+    ['unknown gender', { gender: 'UNKNOWN' }, 'gender'],
     ['unknown role', { roles: ['HACKER'] }, 'roles'],
     ['empty roles array', { roles: [] }, 'roles'],
     ['non-boolean isActive', { isActive: 'yes' }, 'isActive'],

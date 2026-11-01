@@ -1,19 +1,21 @@
-import { IsString, IsNotEmpty, IsBoolean, IsOptional, IsDateString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsString, IsNotEmpty, IsBoolean, IsOptional, IsDateString, IsIBAN } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { toIban } from '../../common/iban';
 
 /**
  * @file create-bank-mandate.dto.ts
  * @description Data Transfer Object for registering a signed SEPA direct debit bank mandate.
  */
 export class CreateBankMandateDto {
-  @ApiProperty({ description: 'ID of the student profile associated with the mandate', example: 'uuid-student' })
+  @ApiProperty({ description: 'Auth-service user id of the payer who owns the IBAN', example: 'uuid-payer' })
   @IsString()
   @IsNotEmpty()
-  studentProfileId: string;
+  payerUserId: string;
 
-  @ApiProperty({ description: 'Debtor IBAN account number', example: 'ES9121000418450200051234' })
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Debtor IBAN account number. Spaces and hyphens are stripped before validation.', example: 'ES9121000418450200051332' })
+  @Transform(({ value }) => toIban(value))
+  @IsIBAN()
   iban: string;
 
   @ApiPropertyOptional({ description: 'BIC / SWIFT code of the debtor bank', example: 'CAIXESBBXXX' })
@@ -29,6 +31,17 @@ export class CreateBankMandateDto {
   @ApiProperty({ description: 'Date when the mandate was signed by the student/guardian', example: '2026-01-15T00:00:00.000Z' })
   @IsDateString()
   signatureDate: string;
+
+  @ApiProperty({ description: 'Legal name of the bank account holder (SEPA debtor)', example: 'Ana Garcia' })
+  @IsString()
+  @IsNotEmpty()
+  accountHolderName: string;
+
+  @ApiProperty({ description: 'DNI/NIF/NIE of the account holder (CaixaBank SEPA requirement)', example: '12345678Z' })
+  @IsString()
+  @IsNotEmpty()
+  accountHolderDni: string;
+
 
   @ApiPropertyOptional({ description: 'Mandate activation status', default: true })
   @IsBoolean()

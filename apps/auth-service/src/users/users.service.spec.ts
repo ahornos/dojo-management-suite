@@ -6,7 +6,7 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@dms/database/client';
-import { Role } from '@dms/shared-types';
+import { Gender, Role } from '@dms/shared-types';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from './users.service';
@@ -25,14 +25,7 @@ const buildUser = (overrides: Record<string, unknown> = {}): Record<string, unkn
   passwordHash: 'secret-hash',
   firstName: 'Ana',
   lastName: 'Gómez',
-  dni: null,
-  birthDate: new Date('2010-05-01T00:00:00.000Z'),
-  phone: null,
-  address: null,
-  city: null,
-  state: null,
-  postalCode: null,
-  country: 'ES',
+  gender: null,
   isActive: true,
   roles: [Role.STUDENT],
   ...overrides,
@@ -64,11 +57,32 @@ describe('UsersService', () => {
       expect(prisma.user.findMany).toHaveBeenCalledTimes(1);
       expect(result).toHaveLength(1);
       expect(result[0]).not.toHaveProperty('passwordHash');
-      expect(result[0].birthDate).toBe('2010-05-01T00:00:00.000Z');
+      expect(result[0].email).toBe('ana@dojo.test');
+      expect(result[0]).not.toHaveProperty('dni');
+      expect(result[0]).not.toHaveProperty('birthDate');
     });
 
     it('short-circuits without touching the database for an empty list', async () => {
       await expect(service.findManyByIds([])).resolves.toEqual([]);
+      expect(prisma.user.findMany).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('findByRoles', () => {
+    it('queries active users matching any of the given roles', async () => {
+      prisma.user.findMany.mockResolvedValue([buildUser({ roles: [Role.INSTRUCTOR] })]);
+
+      const result = await service.findByRoles([Role.INSTRUCTOR]);
+
+      expect(prisma.user.findMany).toHaveBeenCalledWith({
+        where: { isActive: true, roles: { hasSome: [Role.INSTRUCTOR] } },
+        orderBy: { lastName: 'asc' },
+      });
+      expect(result[0].roles).toEqual([Role.INSTRUCTOR]);
+    });
+
+    it('short-circuits without touching the database for an empty role list', async () => {
+      await expect(service.findByRoles([])).resolves.toEqual([]);
       expect(prisma.user.findMany).not.toHaveBeenCalled();
     });
   });
@@ -85,7 +99,6 @@ describe('UsersService', () => {
           email: 'ana@dojo.test',
           passwordHash: 'hashed-random-password',
           roles: [Role.STUDENT],
-          country: 'ES',
         }),
       });
       expect(bcrypt.hash).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f]{24}$/), 10);
@@ -104,12 +117,11 @@ describe('UsersService', () => {
       prisma.user.findUnique.mockResolvedValue(buildUser({ roles: [Role.PARENT] }));
       prisma.user.update.mockResolvedValue(buildUser({ roles: [Role.PARENT, Role.STUDENT] }));
 
-      await service.provision({ email: 'ana@dojo.test', role: Role.STUDENT, phone: '', city: 'Madrid' });
+      await service.provision({ email: 'ana@dojo.test', role: Role.STUDENT, firstName: 'Ana' });
 
       const { data } = prisma.user.update.mock.calls[0][0];
       expect(data.roles).toEqual([Role.PARENT, Role.STUDENT]);
-      expect(data.city).toBe('Madrid');
-      expect(data).not.toHaveProperty('phone');
+      expect(data.firstName).toBe('Ana');
       expect(prisma.user.create).not.toHaveBeenCalled();
     });
 
@@ -130,17 +142,6 @@ describe('UsersService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('throws ConflictException when the DNI belongs to another user', async () => {
-      prisma.user.findUnique
-        .mockResolvedValueOnce(buildUser())
-        .mockResolvedValueOnce(buildUser({ id: 'another-user' }));
-
-      await expect(service.provision({ email: 'ana@dojo.test', dni: '12345678Z', role: Role.STUDENT })).rejects.toThrow(
-        ConflictException,
-      );
-      expect(prisma.user.update).not.toHaveBeenCalled();
-    });
-
     it('maps a unique-constraint race to ConflictException', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
       prisma.user.create.mockRejectedValue(
@@ -154,25 +155,36 @@ describe('UsersService', () => {
   });
 
   describe('updatePersonalData', () => {
-    it('applies only the provided fields and converts birthDate to a Date', async () => {
+    it('applies only login-identity fields and ignores StudentProfile demographics', async () => {
       prisma.user.findUnique.mockResolvedValue(buildUser());
-      prisma.user.update.mockResolvedValue(buildUser({ phone: '600' }));
+      prisma.user.update.mockResolvedValue(buildUser({ firstName: 'Anita' }));
 
       await service.updatePersonalData('11111111-1111-4111-8111-111111111111', {
-        phone: '600',
-        birthDate: '2011-01-02',
+        firstName: 'Anita',
       });
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: '11111111-1111-4111-8111-111111111111' },
-        data: { phone: '600', birthDate: new Date('2011-01-02') },
+        data: { firstName: 'Anita' },
+      });
+    });
+
+    it('persists optional gender without affecting omitted fields', async () => {
+      prisma.user.findUnique.mockResolvedValue(buildUser());
+      prisma.user.update.mockResolvedValue(buildUser({ gender: Gender.FEMALE }));
+
+      await service.updatePersonalData('11111111-1111-4111-8111-111111111111', { gender: Gender.FEMALE });
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: '11111111-1111-4111-8111-111111111111' },
+        data: { gender: Gender.FEMALE },
       });
     });
 
     it('throws NotFoundException for an unknown user', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.updatePersonalData('missing', { phone: '600' })).rejects.toThrow(NotFoundException);
+      await expect(service.updatePersonalData('missing', { firstName: 'Anita' })).rejects.toThrow(NotFoundException);
       expect(prisma.user.update).not.toHaveBeenCalled();
     });
   });

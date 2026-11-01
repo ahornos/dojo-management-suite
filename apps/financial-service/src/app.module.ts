@@ -6,6 +6,9 @@ import { FeesModule } from './fees/fees.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { CashModule } from './cash/cash.module';
 import { RemittancesModule } from './remittances/remittances.module';
+import { BankMandatesModule } from './bank-mandates/bank-mandates.module';
+import { FinancialConfigModule } from './financial-config/financial-config.module';
+import { FederationsModule } from './federations/federations.module';
 import { validateEnv } from './config/env.validation';
 
 /**
@@ -17,8 +20,8 @@ import { validateEnv } from './config/env.validation';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // Service-local .env first, then the monorepo root .env used for local development.
-      envFilePath: ['.env', '../../.env'],
+      // Monorepo root is the single catalog; local `.env` is a leftover fallback only.
+      envFilePath: ['../../.env', '.env'],
       validate: validateEnv,
     }),
     PrismaModule,
@@ -26,7 +29,10 @@ import { validateEnv } from './config/env.validation';
     FeesModule,
     DiscountsModule,
     CashModule,
-    RemittancesModule
+    RemittancesModule,
+    BankMandatesModule,
+    FinancialConfigModule,
+    FederationsModule,
   ],
 })
 export class AppModule {}

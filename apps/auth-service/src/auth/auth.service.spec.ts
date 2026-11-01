@@ -180,8 +180,6 @@ describe('AuthService', () => {
       email: 'new@dojo.com',
       firstName: 'New',
       lastName: 'User',
-      dni: '12345678Z',
-      birthDate: '1990-05-21',
       roles: [Role.INSTRUCTOR],
       password: 'SecurePassword123!',
     };
@@ -195,13 +193,15 @@ describe('AuthService', () => {
       const data = mockPrismaService.user.create.mock.calls[0][0].data;
       expect(await bcrypt.compare('SecurePassword123!', data.passwordHash)).toBe(true);
       expect(data).toMatchObject({
-        email: 'new@dojo.com', roles: [Role.INSTRUCTOR], isActive: true, country: 'ES',
-        phone: null, address: null, birthDate: new Date('1990-05-21'),
+        email: 'new@dojo.com', roles: [Role.INSTRUCTOR], isActive: true, gender: null,
       });
+      expect(data).not.toHaveProperty('dni');
+      expect(data).not.toHaveProperty('birthDate');
+      expect(data).not.toHaveProperty('country');
       expect(result.user).not.toHaveProperty('passwordHash');
     });
 
-    it('falls back to the STUDENT role and a temporary password when omitted', async () => {
+    it('falls back to the STUDENT role and a cryptographically random password when omitted', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
       mockPrismaService.user.create.mockImplementation(async ({ data }) => ({ id: 'uuid-new', ...data }));
 
@@ -209,9 +209,10 @@ describe('AuthService', () => {
 
       const data = mockPrismaService.user.create.mock.calls[0][0].data;
       expect(data.roles).toEqual([Role.STUDENT]);
-      expect(data.dni).toBeNull();
-      expect(data.birthDate).toBeNull();
+      expect(data).not.toHaveProperty('dni');
+      expect(data).not.toHaveProperty('birthDate');
       expect(data.passwordHash).toEqual(expect.any(String));
+      expect(await bcrypt.compare('TemporaryPassword123!', data.passwordHash)).toBe(false);
     });
 
     it('rejects a duplicated email', async () => {
@@ -221,12 +222,6 @@ describe('AuthService', () => {
       expect(mockPrismaService.user.create).not.toHaveBeenCalled();
     });
 
-    it('rejects a duplicated DNI', async () => {
-      mockPrismaService.user.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'other' });
-
-      await expect(service.createUser(dto)).rejects.toThrow(BadRequestException);
-      expect(mockPrismaService.user.create).not.toHaveBeenCalled();
-    });
   });
 
   describe('updateUser', () => {
@@ -235,11 +230,12 @@ describe('AuthService', () => {
       mockPrismaService.user.update.mockImplementation(async ({ data }) => ({ id: 'u1', ...data }));
 
       const result = await service.updateUser('u1', {
-        firstName: 'Ann', roles: [Role.ADMIN_STAFF], password: 'NewPassword123!', birthDate: '1991-01-02', isActive: false,
+        firstName: 'Ann', roles: [Role.ADMIN_STAFF], password: 'NewPassword123!', isActive: false,
       });
 
       const data = mockPrismaService.user.update.mock.calls[0][0].data;
-      expect(data).toMatchObject({ firstName: 'Ann', roles: [Role.ADMIN_STAFF], isActive: false, birthDate: new Date('1991-01-02') });
+      expect(data).toMatchObject({ firstName: 'Ann', roles: [Role.ADMIN_STAFF], isActive: false });
+      expect(data).not.toHaveProperty('birthDate');
       expect(await bcrypt.compare('NewPassword123!', data.passwordHash)).toBe(true);
       expect(result.user).not.toHaveProperty('passwordHash');
     });

@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start:dev": "nest start --watch",
+    "prebuild": "pnpm --workspace-root run ensure:workspace:build",
     "build": "nest build",
+    "prestart:dev": "pnpm --workspace-root run ensure:workspace",
+    "start:dev": "nest start --watch",
     "start:prod": "node dist/main",
     "test": "jest",
     "test:watch": "jest --watch",

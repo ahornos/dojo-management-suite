@@ -16,7 +16,12 @@ import { UserBatchDto, USER_BATCH_MAX_SIZE } from './dto/user-batch.dto';
 
 describe('InternalUsersController', () => {
   let controller: InternalUsersController;
-  const usersService = { findManyByIds: jest.fn(), provision: jest.fn(), updatePersonalData: jest.fn() };
+  const usersService = {
+    findManyByIds: jest.fn(),
+    findByRoles: jest.fn(),
+    provision: jest.fn(),
+    updatePersonalData: jest.fn(),
+  };
   const pipe = new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true });
 
   beforeEach(async () => {
@@ -41,6 +46,13 @@ describe('InternalUsersController', () => {
     expect(usersService.findManyByIds).toHaveBeenCalledWith(['u1']);
   });
 
+  it('delegates role lookups to the service', async () => {
+    usersService.findByRoles.mockResolvedValue([{ id: 'inst-1' }]);
+
+    await expect(controller.findByRoles({ roles: [Role.INSTRUCTOR] })).resolves.toEqual([{ id: 'inst-1' }]);
+    expect(usersService.findByRoles).toHaveBeenCalledWith([Role.INSTRUCTOR]);
+  });
+
   it('delegates provisioning to the service', async () => {
     const dto: ProvisionUserDto = { email: 'a@b.co', role: Role.PARENT };
     usersService.provision.mockResolvedValue({ id: 'u1' });
@@ -51,9 +63,9 @@ describe('InternalUsersController', () => {
   });
 
   it('delegates personal data updates to the service', async () => {
-    await controller.updatePersonalData('id-1', { phone: '600' });
+    await controller.updatePersonalData('id-1', { firstName: 'Anita' });
 
-    expect(usersService.updatePersonalData).toHaveBeenCalledWith('id-1', { phone: '600' });
+    expect(usersService.updatePersonalData).toHaveBeenCalledWith('id-1', { firstName: 'Anita' });
   });
 
   describe('DTO validation', () => {

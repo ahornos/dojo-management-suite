@@ -32,4 +32,23 @@ describe('validateEnv (auth-service)', () => {
   ])('throws a fatal error when JWT_SECRET is %s', (_label, value) => {
     expect(() => validateEnv({ ...validConfig(), JWT_SECRET: value })).toThrow(/JWT_SECRET/);
   });
+
+  it('allows catalog placeholders outside production', () => {
+    expect(
+      validateEnv({
+        ...validConfig(),
+        NODE_ENV: 'development',
+        JWT_SECRET: 'replace-with-a-long-random-secret',
+      }),
+    ).toMatchObject({ JWT_SECRET: 'replace-with-a-long-random-secret' });
+  });
+
+  it.each(['replace-with-a-long-random-secret', 'your-jwt-secret'])(
+    'rejects production JWT_SECRET placeholder %s',
+    (secret) => {
+      expect(() => validateEnv({ ...validConfig(), NODE_ENV: 'production', JWT_SECRET: secret })).toThrow(
+        /placeholder/,
+      );
+    },
+  );
 });

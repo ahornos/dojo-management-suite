@@ -9,13 +9,6 @@ import { ConfigService } from '@nestjs/config';
 /** Environment keys holding the internal base URL of each downstream microservice. */
 export type ServiceUrlKey = 'AUTH_SERVICE_URL' | 'ACADEMIC_SERVICE_URL' | 'FINANCIAL_SERVICE_URL';
 
-/** Fallback base URLs (internal Docker network names / local dev ports). */
-export const SERVICE_URL_DEFAULTS: Record<ServiceUrlKey, string> = {
-  AUTH_SERVICE_URL: 'http://auth-service:3000',
-  ACADEMIC_SERVICE_URL: 'http://localhost:3002',
-  FINANCIAL_SERVICE_URL: 'http://financial-service:3000',
-};
-
 /** Default CORS origin (Vite dev server). */
 export const DEFAULT_ALLOWED_ORIGIN = 'http://localhost:5173';
 
@@ -30,7 +23,11 @@ export const DEFAULT_PORT = 3000;
  * @returns {string} Base URL without a trailing slash.
  */
 export function resolveServiceUrl(config: ConfigService, key: ServiceUrlKey): string {
-  return (config.get<string>(key) || SERVICE_URL_DEFAULTS[key]).replace(/\/+$/, '');
+  const value = config.get<string>(key)?.trim();
+  if (!value) {
+    throw new Error(`FATAL: environment variable ${key} is required and must not be empty.`);
+  }
+  return value.replace(/\/+$/, '');
 }
 
 /**

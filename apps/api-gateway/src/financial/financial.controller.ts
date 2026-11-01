@@ -29,6 +29,19 @@ export class FinancialController {
   }
 
   /**
+   * Forwards academy financial configuration (`/api/financial/config`) to the financial-service.
+   * Authorization and `x-school-id` are propagated by `ProxyService`.
+   *
+   * @param {Request} req - Incoming Express request.
+   * @returns {Promise<unknown>} Downstream financial-service response.
+   */
+  @All('financial/config*')
+  @ApiOperation({ summary: 'Forward academy financial configuration requests' })
+  async proxyConfig(@Req() req: Request) {
+    return this.proxyService.forwardRequest(`${this.targetUrl}${req.originalUrl}`, req);
+  }
+
+  /**
    * @description Catch-all route to forward daily cash register and POS requests.
    * @param {Request} req - The incoming Express request object.
    * @returns {Promise<any>} The transparent response from the financial-service.
@@ -51,6 +64,20 @@ export class FinancialController {
   }
 
   /**
+   * Forwards SEPA mandate registration, lookup, and clickwrap sign (`PATCH .../mandates/:id/sign`).
+   * `ProxyService` stamps `authorization`, `x-school-id`, `x-forwarded-for`, and `x-real-ip`
+   * (client IP from `req.ip` with `trust proxy` enabled). User id is never taken from the body.
+   *
+   * @param {Request} req - Incoming Express request.
+   * @returns {Promise<unknown>} Downstream financial-service response.
+   */
+  @All('financial/mandates*')
+  @ApiOperation({ summary: 'Forward SEPA bank-mandate requests' })
+  async proxyMandates(@Req() req: Request) {
+    return this.proxyService.forwardRequest(`${this.targetUrl}${req.originalUrl}`, req);
+  }
+
+  /**
    * @description Catch-all route to forward SEPA direct debit batch requests.
    * @param {Request} req - The incoming Express request object.
    * @returns {Promise<any>} The transparent response from the financial-service.
@@ -69,6 +96,18 @@ export class FinancialController {
   @All('financial/discounts*')
   @ApiOperation({ summary: 'Forward all financial discount requests' })
   async proxyDiscounts(@Req() req: Request) {
+    return this.proxyService.forwardRequest(`${this.targetUrl}${req.originalUrl}`, req);
+  }
+
+  /**
+   * Forwards federation catalog, seasonal charges, and payout budgets.
+   *
+   * @param {Request} req - Incoming Express request.
+   * @returns {Promise<unknown>} Downstream financial-service response.
+   */
+  @All('financial/federations*')
+  @ApiOperation({ summary: 'Forward federation catalog and budget requests' })
+  async proxyFederations(@Req() req: Request) {
     return this.proxyService.forwardRequest(`${this.targetUrl}${req.originalUrl}`, req);
   }
 }
