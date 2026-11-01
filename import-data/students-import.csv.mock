@@ -1,0 +1,8 @@
+firstName,lastName,email,dni,phone,birthDate,gender,address,city,state,postalCode,country,status,startDate,endDate,leaveReason,iban,accountHolderName,accountHolderDni,parentFirstName,parentLastName,parentEmail,parentPhone,parentDni
+Ana,Gomez,ana.gomez@dojo.test,12345678Z,600111222,1990-01-15,FEMALE,Carrer Major 1,Barcelona,Barcelona,08001,ES,ACTIVE,2024-09-01,,,ES91 2100 0418 4502 0005 1332,Ana Gomez,12345678Z,,,,
+Ana,Gomez,ana.gomez@dojo.test,12345678Z,600111222,1990-01-15,FEMALE,Carrer Major 1,Barcelona,Barcelona,08001,ES,ACTIVE,2024-09-01,,,ES91 2100 0418 4502 0005 1332,Ana Gomez,12345678Z,,,,
+Luis,Perez,luis.perez@dojo.test,,,,,ES,ACTIVE,2025-01-10,,,,,,,,,
+Marta,Ruiz,marta.ruiz@dojo.test,87654321X,600333444,1988-06-20,FEMALE,,Barcelona,,,ES,PAUSED,2023-09-01,2026-02-01,ECONOMIC,,,,,,
+Joan,Solà,joan.sola@dojo.test,11223344A,600555666,1985-03-03,MALE,,Barcelona,,,ES,DROPPED,2022-09-01,2025-07-15,MOVED,,,,,,
+Carla,Vidal,carla.vidal@dojo.test,55667788B,600777888,1992-11-11,FEMALE,,Barcelona,,,ES,ACTIVE,2025-09-01,,,2100 0418 4502 0005 1332,Carla Vidal,55667788B,,,,
+Nil,Marti,nil.marti@dojo.test,,600999000,2014-05-01,MALE,,Barcelona,,,ES,ACTIVE,2025-09-01,,,,,,Laura,Marti,laura.marti@dojo.test,611000111,99887766C
