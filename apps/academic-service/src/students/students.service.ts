@@ -4,15 +4,19 @@
  * Owns profiles, guardians' links, enrollments, ranks and the status audit log. Identities (users) are owned
  * by the auth-service: they are provisioned/updated over HTTP BEFORE the local Prisma transaction opens
  * (no network I/O while holding DB locks) and merged in memory when building responses.
+ *
+ * Adults have a login `User` linked via `StudentProfile.userId`. Minors have no User (`userId` is null)
+ * and are reachable through `StudentGuardian` → parent `User`.
  */
 
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { instanceToPlain } from 'class-transformer';
-import { Prisma } from '@dms/database/client';
+import { Prisma, StudentStatus } from '@dms/database/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser, Role, UserSummary } from '@dms/shared-types';
-import { CreateStudentDto, GuardianDto, StudentDisciplineAssignmentDto, StudentStatusEnum } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { CreateStudentDto, GuardianDto, StudentDisciplineAssignmentDto, StudentStatusEnum, StudentUserDataDto } from './dto/create-student.dto';
+import { CreateTrialStudentDto, isTrialAdult } from './dto/create-trial-student.dto';
+import { UpdateStudentDto, UpdateStudentUserDataDto } from './dto/update-student.dto';
 import { UsersDirectoryClient } from '../users-directory/users-directory.client';
 
 /** Roles allowed to read any student profile. */
@@ -28,6 +32,28 @@ interface ResolvedGuardian {
   userId: string;
   relationship: string | undefined;
 }
+
+/** Profile fields needed to build a public identity projection. */
+interface ProfileIdentitySource {
+  userId: string | null;
+  firstName: string;
+  lastName: string;
+  dni: string | null;
+  birthDate: Date | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string | null;
+  country: string | null;
+  gender: string | null;
+}
+
+/** Display identity returned on student payloads. Login `id`/`email` are null for minors. */
+type PublicStudentIdentity = Omit<UserSummary, 'id' | 'email'> & {
+  id: string | null;
+  email: string | null;
+};
 
 /**
  * Academic owner of student profiles, guardian links, enrollments, ranks, and status history.
@@ -49,10 +75,10 @@ export class StudentsService {
    * Identities (student, guardians, and status-change authors) come from ONE batch call and are merged in memory.
    *
    * @param {string} id - Student profile UUID.
-   * @param {AuthenticatedUser} requestUser - Authenticated caller (staff or the profile owner).
+   * @param {AuthenticatedUser} requestUser - Authenticated caller (staff, owner, or linked parent).
    * @returns {Promise<object>} Profile enriched with `user`, `guardians[].guardian.user` and `statusHistory[].changedBy`.
    * @throws {NotFoundException} If the profile does not exist.
-   * @throws {ForbiddenException} If the caller is neither staff nor the owner.
+   * @throws {ForbiddenException} If the caller is neither staff, owner, nor a linked guardian.
    * @throws {ServiceUnavailableException} If the auth-service is unreachable.
    */
   async findOne(id: string, requestUser: AuthenticatedUser) {
@@ -67,17 +93,13 @@ export class StudentsService {
 
     if (!student) throw new NotFoundException('STUDENT_PROFILE_NOT_FOUND');
 
-    this.assertCanRead(student.userId, requestUser);
+    this.assertCanRead(student, requestUser);
 
-    const users = await this.usersClient.findManyByIds([
-      student.userId,
-      ...student.guardians.map((link) => link.guardian.userId),
-      ...student.statusHistory.map((entry) => entry.changedById),
-    ]);
+    const users = await this.usersClient.findManyByIds(this.collectIdentityIds([student]));
 
     return {
       ...student,
-      user: users.get(student.userId) ?? null,
+      user: this.toPublicIdentity(student, users),
       statusHistory: student.statusHistory.map((entry) => {
         const author = entry.changedById ? users.get(entry.changedById) : undefined;
         return { ...entry, changedBy: author ? { firstName: author.firstName, lastName: author.lastName } : null };
@@ -90,34 +112,114 @@ export class StudentsService {
   }
 
   /**
-   * Creates a student profile. Identities are provisioned over HTTP first (idempotent, safe to retry);
-   * the profile, audit log, guardian links and ranks are then written in a single local transaction.
-   * If that transaction fails, the provisioned identities stay (no cross-service rollback).
+   * Creates a student profile. Adult identities are provisioned over HTTP first (idempotent, safe to retry).
+   * Minors have no User: only parent/guardian identities are provisioned, then the profile is stored with
+   * `userId: null`. Academic writes run in a single local transaction.
    *
    * @param {CreateStudentDto} payload - Student, guardians, emergency contacts and disciplines.
    * @param {AuthenticatedUser} [requestUser] - Caller, recorded as author of the initial status entry.
-   * @returns {Promise<object>} The new profile plus the student's resolved `user`.
+   * @returns {Promise<object>} The new profile plus the student's resolved `user` (null id for minors).
    * @throws {NotFoundException} If an explicit `userId` does not exist in the auth-service.
-   * @throws {BadRequestException} If the user already has a student profile.
+   * @throws {BadRequestException} If the user already has a student profile, a minor has no guardians, or an adult has no email.
    * @throws {ConflictException} If a DNI belongs to another identity.
    * @throws {ServiceUnavailableException} If the auth-service is unreachable.
    */
   async create(payload: CreateStudentDto, requestUser?: AuthenticatedUser) {
     const { isMinor, guardians, disciplines } = payload;
 
+    if (isMinor && !guardians?.length) {
+      throw new BadRequestException('GUARDIANS_REQUIRED_FOR_MINOR');
+    }
+    if (!isMinor && !payload.isExistingUser && !payload.userData.email) {
+      throw new BadRequestException('STUDENT_EMAIL_REQUIRED');
+    }
+
     // Network I/O happens before the transaction opens so no DB locks are held while waiting on the auth-service.
-    const studentUser = await this.provisionStudentIdentity(payload);
+    const studentUser = isMinor ? null : await this.provisionStudentIdentity(payload);
     const resolvedGuardians = isMinor && guardians?.length ? await this.provisionGuardians(guardians) : [];
 
     // Single atomic unit: if any step fails, nothing local is persisted.
     const studentProfile = await this.prisma.$transaction(async (tx) => {
-      const profile = await this.createCoreProfile(tx, studentUser.id, payload, requestUser);
+      const profile = await this.createCoreProfile(tx, studentUser?.id ?? null, payload, requestUser);
       await this.linkGuardians(tx, profile.id, resolvedGuardians);
       await this.assignDisciplines(tx, profile.id, disciplines ?? []);
       return profile;
     });
 
-    return { ...studentProfile, user: studentUser };
+    return {
+      ...studentProfile,
+      user: studentUser ?? this.toPublicIdentity(studentProfile, new Map()),
+      guardians: resolvedGuardians.map((link) => ({
+        guardian: { userId: link.userId, user: { id: link.userId } },
+      })),
+    };
+  }
+
+  /**
+   * Registers a TRIAL prospect. Adults get a lightweight auth-service identity (`Role.TRIAL`).
+   * Minors exist only as a `StudentProfile` (`userId` null) with guardian contact on emergencyContacts.
+   *
+   * @param {CreateTrialStudentDto} payload - Prospect identity, age-dependent contacts, and discipline.
+   * @param {AuthenticatedUser} [requestUser] - Caller recorded on the initial status-history row.
+   * @returns {Promise<object>} The TRIAL profile plus the provisioned identity (null user id for minors).
+   * @throws {BadRequestException} If the discipline does not exist or the identity already has a profile.
+   * @throws {ServiceUnavailableException} If the auth-service is unreachable.
+   */
+  async createTrial(payload: CreateTrialStudentDto, requestUser?: AuthenticatedUser) {
+    const discipline = await this.prisma.discipline.findUnique({ where: { id: payload.disciplineId } });
+    if (!discipline) {
+      throw new BadRequestException('DISCIPLINE_NOT_FOUND');
+    }
+
+    const adult = isTrialAdult(payload.birthDate);
+    const studentUser = adult
+      ? await this.usersClient.provision({
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          role: Role.TRIAL,
+        })
+      : null;
+
+    const emergencyContacts = adult
+      ? []
+      : [{ name: payload.guardianName, phone: payload.guardianPhone, relationship: 'Guardian' }];
+
+    const studentProfile = await this.prisma.$transaction(async (tx) => {
+      if (studentUser) {
+        const existingProfile = await tx.studentProfile.findUnique({ where: { userId: studentUser.id } });
+        if (existingProfile) {
+          throw new BadRequestException('STUDENT_PROFILE_ALREADY_EXISTS');
+        }
+      }
+
+      const profile = await tx.studentProfile.create({
+        data: {
+          userId: studentUser?.id ?? null,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          birthDate: new Date(payload.birthDate),
+          phone: adult ? payload.phone ?? null : payload.guardianPhone ?? null,
+          status: StudentStatus.TRIAL,
+          emergencyContacts: emergencyContacts as Prisma.InputJsonValue,
+        },
+      });
+
+      await tx.studentStatusHistory.create({
+        data: {
+          studentProfileId: profile.id,
+          previousStatus: null,
+          newStatus: StudentStatus.TRIAL,
+          reason: 'Trial registration',
+          changedById: requestUser?.userId ?? null,
+        },
+      });
+
+      await this.assignDisciplines(tx, profile.id, [{ disciplineId: payload.disciplineId }]);
+      return profile;
+    });
+
+    return { ...studentProfile, user: studentUser ?? this.toPublicIdentity(studentProfile, new Map()) };
   }
 
   /**
@@ -130,7 +232,7 @@ export class StudentsService {
    * @param {AuthenticatedUser} requestUser - Authenticated caller.
    * @returns {Promise<object>} The refreshed profile (staff) or the created update request (others).
    * @throws {NotFoundException} If the profile or a referenced identity does not exist.
-   * @throws {ForbiddenException} If the caller is neither staff nor the owner.
+   * @throws {ForbiddenException} If the caller is neither staff, owner, nor a linked guardian.
    * @throws {ConflictException} If a DNI belongs to another identity.
    * @throws {ServiceUnavailableException} If the auth-service is unreachable.
    */
@@ -142,41 +244,53 @@ export class StudentsService {
       return this.prisma.profileUpdateRequest.create({ data: { studentProfileId: student.id, requestedChanges: instanceToPlain(updateData) } });
     }
 
-    // 1. Identity changes go through the auth-service, outside any DB transaction.
-    if (updateData.userData) {
-      const { firstName, lastName, phone, address, city, state, postalCode, country, birthDate } = updateData.userData;
-      await this.usersClient.updatePersonalData(student.userId, {
-        firstName, lastName, phone, address, city, state, postalCode, country, birthDate: birthDate || undefined,
-      });
+    // 1. Login-identity changes go through auth-service only when the student has a User.
+    // Demographics stay on StudentProfile and are never PATCHed to auth.
+    if (updateData.userData && student.userId) {
+      const { firstName, lastName, gender } = updateData.userData;
+      if (firstName !== undefined || lastName !== undefined || gender !== undefined) {
+        await this.usersClient.updatePersonalData(student.userId, { firstName, lastName, gender });
+      }
     }
 
     const resolvedGuardians: ResolvedGuardian[] =
       updateData.isMinor && updateData.guardians?.length ? await this.provisionGuardians(updateData.guardians) : [];
 
     await this.prisma.$transaction(async (tx) => {
+      const profilePatch: Prisma.StudentProfileUpdateInput = {
+        ...this.toProfileDemographics(updateData.userData),
+      };
+      if (updateData.bankMandateId !== undefined) {
+        profilePatch.bankMandateId = updateData.bankMandateId;
+      }
+
       // 2. State Machine: Process lifecycle status change and write Audit Log
       if (updateData.status !== undefined && updateData.status !== student.status) {
-        await tx.studentProfile.update({
-          where: { id: student.id },
-          data: { status: updateData.status as any },
-        });
+        profilePatch.status = updateData.status as StudentStatus;
 
         await tx.studentStatusHistory.create({
           data: {
             studentProfileId: student.id,
-            previousStatus: student.status as any,
-            newStatus: updateData.status as any,
-        reason: updateData.statusReason || 'Status changed manually',
-        changedById: requestUser?.userId ?? null,
+            previousStatus: student.status,
+            newStatus: updateData.status as StudentStatus,
+            reason: updateData.statusReason || 'Status changed manually',
+            leaveReason: updateData.leaveReason,
+            leaveNoticeMethod: updateData.leaveNoticeMethod,
+            customReasonDetails: updateData.customReasonDetails,
+            changedById: requestUser?.userId ?? null,
           },
         });
       }
 
       // 3. Lightweight Contacts (Adults)
       if (updateData.emergencyContacts !== undefined) {
+        profilePatch.emergencyContacts = instanceToPlain(updateData.emergencyContacts) as Prisma.InputJsonValue;
+      }
+
+      if (Object.keys(profilePatch).length > 0) {
         await tx.studentProfile.update({
           where: { id: student.id },
-          data: { emergencyContacts: instanceToPlain(updateData.emergencyContacts) as Prisma.InputJsonValue },
+          data: profilePatch,
         });
       }
 
@@ -226,24 +340,28 @@ export class StudentsService {
       include: {
         ranks: { include: { beltRank: { include: { program: { include: { discipline: true } } } } } },
         guardians: { include: { guardian: true } },
+        statusHistory: { orderBy: { createdAt: 'asc' }, take: 30 },
       },
     });
 
-    const users = await this.usersClient.findManyByIds(
-      students.flatMap((student) => [student.userId, ...student.guardians.map((link) => link.guardian.userId)]),
-    );
+    const users = await this.usersClient.findManyByIds(this.collectIdentityIds(students));
 
     return students.map(student => ({
       ...student,
-      user: users.get(student.userId) ?? null,
+      user: this.toPublicIdentity(student, users),
       guardians: student.guardians.map((link) => ({
         ...link,
         guardian: { ...link.guardian, user: users.get(link.guardian.userId) ?? null },
       })),
-      ranks: student.ranks.map(rank => ({
-        id: rank.id, beltRankId: rank.beltRankId, disciplineId: rank.beltRank?.program?.disciplineId,
+      ranks: student.ranks.map((rank) => ({
+        id: rank.id,
+        beltRankId: rank.beltRankId,
+        disciplineId: rank.beltRank?.program?.disciplineId,
         disciplineName: rank.beltRank?.program?.discipline?.name || 'Unknown Discipline',
-        beltName: rank.beltRank?.name || 'Unknown Belt', currentStripes: rank.currentStripes,
+        disciplineAcronym: rank.beltRank?.program?.discipline?.acronym ?? null,
+        beltName: rank.beltRank?.name || 'Unknown Belt',
+        currentStripes: rank.currentStripes,
+        maxStripes: rank.beltRank?.maxStripes ?? 0,
       })),
     }));
   }
@@ -262,31 +380,40 @@ export class StudentsService {
   }
 
   /**
-   * Enforces read access: staff, or the owner of the profile.
+   * Enforces read access: staff, the login owner, or a linked parent/guardian.
    *
-   * @param {string} ownerUserId - Identity that owns the profile.
+   * @param {{ userId: string | null; guardians?: Array<{ guardian: { userId: string } }> }} student - Profile under inspection.
    * @param {AuthenticatedUser} requestUser - Authenticated caller.
    * @returns {void}
-   * @throws {ForbiddenException} If the caller is neither staff nor the owner.
+   * @throws {ForbiddenException} If the caller is neither staff, owner, nor a linked guardian.
    */
-  private assertCanRead(ownerUserId: string, requestUser: AuthenticatedUser): void {
+  private assertCanRead(
+    student: { userId: string | null; guardians?: Array<{ guardian: { userId: string } }> },
+    requestUser: AuthenticatedUser,
+  ): void {
     const isStaff = (requestUser.roles || []).some((r) => STAFF_READ_ROLES.includes(r));
-    if (!isStaff && ownerUserId !== requestUser.userId) throw new ForbiddenException('FORBIDDEN');
+    if (isStaff) return;
+    if (student.userId && student.userId === requestUser.userId) return;
+    if (student.guardians?.some((link) => link.guardian.userId === requestUser.userId)) return;
+    throw new ForbiddenException('FORBIDDEN');
   }
 
   /**
-   * Loads the bare profile and checks access, without touching the auth-service.
+   * Loads the profile with guardian links and checks access, without touching the auth-service.
    *
    * @param {string} id - Student profile UUID.
    * @param {AuthenticatedUser} requestUser - Authenticated caller.
-   * @returns {Promise<{ id: string; userId: string; status: string }>} The profile row.
+   * @returns {Promise<object>} The profile row including guardian links.
    * @throws {NotFoundException} If the profile does not exist.
-   * @throws {ForbiddenException} If the caller is neither staff nor the owner.
+   * @throws {ForbiddenException} If the caller is neither staff, owner, nor a linked guardian.
    */
   private async findAuthorizedProfile(id: string, requestUser: AuthenticatedUser) {
-    const student = await this.prisma.studentProfile.findUnique({ where: { id } });
+    const student = await this.prisma.studentProfile.findUnique({
+      where: { id },
+      include: { guardians: { include: { guardian: true } } },
+    });
     if (!student) throw new NotFoundException('STUDENT_PROFILE_NOT_FOUND');
-    this.assertCanRead(student.userId, requestUser);
+    this.assertCanRead(student, requestUser);
     return student;
   }
 
@@ -301,11 +428,20 @@ export class StudentsService {
     const { isExistingUser, userId, userData } = payload;
 
     if (isExistingUser && userId) {
-      const { dni, birthDate, phone, address, city, state, postalCode } = userData;
-      return this.usersClient.provision({ userId, role: Role.STUDENT, dni, birthDate: birthDate || undefined, phone, address, city, state, postalCode });
+      return this.usersClient.provision({
+        userId,
+        role: Role.STUDENT,
+        gender: userData.gender,
+      });
     }
 
-    return this.usersClient.provision({ ...userData, birthDate: userData.birthDate || undefined, role: Role.STUDENT });
+    return this.usersClient.provision({
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      gender: userData.gender,
+      role: Role.STUDENT,
+    });
   }
 
   /**
@@ -325,8 +461,6 @@ export class StudentsService {
         email: guardian.email,
         firstName: guardian.firstName,
         lastName: guardian.lastName,
-        phone: guardian.phone,
-        dni: guardian.dni,
         role: Role.PARENT,
       });
 
@@ -344,28 +478,33 @@ export class StudentsService {
    * Emergency contacts are only stored for adults (minors use guardians instead).
    *
    * @param {TransactionClient} tx - Active transaction client (keeps the whole creation atomic).
-   * @param {string} userId - Identity the profile belongs to.
+   * @param {string | null} userId - Login identity, or null for minors.
    * @param {CreateStudentDto} payload - Creation payload.
    * @param {AuthenticatedUser} [requestUser] - Caller, recorded as author of the initial status entry.
-   * @returns {Promise<{ id: string }>} The persisted profile.
+   * @returns {Promise<object>} The persisted profile.
    * @throws {BadRequestException} If the identity already has a student profile.
    */
   private async createCoreProfile(
     tx: TransactionClient,
-    userId: string,
+    userId: string | null,
     payload: CreateStudentDto,
     requestUser?: AuthenticatedUser,
   ) {
     const initialStatus = payload.status || StudentStatusEnum.ACTIVE;
 
-    const existingProfile = await tx.studentProfile.findUnique({ where: { userId } });
-    if (existingProfile) throw new BadRequestException('STUDENT_PROFILE_ALREADY_EXISTS');
+    if (userId) {
+      const existingProfile = await tx.studentProfile.findUnique({ where: { userId } });
+      if (existingProfile) throw new BadRequestException('STUDENT_PROFILE_ALREADY_EXISTS');
+    }
 
     const profile = await tx.studentProfile.create({
       data: {
         userId,
-        status: initialStatus as any, // Mapped to Prisma enum
-        emergencyContacts: (!payload.isMinor && payload.emergencyContacts) ? (payload.emergencyContacts as any) : [],
+        ...this.toProfileCreateDemographics(payload.userData),
+        status: initialStatus as StudentStatus,
+        emergencyContacts: (!payload.isMinor && payload.emergencyContacts)
+          ? (payload.emergencyContacts as unknown as Prisma.InputJsonValue)
+          : [],
       },
     });
 
@@ -374,7 +513,7 @@ export class StudentsService {
       data: {
         studentProfileId: profile.id,
         previousStatus: null,
-        newStatus: initialStatus as any,
+        newStatus: initialStatus as StudentStatus,
         reason: 'Initial enrollment',
         changedById: requestUser?.userId ?? null,
       },
@@ -443,5 +582,103 @@ export class StudentsService {
     });
 
     return lowestBelt?.id;
+  }
+
+  /**
+   * Collects login and guardian identity ids, skipping null `userId` (minors).
+   *
+   * @param {Array<{ userId: string | null; guardians: Array<{ guardian: { userId: string } }>; statusHistory?: Array<{ changedById: string | null }> }>} students - Profiles to scan.
+   * @returns {string[]} De-duplicated auth-service ids.
+   */
+  private collectIdentityIds(
+    students: Array<{
+      userId: string | null;
+      guardians: Array<{ guardian: { userId: string } }>;
+      statusHistory?: Array<{ changedById: string | null }>;
+    }>,
+  ): string[] {
+    const ids: Array<string | null> = [];
+    for (const student of students) {
+      ids.push(student.userId);
+      for (const link of student.guardians) {
+        ids.push(link.guardian.userId);
+      }
+      for (const entry of student.statusHistory ?? []) {
+        ids.push(entry.changedById);
+      }
+    }
+    return ids.filter((id): id is string => Boolean(id));
+  }
+
+  /**
+   * Merges a login User when present; otherwise projects academic demographics for minors.
+   *
+   * @param {ProfileIdentitySource} student - Profile demographics and optional login id.
+   * @param {Map<string, UserSummary>} users - Batch-resolved identities.
+   * @returns {PublicStudentIdentity | null} Public identity, or null when a login id is set but missing upstream.
+   */
+  private toPublicIdentity(student: ProfileIdentitySource, users: Map<string, UserSummary>): PublicStudentIdentity | null {
+    if (student.userId) {
+      const login = users.get(student.userId);
+      return login ?? null;
+    }
+
+    return {
+      id: null,
+      email: null,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      gender: student.gender as UserSummary['gender'],
+      isActive: false,
+      roles: [],
+    };
+  }
+
+  /**
+   * Maps create `userData` onto academic profile columns (always written at insert).
+   *
+   * @param {StudentUserDataDto} userData - Personal data from the enrollment payload.
+   * @returns {Prisma.StudentProfileCreateInput} Demographic fields.
+   */
+  private toProfileCreateDemographics(userData: StudentUserDataDto) {
+    return {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      dni: userData.dni ?? null,
+      birthDate: userData.birthDate ? new Date(userData.birthDate) : null,
+      phone: userData.phone ?? null,
+      address: userData.address ?? null,
+      city: userData.city ?? null,
+      state: userData.state ?? null,
+      postalCode: userData.postalCode ?? null,
+      country: userData.country ?? 'ES',
+      gender: userData.gender ?? null,
+    };
+  }
+
+  /**
+   * Maps partial personal-data updates onto academic profile columns.
+   *
+   * @param {UpdateStudentUserDataDto | undefined} userData - Optional personal-data patch.
+   * @returns {Prisma.StudentProfileUpdateInput} Only the fields that were sent.
+   */
+  private toProfileDemographics(userData?: UpdateStudentUserDataDto): Prisma.StudentProfileUpdateInput {
+    if (!userData) return {};
+
+    const data: Prisma.StudentProfileUpdateInput = {};
+    if (userData.firstName !== undefined) data.firstName = userData.firstName;
+    if (userData.lastName !== undefined) data.lastName = userData.lastName;
+    if (userData.dni !== undefined) data.dni = userData.dni;
+    if (userData.phone !== undefined) data.phone = userData.phone;
+    if (userData.address !== undefined) data.address = userData.address;
+    if (userData.city !== undefined) data.city = userData.city;
+    if (userData.state !== undefined) data.state = userData.state;
+    if (userData.postalCode !== undefined) data.postalCode = userData.postalCode;
+    if (userData.country !== undefined) data.country = userData.country;
+    if (userData.gender !== undefined) data.gender = userData.gender;
+    if (userData.birthDate !== undefined) {
+      data.birthDate = userData.birthDate ? new Date(userData.birthDate) : null;
+    }
+    return data;
   }
 }

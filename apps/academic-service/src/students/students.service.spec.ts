@@ -10,7 +10,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, ConflictException, ForbiddenException, NotFoundException, ServiceUnavailableException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthenticatedUser, Role } from '@dms/shared-types';
+import { AuthenticatedUser, Gender, LeaveNoticeMethod, LeaveReason, Role } from '@dms/shared-types';
 import { AxiosError } from 'axios';
 import { of, throwError } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -39,14 +39,7 @@ const directoryUser = (id: string, overrides: Record<string, unknown> = {}) => (
   email: `${id}@dojo.test`,
   firstName: `First-${id}`,
   lastName: `Last-${id}`,
-  dni: null,
-  birthDate: null,
-  phone: null,
-  address: null,
-  city: null,
-  state: null,
-  postalCode: null,
-  country: 'ES',
+  gender: null,
   isActive: true,
   roles: [Role.STUDENT],
   ...overrides,
@@ -85,6 +78,7 @@ describe('StudentsService', () => {
   const mockPrisma = {
     studentProfile: { findUnique: jest.fn(), findMany: jest.fn() , delete: jest.fn() },
     profileUpdateRequest: { create: jest.fn() },
+    discipline: { findUnique: jest.fn() },
     $transaction: jest.fn((callback: (tx: typeof mockTx) => Promise<unknown>) => callback(mockTx)),
   };
   const mockHttp = { post: jest.fn(), patch: jest.fn() };
@@ -109,6 +103,7 @@ describe('StudentsService', () => {
     );
     stubDirectory();
 
+    mockPrisma.discipline.findUnique.mockResolvedValue({ id: 'bjj' });
     mockTx.studentProfile.findUnique.mockResolvedValue(null);
     mockTx.studentProfile.create.mockResolvedValue({ id: 'profile-1', userId: 'provisioned-new@dojo.test' });
     mockTx.studentStatusHistory.create.mockResolvedValue({});
@@ -133,6 +128,17 @@ describe('StudentsService', () => {
   const studentRecord = (overrides: Record<string, unknown> = {}) => ({
     id: 'profile-1',
     userId: 'owner-id',
+    firstName: 'First-owner-id',
+    lastName: 'Last-owner-id',
+    dni: null,
+    birthDate: null,
+    phone: null,
+    address: null,
+    city: null,
+    state: null,
+    postalCode: null,
+    country: 'ES',
+    gender: null,
     status: 'ACTIVE',
     statusHistory: [],
     ranks: [],
@@ -152,6 +158,22 @@ describe('StudentsService', () => {
 
       await expect(service.findOne('profile-1', caller([Role.STUDENT], 'stranger-id'))).rejects.toThrow(ForbiddenException);
       expect(mockHttp.post).not.toHaveBeenCalled();
+    });
+
+    it('allows a linked parent to read a minor profile that has no login User', async () => {
+      mockPrisma.studentProfile.findUnique.mockResolvedValue(
+        studentRecord({
+          userId: null,
+          firstName: 'Leo',
+          lastName: 'Garcia',
+          guardians: [{ id: 'link-1', guardian: { id: 'g-1', userId: 'parent-id' } }],
+        }),
+      );
+
+      const result = await service.findOne('profile-1', caller([Role.PARENT], 'parent-id'));
+
+      expect(result.user).toEqual(expect.objectContaining({ id: null, firstName: 'Leo', lastName: 'Garcia' }));
+      expect(result.guardians[0].guardian.user?.id).toBe('parent-id');
     });
 
     it('never joins the users table locally', async () => {
@@ -224,6 +246,10 @@ describe('StudentsService', () => {
       expect(result[1].user?.id).toBe('u-2');
       expect(result[0].guardians[0].guardian.user?.id).toBe('parent-1');
       expect(mockPrisma.studentProfile.findMany.mock.calls[0][0].include).not.toHaveProperty('user');
+      expect(mockPrisma.studentProfile.findMany.mock.calls[0][0].include.statusHistory).toEqual({
+        orderBy: { createdAt: 'asc' },
+        take: 30,
+      });
     });
 
     it('skips the HTTP call when there are no students', async () => {
@@ -231,6 +257,43 @@ describe('StudentsService', () => {
 
       await expect(service.findAll()).resolves.toEqual([]);
       expect(mockHttp.post).not.toHaveBeenCalled();
+    });
+
+    it('flattens ranks with discipline acronym, stripes, and belt name', async () => {
+      mockPrisma.studentProfile.findMany.mockResolvedValue([
+        studentRecord({
+          ranks: [
+            {
+              id: 'rank-1',
+              beltRankId: 'belt-1',
+              currentStripes: 2,
+              beltRank: {
+                name: 'Grey/White Belt',
+                maxStripes: 4,
+                program: {
+                  disciplineId: 'bjj',
+                  discipline: { name: 'Brazilian Jiu-Jitsu', acronym: 'BJJ' },
+                },
+              },
+            },
+          ],
+        }),
+      ]);
+
+      const result = await service.findAll();
+
+      expect(result[0].ranks).toEqual([
+        {
+          id: 'rank-1',
+          beltRankId: 'belt-1',
+          disciplineId: 'bjj',
+          disciplineName: 'Brazilian Jiu-Jitsu',
+          disciplineAcronym: 'BJJ',
+          beltName: 'Grey/White Belt',
+          currentStripes: 2,
+          maxStripes: 4,
+        },
+      ]);
     });
   });
 
@@ -273,12 +336,14 @@ describe('StudentsService', () => {
       expect(typeof historyCall.data.changedById).toBe('string');
     });
 
-    it('enrolling an existing user by id sends contact data only (names are not overwritten)', async () => {
+    it('enrolling an existing user by id grants STUDENT without sending StudentProfile demographics', async () => {
       await service.create(payload({ isExistingUser: true, userId: 'existing-id' }));
 
       const body = mockHttp.post.mock.calls[0][1];
       expect(body.userId).toBe('existing-id');
-      expect(body.phone).toBe('600');
+      expect(body.role).toBe(Role.STUDENT);
+      expect(body).not.toHaveProperty('phone');
+      expect(body).not.toHaveProperty('dni');
       expect(body).not.toHaveProperty('firstName');
       expect(body).not.toHaveProperty('email');
     });
@@ -290,8 +355,8 @@ describe('StudentsService', () => {
       expect(mockPrisma.$transaction).not.toHaveBeenCalled();
     });
 
-    it('maps a DNI conflict from the auth-service to ConflictException', async () => {
-      mockHttp.post.mockReturnValue(throwError(() => httpError(409, 'USER_DNI_ALREADY_REGISTERED')));
+    it('maps an identity conflict from the auth-service to ConflictException', async () => {
+      mockHttp.post.mockReturnValue(throwError(() => httpError(409, 'USER_ALREADY_EXISTS')));
 
       await expect(service.create(payload())).rejects.toThrow(ConflictException);
       expect(mockPrisma.$transaction).not.toHaveBeenCalled();
@@ -314,28 +379,30 @@ describe('StudentsService', () => {
         }),
       );
 
-      expect(mockHttp.post).toHaveBeenCalledTimes(2);
-      expect(mockHttp.post.mock.calls[1][1]).toMatchObject({ email: 'mum@dojo.test', role: Role.PARENT });
-      expect(mockHttp.post.mock.invocationCallOrder[1]).toBeLessThan(mockPrisma.$transaction.mock.invocationCallOrder[0]);
+      expect(mockHttp.post).toHaveBeenCalledTimes(1);
+      expect(mockHttp.post.mock.calls[0][1]).toMatchObject({ email: 'mum@dojo.test', role: Role.PARENT });
+      expect(mockHttp.post.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.$transaction.mock.invocationCallOrder[0]);
+      expect(mockTx.studentProfile.create.mock.calls[0][0].data.userId).toBeNull();
       expect(mockTx.guardian.create).toHaveBeenCalledWith({ data: { userId: 'provisioned-mum@dojo.test' } });
       expect(mockTx.studentGuardian.create).toHaveBeenCalledWith({
         data: { studentProfileId: 'profile-1', guardianId: 'guardian-1', relationship: 'Tía' },
       });
     });
 
-    it('omits empty-string identifiers/dates from the provisioning requests (form defaults)', async () => {
+    it('omits empty-string identifiers from the guardian provisioning request (form defaults)', async () => {
       await service.create(
         payload({
           isMinor: true,
-          userData: { email: 'new@dojo.test', firstName: 'New', lastName: 'Student', birthDate: '' },
+          userData: { firstName: 'New', lastName: 'Student', birthDate: '' },
           guardians: [
             { userId: '', email: 'mum@dojo.test', firstName: 'Mum', lastName: 'M', phone: '', dni: '' },
           ] as CreateStudentDto['guardians'],
         }),
       );
 
-      expect(mockHttp.post.mock.calls[0][1].birthDate).toBeUndefined();
-      expect(mockHttp.post.mock.calls[1][1].userId).toBeUndefined();
+      expect(mockHttp.post).toHaveBeenCalledTimes(1);
+      expect(mockHttp.post.mock.calls[0][1].userId).toBeUndefined();
+      expect(mockTx.studentProfile.create.mock.calls[0][0].data.birthDate).toBeNull();
     });
 
     it('runs every local write through the same single transaction (atomicity)', async () => {
@@ -428,6 +495,99 @@ describe('StudentsService', () => {
     });
   });
 
+  describe('createTrial', () => {
+    const adultBirthDate = '1998-01-15';
+    const minorBirthDate = '2014-06-01';
+
+    it('provisions a TRIAL adult over HTTP then writes status TRIAL with a plain changedById', async () => {
+      mockTx.beltRank.findFirst.mockResolvedValue({ id: 'lowest-belt' });
+      mockTx.studentRank.create.mockResolvedValue({});
+
+      const result = await service.createTrial(
+        {
+          disciplineId: 'bjj',
+          firstName: 'Maria',
+          lastName: 'Garcia',
+          birthDate: adultBirthDate,
+          email: 'maria@dojo.test',
+          phone: '600111222',
+        },
+        caller([Role.ADMIN_STAFF], 'admin-id'),
+      );
+
+      expect(mockPrisma.discipline.findUnique).toHaveBeenCalledWith({ where: { id: 'bjj' } });
+      expect(mockHttp.post.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.$transaction.mock.invocationCallOrder[0]);
+      expect(mockHttp.post.mock.calls[0][1]).toMatchObject({
+        email: 'maria@dojo.test',
+        firstName: 'Maria',
+        lastName: 'Garcia',
+        role: Role.TRIAL,
+      });
+      expect(mockHttp.post.mock.calls[0][1]).not.toHaveProperty('phone');
+      expect(mockHttp.post.mock.calls[0][1]).not.toHaveProperty('birthDate');
+      expect(mockTx.studentProfile.create.mock.calls[0][0].data).toMatchObject({
+        status: 'TRIAL',
+        emergencyContacts: [],
+      });
+      expect(mockTx.studentStatusHistory.create.mock.calls[0][0].data).toEqual({
+        studentProfileId: 'profile-1',
+        previousStatus: null,
+        newStatus: 'TRIAL',
+        reason: 'Trial registration',
+        changedById: 'admin-id',
+      });
+      expect(mockTx.studentGuardian.create).not.toHaveBeenCalled();
+      expect(result.user.id).toBe('provisioned-maria@dojo.test');
+    });
+
+    it('stores a trial minor as a profile without a User identity', async () => {
+      mockTx.beltRank.findFirst.mockResolvedValue(null);
+
+      await service.createTrial(
+        {
+          disciplineId: 'bjj',
+          firstName: 'Leo',
+          lastName: 'Garcia',
+          birthDate: minorBirthDate,
+          guardianName: 'Ana Garcia',
+          guardianPhone: '611000000',
+        },
+        caller([Role.ADMIN_STAFF], 'admin-id'),
+      );
+
+      expect(mockHttp.post).not.toHaveBeenCalled();
+      expect(mockTx.studentProfile.create.mock.calls[0][0].data).toMatchObject({
+        userId: null,
+        firstName: 'Leo',
+        lastName: 'Garcia',
+        phone: '611000000',
+        emergencyContacts: [{ name: 'Ana Garcia', phone: '611000000', relationship: 'Guardian' }],
+      });
+      expect(mockTx.studentGuardian.create).not.toHaveBeenCalled();
+    });
+
+    it('does not provision an identity when the discipline does not exist', async () => {
+      mockPrisma.discipline.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.createTrial(
+          {
+            disciplineId: 'missing',
+            firstName: 'Maria',
+            lastName: 'Garcia',
+            birthDate: adultBirthDate,
+            email: 'maria@dojo.test',
+            phone: '600',
+          },
+          caller([Role.ADMIN_STAFF], 'admin-id'),
+        ),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(mockHttp.post).not.toHaveBeenCalled();
+      expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
   describe('updateProfile', () => {
     beforeEach(() => {
       mockPrisma.studentProfile.findUnique.mockResolvedValue(studentRecord());
@@ -458,7 +618,8 @@ describe('StudentsService', () => {
 
       const [url, body] = mockHttp.patch.mock.calls[0];
       expect(url).toBe('http://auth-service:3000/api/internal/users/owner-id/personal-data');
-      expect(body).toMatchObject({ firstName: 'Ana', phone: '622' });
+      expect(body).toMatchObject({ firstName: 'Ana' });
+      expect(body).not.toHaveProperty('phone');
       expect(mockHttp.patch.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.$transaction.mock.invocationCallOrder[0]);
       expect(mockTx.studentStatusHistory.create.mock.calls[0][0].data).toMatchObject({
         previousStatus: 'ACTIVE',
@@ -469,13 +630,48 @@ describe('StudentsService', () => {
       expect(result).toHaveProperty('user');
     });
 
-    it('does not open the transaction when the identity update fails', async () => {
-      mockHttp.patch.mockReturnValue(throwError(() => httpError(409, 'USER_DNI_ALREADY_REGISTERED')));
+    it('persists structured leave metadata on PAUSED/DROPPED and forwards gender to auth-service', async () => {
+      await service.updateProfile(
+        'profile-1',
+        {
+          userData: { gender: Gender.FEMALE },
+          status: StudentStatusEnum.DROPPED,
+          statusReason: 'Other',
+          leaveReason: LeaveReason.OTHER,
+          leaveNoticeMethod: LeaveNoticeMethod.WHATSAPP,
+          customReasonDetails: 'Family relocated outside Catalonia',
+        },
+        caller([Role.ADMIN_STAFF], 'admin-id'),
+      );
+
+      expect(mockHttp.patch.mock.calls[0][1]).toMatchObject({ gender: Gender.FEMALE });
+      expect(mockTx.studentStatusHistory.create.mock.calls[0][0].data).toMatchObject({
+        newStatus: 'DROPPED',
+        reason: 'Other',
+        leaveReason: LeaveReason.OTHER,
+        leaveNoticeMethod: LeaveNoticeMethod.WHATSAPP,
+        customReasonDetails: 'Family relocated outside Catalonia',
+      });
+    });
+
+    it('does not open the transaction when the login-identity update fails', async () => {
+      mockHttp.patch.mockReturnValue(throwError(() => httpError(409, 'USER_ALREADY_EXISTS')));
 
       await expect(
-        service.updateProfile('profile-1', { userData: { dni: '1' } }, caller([Role.SUPER_ADMIN])),
+        service.updateProfile('profile-1', { userData: { firstName: 'Anita' } }, caller([Role.SUPER_ADMIN])),
       ).rejects.toThrow(ConflictException);
       expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('does not PATCH StudentProfile demographics to the auth-service', async () => {
+      await service.updateProfile(
+        'profile-1',
+        { userData: { dni: '1', phone: '600' } },
+        caller([Role.SUPER_ADMIN]),
+      );
+
+      expect(mockHttp.patch).not.toHaveBeenCalled();
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
     it('replaces guardians: provisions first, then deletes and re-links inside the transaction', async () => {

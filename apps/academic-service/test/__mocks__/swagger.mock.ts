@@ -10,6 +10,7 @@ export const ApiOperation = () => () => {};
 export const ApiResponse = () => () => {};
 export const ApiParam = () => () => {};
 export const ApiBearerAuth = () => () => {};
+export const ApiHeader = () => () => {};
 export const ApiProperty = () => () => {};
 export const ApiPropertyOptional = () => () => {};
 

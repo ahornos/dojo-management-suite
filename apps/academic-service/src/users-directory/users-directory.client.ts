@@ -22,8 +22,10 @@ import { defer, firstValueFrom, Observable, retry, throwError, timeout, TimeoutE
 import {
   INTERNAL_API_KEY_HEADER,
   ProvisionUserRequest,
+  Role,
   UpdateUserPersonalDataRequest,
   UserBatchRequest,
+  UserByRolesRequest,
   UserSummary,
 } from '@dms/shared-types';
 
@@ -83,6 +85,27 @@ export class UsersDirectoryClient {
     );
 
     return new Map(responses.flat().map((user) => [user.id, user]));
+  }
+
+  /**
+   * Lists active users that hold at least one of the given roles.
+   *
+   * @param {Role[]} roles - Roles to match.
+   * @returns {Promise<UserSummary[]>} Matching identities.
+   * @throws {ServiceUnavailableException} If the auth-service stays unreachable after retries.
+   */
+  findByRoles(roles: Role[]): Promise<UserSummary[]> {
+    if (roles.length === 0) {
+      return Promise.resolve([]);
+    }
+
+    return this.execute<UserSummary[]>(() =>
+      this.httpService.post<UserSummary[]>(
+        `${this.baseUrl}/by-roles`,
+        { roles } satisfies UserByRolesRequest,
+        this.requestConfig(),
+      ),
+    );
   }
 
   /**

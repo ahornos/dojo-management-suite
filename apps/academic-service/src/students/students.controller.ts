@@ -4,12 +4,13 @@
  * Implements data ownership, conditional approval workflows, and administrative deletions.
  */
 
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard, RolesGuard, Roles, CurrentUser } from '@dms/shared-auth';
 import { AuthenticatedUser, Role } from '@dms/shared-types';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateTrialStudentDto } from './dto/create-trial-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
 @ApiTags('Student Management')
@@ -40,6 +41,21 @@ export class StudentsController {
   @ApiOperation({ summary: 'Retrieve student details (Owner or Staff)' })
   async findOne(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.studentsService.findOne(id, user);
+  }
+
+  /**
+   * @description Registers a TRIAL prospect. Strictly limited to staff members.
+   * @param {CreateTrialStudentDto} createTrialStudentDto - Prospect identity and discipline.
+   * @param {AuthenticatedUser} user - Authenticated caller, recorded in the status audit log.
+   * @returns {Promise<object>} The newly created TRIAL profile.
+   */
+  @Post('trial')
+  @HttpCode(HttpStatus.CREATED)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)
+  @ApiOperation({ summary: 'Register a trial student (Staff only)' })
+  @ApiResponse({ status: 201, description: 'Trial student successfully created.' })
+  async createTrial(@Body() createTrialStudentDto: CreateTrialStudentDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.createTrial(createTrialStudentDto, user);
   }
 
   /**

@@ -7,6 +7,7 @@
 import { StudentsController } from './students.controller';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
+import { CreateTrialStudentDto } from './dto/create-trial-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { AuthenticatedUser, Role } from '@dms/shared-types';
 
@@ -15,6 +16,7 @@ describe('StudentsController', () => {
     findAll: jest.fn().mockResolvedValue([]),
     findOne: jest.fn().mockResolvedValue({ id: 's1' }),
     create: jest.fn().mockResolvedValue({ id: 's1' }),
+    createTrial: jest.fn().mockResolvedValue({ id: 't1' }),
     updateProfile: jest.fn().mockResolvedValue({ id: 's1' }),
     remove: jest.fn().mockResolvedValue({ deleted: true }),
   };
@@ -39,6 +41,14 @@ describe('StudentsController', () => {
     await controller.create(dto, user);
 
     expect(service.create).toHaveBeenCalledWith(dto, user);
+  });
+
+  it('passes the trial DTO and the actor to createTrial', async () => {
+    const dto = { firstName: 'Leo' } as CreateTrialStudentDto;
+
+    await controller.createTrial(dto, user);
+
+    expect(service.createTrial).toHaveBeenCalledWith(dto, user);
   });
 
   it('passes the typed update DTO and the actor to updateProfile', async () => {

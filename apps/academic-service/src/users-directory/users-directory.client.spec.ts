@@ -94,6 +94,24 @@ describe('UsersDirectoryClient', () => {
     });
   });
 
+  describe('findByRoles', () => {
+    it('posts the roles filter to the internal directory', async () => {
+      http.post.mockReturnValue(of({ data: [{ id: 'inst-1' }] }));
+
+      await expect(client.findByRoles([Role.INSTRUCTOR])).resolves.toEqual([{ id: 'inst-1' }]);
+      expect(http.post).toHaveBeenCalledWith(
+        'http://auth:3000/api/internal/users/by-roles',
+        { roles: [Role.INSTRUCTOR] },
+        { headers: { 'x-internal-api-key': 'k' } },
+      );
+    });
+
+    it('returns an empty list without any HTTP call when no roles are given', async () => {
+      await expect(client.findByRoles([])).resolves.toEqual([]);
+      expect(http.post).not.toHaveBeenCalled();
+    });
+  });
+
   describe('provision / updatePersonalData', () => {
     it('posts the provisioning request', async () => {
       http.post.mockReturnValue(of({ data: { id: 'u1' } }));
@@ -105,7 +123,7 @@ describe('UsersDirectoryClient', () => {
     it('patches personal data and encodes the user id in the path', async () => {
       http.patch.mockReturnValue(of({ data: { id: 'u 1' } }));
 
-      await client.updatePersonalData('u 1', { phone: '6' });
+      await client.updatePersonalData('u 1', { firstName: 'Ana' });
 
       expect(http.patch.mock.calls[0][0]).toBe('http://auth:3000/api/internal/users/u%201/personal-data');
     });

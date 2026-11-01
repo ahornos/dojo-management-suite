@@ -6,7 +6,7 @@ import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { UsersDirectoryClient } from '../src/users-directory/users-directory.client';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { Role, UserSummary } from '@dms/shared-types';
+import { LicenseHolderType, Role, UserSummary } from '@dms/shared-types';
 
 /**
  * Deterministic secret injected before the app boots, so the suite never depends on a local `.env`.
@@ -32,6 +32,7 @@ describe('Academic Service (e2e)', () => {
   const directoryStub = {
     provision: jest.fn(),
     findManyByIds: jest.fn(),
+    findByRoles: jest.fn(),
     updatePersonalData: jest.fn(),
   };
 
@@ -49,6 +50,7 @@ describe('Academic Service (e2e)', () => {
     process.env.JWT_SECRET = TEST_JWT_SECRET;
     // Peer-service settings are mandatory at boot; no real auth-service is contacted in these suites.
     process.env.AUTH_SERVICE_URL = 'http://auth-service.invalid:3000';
+    process.env.FINANCIAL_SERVICE_URL = 'http://financial-service.invalid:3000';
     process.env.INTERNAL_API_KEY = 'e2e-internal-key-not-for-production';
 
     const provisionedUser: UserSummary = {
@@ -56,19 +58,13 @@ describe('Academic Service (e2e)', () => {
       email: 'e2e.student@dojo.test',
       firstName: 'E2E',
       lastName: 'Student',
-      dni: null,
-      birthDate: null,
-      phone: null,
-      address: null,
-      city: null,
-      state: null,
-      postalCode: null,
-      country: 'ES',
+      gender: null,
       isActive: true,
       roles: [Role.STUDENT],
     };
     directoryStub.provision.mockResolvedValue(provisionedUser);
     directoryStub.findManyByIds.mockResolvedValue(new Map([[provisionedUser.id, provisionedUser]]));
+    directoryStub.findByRoles.mockResolvedValue([]);
     directoryStub.updatePersonalData.mockResolvedValue(provisionedUser);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -225,6 +221,162 @@ describe('Academic Service (e2e)', () => {
         newStatus: 'ACTIVE',
         changedById: 'admin-uuid',
       });
+    });
+  });
+
+  describe('/api/students/trial (POST)', () => {
+    let createdProfileId: string | undefined;
+
+    afterEach(async () => {
+      if (!createdProfileId) {
+        return;
+      }
+      await prismaService.studentProfile.delete({ where: { id: createdProfileId } }).catch(() => undefined);
+      createdProfileId = undefined;
+    });
+
+    it('rejects an incomplete payload with 400', async () => {
+      const response: any = await (request(app.getHttpServer()).post('/api/students/trial') as any)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ firstName: 'Maria' });
+
+      expect(response.status).toBe(400);
+    });
+
+    it('forbids instructors from registering trials', async () => {
+      const response: any = await (request(app.getHttpServer()).post('/api/students/trial') as any)
+        .set('Authorization', `Bearer ${instructorToken}`)
+        .send({
+          disciplineId: '11111111-1111-4111-8111-111111111111',
+          firstName: 'Maria',
+          lastName: 'Garcia',
+          birthDate: '1998-01-15',
+          email: 'maria.trial@dojo.test',
+          phone: '600111222',
+        });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('creates a TRIAL profile and records the actor on the audit log', async () => {
+      const discipline = await prismaService.discipline.findFirst();
+      expect(discipline).toBeTruthy();
+
+      const response: any = await (request(app.getHttpServer()).post('/api/students/trial') as any)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          disciplineId: discipline?.id,
+          firstName: 'Maria',
+          lastName: 'Garcia',
+          birthDate: '1998-01-15',
+          email: 'maria.trial@dojo.test',
+          phone: '600111222',
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.status).toBe('TRIAL');
+      expect(response.body.user.id).toBe(provisionedUserId);
+      createdProfileId = response.body.id;
+
+      const audit = await prismaService.studentStatusHistory.findFirst({
+        where: { studentProfileId: createdProfileId },
+      });
+      expect(audit).toMatchObject({
+        newStatus: 'TRIAL',
+        reason: 'Trial registration',
+        changedById: 'admin-uuid',
+      });
+    });
+  });
+
+  describe('/api/licenses', () => {
+    const tenantId = 'fox-jiujitsu-academy';
+    const federationId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    const disciplineId = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+
+    beforeEach(() => {
+      jest.spyOn(prismaService.affiliationLicense, 'findMany').mockResolvedValue([]);
+      jest.spyOn(prismaService.studentProfile, 'findMany').mockResolvedValue([
+        {
+          id: 'profile-1',
+          userId: provisionedUserId,
+          firstName: 'E2E',
+          lastName: 'Student',
+          birthDate: new Date('2014-01-01T00:00:00.000Z'),
+          createdAt: new Date('2026-01-10T00:00:00.000Z'),
+          ranks: [{ beltRank: { program: { disciplineId } } }],
+          guardians: [],
+        },
+      ] as never);
+      directoryStub.findManyByIds.mockResolvedValue(
+        new Map([
+          [
+            provisionedUserId,
+            {
+              id: provisionedUserId,
+              email: 'e2e.student@dojo.test',
+              firstName: 'E2E',
+              lastName: 'Student',
+              gender: null,
+              isActive: true,
+              roles: [Role.STUDENT],
+            },
+          ],
+        ]),
+      );
+    });
+
+    afterEach(() => {
+      jest.mocked(prismaService.affiliationLicense.findMany).mockRestore();
+      jest.mocked(prismaService.studentProfile.findMany).mockRestore();
+    });
+
+    it('rejects unauthenticated preview requests', async () => {
+      const response: any = await (request(app.getHttpServer()).post('/api/licenses/preview') as any)
+        .set('x-school-id', tenantId)
+        .send({ federationId, season: '2026-2027', holderType: LicenseHolderType.STUDENT });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('forbids instructors from previewing license batches', async () => {
+      const response: any = await (request(app.getHttpServer()).post('/api/licenses/preview') as any)
+        .set('Authorization', `Bearer ${instructorToken}`)
+        .set('x-school-id', tenantId)
+        .send({ federationId, season: '2026-2027', holderType: LicenseHolderType.STUDENT });
+
+      expect(response.status).toBe(403);
+    });
+
+    it('previews ACTIVE students matching discipline and enrollment filters', async () => {
+      const response: any = await (request(app.getHttpServer()).post('/api/licenses/preview') as any)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('x-school-id', tenantId)
+        .send({
+          federationId,
+          season: '2026-2027',
+          holderType: LicenseHolderType.STUDENT,
+          disciplineId,
+          enrollmentDateBefore: '2026-02-01',
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.holders).toEqual([
+        expect.objectContaining({
+          holderUserId: provisionedUserId,
+          studentProfileId: 'profile-1',
+          alreadyLicensed: false,
+        }),
+      ]);
+      expect(prismaService.studentProfile.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            status: 'ACTIVE',
+            createdAt: { lt: new Date('2026-02-01') },
+            ranks: { some: { beltRank: { program: { disciplineId } } } },
+          }),
+        }),
+      );
     });
   });
 });

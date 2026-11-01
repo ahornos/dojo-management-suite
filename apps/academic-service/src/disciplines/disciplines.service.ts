@@ -32,6 +32,7 @@ export class DisciplinesService {
     return this.prisma.discipline.create({
       data: {
         name: dto.name,
+        acronym: dto.acronym?.trim() || null,
         description: dto.description,
         programs: {
           create: dto.programs.map((prog) => ({
@@ -134,6 +135,7 @@ export class DisciplinesService {
       where: { id },
       data: {
         name: dto.name,
+        acronym: dto.acronym !== undefined ? dto.acronym?.trim() || null : undefined,
         description: dto.description,
       },
       include: {

@@ -13,6 +13,7 @@ describe('DisciplinesService', () => {
   const mockPrisma = {
     discipline: {
       findMany: jest.fn().mockResolvedValue([{ id: '1', name: 'BJJ', description: 'Brazilian Jiu-Jitsu' }]),
+      findUnique: jest.fn().mockResolvedValue(null),
       create: jest.fn().mockImplementation((dto) => Promise.resolve({ id: '1', ...dto.data })),
     },
   };
@@ -36,5 +37,24 @@ describe('DisciplinesService', () => {
   it('should return an array of disciplines', async () => {
     const result = await service.findAll();
     expect(result).toEqual([{ id: '1', name: 'BJJ', description: 'Brazilian Jiu-Jitsu' }]);
+  });
+
+  it('persists a trimmed acronym when creating a discipline', async () => {
+    await service.create({
+      name: 'Brazilian Jiu-Jitsu',
+      acronym: '  BJJ  ',
+      programs: [
+        {
+          name: 'Adults',
+          beltRanks: [{ name: 'White Belt', order: 1, maxStripes: 4, minMonthsRequired: 0, minHoursRequired: 0 }],
+        },
+      ],
+    });
+
+    expect(mockPrisma.discipline.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ name: 'Brazilian Jiu-Jitsu', acronym: 'BJJ' }),
+      }),
+    );
   });
 });

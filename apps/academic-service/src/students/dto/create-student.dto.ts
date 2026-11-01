@@ -7,6 +7,7 @@
 import { IsBoolean, IsOptional, IsString, IsEmail, ValidateNested, IsDateString, Length, IsArray, IsInt, Min, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { Gender } from '@dms/shared-types';
 
 export enum StudentStatusEnum {
   TRIAL = 'TRIAL',
@@ -16,9 +17,13 @@ export enum StudentStatusEnum {
 }
 
 export class StudentUserDataDto {
-  @ApiProperty({ example: 'john.doe@example.com', description: 'Primary email address for the user account.' })
+  @ApiPropertyOptional({
+    example: 'john.doe@example.com',
+    description: 'Login email. Required for adult students; omitted for minors who have no User identity.',
+  })
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @ApiProperty({ example: 'John', description: 'User given name.' })
   @IsString()
@@ -68,6 +73,11 @@ export class StudentUserDataDto {
   @IsString()
   @Length(2, 2)
   country?: string;
+
+  @ApiPropertyOptional({ enum: Gender, description: 'Optional gender for competition categories and stats.' })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
 }
 
 export class GuardianDto {

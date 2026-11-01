@@ -7,6 +7,7 @@ import { StudentsModule } from './students/students.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { GraduationsModule } from './graduations/graduations.module';
 import { DisciplinesModule } from './disciplines/disciplines.module';
+import { LicensesModule } from './licenses/licenses.module';
 import { AuthModule } from './auth/auth.module';
 import { validateEnv } from './config/env.validation';
 
@@ -20,8 +21,8 @@ import { validateEnv } from './config/env.validation';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // Service-local .env first, then the monorepo root .env used for local development.
-      envFilePath: ['.env', '../../.env'],
+      // Monorepo root is the single catalog; local `.env` is a leftover fallback only.
+      envFilePath: ['../../.env', '.env'],
       validate: validateEnv,
     }),
     PrismaModule, 
@@ -29,7 +30,8 @@ import { validateEnv } from './config/env.validation';
     StudentsModule,
     AttendancesModule, 
     GraduationsModule, 
-    DisciplinesModule
+    DisciplinesModule,
+    LicensesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

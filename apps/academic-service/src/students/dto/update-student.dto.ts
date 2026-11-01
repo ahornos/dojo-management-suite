@@ -6,7 +6,8 @@
 
 import { PartialType, OmitType, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsDateString, IsEmail, IsOptional, IsString, Length, ValidateNested } from 'class-validator';
+import { IsDateString, IsEmail, IsEnum, IsOptional, IsString, IsUUID, Length, ValidateNested } from 'class-validator';
+import { Gender, LeaveNoticeMethod, LeaveReason } from '@dms/shared-types';
 import { CreateStudentDto } from './create-student.dto';
 
 /**
@@ -80,6 +81,11 @@ export class UpdateStudentUserDataDto {
   @IsString()
   @Length(2, 2)
   country?: string;
+
+  @ApiPropertyOptional({ enum: Gender, description: 'Optional gender for competition categories and stats.' })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
 }
 
 /**
@@ -97,4 +103,26 @@ export class UpdateStudentDto extends OmitType(PartialType(CreateStudentDto), ['
   @IsOptional()
   @IsString()
   statusReason?: string;
+
+  @ApiPropertyOptional({ enum: LeaveReason, description: 'Structured leave reason when status becomes PAUSED or DROPPED.' })
+  @IsOptional()
+  @IsEnum(LeaveReason)
+  leaveReason?: LeaveReason;
+
+  @ApiPropertyOptional({ enum: LeaveNoticeMethod, description: 'Channel through which the leave was communicated.' })
+  @IsOptional()
+  @IsEnum(LeaveNoticeMethod)
+  leaveNoticeMethod?: LeaveNoticeMethod;
+
+  @ApiPropertyOptional({ description: 'Free-text details, typically when leaveReason is OTHER.' })
+  @IsOptional()
+  @IsString()
+  customReasonDetails?: string;
+
+  @ApiPropertyOptional({
+    description: 'Logical financial-service mandate that covers this student (payer-owned BankMandate id).',
+  })
+  @IsOptional()
+  @IsUUID()
+  bankMandateId?: string;
 }

@@ -112,13 +112,18 @@ export class AttendancesService {
     const users = await this.usersClient.findManyByIds(attendances.map((attendance) => attendance.student.userId));
 
     return attendances.map((attendance) => {
-      const user = users.get(attendance.student.userId);
+      const login = attendance.student.userId ? users.get(attendance.student.userId) : undefined;
+      const displayUser = login
+        ? { firstName: login.firstName, lastName: login.lastName, email: login.email }
+        : attendance.student.userId
+          ? null
+          : { firstName: attendance.student.firstName, lastName: attendance.student.lastName, email: null };
 
       return {
         ...attendance,
         student: {
           ...attendance.student,
-          user: user ? { firstName: user.firstName, lastName: user.lastName, email: user.email } : null,
+          user: displayUser,
         },
       };
     });

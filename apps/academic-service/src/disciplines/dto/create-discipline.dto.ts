@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsInt, Min, ValidateNested, ArrayMinSize } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsInt, MaxLength, Min, ValidateNested, ArrayMinSize } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -59,6 +59,12 @@ export class CreateDisciplineDto {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @ApiPropertyOptional({ example: 'BJJ', description: 'Short staff-facing label for dense tables. Empty falls back to the full name.' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(12)
+  acronym?: string | null;
 
   @ApiPropertyOptional({ example: 'Grappling martial art focused on ground fighting' })
   @IsOptional()
