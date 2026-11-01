@@ -8,7 +8,7 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@9.12.1 --activate
+RUN corepack enable && corepack prepare pnpm@12.6.0 --activate
 
 FROM base AS deps
 
