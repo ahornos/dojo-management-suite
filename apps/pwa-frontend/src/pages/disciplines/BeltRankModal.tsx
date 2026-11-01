@@ -5,9 +5,9 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Field, FormGrid, FormSection } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BeltRankPayload } from './types';
 
@@ -66,7 +66,7 @@ export function BeltRankModal({ isOpen, beltRank, programId, onClose, onSubmit, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-foreground/50 p-4">
       <Card className="w-full max-w-lg bg-card shadow-xl">
         <CardHeader>
           <CardTitle>
@@ -74,64 +74,58 @@ export function BeltRankModal({ isOpen, beltRank, programId, onClose, onSubmit, 
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="belt-name">{t('belts.name_label')}</Label>
-                <Input
-                  id="belt-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t('belts.name_placeholder')}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="belt-order">{t('belts.order_label')}</Label>
-                <Input
-                  id="belt-order"
-                  type="number"
-                  value={order}
-                  onChange={(e) => setOrder(Number(e.target.value))}
-                  required
-                />
-              </div>
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <FormSection title={beltRank ? t('belts.edit_title') : t('belts.create_title')}>
+              <FormGrid>
+                <Field id="belt-name" label={t('belts.name_label')} required>
+                  <Input
+                    id="belt-name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={t('belts.name_placeholder')}
+                    required
+                  />
+                </Field>
+                <Field id="belt-order" label={t('belts.order_label')} required>
+                  <Input
+                    id="belt-order"
+                    type="number"
+                    value={order}
+                    onChange={(e) => setOrder(Number(e.target.value))}
+                    required
+                  />
+                </Field>
+                <Field id="max-stripes" label={t('belts.max_stripes')} required>
+                  <Input
+                    id="max-stripes"
+                    type="number"
+                    value={maxStripes}
+                    onChange={(e) => setMaxStripes(Number(e.target.value))}
+                    required
+                  />
+                </Field>
+                <Field id="min-months" label={t('belts.min_months')} required>
+                  <Input
+                    id="min-months"
+                    type="number"
+                    value={minMonths}
+                    onChange={(e) => setMinMonths(Number(e.target.value))}
+                    required
+                  />
+                </Field>
+                <Field id="min-hours" label={t('belts.min_hours')} required>
+                  <Input
+                    id="min-hours"
+                    type="number"
+                    value={minHours}
+                    onChange={(e) => setMinHours(Number(e.target.value))}
+                    required
+                  />
+                </Field>
+              </FormGrid>
+            </FormSection>
 
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="max-stripes">{t('belts.max_stripes')}</Label>
-                <Input
-                  id="max-stripes"
-                  type="number"
-                  value={maxStripes}
-                  onChange={(e) => setMaxStripes(Number(e.target.value))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="min-months">{t('belts.min_months')}</Label>
-                <Input
-                  id="min-months"
-                  type="number"
-                  value={minMonths}
-                  onChange={(e) => setMinMonths(Number(e.target.value))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="min-hours">{t('belts.min_hours')}</Label>
-                <Input
-                  id="min-hours"
-                  type="number"
-                  value={minHours}
-                  onChange={(e) => setMinHours(Number(e.target.value))}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 border-t border-border pt-4">
               <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
                 {t('belts.cancel')}
               </Button>

@@ -1,17 +1,17 @@
 /**
  * @file Disciplines.tsx
- * @description Disciplines and training programs management view. 
- * Displays martial arts disciplines, age-based training programs, localized belt hierarchies 
- * with realistic BJJ solid and center-striped belt badge designs, and full CRUD management modals.
+ * @description Disciplines catalog list. Identity create/edit lives on dedicated sub-routes;
+ * belt ranks remain a nested modal.
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDisciplines } from './useDisciplines';
+import { resolveBeltAppearance } from '@/lib/beltAppearance';
 import { getLocalizedBeltName } from '@/lib/beltTranslations';
-import { DisciplineModal } from './DisciplineModal';
 import { BeltRankModal } from './BeltRankModal';
-import { DisciplinePayload, BeltRankPayload } from './types';
+import { BeltRankPayload } from './types';
 
 /**
  * Renders the Disciplines management interface with localization, realistic color-coded belt ranks,
@@ -22,22 +22,17 @@ import { DisciplinePayload, BeltRankPayload } from './types';
  */
 export default function Disciplines() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { 
     disciplines, 
     isLoading, 
     error, 
-    createDiscipline, 
-    updateDiscipline, 
     deleteDiscipline,
     saveBeltRank, 
     deleteBeltRank 
   } = useDisciplines();
 
-  // Modal states for Disciplines
-  const [isDisciplineModalOpen, setIsDisciplineModalOpen] = useState(false);
-  const [selectedDiscipline, setSelectedDiscipline] = useState<DisciplinePayload | null>(null);
-
-  // Modal states for Belt Ranks
+  // Modal states for Belt Ranks (nested catalog action — stays a modal)
   const [isBeltModalOpen, setIsBeltModalOpen] = useState(false);
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
   const [selectedBeltRank, setSelectedBeltRank] = useState<BeltRankPayload | null>(null);
@@ -52,81 +47,12 @@ export default function Disciplines() {
    */
   const renderBeltBadge = (belt: any, programId: string) => {
     const localizedName = getLocalizedBeltName(belt.name, t);
-    
-    let baseClass = 'bg-muted text-foreground';
-    let stripeClass: string | null = null;
-    let textColor = 'text-foreground';
-
-    switch (belt.name) {
-      case 'White Belt':
-        baseClass = 'bg-belt-white border border-border';
-        textColor = 'text-foreground';
-        break;
-      case 'Blue Belt':
-        baseClass = 'bg-belt-blue';
-        textColor = 'text-white';
-        break;
-      case 'Purple Belt':
-        baseClass = 'bg-belt-purple';
-        textColor = 'text-white';
-        break;
-      case 'Brown Belt':
-        baseClass = 'bg-belt-brown';
-        textColor = 'text-white';
-        break;
-      case 'Black Belt':
-        baseClass = 'bg-belt-black border-b-4 border-belt-red';
-        textColor = 'text-white';
-        break;
-      case 'Solid Grey Belt':
-        baseClass = 'bg-belt-grey';
-        textColor = 'text-foreground';
-        break;
-      case 'Solid Yellow Belt':
-        baseClass = 'bg-belt-yellow';
-        textColor = 'text-foreground';
-        break;
-      case 'Solid Green Belt':
-        baseClass = 'bg-belt-green';
-        textColor = 'text-white';
-        break;
-      case 'Grey/White Belt':
-        baseClass = 'bg-belt-grey';
-        stripeClass = 'bg-belt-white';
-        textColor = 'text-foreground';
-        break;
-      case 'Grey/Black Belt':
-        baseClass = 'bg-belt-grey';
-        stripeClass = 'bg-belt-black';
-        textColor = 'text-white';
-        break;
-      case 'Yellow/White Belt':
-        baseClass = 'bg-belt-yellow';
-        stripeClass = 'bg-belt-white';
-        textColor = 'text-foreground';
-        break;
-      case 'Yellow/Black Belt':
-        baseClass = 'bg-belt-yellow';
-        stripeClass = 'bg-belt-black';
-        textColor = 'text-foreground';
-        break;
-      case 'Green/White Belt':
-        baseClass = 'bg-belt-green';
-        stripeClass = 'bg-belt-white';
-        textColor = 'text-foreground';
-        break;
-      case 'Green/Black Belt':
-        baseClass = 'bg-belt-green';
-        stripeClass = 'bg-belt-black';
-        textColor = 'text-white';
-        break;
-      default:
-        baseClass = 'bg-muted';
-        textColor = 'text-foreground';
-        break;
-    }
-
-    const textBgPill = textColor === 'text-white' ? 'bg-black/25 px-2 py-0.5 rounded' : 'bg-card/80 px-2 py-0.5 rounded shadow-2xs';
+    const appearance = resolveBeltAppearance(belt.name);
+    const baseClass = `${appearance.baseClass} ${appearance.extraClass}`.trim();
+    const stripeClass = appearance.stripeClass;
+    const textColor = appearance.textClass;
+    const lightText = textColor === 'text-white';
+    const textBgPill = lightText ? 'bg-black/25 px-2 py-0.5 rounded' : 'bg-card/80 px-2 py-0.5 rounded shadow-2xs';
 
     return (
       <div
@@ -143,7 +69,7 @@ export default function Disciplines() {
           onClick={() => handleOpenEditBelt(programId, belt)}
           title={t('belts.edit_belt')}
         >
-          <span className={`font-bold ${textColor === 'text-white' ? 'text-white/90' : 'text-foreground'}`}>
+          <span className={`font-bold ${lightText ? 'text-white/90' : 'text-black'}`}>
             #{belt.order}
           </span>
           <span className={`font-semibold text-sm ${textBgPill}`}>
@@ -180,16 +106,6 @@ export default function Disciplines() {
     );
   };
 
-  const handleOpenCreateDiscipline = () => {
-    setSelectedDiscipline(null);
-    setIsDisciplineModalOpen(true);
-  };
-
-  const handleOpenEditDiscipline = (discipline: DisciplinePayload) => {
-    setSelectedDiscipline(discipline);
-    setIsDisciplineModalOpen(true);
-  };
-
   const handleOpenAddBelt = (programId: string) => {
     setSelectedProgramId(programId);
     setSelectedBeltRank(null);
@@ -200,18 +116,6 @@ export default function Disciplines() {
     setSelectedProgramId(programId);
     setSelectedBeltRank(belt);
     setIsBeltModalOpen(true);
-  };
-
-  const handleDisciplineSubmit = (data: DisciplinePayload) => {
-    if (data.id) {
-      updateDiscipline.mutate(data, {
-        onSuccess: () => setIsDisciplineModalOpen(false),
-      });
-    } else {
-      createDiscipline.mutate(data, {
-        onSuccess: () => setIsDisciplineModalOpen(false),
-      });
-    }
   };
 
   const handleBeltSubmit = (data: BeltRankPayload) => {
@@ -251,7 +155,7 @@ export default function Disciplines() {
           <p className="text-sm text-muted-foreground mt-1">{t('disciplines.subtitle')}</p>
         </div>
         <button
-          onClick={handleOpenCreateDiscipline}
+          onClick={() => navigate('/disciplines/new')}
           className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
         >
           {t('disciplines.new_discipline')}
@@ -275,7 +179,7 @@ export default function Disciplines() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => handleOpenEditDiscipline(discipline)}
+                    onClick={() => navigate(`/disciplines/${discipline.id}/edit`)}
                     className="text-sm text-primary hover:text-primary font-medium"
                   >
                     {t('disciplines.edit')}
@@ -335,15 +239,6 @@ export default function Disciplines() {
           ))
         )}
       </div>
-
-      {/* Modals Integration */}
-      <DisciplineModal
-        isOpen={isDisciplineModalOpen}
-        discipline={selectedDiscipline}
-        onClose={() => setIsDisciplineModalOpen(false)}
-        onSubmit={handleDisciplineSubmit}
-        isPending={createDiscipline.isPending || updateDiscipline.isPending}
-      />
 
       <BeltRankModal
         isOpen={isBeltModalOpen}

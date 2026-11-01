@@ -1,56 +1,95 @@
 /**
  * @file StudentFilters.tsx
- * @description Renders the search bar and a multi-select visual filter for age ranges.
+ * @description Compact toolbar: search plus multi-select age, status, and discipline filters.
  */
 
 import { useTranslation } from 'react-i18next';
+import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { AGE_GROUPS } from '../config/ageGroups';
+import { STUDENT_STATUS_OPTIONS } from '../listFilters';
+import { MultiSelectFilter } from './MultiSelectFilter';
 
 interface StudentFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   selectedAgeGroups: string[];
-  onAgeGroupToggle: (groupId: string) => void;
+  onAgeGroupsChange: (next: string[]) => void;
+  selectedStatuses: string[];
+  onStatusesChange: (next: string[]) => void;
+  selectedDisciplines: string[];
+  onDisciplinesChange: (next: string[]) => void;
+  disciplineOptions: string[];
+  showClear: boolean;
+  onClearFilters: () => void;
 }
 
-export function StudentFilters({ searchTerm, onSearchChange, selectedAgeGroups, onAgeGroupToggle }: StudentFiltersProps): JSX.Element {
+/**
+ * Horizontal filter bar for the student directory.
+ *
+ * @param {StudentFiltersProps} props - Search, selections, and clear handler.
+ * @returns {JSX.Element} Toolbar.
+ */
+export function StudentFilters({
+  searchTerm,
+  onSearchChange,
+  selectedAgeGroups,
+  onAgeGroupsChange,
+  selectedStatuses,
+  onStatusesChange,
+  selectedDisciplines,
+  onDisciplinesChange,
+  disciplineOptions,
+  showClear,
+  onClearFilters,
+}: StudentFiltersProps): JSX.Element {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg shadow-sm border border-border">
-      <div className="w-full sm:w-1/2 md:w-1/3">
+    <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 shadow-sm md:flex-row md:flex-wrap md:items-end">
+      <div className="min-w-[12rem] flex-1">
         <Input
           placeholder={t('students.search_placeholder')}
           value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full"
+          onChange={(event) => onSearchChange(event.target.value)}
+          className="h-9"
         />
       </div>
-      
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm font-medium text-muted-foreground mr-2">{t('students.filter_age')}:</span>
-        
-        <Badge 
-          variant={selectedAgeGroups.length === 0 ? "default" : "outline"}
-          className="cursor-pointer transition-colors"
-          onClick={() => onAgeGroupToggle('ALL')}
-        >
-          {t('students.all_ages')}
-        </Badge>
-        
-        {AGE_GROUPS.map(group => (
-          <Badge
-            key={group.id}
-            variant={selectedAgeGroups.includes(group.id) ? "default" : "outline"}
-            className="cursor-pointer transition-colors"
-            onClick={() => onAgeGroupToggle(group.id)}
-          >
-            {t(group.labelKey)}
-          </Badge>
-        ))}
-      </div>
+
+      <MultiSelectFilter
+        label={t('students.filter_age')}
+        emptyLabel={t('students.all_ages')}
+        selected={selectedAgeGroups}
+        onChange={onAgeGroupsChange}
+        options={AGE_GROUPS.map((group) => ({ value: group.id, label: t(group.labelKey) }))}
+      />
+
+      <MultiSelectFilter
+        label={t('students.filter_status')}
+        emptyLabel={t('students.all_statuses')}
+        selected={selectedStatuses}
+        onChange={onStatusesChange}
+        options={STUDENT_STATUS_OPTIONS.map((status) => ({
+          value: status,
+          label: t(`enums.status.${status}`),
+        }))}
+      />
+
+      <MultiSelectFilter
+        label={t('students.filter_discipline')}
+        emptyLabel={t('students.all_disciplines')}
+        selected={selectedDisciplines}
+        onChange={onDisciplinesChange}
+        options={disciplineOptions.map((name) => ({ value: name, label: name }))}
+      />
+
+      {showClear && (
+        <Button type="button" variant="ghost" size="sm" className="h-9" onClick={onClearFilters}>
+          <X className="h-4 w-4" />
+          {t('students.clear_filters')}
+        </Button>
+      )}
     </div>
   );
 }

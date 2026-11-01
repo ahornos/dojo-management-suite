@@ -1,122 +1,158 @@
 /**
  * @file StudentTableRow.tsx
- * @description Presentational component rendering an individual student table row.
- * Universally handles both JSON emergency contacts for adults and structured Guardians for minors.
+ * @description Directory columns: status, age, lastName/firstName, gender, discipline & rank, stacked contacts, actions + chevron.
  */
 
+import { ChevronRight, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
-import { getLocalizedBeltName } from '@/lib/beltTranslations';
-import { getLocalizedRelationship } from '@/lib/relationships';
-import { StudentProfileResponse } from '../types';
-import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { ageGroupForAge, calculateAge, studentBirthDate } from '../listFilters';
+import { studentDisplayName, studentGender } from '../studentIdentity';
+import type { StudentProfileResponse } from '../types';
+import { StudentDetailPanel } from './StudentDetailPanel';
+import { StudentDisciplineRankCell } from './StudentDisciplineRankCell';
+import { StudentGenderIcon } from './StudentGenderIcon';
+import { StudentRowContacts } from './StudentRowContacts';
+import { StudentStatusBadge } from './StudentStatusBadge';
 
 interface StudentTableRowProps {
   student: StudentProfileResponse;
+  expanded: boolean;
+  onToggle: () => void;
   onEdit: (student: StudentProfileResponse) => void;
   onDelete: (id: string) => void;
 }
 
-export function StudentTableRow({ student, onEdit, onDelete }: StudentTableRowProps) {
+/**
+ * Formats identity as `lastName, firstName` for the directory.
+ *
+ * @param {StudentProfileResponse} student - Directory row.
+ * @returns {string} Display name.
+ */
+function directoryName(student: StudentProfileResponse): string {
+  const { firstName, lastName } = studentDisplayName(student);
+  const last = lastName.trim();
+  const first = firstName.trim();
+  if (last && first) return `${last}, ${first}`;
+  return last || first || '—';
+}
+
+/**
+ * Directory row plus optional accordion details.
+ *
+ * @param {StudentTableRowProps} props - Student, expand state, and actions.
+ * @returns {JSX.Element} Two table rows (summary + details).
+ */
+export function StudentTableRow({
+  student,
+  expanded,
+  onToggle,
+  onEdit,
+  onDelete,
+}: StudentTableRowProps): JSX.Element {
   const { t } = useTranslation();
-
-  const calculateAge = (birthDate?: string) => {
-    if (!birthDate) return -1;
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
-  const birthDate = student.user?.birthDate || student.birthDate;
-  const age = calculateAge(birthDate);
-  const isMinor = age !== -1 && age < 18;
-  
-  // Unify display logic dynamically based on data source
-  const displayContacts = useMemo(() => {
-    if (isMinor) {
-      return (student as any).guardians?.map((g: any) => ({
-        name: `${g.guardian?.user?.firstName || ''} ${g.guardian?.user?.lastName || ''}`.trim(),
-        phone: g.guardian?.user?.phone || t('students.no_phone'),
-        rel: getLocalizedRelationship(g.relationship, t)
-      })) || [];
-    } else {
-      return student.emergencyContacts?.map(c => ({
-        name: c.name,
-        phone: c.phone,
-        rel: getLocalizedRelationship(c.relationship, t)
-      })) || [];
-    }
-  }, [student, isMinor, t]);
+  const age = calculateAge(studentBirthDate(student));
+  const ageGroup = ageGroupForAge(age);
+  const ranks = student.ranks ?? [];
 
   return (
-    <tr className="hover:bg-muted transition-colors">
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-foreground">
-        {age !== -1 ? `${age} ${t('disciplines.years')}` : '-'}
-      </td>
-      
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-        {student.user?.firstName}
-      </td>
-
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-        {student.user?.lastName}
-      </td>
-      
-      <td className="px-6 py-4 whitespace-nowrap">
-        {student.ranks && student.ranks.length > 0 ? (
-          <div className="flex flex-col gap-1.5">
-            {student.ranks.map(rank => (
-              <div key={rank.id} className="text-sm">
-                <span className="font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded mr-1.5 inline-block">
-                  {rank.disciplineName}
-                </span>
-                <span className="text-foreground font-medium">
-                  {getLocalizedBeltName(rank.beltName, t)}
-                </span>
-                <span className="text-muted-foreground ml-1 text-xs">
-                  ({t('belts.stripes_count', { count: rank.currentStripes })})
-                </span>
-              </div>
-            ))}
+    <>
+      <tr
+        className={cn('group cursor-pointer hover:bg-muted/60 transition-colors', expanded && 'bg-muted/40')}
+        onClick={onToggle}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onToggle();
+          }
+        }}
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-label={expanded ? t('students.detail.collapse') : t('students.detail.expand')}
+      >
+        <td className="whitespace-nowrap px-3 py-2.5">
+          <StudentStatusBadge status={student.status} />
+        </td>
+        <td className="whitespace-nowrap px-3 py-2.5">
+          <p className="text-sm font-semibold tabular-nums text-foreground">
+            {age !== -1 ? t('students.row.age_years', { count: age }) : '—'}
+          </p>
+          {ageGroup ? (
+            <p className="text-[11px] text-muted-foreground">{t(`students.age_groups_short.${ageGroup.id}`)}</p>
+          ) : null}
+        </td>
+        <td className="px-3 py-2.5">
+          <p className="text-sm font-medium text-foreground">{directoryName(student)}</p>
+        </td>
+        <td className="whitespace-nowrap px-3 py-2.5">
+          <StudentGenderIcon gender={studentGender(student)} />
+        </td>
+        <td className="min-w-[11.5rem] whitespace-nowrap px-3 py-2.5">
+          <StudentDisciplineRankCell ranks={ranks} />
+        </td>
+        <td className="px-3 py-2.5">
+          <StudentRowContacts student={student} />
+        </td>
+        <td
+          className={cn(
+            'sticky right-0 whitespace-nowrap px-3 py-2.5 text-right group-hover:bg-muted/60',
+            expanded ? 'bg-muted/40 group-hover:bg-muted/40' : 'bg-card',
+          )}
+        >
+          <div className="inline-flex items-center justify-end gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label={t('students.edit_title')}
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit(student);
+              }}
+            >
+              <Pencil className="h-4 w-4 text-primary" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+              aria-label={t('users.delete')}
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete(student.id);
+              }}
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              aria-expanded={expanded}
+              aria-label={expanded ? t('students.detail.collapse') : t('students.detail.expand')}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggle();
+              }}
+            >
+              <ChevronRight
+                className={cn('h-4 w-4 text-muted-foreground transition-transform', expanded && 'rotate-90')}
+              />
+            </Button>
           </div>
-        ) : (
-          <span className="text-xs text-muted-foreground italic">{t('students.no_discipline')}</span>
-        )}
-      </td>
-
-      {/* Unified Emergency Contact Column */}
-      <td className="px-6 py-4 text-sm text-muted-foreground">
-        {displayContacts.length > 0 ? (
-          <div className="flex flex-col gap-1.5">
-            {displayContacts.map((contact: any, index: number) => (
-                <div key={index} className="text-xs flex items-center">
-                  <span className="font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded mr-2 border border-primary/20 whitespace-nowrap">
-                    {contact.rel}
-                  </span>
-                  <span className="font-medium text-foreground mr-1 whitespace-nowrap">{contact.name}</span>
-                  <span className="text-muted-foreground whitespace-nowrap">- {contact.phone}</span>
-                </div>
-            ))}
-          </div>
-        ) : (
-          <span className="text-muted-foreground italic">{t('students.no_emergency')}</span>
-        )}
-      </td>
-
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => onEdit(student)}>
-          <Pencil className="h-4 w-4 text-primary" />
-        </Button>
-        <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive border-destructive/40" onClick={() => onDelete(student.id)}>
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
-      </td>
-    </tr>
+        </td>
+      </tr>
+      {expanded && (
+        <tr className="bg-card">
+          <td colSpan={7} className="px-3 pb-4 pt-0">
+            <div className="overflow-hidden pt-2">
+              <StudentDetailPanel student={student} onEdit={() => onEdit(student)} />
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 }

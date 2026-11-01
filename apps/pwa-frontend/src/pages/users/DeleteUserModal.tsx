@@ -26,7 +26,7 @@ export function DeleteUserModal({ isOpen, onClose, onConfirm, isPending }: Delet
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-foreground/50 p-4">
       <Card className="w-full max-w-md bg-card shadow-xl">
         <CardHeader>
           <CardTitle className="text-destructive">{t('users.delete_confirm_title')}</CardTitle>

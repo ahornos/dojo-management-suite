@@ -6,7 +6,24 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
+import { toOptionalGender } from '@/lib/domain-enums';
 import { UserFormPayload } from './types';
+
+/**
+ * Drops empty password/gender so optional backend validators are not sent `''`.
+ *
+ * @param {UserFormPayload} payload - Form values.
+ * @returns {Record<string, unknown>} Sanitized body for POST/PATCH `/auth/users`.
+ */
+function sanitizeUserPayload(payload: UserFormPayload): Record<string, unknown> {
+  const { password, gender, ...rest } = payload;
+  const resolvedGender = toOptionalGender(gender);
+  return {
+    ...rest,
+    ...(password?.trim() ? { password } : {}),
+    ...(resolvedGender ? { gender: resolvedGender } : {}),
+  };
+}
 
 /**
  * Loads the user directory and exposes create/update/delete mutations.
@@ -26,7 +43,7 @@ export function useUsers() {
 
   const createMutation = useMutation({
     mutationFn: async (payload: UserFormPayload) => {
-      const response = await apiClient.post('/auth/users', payload);
+      const response = await apiClient.post('/auth/users', sanitizeUserPayload(payload));
       return response.data;
     },
     onSuccess: () => {
@@ -36,9 +53,7 @@ export function useUsers() {
 
   const updateMutation = useMutation({
     mutationFn: async (payload: UserFormPayload) => {
-      const { id, ...data } = payload;
-      if (!data.password || data.password.trim() === '') delete data.password;
-      
+      const { id, ...data } = sanitizeUserPayload(payload);
       const response = await apiClient.patch(`/auth/users/${id}`, data);
       return response.data;
     },

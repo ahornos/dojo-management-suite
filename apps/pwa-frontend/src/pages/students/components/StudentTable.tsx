@@ -1,49 +1,33 @@
 /**
  * @file StudentTable.tsx
- * @description Orchestrator component for the student directory table.
- * Manages sorting configuration, search and age range filters, and delegates rendering to sub-components.
+ * @description Student directory: default ACTIVE filter is applied upstream; this table sorts and expands rows.
  */
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StudentProfileResponse } from '../types';
-import { AGE_GROUPS } from '../config/ageGroups';
-import { StudentTableHeaders, SortKey } from './StudentTableHeaders';
+import { calculateAge, compareStudentsDefault, studentBirthDate } from '../listFilters';
+import type { StudentProfileResponse } from '../types';
+import { StudentTableHeaders, type SortConfig, type SortKey } from './StudentTableHeaders';
 import { StudentTableRow } from './StudentTableRow';
 
 interface StudentTableProps {
   students: StudentProfileResponse[];
   isLoading: boolean;
-  error: any;
-  searchTerm: string;
-  selectedAgeGroups: string[];
+  error: unknown;
   onEdit: (student: StudentProfileResponse) => void;
   onDelete: (id: string) => void;
 }
 
-type SortConfig = {
-  key: SortKey;
-  direction: 'asc' | 'desc';
-} | null;
-
-export function StudentTable({ students, isLoading, error, searchTerm, selectedAgeGroups, onEdit, onDelete }: StudentTableProps) {
+/**
+ * Renders the filtered student list with expandable rows.
+ *
+ * @param {StudentTableProps} props - Rows, loading, and row actions.
+ * @returns {JSX.Element} Card table.
+ */
+export function StudentTable({ students, isLoading, error, onEdit, onDelete }: StudentTableProps): JSX.Element {
   const { t } = useTranslation();
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
-
-  /**
-   * Helper function to calculate precise age from birthDate.
-   */
-  const calculateAge = (birthDate?: string) => {
-    if (!birthDate) return -1;
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
-  };
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleSort = (key: SortKey) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -53,74 +37,60 @@ export function StudentTable({ students, isLoading, error, searchTerm, selectedA
     setSortConfig({ key, direction });
   };
 
-  const getProcessedStudents = () => {
-    const filtered = students.filter(s => {
-      const birth = s.user?.birthDate || s.birthDate;
-      const searchTarget = `${s.user?.firstName || ''} ${s.user?.lastName || ''} ${s.user?.dni || ''} ${s.phone || ''}`.toLowerCase();
-      const matchesSearch = searchTarget.includes(searchTerm.toLowerCase());
+  const ordered = [...students].sort((a, b) => {
+    if (!sortConfig) return compareStudentsDefault(a, b);
+    const dir = sortConfig.direction === 'asc' ? 1 : -1;
+    const ageA = calculateAge(studentBirthDate(a));
+    const ageB = calculateAge(studentBirthDate(b));
+    if (sortConfig.key === 'age' && ageA !== ageB) {
+      const nA = ageA < 0 ? Number.POSITIVE_INFINITY : ageA;
+      const nB = ageB < 0 ? Number.POSITIVE_INFINITY : ageB;
+      return (nA - nB) * dir;
+    }
+    if (sortConfig.key === 'firstName') {
+      const cmp = (a.user?.firstName ?? '').localeCompare(b.user?.firstName ?? '', undefined, { sensitivity: 'base' });
+      if (cmp !== 0) return cmp * dir;
+    }
+    if (sortConfig.key === 'lastName') {
+      const cmp = (a.user?.lastName ?? '').localeCompare(b.user?.lastName ?? '', undefined, { sensitivity: 'base' });
+      if (cmp !== 0) return cmp * dir;
+    }
+    if (sortConfig.key === 'belt') {
+      const beltA = a.ranks && a.ranks.length > 0 ? a.ranks[0].beltName.toLowerCase() : '';
+      const beltB = b.ranks && b.ranks.length > 0 ? b.ranks[0].beltName.toLowerCase() : '';
+      if (beltA !== beltB) return beltA.localeCompare(beltB) * dir;
+    }
+    return compareStudentsDefault(a, b);
+  });
 
-      const age = calculateAge(birth);
-      const matchesAge = selectedAgeGroups.length === 0 || selectedAgeGroups.some(groupId => {
-        const group = AGE_GROUPS.find(g => g.id === groupId);
-        return group && age >= group.minAge && age <= group.maxAge;
-      });
-
-      return matchesSearch && matchesAge;
-    });
-
-    return filtered.sort((a, b) => {
-      const ageA = calculateAge(a.user?.birthDate || a.birthDate);
-      const ageB = calculateAge(b.user?.birthDate || b.birthDate);
-      const lastA = a.user?.lastName?.toLowerCase() || '';
-      const lastB = b.user?.lastName?.toLowerCase() || '';
-      const firstA = a.user?.firstName?.toLowerCase() || '';
-      const firstB = b.user?.firstName?.toLowerCase() || '';
-
-      const defaultSort = () => {
-        if (ageA !== ageB) return ageB - ageA; // Default: Descending age
-        if (lastA !== lastB) return lastA.localeCompare(lastB);
-        return firstA.localeCompare(firstB);
-      };
-
-      if (!sortConfig) return defaultSort();
-
-      const dirMultiplier = sortConfig.direction === 'asc' ? 1 : -1;
-
-      if (sortConfig.key === 'age' && ageA !== ageB) return (ageA - ageB) * dirMultiplier;
-      if (sortConfig.key === 'firstName' && firstA !== firstB) return firstA.localeCompare(firstB) * dirMultiplier;
-      if (sortConfig.key === 'lastName' && lastA !== lastB) return lastA.localeCompare(lastB) * dirMultiplier;
-      if (sortConfig.key === 'belt') {
-        const beltA = a.ranks && a.ranks.length > 0 ? a.ranks[0].beltName.toLowerCase() : '';
-        const beltB = b.ranks && b.ranks.length > 0 ? b.ranks[0].beltName.toLowerCase() : '';
-        if (beltA !== beltB) return beltA.localeCompare(beltB) * dirMultiplier;
-      }
-
-      return defaultSort();
-    });
-  };
-
-  if (isLoading) return <div className="p-6 text-center text-muted-foreground bg-card rounded-lg shadow">{t('students.loading')}</div>;
-  if (error) return <div className="p-6 text-center text-destructive bg-card rounded-lg shadow">{t('students.error')}</div>;
-
-  const processedStudents = getProcessedStudents();
+  if (isLoading) {
+    return <div className="rounded-lg bg-card p-6 text-center text-muted-foreground shadow">{t('students.loading')}</div>;
+  }
+  if (error) {
+    return <div className="rounded-lg bg-card p-6 text-center text-destructive shadow">{t('students.error')}</div>;
+  }
 
   return (
-    <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-border">
           <StudentTableHeaders sortConfig={sortConfig} onSort={handleSort} />
-          <tbody className="bg-card divide-y divide-border">
-            {processedStudents.length === 0 ? (
+          <tbody className="divide-y divide-border bg-card">
+            {ordered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-muted-foreground">{t('students.no_students')}</td>
+                <td colSpan={7} className="px-6 py-4 text-center text-muted-foreground">
+                  {t('students.no_students')}
+                </td>
               </tr>
             ) : (
-              processedStudents.map((student) => (
-                <StudentTableRow 
-                  key={student.id} 
-                  student={student} 
-                  onEdit={onEdit} 
-                  onDelete={onDelete} 
+              ordered.map((student) => (
+                <StudentTableRow
+                  key={student.id}
+                  student={student}
+                  expanded={expandedId === student.id}
+                  onToggle={() => setExpandedId((current) => (current === student.id ? null : student.id))}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
                 />
               ))
             )}

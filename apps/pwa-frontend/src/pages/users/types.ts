@@ -1,7 +1,7 @@
 /**
  * @file types.ts
  * @description Shared TypeScript interfaces for the user management module.
- * Supports multi-role user configurations.
+ * Login identity only — demographics live on StudentProfile.
  */
 
 export interface UserFormPayload {
@@ -10,14 +10,7 @@ export interface UserFormPayload {
   lastName: string;
   email: string;
   password?: string;
-  dni: string;
-  birthDate: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  gender: string;
   roles: string[];
   isActive: boolean;
 }

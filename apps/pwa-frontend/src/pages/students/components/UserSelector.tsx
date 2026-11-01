@@ -1,11 +1,13 @@
 /**
  * @file UserSelector.tsx
- * @description Component for toggling and selecting existing system users 
+ * @description Component for toggling and selecting existing system users
  * to be enrolled as students.
  */
 
 import { useTranslation } from 'react-i18next';
+import { Field, FormSection } from '@/components/forms/FormSection';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
 interface UserSelectorProps {
@@ -16,52 +18,54 @@ interface UserSelectorProps {
   availableUsers: any[];
 }
 
-export function UserSelector({ 
-  isExistingUser, 
-  onToggleExisting, 
-  selectedUserId, 
-  onSelectUser, 
-  availableUsers 
+/**
+ * Enrollment identity toggle: create a new user or attach an existing directory account.
+ *
+ * @param {UserSelectorProps} props - Toggle state, selected id, lookup users, and handlers.
+ * @returns {JSX.Element} Section.
+ */
+export function UserSelector({
+  isExistingUser,
+  onToggleExisting,
+  selectedUserId,
+  onSelectUser,
+  availableUsers,
 }: UserSelectorProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 bg-card px-4 py-2 rounded-lg shadow-sm border border-border w-max">
-        <Label htmlFor="user-toggle" className="text-sm font-medium text-foreground cursor-pointer">
+    <FormSection title={t('students.form.enrollment_title')}>
+      <div className="flex w-max items-center gap-3 rounded-lg border border-border bg-card px-4 py-2 shadow-sm">
+        <Label htmlFor="user-toggle" className="cursor-pointer text-sm font-medium text-foreground">
           {t('students.form.existing_user_toggle')}
         </Label>
-        <Switch
-          id="user-toggle"
-          checked={isExistingUser}
-          onCheckedChange={onToggleExisting}
-        />
+        <Switch id="user-toggle" checked={isExistingUser} onCheckedChange={onToggleExisting} />
       </div>
 
-      {isExistingUser && (
-        <div className="bg-primary/10 p-4 rounded-lg border border-primary/20 space-y-2 animate-in fade-in">
-          <Label htmlFor="userSelect" className="text-primary font-semibold">
-            {t('students.form.select_user_title')}
-          </Label>
-          <select
+      {isExistingUser ? (
+        <div className="space-y-2 rounded-lg border border-primary/20 bg-primary/10 p-4">
+          <Field
             id="userSelect"
-            required={isExistingUser}
-            value={selectedUserId}
-            onChange={(e) => onSelectUser(e.target.value)}
-            className="w-full px-3 py-2 border border-primary/30 rounded-lg focus:ring-2 focus:ring-ring focus:outline-none bg-card text-sm"
+            label={t('students.form.select_user_title')}
+            required
+            hint={t('students.form.select_user_help')}
           >
-            <option value="">{t('students.form.select_user_placeholder')}</option>
-            {availableUsers.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.firstName} {user.lastName} ({user.email}) - {user.dni || t('users.no_dni')}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-primary">
-            {t('students.form.select_user_help')}
-          </p>
+            <Select
+              id="userSelect"
+              required={isExistingUser}
+              value={selectedUserId}
+              onChange={(e) => onSelectUser(e.target.value)}
+            >
+              <option value="">{t('students.form.select_user_placeholder')}</option>
+              {availableUsers.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.firstName} {user.lastName} ({user.email})
+                </option>
+              ))}
+            </Select>
+          </Field>
         </div>
-      )}
-    </div>
+      ) : null}
+    </FormSection>
   );
 }

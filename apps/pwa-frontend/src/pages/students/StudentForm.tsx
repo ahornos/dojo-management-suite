@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserSelector } from './components/UserSelector';
-import { PersonalDataSection } from './components/PersonalDataSection';
+import { EMPTY_PERSONAL_FORM, PersonalDataSection } from './components/PersonalDataSection';
 import { GuardianSection } from './components/GuardianSection';
 import { StudentProfileResponse } from './types';
 
@@ -36,10 +36,7 @@ export function StudentForm({
   const [isExistingUser, setIsExistingUser] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
 
-  const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', dni: '', phone: '',
-    birthDate: '', address: '', city: '', state: '', postalCode: '', country: 'ES',
-  });
+  const [formData, setFormData] = useState(EMPTY_PERSONAL_FORM);
 
   const [guardians, setGuardians] = useState([
     { isExistingUser: false, userId: '', firstName: '', lastName: '', email: '', phone: '', dni: '' }
@@ -49,10 +46,10 @@ export function StudentForm({
   useEffect(() => {
     if (mode === 'edit' && initialData) {
       setFormData({
-        firstName: initialData.user?.firstName || '',
-        lastName: initialData.user?.lastName || '',
+        firstName: initialData.firstName || initialData.user?.firstName || '',
+        lastName: initialData.lastName || initialData.user?.lastName || '',
         email: initialData.user?.email || '',
-        dni: initialData.user?.dni || '',
+        dni: initialData.dni || '',
         phone: initialData.phone || '',
         birthDate: initialData.birthDate ? new Date(initialData.birthDate).toISOString().split('T')[0] : '',
         address: initialData.address || '',
@@ -60,6 +57,7 @@ export function StudentForm({
         state: initialData.state || '',
         postalCode: initialData.postalCode || '',
         country: initialData.country || 'ES',
+        gender: initialData.gender || initialData.user?.gender || '',
       });
       // Note: If guardians are retrieved from the API, they would be mapped here.
       // Assuming empty or existing mapping logic based on your backend response.
@@ -80,18 +78,18 @@ export function StudentForm({
     const user = availableUsers.find((u) => u.id === userId);
     if (user) {
       setFormData({
-        firstName: user.firstName || '', lastName: user.lastName || '', email: user.email || '',
-        dni: user.dni || '', phone: user.phone || '',
-        birthDate: user.birthDate ? new Date(user.birthDate).toISOString().split('T')[0] : '',
-        address: user.address || '', city: user.city || '', state: user.state || '',
-        postalCode: user.postalCode || '', country: user.country || 'ES',
+        ...EMPTY_PERSONAL_FORM,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        gender: user.gender || '',
       });
     } else {
-      setFormData({ firstName: '', lastName: '', email: '', dni: '', phone: '', birthDate: '', address: '', city: '', state: '', postalCode: '', country: 'ES' });
+      setFormData(EMPTY_PERSONAL_FORM);
     }
   };
 
-  const handleFormDataChange = (field: string, value: string) => {
+  const handleFormDataChange = (field: keyof typeof EMPTY_PERSONAL_FORM, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -132,8 +130,8 @@ export function StudentForm({
           firstName: user.firstName || '',
           lastName: user.lastName || '',
           email: user.email || '',
-          phone: user.phone || '',
-          dni: user.dni || '',
+          phone: '',
+          dni: '',
         };
       } else {
         updated[index] = { ...updated[index], userId: '', firstName: '', lastName: '', email: '', phone: '', dni: '' };

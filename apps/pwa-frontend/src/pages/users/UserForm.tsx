@@ -1,15 +1,18 @@
 /**
  * @file UserForm.tsx
- * @description Smart form screen component for user creation and editing. 
- * Manages multi-role selection, personal data, and address fields uniformly.
+ * @description Smart form screen component for user creation and editing.
+ * Manages multi-role selection and login identity (no StudentProfile demographics).
  */
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Field, FormGrid, FormSection } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { GENDERS } from '@/lib/domain-enums';
 import { UserFormPayload } from './types';
 
 interface UserFormProps {
@@ -33,20 +36,13 @@ const emptyFormState: UserFormPayload = {
   lastName: '',
   email: '',
   password: '',
-  dni: '',
-  birthDate: '',
-  phone: '',
-  address: '',
-  city: '',
-  state: '',
-  postalCode: '',
-  country: 'ES',
+  gender: '',
   roles: ['STUDENT'],
   isActive: true,
 };
 
 /**
- * Full-page create/edit form for a user (personal data, roles, status, password).
+ * Full-page create/edit form for a login user (name, email, gender, roles, status, password).
  *
  * @param {UserFormProps} props - Optional initial values, submit/cancel handlers, and pending flag.
  * @returns {JSX.Element} The user form card.
@@ -65,14 +61,7 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
         lastName: initialData.lastName || '',
         email: initialData.email || '',
         password: '',
-        dni: initialData.dni || '',
-        birthDate: initialData.birthDate ? initialData.birthDate.substring(0, 10) : '',
-        phone: initialData.phone || '',
-        address: initialData.address || '',
-        city: initialData.city || '',
-        state: initialData.state || '',
-        postalCode: initialData.postalCode || '',
-        country: initialData.country || 'ES',
+        gender: initialData.gender || '',
         roles: Array.isArray(initialData.roles) ? initialData.roles : ['STUDENT'],
         isActive: initialData.isActive ?? true,
       });
@@ -81,7 +70,7 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
     }
   }, [initialData]);
 
-  const handleChange = (field: keyof UserFormPayload, value: any) => {
+  const handleChange = (field: keyof UserFormPayload, value: string | boolean | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -89,11 +78,10 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
     setFormData((prev) => {
       const currentRoles = prev.roles || [];
       if (currentRoles.includes(role)) {
-        if (currentRoles.length === 1) return prev; // Keep at least one role assigned
+        if (currentRoles.length === 1) return prev;
         return { ...prev, roles: currentRoles.filter((r) => r !== role) };
-      } else {
-        return { ...prev, roles: [...currentRoles, role] };
       }
+      return { ...prev, roles: [...currentRoles, role] };
     });
   };
 
@@ -103,43 +91,28 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
   };
 
   return (
-    <Card className="max-w-4xl shadow-md border-border mx-auto">
-      <CardHeader className="bg-muted border-b border-border pb-4">
-        <CardTitle className="text-xl text-foreground">
-          {isEditing ? t('users.edit_modal_title') : t('users.create_title')}
-        </CardTitle>
-      </CardHeader>
-
+    <Card className="w-full border-border shadow-md">
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-8">
-          
-          {/* Personal Information Section */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground border-b pb-2">
-              {t('students.form.personal_data_title')}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">{t('users.first_name')} *</Label>
+          <FormSection title={t('users.personal_section')}>
+            <FormGrid>
+              <Field id="firstName" label={t('users.first_name')} required>
                 <Input
                   id="firstName"
                   required
                   value={formData.firstName}
                   onChange={(e) => handleChange('firstName', e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">{t('users.last_name')} *</Label>
+              </Field>
+              <Field id="lastName" label={t('users.last_name')} required>
                 <Input
                   id="lastName"
                   required
                   value={formData.lastName}
                   onChange={(e) => handleChange('lastName', e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">{t('users.email')} *</Label>
+              </Field>
+              <Field id="email" label={t('users.email')} required>
                 <Input
                   id="email"
                   type="email"
@@ -147,131 +120,55 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dni">{t('users.dni')}</Label>
-                <Input
-                  id="dni"
-                  value={formData.dni}
-                  onChange={(e) => handleChange('dni', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="birthDate">{t('users.birth_date')}</Label>
-                <Input
-                  id="birthDate"
-                  type="date"
-                  value={formData.birthDate}
-                  onChange={(e) => handleChange('birthDate', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">{t('users.phone')}</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleChange('phone', e.target.value)}
-                />
-              </div>
-            </div>
+              </Field>
+              <Field id="gender" label={t('users.gender')}>
+                <Select id="gender" value={formData.gender} onChange={(e) => handleChange('gender', e.target.value)}>
+                  <option value="">{t('users.gender_placeholder')}</option>
+                  {GENDERS.map((gender) => (
+                    <option key={gender} value={gender}>
+                      {t(`enums.gender.${gender}`)}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            </FormGrid>
+          </FormSection>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="address">{t('users.address')}</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => handleChange('address', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">{t('users.city')}</Label>
-                <Input
-                  id="city"
-                  value={formData.city}
-                  onChange={(e) => handleChange('city', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="postalCode">{t('users.postal_code')}</Label>
-                <Input
-                  id="postalCode"
-                  value={formData.postalCode}
-                  onChange={(e) => handleChange('postalCode', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="state">{t('users.state')}</Label>
-                <Input
-                  id="state"
-                  value={formData.state}
-                  onChange={(e) => handleChange('state', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">{t('users.country')}</Label>
-                <Input
-                  id="country"
-                  maxLength={2}
-                  value={formData.country}
-                  onChange={(e) => handleChange('country', e.target.value.toUpperCase())}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Multi-Role Selection Section */}
-          <div className="space-y-3 border-t pt-6">
-            <h3 className="text-lg font-semibold text-foreground">
-              {t('users.role')}
-            </h3>
-            <p className="text-xs text-muted-foreground">{t('users.select_roles')}</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 bg-muted p-4 rounded-lg border border-border">
+          <FormSection title={t('users.role')} description={t('users.select_roles')}>
+            <div className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-muted p-4 sm:grid-cols-2 md:grid-cols-3">
               {AVAILABLE_ROLES.map((role) => {
                 const isChecked = formData.roles?.includes(role);
                 return (
-                  <label key={role} className="flex items-center space-x-2 cursor-pointer text-sm font-medium text-foreground select-none">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleRoleToggle(role)}
-                      className="rounded border-input text-primary focus:ring-ring h-4 w-4"
-                    />
+                  <label
+                    key={role}
+                    className="flex cursor-pointer select-none items-center gap-2 text-sm font-medium text-foreground"
+                  >
+                    <Checkbox checked={isChecked} onChange={() => handleRoleToggle(role)} />
                     <span>{t(`users.roles.${role}`)}</span>
                   </label>
                 );
               })}
             </div>
-          </div>
+          </FormSection>
 
-          {/* Account Status & Password Section */}
-          <div className="space-y-4 border-t pt-6">
-            <h3 className="text-lg font-semibold text-foreground">
-              {t('users.status_security')}
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="isActive">{t('users.status_label')}</Label>
-                <select
+          <FormSection title={t('users.status_security')}>
+            <FormGrid>
+              <Field id="isActive" label={t('users.status_label')}>
+                <Select
                   id="isActive"
                   value={formData.isActive ? 'true' : 'false'}
                   onChange={(e) => handleChange('isActive', e.target.value === 'true')}
-                  className="w-full text-sm bg-card border border-input rounded-md px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="true">{t('users.active')}</option>
                   <option value="false">{t('users.inactive')}</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">
-                  {isEditing ? t('users.password') : `${t('users.password')} *`}
-                </Label>
+                </Select>
+              </Field>
+              <Field
+                id="password"
+                label={t('users.password')}
+                required={!isEditing}
+                hint={t('users.password_hint')}
+              >
                 <Input
                   id="password"
                   type="password"
@@ -280,13 +177,11 @@ export function UserForm({ initialData, onSubmit, onCancel, isPending }: UserFor
                   value={formData.password || ''}
                   onChange={(e) => handleChange('password', e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">{t('users.password_hint')}</p>
-              </div>
-            </div>
-          </div>
+              </Field>
+            </FormGrid>
+          </FormSection>
 
-          {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-border">
+          <div className="flex justify-end gap-3 border-t border-border pt-6">
             <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
               {t('users.cancel')}
             </Button>

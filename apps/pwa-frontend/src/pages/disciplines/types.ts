@@ -25,6 +25,7 @@ export interface DisciplineProgramPayload {
 export interface DisciplinePayload {
   id?: string;
   name: string;
+  acronym?: string | null;
   description?: string;
   programs?: DisciplineProgramPayload[];
 }
