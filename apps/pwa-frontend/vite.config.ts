@@ -9,6 +9,7 @@ import path from 'path';
  */
 export default defineConfig({
   plugins: [react()],
+  envDir: '../../',
   resolve: {
     alias: {
       // Map the '@' prefix to the 'src' directory to avoid relative path hell (e.g., ../../../components)

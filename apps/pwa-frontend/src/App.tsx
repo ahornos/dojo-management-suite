@@ -1,28 +1,33 @@
 /**
  * @file App.tsx
  * @description Main application component and routing configuration root.
- * Orchestrates public and protected routes, layout wrappers, and dynamic views.
+ * Orchestrates public and protected routes, layout wrappers, and lazy-loaded views.
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
+import { RouteFallback } from './components/layout/RouteFallback';
 
-// Module Views
-import Login from '@/pages/login/Login';
-import Users from '@/pages/users/Users';
-import Disciplines from '@/pages/disciplines/Disciplines';
-import Students from '@/pages/students/Students';
-
-/**
- * Placeholder component for the Dashboard view.
- * Uses translation hooks to avoid hardcoded text.
- */
-const Dashboard = () => {
-  const { t } = useTranslation();
-  return <div className="bg-card p-6 rounded-lg shadow">{t('dashboard.welcome')}</div>;
-};
+const Login = lazy(() => import('@/pages/login/Login'));
+const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'));
+const Users = lazy(() => import('@/pages/users/Users'));
+const UserCreatePage = lazy(() => import('@/pages/users/UserCreatePage'));
+const UserEditPage = lazy(() => import('@/pages/users/UserEditPage'));
+const Disciplines = lazy(() => import('@/pages/disciplines/Disciplines'));
+const DisciplineCreatePage = lazy(() => import('@/pages/disciplines/DisciplineCreatePage'));
+const DisciplineEditPage = lazy(() => import('@/pages/disciplines/DisciplineEditPage'));
+const Students = lazy(() => import('@/pages/students/Students'));
+const StudentCreatePage = lazy(() => import('@/pages/students/StudentCreatePage'));
+const StudentEditPage = lazy(() => import('@/pages/students/StudentEditPage'));
+const FinancialConfig = lazy(() => import('@/pages/financial/FinancialConfig'));
+const Federations = lazy(() => import('@/pages/financial/federations/Federations'));
+const FederationCreatePage = lazy(() => import('@/pages/financial/federations/FederationCreatePage'));
+const FederationEditPage = lazy(() => import('@/pages/financial/federations/FederationEditPage'));
+const Licenses = lazy(() => import('@/pages/financial/licenses/Licenses'));
+const BatchWizard = lazy(() => import('@/pages/financial/licenses/BatchWizard'));
 
 /**
  * Placeholder component for the Attendances view.
@@ -41,55 +46,77 @@ const Graduations = () => {
 };
 
 /**
- * Placeholder component for the Financial view.
+ * Preserves the federation id when rewriting the legacy edit URL.
+ *
+ * @returns {JSX.Element} Redirect to `/federations/:id/edit`.
  */
-const Financial = () => {
-  const { t } = useTranslation();
-  return <div className="bg-card p-6 rounded-lg shadow">{t('modules.financial')}</div>;
-};
+function LegacyFederationEditRedirect(): JSX.Element {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={`/federations/${id}/edit`} replace />;
+}
 
 /**
- * Initializes the React Router configuration.
- * Defines public routes and wraps private routes inside protected and layout boundaries.
- * 
+ * Initializes the React Router configuration with lazy-loaded entity CRUD routes.
+ *
  * @component
  * @returns {React.ReactElement} The configured application router.
  */
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        
-        {/* Protected Routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route element={<MainLayout />}>
-            {/* Default redirection to the dashboard upon successful login */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
-            <Route path="/dashboard" element={<Dashboard />} />
-            
-            {/* Connected Submodules */}
-            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
-              <Route path="/users" element={<Users />} />
-            </Route>
-            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'SPORTS_TECHNICAL_DIRECTOR']} />}>
-              <Route path="/disciplines" element={<Disciplines />} />
-            </Route>
-            <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'INSTRUCTOR']} />}>
-              <Route path="/students" element={<Students />} />
-            </Route>
-            
-            <Route path="/attendances" element={<Attendances />} />
-            <Route path="/graduations" element={<Graduations />} />
-            <Route path="/financial" element={<Financial />} />
-          </Route>
-        </Route>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
 
-        {/* Catch-all route for undefined paths */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+
+              <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
+                <Route path="/users" element={<Users />} />
+                <Route path="/users/new" element={<UserCreatePage />} />
+                <Route path="/users/:id/edit" element={<UserEditPage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'SPORTS_TECHNICAL_DIRECTOR']} />}>
+                <Route path="/disciplines" element={<Disciplines />} />
+                <Route path="/disciplines/new" element={<DisciplineCreatePage />} />
+                <Route path="/disciplines/:id/edit" element={<DisciplineEditPage />} />
+              </Route>
+
+              <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF', 'INSTRUCTOR']} />}>
+                <Route path="/students" element={<Students />} />
+                <Route path="/students/new" element={<StudentCreatePage />} />
+                <Route path="/students/:id/edit" element={<StudentEditPage />} />
+              </Route>
+
+              <Route path="/attendances" element={<Attendances />} />
+              <Route path="/graduations" element={<Graduations />} />
+
+              <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN', 'ADMIN_STAFF']} />}>
+                <Route path="/financial" element={<Navigate to="/financial/config" replace />} />
+                <Route path="/financial/config" element={<FinancialConfig />} />
+
+                <Route path="/federations" element={<Federations />} />
+                <Route path="/federations/new" element={<FederationCreatePage />} />
+                <Route path="/federations/:id/edit" element={<FederationEditPage />} />
+                <Route path="/licenses" element={<Licenses />} />
+                <Route path="/licenses/batch" element={<BatchWizard />} />
+
+                <Route path="/financial/federations" element={<Navigate to="/federations" replace />} />
+                <Route path="/financial/federations/new" element={<Navigate to="/federations/new" replace />} />
+                <Route path="/financial/federations/:id/edit" element={<LegacyFederationEditRedirect />} />
+                <Route path="/financial/licenses" element={<Navigate to="/licenses" replace />} />
+                <Route path="/financial/licenses/batch" element={<Navigate to="/licenses/batch" replace />} />
+                <Route path="/financial/licenses/budget" element={<Navigate to="/licenses" replace />} />
+              </Route>
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

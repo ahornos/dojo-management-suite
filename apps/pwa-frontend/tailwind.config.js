@@ -9,6 +9,19 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  safelist: [
+    "bg-belt-white",
+    "bg-belt-blue",
+    "bg-belt-purple",
+    "bg-belt-brown",
+    "bg-belt-black",
+    "bg-belt-grey",
+    "bg-belt-yellow",
+    "bg-belt-green",
+    "border-belt-red",
+    "bg-belt-purple/15",
+    "border-belt-purple/40",
+  ],
   theme: {
     extend: {
       colors: {

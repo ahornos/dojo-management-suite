@@ -3,10 +3,12 @@
  * @description Master layout wrapper for authenticated views.
  */
 
+import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { RouteFallback } from './RouteFallback';
 
 /**
  * Orchestrates the primary UI structure consisting of a Sidebar, Header, 
@@ -25,7 +27,9 @@ export const MainLayout = () => {
         <Header />
         
         <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
+          <Suspense fallback={<RouteFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
         
         <Footer />

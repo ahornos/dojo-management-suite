@@ -8,13 +8,18 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+if (!apiBaseUrl) {
+  throw new Error('FATAL: VITE_API_BASE_URL is required and must not be empty.');
+}
+
 /**
  * Pre-configured Axios instance pointing to the API Gateway.
- * 
+ *
  * @constant
  */
 export const apiClient = axios.create({
-  baseURL: 'http://localhost:3000/api', // Points directly to the API Gateway routes
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -50,6 +55,11 @@ apiClient.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    const tenantId = useAuthStore.getState().tenantId;
+    if (tenantId) {
+      config.headers['x-school-id'] = tenantId;
     }
 
     return config;
