@@ -8,6 +8,7 @@ import { AttendancesModule } from './attendances/attendances.module';
 import { GraduationsModule } from './graduations/graduations.module';
 import { DisciplinesModule } from './disciplines/disciplines.module';
 import { LicensesModule } from './licenses/licenses.module';
+import { AcademyModule } from './academy/academy.module';
 import { AuthModule } from './auth/auth.module';
 import { validateEnv } from './config/env.validation';
 
@@ -32,6 +33,7 @@ import { validateEnv } from './config/env.validation';
     GraduationsModule, 
     DisciplinesModule,
     LicensesModule,
+    AcademyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

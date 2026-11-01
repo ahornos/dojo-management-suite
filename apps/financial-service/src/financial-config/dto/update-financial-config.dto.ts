@@ -79,4 +79,10 @@ export class UpdateFinancialConfigDto {
   @IsOptional()
   @IsString()
   bic?: string;
+
+  @ApiPropertyOptional({ description: 'Reserved Stripe connected-account id. Empty until onboarding exists.' })
+  @Transform(({ value }) => trimString(value))
+  @IsOptional()
+  @IsString()
+  stripeAccountId?: string;
 }

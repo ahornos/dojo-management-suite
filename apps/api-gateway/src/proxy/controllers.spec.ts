@@ -71,6 +71,7 @@ describe('Gateway proxy controllers', () => {
     await controller.proxyAttendances(req('/api/academic/attendances'));
     await controller.proxyGraduations(req('/api/academic/graduations'));
     await controller.proxyLicenses(req('/api/academic/licenses/expiring'));
+    await controller.proxyAcademy(req('/api/academic/academy/settings'));
 
     expect(proxy.forwardRequest.mock.calls.map(([url]) => url)).toEqual([
       'http://academic.internal:3000/api/disciplines?x=1',
@@ -78,6 +79,7 @@ describe('Gateway proxy controllers', () => {
       'http://academic.internal:3000/api/attendances',
       'http://academic.internal:3000/api/graduations',
       'http://academic.internal:3000/api/licenses/expiring',
+      'http://academic.internal:3000/api/academy/settings',
     ]);
   });
 

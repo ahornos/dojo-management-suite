@@ -15,6 +15,7 @@ describe('GraduationsService', () => {
   const mockPrisma = {
     studentProfile: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
     graduationRequest: {
       create: jest.fn().mockResolvedValue({ id: 'req-uuid', status: 'PENDING' }),
@@ -50,6 +51,20 @@ describe('GraduationsService', () => {
       await expect(
         service.evaluateGraduationEligibility('non-existent-id'),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('batch evaluation marks students without a rank as not eligible', async () => {
+      mockPrisma.studentProfile.findMany.mockResolvedValue([
+        { id: 'p-1', ranks: [], attendances: [] },
+      ]);
+
+      const result = await service.evaluateEligibilityBatch(['p-1']);
+
+      expect(result[0]).toMatchObject({
+        studentProfileId: 'p-1',
+        currentBelt: null,
+        eligibility: { isEligible: false },
+      });
     });
   });
 

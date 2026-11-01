@@ -1,28 +1,107 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+/**
+ * @file attendances.controller.ts
+ * @description Staff HTTP API for legacy attendance logs and session-based quick check-in.
+ */
+
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CurrentUser, JwtAuthGuard, Roles, RolesGuard, TenantId } from '@dms/shared-auth';
+import { AuthenticatedUser, Role } from '@dms/shared-types';
 import { AttendancesService } from './attendances.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { JwtAuthGuard, RolesGuard, Roles } from '@dms/shared-auth';
-import { Role } from '@dms/shared-types';
+import { CreateAttendanceSessionDto } from './dto/create-attendance-session.dto';
+import { ListAttendanceSessionsDto } from './dto/list-attendance-sessions.dto';
+import { SessionRosterQueryDto } from './dto/session-roster-query.dto';
+import { UpsertAttendanceRecordsDto } from './dto/upsert-attendance-records.dto';
+
+const CHECKIN_ROLES = [Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR] as const;
 
 /**
- * @class AttendancesController
- * @description Controller responsible for tracking student class attendances.
+ * Controller responsible for tracking student class attendances.
  */
 @ApiTags('Attendances')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('attendances')
 export class AttendancesController {
+  /**
+   * @param {AttendancesService} attendancesService - Logs, sessions, and roll-call.
+   */
   constructor(private readonly attendancesService: AttendancesService) {}
 
   /**
-   * @description Registers a new class attendance record for a student.
+   * Opens a class session (idempotent for the same discipline, day, and instructor).
+   *
+   * @param {CreateAttendanceSessionDto} dto - Discipline, date, optional instructor and capacity.
+   * @param {AuthenticatedUser} actor - Authenticated staff member.
+   * @returns {Promise<object>} Session header.
+   */
+  @Post('sessions')
+  @Roles(...CHECKIN_ROLES)
+  @ApiOperation({ summary: 'Create or reuse a class attendance session' })
+  createSession(@Body() dto: CreateAttendanceSessionDto, @CurrentUser() actor: AuthenticatedUser) {
+    return this.attendancesService.createSession(dto, actor);
+  }
+
+  /**
+   * Lists class sessions with optional date and discipline filters.
+   *
+   * @param {ListAttendanceSessionsDto} query - Filters.
+   * @returns {Promise<object[]>} Sessions.
+   */
+  @Get('sessions')
+  @Roles(...CHECKIN_ROLES)
+  @ApiOperation({ summary: 'List class attendance sessions' })
+  listSessions(@TenantId() tenantId: string, @Query() query: ListAttendanceSessionsDto) {
+    return this.attendancesService.listSessions(tenantId, query);
+  }
+
+  /**
+   * Session details and the check-in roster (age-filtered, with current marks).
+   *
+   * @param {string} sessionId - Session UUID.
+   * @param {SessionRosterQueryDto} query - Optional age bracket.
+   * @returns {Promise<object>} Session plus students.
+   */
+  @Get('sessions/:sessionId')
+  @Roles(...CHECKIN_ROLES)
+  @ApiOperation({ summary: 'Get a class session and its check-in roster' })
+  @ApiParam({ name: 'sessionId', description: 'Attendance session UUID' })
+  getSession(
+    @TenantId() tenantId: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Query() query: SessionRosterQueryDto,
+  ) {
+    return this.attendancesService.getSession(tenantId, sessionId, query);
+  }
+
+  /**
+   * Bulk-upserts roll-call marks for a session (checkbox grid save).
+   *
+   * @param {string} sessionId - Session UUID.
+   * @param {UpsertAttendanceRecordsDto} dto - Student marks.
+   * @returns {Promise<object>} Updated roster.
+   */
+  @Post('sessions/:sessionId/records')
+  @Roles(...CHECKIN_ROLES)
+  @ApiOperation({ summary: 'Submit attendance marks for a class session' })
+  @ApiParam({ name: 'sessionId', description: 'Attendance session UUID' })
+  upsertRecords(
+    @TenantId() tenantId: string,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Body() dto: UpsertAttendanceRecordsDto,
+  ) {
+    return this.attendancesService.upsertRecords(tenantId, sessionId, dto);
+  }
+
+  /**
+   * Registers a new class attendance record for a student.
+   *
    * @param {CreateAttendanceDto} createAttendanceDto - The attendance details.
-   * @returns {Promise<any>} The created attendance record.
+   * @returns {Promise<object>} The created attendance record.
    */
   @Post()
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR, Role.INSTRUCTOR)
+  @Roles(...CHECKIN_ROLES)
   @ApiOperation({ summary: 'Register class attendance for a student' })
   @ApiResponse({ status: 201, description: 'Attendance successfully logged.' })
   create(@Body() createAttendanceDto: CreateAttendanceDto) {
@@ -30,8 +109,9 @@ export class AttendancesController {
   }
 
   /**
-   * @description Retrieves all recorded attendance logs across the academy.
-   * @returns {Promise<any[]>} A list of all attendances.
+   * Retrieves all recorded attendance logs across the academy.
+   *
+   * @returns {Promise<object[]>} A list of all attendances.
    */
   @Get()
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF, Role.SPORTS_TECHNICAL_DIRECTOR)
@@ -42,10 +122,10 @@ export class AttendancesController {
   }
 
   /**
-   * @description Retrieves attendance logs for a specific student. 
-   * Open to all authenticated users (students can view their own, enforced by service logic).
+   * Retrieves attendance logs for a specific student.
+   *
    * @param {string} studentProfileId - The UUID of the student's profile.
-   * @returns {Promise<any[]>} The student's attendance history.
+   * @returns {Promise<object[]>} The student's attendance history.
    */
   @Get('student/:studentProfileId')
   @ApiOperation({ summary: 'Retrieve attendance logs for a specific student' })
@@ -56,9 +136,10 @@ export class AttendancesController {
   }
 
   /**
-   * @description Deletes a specific attendance record.
+   * Deletes a specific attendance record.
+   *
    * @param {string} id - The UUID of the attendance record.
-   * @returns {Promise<any>} The deleted record.
+   * @returns {Promise<object>} The deleted record.
    */
   @Delete(':id')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN_STAFF)

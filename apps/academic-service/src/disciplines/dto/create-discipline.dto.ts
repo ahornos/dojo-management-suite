@@ -47,11 +47,12 @@ export class CreateDisciplineProgramDto {
   @Min(0)
   maxAge?: number;
 
-  @ApiProperty({ type: [CreateBeltRankDto] })
+  @ApiPropertyOptional({ type: [CreateBeltRankDto] })
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateBeltRankDto)
-  @ArrayMinSize(1)
-  beltRanks: CreateBeltRankDto[];
+  @ArrayMinSize(0)
+  beltRanks?: CreateBeltRankDto[];
 }
 
 export class CreateDisciplineDto {
@@ -71,9 +72,10 @@ export class CreateDisciplineDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ type: [CreateDisciplineProgramDto] })
+  @ApiPropertyOptional({ type: [CreateDisciplineProgramDto], description: 'Optional nested programs. Empty creates the discipline only.' })
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateDisciplineProgramDto)
-  @ArrayMinSize(1)
-  programs: CreateDisciplineProgramDto[];
+  @ArrayMinSize(0)
+  programs?: CreateDisciplineProgramDto[];
 }

@@ -100,6 +100,65 @@ export class GraduationsService {
   }
 
   /**
+   * Evaluates belt criteria for many students in one query. Missing ranks are not eligible (no throw).
+   *
+   * @param {string[]} studentProfileIds - Academic profile ids.
+   * @returns {Promise<object[]>} Eligibility payload per student that exists.
+   */
+  async evaluateEligibilityBatch(studentProfileIds: string[]) {
+    const ids = [...new Set(studentProfileIds)];
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const students = await this.prisma.studentProfile.findMany({
+      where: { id: { in: ids } },
+      include: {
+        ranks: {
+          orderBy: { promotedAt: 'desc' },
+          take: 1,
+          include: { beltRank: true },
+        },
+        attendances: { where: { countedForRank: true }, select: { date: true } },
+      },
+    });
+
+    const now = new Date();
+    return students.map((student) => {
+      const activeRank = student.ranks[0];
+      if (!activeRank) {
+        return {
+          studentProfileId: student.id,
+          currentBelt: null,
+          currentStripes: 0,
+          maxStripes: 0,
+          requirements: { minMonthsRequired: 0, minHoursRequired: 0 },
+          currentMetrics: { monthsInRank: 0, accumulatedHours: 0 },
+          eligibility: { meetsMonths: false, meetsHours: false, isEligible: false },
+        };
+      }
+
+      const beltCriteria = activeRank.beltRank;
+      const promotedAt = new Date(activeRank.promotedAt);
+      const monthsInRank =
+        (now.getFullYear() - promotedAt.getFullYear()) * 12 + (now.getMonth() - promotedAt.getMonth());
+      const trainingHours = student.attendances.filter((att) => new Date(att.date) >= promotedAt).length;
+      const meetsMonths = monthsInRank >= beltCriteria.minMonthsRequired;
+      const meetsHours = trainingHours >= beltCriteria.minHoursRequired;
+
+      return {
+        studentProfileId: student.id,
+        currentBelt: beltCriteria.name,
+        currentStripes: activeRank.currentStripes,
+        maxStripes: beltCriteria.maxStripes,
+        requirements: { minMonthsRequired: beltCriteria.minMonthsRequired, minHoursRequired: beltCriteria.minHoursRequired },
+        currentMetrics: { monthsInRank, accumulatedHours: trainingHours },
+        eligibility: { meetsMonths, meetsHours, isEligible: meetsMonths && meetsHours },
+      };
+    });
+  }
+
+  /**
    * Creates a `PENDING` graduation request for staff review.
    *
    * @param {string} studentProfileId - Student profile UUID.

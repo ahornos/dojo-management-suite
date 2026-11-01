@@ -95,4 +95,17 @@ export class AcademicController {
     const targetPath = req.originalUrl.replace('/api/academic', '/api');
     return this.proxyService.forwardRequest(`${this.targetUrl}${targetPath}`, req);
   }
+
+  /**
+   * Forwards academy operational settings, age brackets, and the weekly master schedule.
+   *
+   * @param {Request} req - Incoming Express request.
+   * @returns {Promise<unknown>} Downstream academic-service response.
+   */
+  @All('academy*')
+  @ApiOperation({ summary: 'Forward academy settings requests' })
+  async proxyAcademy(@Req() req: Request) {
+    const targetPath = req.originalUrl.replace('/api/academic', '/api');
+    return this.proxyService.forwardRequest(`${this.targetUrl}${targetPath}`, req);
+  }
 }

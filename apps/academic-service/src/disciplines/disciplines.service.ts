@@ -1,7 +1,8 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateDisciplineDto } from './dto/create-discipline.dto';
+import { CreateBeltRankDto, CreateDisciplineDto } from './dto/create-discipline.dto';
 import { UpdateDisciplineDto } from './dto/update-discipline.dto';
+import { CreateProgramDto, UpdateProgramDto } from './dto/upsert-program.dto';
 
 /**
  * Service responsible for managing academy disciplines, age-based programs,
@@ -35,12 +36,12 @@ export class DisciplinesService {
         acronym: dto.acronym?.trim() || null,
         description: dto.description,
         programs: {
-          create: dto.programs.map((prog) => ({
+          create: (dto.programs ?? []).map((prog) => ({
             name: prog.name,
             minAge: prog.minAge ?? 0,
             maxAge: prog.maxAge ?? 99,
             beltRanks: {
-              create: prog.beltRanks.map((belt) => ({
+              create: (prog.beltRanks ?? []).map((belt) => ({
                 name: belt.name,
                 order: belt.order,
                 maxStripes: belt.maxStripes,
@@ -163,5 +164,135 @@ export class DisciplinesService {
     return this.prisma.discipline.delete({
       where: { id },
     });
+  }
+
+  /**
+   * Creates a training program under an existing discipline.
+   *
+   * @param {string} disciplineId - Parent discipline UUID.
+   * @param {CreateProgramDto} dto - Program name and optional age range.
+   * @returns {Promise<object>} The created program.
+   */
+  async createProgram(disciplineId: string, dto: CreateProgramDto) {
+    await this.findOne(disciplineId);
+    return this.prisma.disciplineProgram.create({
+      data: {
+        disciplineId,
+        name: dto.name,
+        minAge: dto.minAge ?? 0,
+        maxAge: dto.maxAge ?? 99,
+      },
+      include: { beltRanks: { orderBy: { order: 'asc' } } },
+    });
+  }
+
+  /**
+   * Updates a training program identity (name / age range).
+   *
+   * @param {string} programId - Program UUID.
+   * @param {UpdateProgramDto} dto - Partial fields.
+   * @returns {Promise<object>} The updated program.
+   */
+  async updateProgram(programId: string, dto: UpdateProgramDto) {
+    await this.requireProgram(programId);
+    return this.prisma.disciplineProgram.update({
+      where: { id: programId },
+      data: {
+        ...(dto.name !== undefined ? { name: dto.name } : {}),
+        ...(dto.minAge !== undefined ? { minAge: dto.minAge } : {}),
+        ...(dto.maxAge !== undefined ? { maxAge: dto.maxAge } : {}),
+      },
+      include: { beltRanks: { orderBy: { order: 'asc' } } },
+    });
+  }
+
+  /**
+   * Deletes a training program and its belt ranks.
+   *
+   * @param {string} programId - Program UUID.
+   * @returns {Promise<object>} Deleted id.
+   */
+  async deleteProgram(programId: string) {
+    await this.requireProgram(programId);
+    await this.prisma.disciplineProgram.delete({ where: { id: programId } });
+    return { id: programId };
+  }
+
+  /**
+   * Creates a belt rank under a training program.
+   *
+   * @param {string} programId - Parent program UUID.
+   * @param {CreateBeltRankDto} dto - Rank criteria.
+   * @returns {Promise<object>} The created belt rank.
+   */
+  async createBeltRank(programId: string, dto: CreateBeltRankDto) {
+    await this.requireProgram(programId);
+    return this.prisma.beltRank.create({
+      data: {
+        disciplineProgramId: programId,
+        name: dto.name,
+        order: dto.order,
+        maxStripes: dto.maxStripes,
+        minMonthsRequired: dto.minMonthsRequired,
+        minHoursRequired: dto.minHoursRequired,
+      },
+    });
+  }
+
+  /**
+   * Updates a belt rank's criteria.
+   *
+   * @param {string} id - Belt rank UUID.
+   * @param {Partial<CreateBeltRankDto>} dto - Partial fields.
+   * @returns {Promise<object>} The updated belt rank.
+   */
+  async updateBeltRank(id: string, dto: Partial<CreateBeltRankDto>) {
+    await this.requireBeltRank(id);
+    return this.prisma.beltRank.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined ? { name: dto.name } : {}),
+        ...(dto.order !== undefined ? { order: dto.order } : {}),
+        ...(dto.maxStripes !== undefined ? { maxStripes: dto.maxStripes } : {}),
+        ...(dto.minMonthsRequired !== undefined ? { minMonthsRequired: dto.minMonthsRequired } : {}),
+        ...(dto.minHoursRequired !== undefined ? { minHoursRequired: dto.minHoursRequired } : {}),
+      },
+    });
+  }
+
+  /**
+   * Deletes a belt rank.
+   *
+   * @param {string} id - Belt rank UUID.
+   * @returns {Promise<object>} Deleted id.
+   */
+  async deleteBeltRank(id: string) {
+    await this.requireBeltRank(id);
+    await this.prisma.beltRank.delete({ where: { id } });
+    return { id };
+  }
+
+  /**
+   * @param {string} id - Program UUID.
+   * @returns {Promise<object>} Existing program.
+   */
+  private async requireProgram(id: string) {
+    const program = await this.prisma.disciplineProgram.findUnique({ where: { id } });
+    if (!program) {
+      throw new NotFoundException('DISCIPLINE_PROGRAM_NOT_FOUND');
+    }
+    return program;
+  }
+
+  /**
+   * @param {string} id - Belt rank UUID.
+   * @returns {Promise<object>} Existing belt rank.
+   */
+  private async requireBeltRank(id: string) {
+    const belt = await this.prisma.beltRank.findUnique({ where: { id } });
+    if (!belt) {
+      throw new NotFoundException('BELT_RANK_NOT_FOUND');
+    }
+    return belt;
   }
 }
