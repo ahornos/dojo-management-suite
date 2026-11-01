@@ -184,37 +184,37 @@ CREATE UNIQUE INDEX "disciplines_name_key" ON "disciplines"("name");
 CREATE UNIQUE INDEX "student_ranks_studentProfileId_beltRankId_key" ON "student_ranks"("studentProfileId", "beltRankId");
 
 -- AddForeignKey
-ALTER TABLE "student_profiles" ADD CONSTRAINT "student_profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_profiles" ADD CONSTRAINT "student_profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_guardians" ADD CONSTRAINT "student_guardians_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_guardians" ADD CONSTRAINT "student_guardians_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_guardians" ADD CONSTRAINT "student_guardians_guardianId_fkey" FOREIGN KEY ("guardianId") REFERENCES "guardians"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_guardians" ADD CONSTRAINT "student_guardians_guardianId_fkey" FOREIGN KEY ("guardianId") REFERENCES "guardians"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "status_history" ADD CONSTRAINT "status_history_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "status_history" ADD CONSTRAINT "status_history_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_subscriptions" ADD CONSTRAINT "student_subscriptions_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_subscriptions" ADD CONSTRAINT "student_subscriptions_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_subscriptions" ADD CONSTRAINT "student_subscriptions_feePlanId_fkey" FOREIGN KEY ("feePlanId") REFERENCES "fee_plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_subscriptions" ADD CONSTRAINT "student_subscriptions_feePlanId_fkey" FOREIGN KEY ("feePlanId") REFERENCES "fee_plans"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_licenses" ADD CONSTRAINT "student_licenses_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_licenses" ADD CONSTRAINT "student_licenses_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_licenses" ADD CONSTRAINT "student_licenses_federationId_fkey" FOREIGN KEY ("federationId") REFERENCES "federations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_licenses" ADD CONSTRAINT "student_licenses_federationId_fkey" FOREIGN KEY ("federationId") REFERENCES "federations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "belt_ranks" ADD CONSTRAINT "belt_ranks_disciplineId_fkey" FOREIGN KEY ("disciplineId") REFERENCES "disciplines"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "belt_ranks" ADD CONSTRAINT "belt_ranks_disciplineId_fkey" FOREIGN KEY ("disciplineId") REFERENCES "disciplines"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_ranks" ADD CONSTRAINT "student_ranks_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_ranks" ADD CONSTRAINT "student_ranks_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "student_ranks" ADD CONSTRAINT "student_ranks_beltRankId_fkey" FOREIGN KEY ("beltRankId") REFERENCES "belt_ranks"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "student_ranks" ADD CONSTRAINT "student_ranks_beltRankId_fkey" FOREIGN KEY ("beltRankId") REFERENCES "belt_ranks"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "attendances" ADD CONSTRAINT "attendances_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IF EXISTS "attendances" ADD CONSTRAINT "attendances_studentProfileId_fkey" FOREIGN KEY ("studentProfileId") REFERENCES "student_profiles"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,26 +1,14 @@
+import { Gender, Role } from './common.enums';
 /**
- * @file users.types.ts
- * @description HTTP contracts of the auth-service internal user directory (`/api/internal/users`).
- * Consumed by academic-service and financial-service instead of querying the `users` table directly.
- * Dates travel as ISO-8601 strings because the payloads are JSON.
- */
-import { Role } from './common.enums';
-/**
- * Public projection of a user. Never contains credentials.
+ * Public projection of a login identity. Never contains credentials.
+ * Demographics (dni, birthDate, phone, address) live on StudentProfile, not here.
  */
 export interface UserSummary {
     id: string;
     email: string;
     firstName: string;
     lastName: string;
-    dni: string | null;
-    birthDate: string | null;
-    phone: string | null;
-    address: string | null;
-    city: string | null;
-    state: string | null;
-    postalCode: string | null;
-    country: string | null;
+    gender: Gender | null;
     isActive: boolean;
     roles: Role[];
 }
@@ -32,25 +20,24 @@ export interface UserBatchRequest {
     ids: string[];
 }
 /**
+ * Body of `POST /api/internal/users/by-roles`.
+ */
+export interface UserByRolesRequest {
+    /** Roles to match (`hasSome`). Only active users are returned. */
+    roles: Role[];
+}
+/**
  * Roles an internal caller may grant while provisioning an identity (least privilege).
  */
-export type ProvisionableRole = Role.STUDENT | Role.PARENT;
+export type ProvisionableRole = Role.STUDENT | Role.PARENT | Role.TRIAL;
 /**
- * Personal data that can be set or refreshed on a user.
+ * Login-identity fields that can be set or refreshed on a user.
  * On provisioning, non-empty values overwrite stored data and absent values are preserved.
  */
 export interface UserPersonalData {
     firstName?: string;
     lastName?: string;
-    dni?: string;
-    /** ISO-8601 date string. */
-    birthDate?: string;
-    phone?: string;
-    address?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
-    country?: string;
+    gender?: Gender;
 }
 /**
  * Body of `POST /api/internal/users/provision`: find-or-create an identity and grant it a role.

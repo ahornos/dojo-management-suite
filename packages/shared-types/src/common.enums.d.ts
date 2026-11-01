@@ -8,7 +8,8 @@ export declare enum Role {
     SPORTS_TECHNICAL_DIRECTOR = "SPORTS_TECHNICAL_DIRECTOR",
     INSTRUCTOR = "INSTRUCTOR",
     STUDENT = "STUDENT",
-    PARENT = "PARENT"
+    PARENT = "PARENT",
+    TRIAL = "TRIAL"
 }
 export declare enum DiscountType {
     PERCENTAGE = "PERCENTAGE",
@@ -47,4 +48,42 @@ export declare enum RemittanceItemStatus {
     PENDING = "PENDING",
     SETTLED = "SETTLED",
     RETURNED = "RETURNED"
+}
+export declare enum Gender {
+    MALE = "MALE",
+    FEMALE = "FEMALE",
+    NON_BINARY = "NON_BINARY",
+    OTHER = "OTHER"
+}
+export declare enum LeaveReason {
+    ECONOMIC = "ECONOMIC",
+    TIME_CONFLICT = "TIME_CONFLICT",
+    INJURY = "INJURY",
+    MOVED = "MOVED",
+    DISSATISFIED = "DISSATISFIED",
+    OTHER = "OTHER"
+}
+export declare enum LeaveNoticeMethod {
+    PHONE = "PHONE",
+    WHATSAPP = "WHATSAPP",
+    IN_PERSON = "IN_PERSON",
+    RECEPTION = "RECEPTION",
+    OTHER = "OTHER"
+}
+export declare enum LicenseHolderType {
+    STUDENT = "STUDENT",
+    INSTRUCTOR = "INSTRUCTOR",
+    TECHNICAL_DIRECTOR = "TECHNICAL_DIRECTOR",
+    CLUB = "CLUB"
+}
+export declare enum AffiliationLicenseStatus {
+    PENDING = "PENDING",
+    PAID = "PAID",
+    EXEMPT = "EXEMPT",
+    FAILED = "FAILED"
+}
+export declare enum FederationContactMedium {
+    EMAIL = "EMAIL",
+    PHONE = "PHONE",
+    ADDRESS = "ADDRESS"
 }

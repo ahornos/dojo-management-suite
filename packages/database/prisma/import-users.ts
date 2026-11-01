@@ -1,16 +1,16 @@
 /**
  * @file import-users.ts
- * @description Dynamic seed script to populate the database with users from a provided CSV file.
- * Accepts the CSV file path as a CLI argument, strictly validates the header structure, 
- * checks for existing users by email to prevent overwriting, handles duplicate DNIs gracefully,
- * securely hashes passwords, and maps roles as an array to align with the Prisma schema.
+ * @description Headless CLI for `pnpm import:users`.
+ * Default source: `import-data/users-import.csv`, falling back to `users-import.csv.mock`.
+ * Strictly validates headers, skips existing emails, and hashes passwords.
+ * DNI and other demographics are not stored on User (they live on StudentProfile).
  */
 
 import { PrismaClient, Role } from '../client';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as bcrypt from 'bcrypt';
 import csvParser from 'csv-parser';
+import { resolveImportCsv } from './import-data-path';
 
 const prisma = new PrismaClient();
 
@@ -112,50 +112,20 @@ async function importUsers(filePath: string): Promise<void> {
         continue;
       }
 
-      let dniToSave = row['ID / Passport']?.trim() || null;
-      if (dniToSave && dniToSave !== '') {
-        const existingDni = await prisma.user.findUnique({
-          where: { dni: dniToSave },
-        });
-        if (existingDni) {
-          console.warn(`⚠️  Warning: DNI '${dniToSave}' for user ${email} is already registered. Setting DNI to null.`);
-          dniToSave = null;
-        }
-      }
-
-      let parsedBirthDate: Date | null = null;
-      const rawBirthDate = row.birthDate?.trim();
-      if (rawBirthDate && rawBirthDate !== '') {
-        const dateObj = new Date(rawBirthDate);
-        if (!isNaN(dateObj.getTime())) {
-          parsedBirthDate = dateObj;
-        } else {
-          console.warn(`⚠️  Warning: Invalid birthDate format ('${rawBirthDate}') for user ${email}. Setting to null.`);
-        }
-      }
-
       const saltRounds = 10;
       const plainPassword = row['Init password']?.trim() || 'FoxJiuJitsu2026!';
       const passwordHash = await bcrypt.hash(plainPassword, saltRounds);
 
       const parsedRole = (row.Role?.trim() as Role) || Role.STUDENT;
 
-      // Create the new user mapping CSV headers to Prisma Schema fields (using roles array)
+      // Login identity only. DNI / birthDate / address live on StudentProfile.
       await prisma.user.create({
         data: {
           firstName: row.Name?.trim() || 'Unknown',
           lastName: row['Surname/s']?.trim() || 'Unknown',
           email: email,
           passwordHash: passwordHash,
-          roles: [parsedRole], // Updated to array format to match schema
-          dni: dniToSave,
-          birthDate: parsedBirthDate,
-          phone: row.Phone?.trim() || null,
-          address: row.Address?.trim() || null,
-          city: row.City?.trim() || null,
-          state: row['State / Province']?.trim() || null,
-          postalCode: row['Postal Code']?.trim() || null,
-          country: row.Country?.trim() || 'ES',
+          roles: [parsedRole],
           isActive: true,
         },
       });
@@ -170,25 +140,14 @@ async function importUsers(filePath: string): Promise<void> {
 }
 
 /**
- * Main execution block. Parses CLI arguments, resolves file paths, and manages global errors.
+ * Main execution block. Default source: `import-data/users-import.csv`, then `users-import.csv.mock`.
  */
 async function main() {
-  const args = process.argv.slice(2);
-
-  if (args.length === 0) {
-    console.error('\n❌ Missing CSV file argument.');
-    console.log('💡 Usage: pnpm --filter database exec ts-node prisma/import-users.ts <path-to-csv-file>\n');
-    process.exit(1);
+  const resolved = resolveImportCsv('users', process.argv[2]);
+  if (resolved.usedFallback) {
+    console.log(`[import-users] Real CSV missing; using template ${resolved.filePath}`);
   }
-
-  const csvFilePath = path.resolve(args[0]);
-  
-  if (!fs.existsSync(csvFilePath)) {
-    console.error(`\n❌ File not found: ${csvFilePath}\n`);
-    process.exit(1);
-  }
-
-  await importUsers(csvFilePath);
+  await importUsers(resolved.filePath);
 }
 
 main()

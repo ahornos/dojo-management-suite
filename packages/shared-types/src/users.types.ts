@@ -5,24 +5,18 @@
  * Dates travel as ISO-8601 strings because the payloads are JSON.
  */
 
-import { Role } from './common.enums';
+import { Gender, Role } from './common.enums';
 
 /**
- * Public projection of a user. Never contains credentials.
+ * Public projection of a login identity. Never contains credentials.
+ * Demographics (dni, birthDate, phone, address) live on StudentProfile, not here.
  */
 export interface UserSummary {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  dni: string | null;
-  birthDate: string | null;
-  phone: string | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  postalCode: string | null;
-  country: string | null;
+  gender: Gender | null;
   isActive: boolean;
   roles: Role[];
 }
@@ -36,26 +30,26 @@ export interface UserBatchRequest {
 }
 
 /**
- * Roles an internal caller may grant while provisioning an identity (least privilege).
+ * Body of `POST /api/internal/users/by-roles`.
  */
-export type ProvisionableRole = Role.STUDENT | Role.PARENT;
+export interface UserByRolesRequest {
+  /** Roles to match (`hasSome`). Only active users are returned. */
+  roles: Role[];
+}
 
 /**
- * Personal data that can be set or refreshed on a user.
+ * Roles an internal caller may grant while provisioning an identity (least privilege).
+ */
+export type ProvisionableRole = Role.STUDENT | Role.PARENT | Role.TRIAL;
+
+/**
+ * Login-identity fields that can be set or refreshed on a user.
  * On provisioning, non-empty values overwrite stored data and absent values are preserved.
  */
 export interface UserPersonalData {
   firstName?: string;
   lastName?: string;
-  dni?: string;
-  /** ISO-8601 date string. */
-  birthDate?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  country?: string;
+  gender?: Gender;
 }
 
 /**

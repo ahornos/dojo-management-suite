@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.INTERNAL_API_KEY_HEADER = exports.RemittanceItemStatus = exports.RemittanceStatus = exports.PaymentMethod = exports.CashCategory = exports.CashMovementType = exports.DiscountCategory = exports.DiscountType = exports.Role = void 0;
+exports.INTERNAL_API_KEY_HEADER = exports.LicenseHolderType = exports.LeaveNoticeMethod = exports.LeaveReason = exports.Gender = exports.RemittanceItemStatus = exports.RemittanceStatus = exports.PaymentMethod = exports.CashCategory = exports.CashMovementType = exports.DiscountCategory = exports.DiscountType = exports.Role = void 0;
 var common_enums_1 = require("./common.enums");
 Object.defineProperty(exports, "Role", { enumerable: true, get: function () { return common_enums_1.Role; } });
 Object.defineProperty(exports, "DiscountType", { enumerable: true, get: function () { return common_enums_1.DiscountType; } });
@@ -10,5 +10,9 @@ Object.defineProperty(exports, "CashCategory", { enumerable: true, get: function
 Object.defineProperty(exports, "PaymentMethod", { enumerable: true, get: function () { return common_enums_1.PaymentMethod; } });
 Object.defineProperty(exports, "RemittanceStatus", { enumerable: true, get: function () { return common_enums_1.RemittanceStatus; } });
 Object.defineProperty(exports, "RemittanceItemStatus", { enumerable: true, get: function () { return common_enums_1.RemittanceItemStatus; } });
+Object.defineProperty(exports, "Gender", { enumerable: true, get: function () { return common_enums_1.Gender; } });
+Object.defineProperty(exports, "LeaveReason", { enumerable: true, get: function () { return common_enums_1.LeaveReason; } });
+Object.defineProperty(exports, "LeaveNoticeMethod", { enumerable: true, get: function () { return common_enums_1.LeaveNoticeMethod; } });
+Object.defineProperty(exports, "LicenseHolderType", { enumerable: true, get: function () { return common_enums_1.LicenseHolderType; } });
 var users_types_1 = require("./users.types");
 Object.defineProperty(exports, "INTERNAL_API_KEY_HEADER", { enumerable: true, get: function () { return users_types_1.INTERNAL_API_KEY_HEADER; } });

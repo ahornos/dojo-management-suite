@@ -1,8 +1,11 @@
 /**
  * @file seed.ts
- * @description Database seeding script to automatically provision the default 
- * SUPER_ADMIN user and foundational martial disciplines (Brazilian Jiu-Jitsu) 
+ * @description Database seeding script to automatically provision the default
+ * SUPER_ADMIN user and foundational martial disciplines (Brazilian Jiu-Jitsu)
  * with complete adult and kids belt hierarchies upon initial deployment.
+ *
+ * Super Admin is a login identity only. Unique key is `email` — national ID and
+ * other demographics live exclusively on `StudentProfile`.
  */
 
 import { PrismaClient, Role } from '../client';
@@ -13,29 +16,30 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('[Seed] Starting database initialization...');
 
-  // 1. Provision Default Super Admin
-  const adminEmail = process.env.DEFAULT_SUPER_ADMIN_EMAIL || 'superadmin@foxjiujitsuacademy.com';
-  const adminPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD || 'SecurePassword123!';
+  // 1. Provision Default Super Admin (identified by email, never by dni)
+  const adminEmail = process.env.DEFAULT_SUPER_ADMIN_EMAIL;
+  const adminPassword = process.env.DEFAULT_SUPER_ADMIN_PASSWORD;
+  if (!adminEmail?.trim()) {
+    throw new Error('FATAL: DEFAULT_SUPER_ADMIN_EMAIL is required to seed the Super Admin.');
+  }
+  if (!adminPassword?.trim()) {
+    throw new Error('FATAL: DEFAULT_SUPER_ADMIN_PASSWORD is required to seed the Super Admin.');
+  }
   const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
-  const existingAdmin = await prisma.user.findUnique({
+  await prisma.user.upsert({
     where: { email: adminEmail },
+    update: {},
+    create: {
+      email: adminEmail,
+      passwordHash: hashedPassword,
+      firstName: 'Super',
+      lastName: 'Admin',
+      roles: [Role.SUPER_ADMIN],
+      isActive: true,
+    },
   });
-
-  if (!existingAdmin) {
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        passwordHash: hashedPassword,
-        firstName: 'Super',
-        lastName: 'Admin',
-        roles: [Role.SUPER_ADMIN],
-      },
-    });
-    console.log(`[Seed] Default SUPER_ADMIN created successfully: ${adminEmail}`);
-  } else {
-    console.log(`[Seed] SUPER_ADMIN already exists: ${adminEmail}`);
-  }
+  console.log(`[Seed] SUPER_ADMIN ensured: ${adminEmail}`);
 
   // 2. Provision Default Martial Discipline & Comprehensive Belt Hierarchy (BJJ)
   const bjjDisciplineName = 'Brazilian Jiu-Jitsu';
@@ -47,6 +51,7 @@ async function main() {
     bjjDiscipline = await prisma.discipline.create({
       data: {
         name: bjjDisciplineName,
+        acronym: 'BJJ',
         description: 'Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.',
         programs: {
           create: [
@@ -89,7 +94,15 @@ async function main() {
     });
     console.log('[Seed] Default Brazilian Jiu-Jitsu discipline, programs, and expanded belt ranks created successfully.');
   } else {
-    console.log('[Seed] Brazilian Jiu-Jitsu discipline already exists.');
+    if (bjjDiscipline.acronym !== 'BJJ') {
+      bjjDiscipline = await prisma.discipline.update({
+        where: { id: bjjDiscipline.id },
+        data: { acronym: 'BJJ' },
+      });
+      console.log('[Seed] Brazilian Jiu-Jitsu acronym set to BJJ.');
+    } else {
+      console.log('[Seed] Brazilian Jiu-Jitsu discipline already exists.');
+    }
   }
 
   console.log('[Seed] Database initialization completed successfully.');

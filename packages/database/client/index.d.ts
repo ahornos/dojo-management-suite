@@ -18,6 +18,8 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * ---------------------------------------------------------
  * Core Identity & Users
  * ---------------------------------------------------------
+ * Login identity owned by auth-service. Demographics (dni, birthDate, phone, address)
+ * live exclusively on StudentProfile — never on User.
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
@@ -123,6 +125,16 @@ export type CashRegisterSession = $Result.DefaultSelection<Prisma.$CashRegisterS
  */
 export type CashTransaction = $Result.DefaultSelection<Prisma.$CashTransactionPayload>
 /**
+ * Model TenantFinancialConfig
+ * ---------------------------------------------------------
+ * Tenant Financial Configuration (SEPA creditor / invoicing)
+ * Owned exclusively by financial-service. `tenantId` is the logical academy
+ * key from `x-school-id` (no physical Tenant table / cross-service FK).
+ * Empty-string defaults let GET create a blank row until staff complete it.
+ * ---------------------------------------------------------
+ */
+export type TenantFinancialConfig = $Result.DefaultSelection<Prisma.$TenantFinancialConfigPayload>
+/**
  * Model BankMandate
  * ---------------------------------------------------------
  * Bank Remittance Submodule (SEPA / Caixabank Integration)
@@ -142,27 +154,65 @@ export type RemittanceItem = $Result.DefaultSelection<Prisma.$RemittanceItemPayl
 /**
  * Model Federation
  * ---------------------------------------------------------
- * Federations & Licenses (Foundation)
+ * Federations (financial-service) & Affiliation Licenses (academic-service)
+ * `federationId` on licenses/charges is a logical id — no cross-service FK.
+ * `holderUserId` is a logical auth-service identity (no User @relation).
  * ---------------------------------------------------------
  */
 export type Federation = $Result.DefaultSelection<Prisma.$FederationPayload>
 /**
- * Model StudentLicense
- * 
+ * Model FederationContact
+ * Tagged multi-value contact for a federation (several phones/emails/addresses).
  */
-export type StudentLicense = $Result.DefaultSelection<Prisma.$StudentLicensePayload>
+export type FederationContact = $Result.DefaultSelection<Prisma.$FederationContactPayload>
+/**
+ * Model FederationSeason
+ * One pricing season for a federation (identity stays on `Federation`).
+ */
+export type FederationSeason = $Result.DefaultSelection<Prisma.$FederationSeasonPayload>
+/**
+ * Model FederationLicenseType
+ * One license product offered in a federation season (insurance variant, etc.).
+ */
+export type FederationLicenseType = $Result.DefaultSelection<Prisma.$FederationLicenseTypePayload>
+/**
+ * Model FederationLicensePriceRow
+ * One pricing-matrix row (instructor, adult, or custom birth-year band).
+ */
+export type FederationLicensePriceRow = $Result.DefaultSelection<Prisma.$FederationLicensePriceRowPayload>
+/**
+ * Model FederationSeasonCharge
+ * Seasonal charge row owned by financial-service (budget + future remittance source).
+ */
+export type FederationSeasonCharge = $Result.DefaultSelection<Prisma.$FederationSeasonChargePayload>
+/**
+ * Model AffiliationLicense
+ * Affiliation license history owned by academic-service.
+ */
+export type AffiliationLicense = $Result.DefaultSelection<Prisma.$AffiliationLicensePayload>
 
 /**
  * Enums
  */
 export namespace $Enums {
-  export const Role: {
+  export const Gender: {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  NON_BINARY: 'NON_BINARY',
+  OTHER: 'OTHER'
+};
+
+export type Gender = (typeof Gender)[keyof typeof Gender]
+
+
+export const Role: {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN_STAFF: 'ADMIN_STAFF',
   SPORTS_TECHNICAL_DIRECTOR: 'SPORTS_TECHNICAL_DIRECTOR',
   INSTRUCTOR: 'INSTRUCTOR',
   STUDENT: 'STUDENT',
-  PARENT: 'PARENT'
+  PARENT: 'PARENT',
+  TRIAL: 'TRIAL'
 };
 
 export type Role = (typeof Role)[keyof typeof Role]
@@ -176,6 +226,29 @@ export const StudentStatus: {
 };
 
 export type StudentStatus = (typeof StudentStatus)[keyof typeof StudentStatus]
+
+
+export const LeaveReason: {
+  ECONOMIC: 'ECONOMIC',
+  TIME_CONFLICT: 'TIME_CONFLICT',
+  INJURY: 'INJURY',
+  MOVED: 'MOVED',
+  DISSATISFIED: 'DISSATISFIED',
+  OTHER: 'OTHER'
+};
+
+export type LeaveReason = (typeof LeaveReason)[keyof typeof LeaveReason]
+
+
+export const LeaveNoticeMethod: {
+  PHONE: 'PHONE',
+  WHATSAPP: 'WHATSAPP',
+  IN_PERSON: 'IN_PERSON',
+  RECEPTION: 'RECEPTION',
+  OTHER: 'OTHER'
+};
+
+export type LeaveNoticeMethod = (typeof LeaveNoticeMethod)[keyof typeof LeaveNoticeMethod]
 
 
 export const RequestStatus: {
@@ -261,7 +334,49 @@ export const RemittanceItemStatus: {
 
 export type RemittanceItemStatus = (typeof RemittanceItemStatus)[keyof typeof RemittanceItemStatus]
 
+
+export const FederationContactMedium: {
+  EMAIL: 'EMAIL',
+  PHONE: 'PHONE',
+  ADDRESS: 'ADDRESS'
+};
+
+export type FederationContactMedium = (typeof FederationContactMedium)[keyof typeof FederationContactMedium]
+
+
+export const LicensePriceRowKind: {
+  INSTRUCTOR: 'INSTRUCTOR',
+  ADULT: 'ADULT',
+  CUSTOM: 'CUSTOM'
+};
+
+export type LicensePriceRowKind = (typeof LicensePriceRowKind)[keyof typeof LicensePriceRowKind]
+
+
+export const LicenseHolderType: {
+  STUDENT: 'STUDENT',
+  INSTRUCTOR: 'INSTRUCTOR',
+  TECHNICAL_DIRECTOR: 'TECHNICAL_DIRECTOR',
+  CLUB: 'CLUB'
+};
+
+export type LicenseHolderType = (typeof LicenseHolderType)[keyof typeof LicenseHolderType]
+
+
+export const AffiliationLicenseStatus: {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  EXEMPT: 'EXEMPT',
+  FAILED: 'FAILED'
+};
+
+export type AffiliationLicenseStatus = (typeof AffiliationLicenseStatus)[keyof typeof AffiliationLicenseStatus]
+
 }
+
+export type Gender = $Enums.Gender
+
+export const Gender: typeof $Enums.Gender
 
 export type Role = $Enums.Role
 
@@ -270,6 +385,14 @@ export const Role: typeof $Enums.Role
 export type StudentStatus = $Enums.StudentStatus
 
 export const StudentStatus: typeof $Enums.StudentStatus
+
+export type LeaveReason = $Enums.LeaveReason
+
+export const LeaveReason: typeof $Enums.LeaveReason
+
+export type LeaveNoticeMethod = $Enums.LeaveNoticeMethod
+
+export const LeaveNoticeMethod: typeof $Enums.LeaveNoticeMethod
 
 export type RequestStatus = $Enums.RequestStatus
 
@@ -306,6 +429,22 @@ export const RemittanceStatus: typeof $Enums.RemittanceStatus
 export type RemittanceItemStatus = $Enums.RemittanceItemStatus
 
 export const RemittanceItemStatus: typeof $Enums.RemittanceItemStatus
+
+export type FederationContactMedium = $Enums.FederationContactMedium
+
+export const FederationContactMedium: typeof $Enums.FederationContactMedium
+
+export type LicensePriceRowKind = $Enums.LicensePriceRowKind
+
+export const LicensePriceRowKind: typeof $Enums.LicensePriceRowKind
+
+export type LicenseHolderType = $Enums.LicenseHolderType
+
+export const LicenseHolderType: typeof $Enums.LicenseHolderType
+
+export type AffiliationLicenseStatus = $Enums.AffiliationLicenseStatus
+
+export const AffiliationLicenseStatus: typeof $Enums.AffiliationLicenseStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -621,6 +760,16 @@ export class PrismaClient<
   get cashTransaction(): Prisma.CashTransactionDelegate<ExtArgs>;
 
   /**
+   * `prisma.tenantFinancialConfig`: Exposes CRUD operations for the **TenantFinancialConfig** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TenantFinancialConfigs
+    * const tenantFinancialConfigs = await prisma.tenantFinancialConfig.findMany()
+    * ```
+    */
+  get tenantFinancialConfig(): Prisma.TenantFinancialConfigDelegate<ExtArgs>;
+
+  /**
    * `prisma.bankMandate`: Exposes CRUD operations for the **BankMandate** model.
     * Example usage:
     * ```ts
@@ -661,14 +810,64 @@ export class PrismaClient<
   get federation(): Prisma.FederationDelegate<ExtArgs>;
 
   /**
-   * `prisma.studentLicense`: Exposes CRUD operations for the **StudentLicense** model.
+   * `prisma.federationContact`: Exposes CRUD operations for the **FederationContact** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more StudentLicenses
-    * const studentLicenses = await prisma.studentLicense.findMany()
+    * // Fetch zero or more FederationContacts
+    * const federationContacts = await prisma.federationContact.findMany()
     * ```
     */
-  get studentLicense(): Prisma.StudentLicenseDelegate<ExtArgs>;
+  get federationContact(): Prisma.FederationContactDelegate<ExtArgs>;
+
+  /**
+   * `prisma.federationSeason`: Exposes CRUD operations for the **FederationSeason** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FederationSeasons
+    * const federationSeasons = await prisma.federationSeason.findMany()
+    * ```
+    */
+  get federationSeason(): Prisma.FederationSeasonDelegate<ExtArgs>;
+
+  /**
+   * `prisma.federationLicenseType`: Exposes CRUD operations for the **FederationLicenseType** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FederationLicenseTypes
+    * const federationLicenseTypes = await prisma.federationLicenseType.findMany()
+    * ```
+    */
+  get federationLicenseType(): Prisma.FederationLicenseTypeDelegate<ExtArgs>;
+
+  /**
+   * `prisma.federationLicensePriceRow`: Exposes CRUD operations for the **FederationLicensePriceRow** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FederationLicensePriceRows
+    * const federationLicensePriceRows = await prisma.federationLicensePriceRow.findMany()
+    * ```
+    */
+  get federationLicensePriceRow(): Prisma.FederationLicensePriceRowDelegate<ExtArgs>;
+
+  /**
+   * `prisma.federationSeasonCharge`: Exposes CRUD operations for the **FederationSeasonCharge** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FederationSeasonCharges
+    * const federationSeasonCharges = await prisma.federationSeasonCharge.findMany()
+    * ```
+    */
+  get federationSeasonCharge(): Prisma.FederationSeasonChargeDelegate<ExtArgs>;
+
+  /**
+   * `prisma.affiliationLicense`: Exposes CRUD operations for the **AffiliationLicense** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AffiliationLicenses
+    * const affiliationLicenses = await prisma.affiliationLicense.findMany()
+    * ```
+    */
+  get affiliationLicense(): Prisma.AffiliationLicenseDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -1129,11 +1328,17 @@ export namespace Prisma {
     StudentSubscription: 'StudentSubscription',
     CashRegisterSession: 'CashRegisterSession',
     CashTransaction: 'CashTransaction',
+    TenantFinancialConfig: 'TenantFinancialConfig',
     BankMandate: 'BankMandate',
     RemittanceBatch: 'RemittanceBatch',
     RemittanceItem: 'RemittanceItem',
     Federation: 'Federation',
-    StudentLicense: 'StudentLicense'
+    FederationContact: 'FederationContact',
+    FederationSeason: 'FederationSeason',
+    FederationLicenseType: 'FederationLicenseType',
+    FederationLicensePriceRow: 'FederationLicensePriceRow',
+    FederationSeasonCharge: 'FederationSeasonCharge',
+    AffiliationLicense: 'AffiliationLicense'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1149,7 +1354,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "studentStatusHistory" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "studentLicense"
+      modelProps: "user" | "studentProfile" | "studentStatusHistory" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "tenantFinancialConfig" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "federationContact" | "federationSeason" | "federationLicenseType" | "federationLicensePriceRow" | "federationSeasonCharge" | "affiliationLicense"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2483,6 +2688,76 @@ export namespace Prisma {
           }
         }
       }
+      TenantFinancialConfig: {
+        payload: Prisma.$TenantFinancialConfigPayload<ExtArgs>
+        fields: Prisma.TenantFinancialConfigFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TenantFinancialConfigFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TenantFinancialConfigFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          findFirst: {
+            args: Prisma.TenantFinancialConfigFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TenantFinancialConfigFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          findMany: {
+            args: Prisma.TenantFinancialConfigFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>[]
+          }
+          create: {
+            args: Prisma.TenantFinancialConfigCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          createMany: {
+            args: Prisma.TenantFinancialConfigCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TenantFinancialConfigCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>[]
+          }
+          delete: {
+            args: Prisma.TenantFinancialConfigDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          update: {
+            args: Prisma.TenantFinancialConfigUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          deleteMany: {
+            args: Prisma.TenantFinancialConfigDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TenantFinancialConfigUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.TenantFinancialConfigUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TenantFinancialConfigPayload>
+          }
+          aggregate: {
+            args: Prisma.TenantFinancialConfigAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTenantFinancialConfig>
+          }
+          groupBy: {
+            args: Prisma.TenantFinancialConfigGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TenantFinancialConfigGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TenantFinancialConfigCountArgs<ExtArgs>
+            result: $Utils.Optional<TenantFinancialConfigCountAggregateOutputType> | number
+          }
+        }
+      }
       BankMandate: {
         payload: Prisma.$BankMandatePayload<ExtArgs>
         fields: Prisma.BankMandateFieldRefs
@@ -2763,73 +3038,423 @@ export namespace Prisma {
           }
         }
       }
-      StudentLicense: {
-        payload: Prisma.$StudentLicensePayload<ExtArgs>
-        fields: Prisma.StudentLicenseFieldRefs
+      FederationContact: {
+        payload: Prisma.$FederationContactPayload<ExtArgs>
+        fields: Prisma.FederationContactFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.StudentLicenseFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload> | null
+            args: Prisma.FederationContactFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.StudentLicenseFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           findFirst: {
-            args: Prisma.StudentLicenseFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload> | null
+            args: Prisma.FederationContactFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.StudentLicenseFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           findMany: {
-            args: Prisma.StudentLicenseFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>[]
+            args: Prisma.FederationContactFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>[]
           }
           create: {
-            args: Prisma.StudentLicenseCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           createMany: {
-            args: Prisma.StudentLicenseCreateManyArgs<ExtArgs>
+            args: Prisma.FederationContactCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.StudentLicenseCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>[]
+            args: Prisma.FederationContactCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>[]
           }
           delete: {
-            args: Prisma.StudentLicenseDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           update: {
-            args: Prisma.StudentLicenseUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           deleteMany: {
-            args: Prisma.StudentLicenseDeleteManyArgs<ExtArgs>
+            args: Prisma.FederationContactDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.StudentLicenseUpdateManyArgs<ExtArgs>
+            args: Prisma.FederationContactUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           upsert: {
-            args: Prisma.StudentLicenseUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StudentLicensePayload>
+            args: Prisma.FederationContactUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationContactPayload>
           }
           aggregate: {
-            args: Prisma.StudentLicenseAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStudentLicense>
+            args: Prisma.FederationContactAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFederationContact>
           }
           groupBy: {
-            args: Prisma.StudentLicenseGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StudentLicenseGroupByOutputType>[]
+            args: Prisma.FederationContactGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FederationContactGroupByOutputType>[]
           }
           count: {
-            args: Prisma.StudentLicenseCountArgs<ExtArgs>
-            result: $Utils.Optional<StudentLicenseCountAggregateOutputType> | number
+            args: Prisma.FederationContactCountArgs<ExtArgs>
+            result: $Utils.Optional<FederationContactCountAggregateOutputType> | number
+          }
+        }
+      }
+      FederationSeason: {
+        payload: Prisma.$FederationSeasonPayload<ExtArgs>
+        fields: Prisma.FederationSeasonFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FederationSeasonFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FederationSeasonFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          findFirst: {
+            args: Prisma.FederationSeasonFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FederationSeasonFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          findMany: {
+            args: Prisma.FederationSeasonFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>[]
+          }
+          create: {
+            args: Prisma.FederationSeasonCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          createMany: {
+            args: Prisma.FederationSeasonCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FederationSeasonCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>[]
+          }
+          delete: {
+            args: Prisma.FederationSeasonDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          update: {
+            args: Prisma.FederationSeasonUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          deleteMany: {
+            args: Prisma.FederationSeasonDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FederationSeasonUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FederationSeasonUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonPayload>
+          }
+          aggregate: {
+            args: Prisma.FederationSeasonAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFederationSeason>
+          }
+          groupBy: {
+            args: Prisma.FederationSeasonGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FederationSeasonGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FederationSeasonCountArgs<ExtArgs>
+            result: $Utils.Optional<FederationSeasonCountAggregateOutputType> | number
+          }
+        }
+      }
+      FederationLicenseType: {
+        payload: Prisma.$FederationLicenseTypePayload<ExtArgs>
+        fields: Prisma.FederationLicenseTypeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FederationLicenseTypeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FederationLicenseTypeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          findFirst: {
+            args: Prisma.FederationLicenseTypeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FederationLicenseTypeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          findMany: {
+            args: Prisma.FederationLicenseTypeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>[]
+          }
+          create: {
+            args: Prisma.FederationLicenseTypeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          createMany: {
+            args: Prisma.FederationLicenseTypeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FederationLicenseTypeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>[]
+          }
+          delete: {
+            args: Prisma.FederationLicenseTypeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          update: {
+            args: Prisma.FederationLicenseTypeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          deleteMany: {
+            args: Prisma.FederationLicenseTypeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FederationLicenseTypeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FederationLicenseTypeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicenseTypePayload>
+          }
+          aggregate: {
+            args: Prisma.FederationLicenseTypeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFederationLicenseType>
+          }
+          groupBy: {
+            args: Prisma.FederationLicenseTypeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FederationLicenseTypeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FederationLicenseTypeCountArgs<ExtArgs>
+            result: $Utils.Optional<FederationLicenseTypeCountAggregateOutputType> | number
+          }
+        }
+      }
+      FederationLicensePriceRow: {
+        payload: Prisma.$FederationLicensePriceRowPayload<ExtArgs>
+        fields: Prisma.FederationLicensePriceRowFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FederationLicensePriceRowFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FederationLicensePriceRowFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          findFirst: {
+            args: Prisma.FederationLicensePriceRowFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FederationLicensePriceRowFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          findMany: {
+            args: Prisma.FederationLicensePriceRowFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>[]
+          }
+          create: {
+            args: Prisma.FederationLicensePriceRowCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          createMany: {
+            args: Prisma.FederationLicensePriceRowCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FederationLicensePriceRowCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>[]
+          }
+          delete: {
+            args: Prisma.FederationLicensePriceRowDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          update: {
+            args: Prisma.FederationLicensePriceRowUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          deleteMany: {
+            args: Prisma.FederationLicensePriceRowDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FederationLicensePriceRowUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FederationLicensePriceRowUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationLicensePriceRowPayload>
+          }
+          aggregate: {
+            args: Prisma.FederationLicensePriceRowAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFederationLicensePriceRow>
+          }
+          groupBy: {
+            args: Prisma.FederationLicensePriceRowGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FederationLicensePriceRowGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FederationLicensePriceRowCountArgs<ExtArgs>
+            result: $Utils.Optional<FederationLicensePriceRowCountAggregateOutputType> | number
+          }
+        }
+      }
+      FederationSeasonCharge: {
+        payload: Prisma.$FederationSeasonChargePayload<ExtArgs>
+        fields: Prisma.FederationSeasonChargeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FederationSeasonChargeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FederationSeasonChargeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          findFirst: {
+            args: Prisma.FederationSeasonChargeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FederationSeasonChargeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          findMany: {
+            args: Prisma.FederationSeasonChargeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>[]
+          }
+          create: {
+            args: Prisma.FederationSeasonChargeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          createMany: {
+            args: Prisma.FederationSeasonChargeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FederationSeasonChargeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>[]
+          }
+          delete: {
+            args: Prisma.FederationSeasonChargeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          update: {
+            args: Prisma.FederationSeasonChargeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          deleteMany: {
+            args: Prisma.FederationSeasonChargeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FederationSeasonChargeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FederationSeasonChargeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FederationSeasonChargePayload>
+          }
+          aggregate: {
+            args: Prisma.FederationSeasonChargeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFederationSeasonCharge>
+          }
+          groupBy: {
+            args: Prisma.FederationSeasonChargeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FederationSeasonChargeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FederationSeasonChargeCountArgs<ExtArgs>
+            result: $Utils.Optional<FederationSeasonChargeCountAggregateOutputType> | number
+          }
+        }
+      }
+      AffiliationLicense: {
+        payload: Prisma.$AffiliationLicensePayload<ExtArgs>
+        fields: Prisma.AffiliationLicenseFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AffiliationLicenseFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AffiliationLicenseFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          findFirst: {
+            args: Prisma.AffiliationLicenseFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AffiliationLicenseFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          findMany: {
+            args: Prisma.AffiliationLicenseFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>[]
+          }
+          create: {
+            args: Prisma.AffiliationLicenseCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          createMany: {
+            args: Prisma.AffiliationLicenseCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AffiliationLicenseCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>[]
+          }
+          delete: {
+            args: Prisma.AffiliationLicenseDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          update: {
+            args: Prisma.AffiliationLicenseUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          deleteMany: {
+            args: Prisma.AffiliationLicenseDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AffiliationLicenseUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AffiliationLicenseUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AffiliationLicensePayload>
+          }
+          aggregate: {
+            args: Prisma.AffiliationLicenseAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAffiliationLicense>
+          }
+          groupBy: {
+            args: Prisma.AffiliationLicenseGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AffiliationLicenseGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AffiliationLicenseCountArgs<ExtArgs>
+            result: $Utils.Optional<AffiliationLicenseCountAggregateOutputType> | number
           }
         }
       }
@@ -3000,11 +3625,6 @@ export namespace Prisma {
     attendances: number
     updateRequests: number
     graduationRequests: number
-    subscriptions: number
-    licenses: number
-    studentFees: number
-    studentDiscounts: number
-    bankMandates: number
   }
 
   export type StudentProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3014,11 +3634,6 @@ export namespace Prisma {
     attendances?: boolean | StudentProfileCountOutputTypeCountAttendancesArgs
     updateRequests?: boolean | StudentProfileCountOutputTypeCountUpdateRequestsArgs
     graduationRequests?: boolean | StudentProfileCountOutputTypeCountGraduationRequestsArgs
-    subscriptions?: boolean | StudentProfileCountOutputTypeCountSubscriptionsArgs
-    licenses?: boolean | StudentProfileCountOutputTypeCountLicensesArgs
-    studentFees?: boolean | StudentProfileCountOutputTypeCountStudentFeesArgs
-    studentDiscounts?: boolean | StudentProfileCountOutputTypeCountStudentDiscountsArgs
-    bankMandates?: boolean | StudentProfileCountOutputTypeCountBankMandatesArgs
   }
 
   // Custom InputTypes
@@ -3072,41 +3687,6 @@ export namespace Prisma {
    */
   export type StudentProfileCountOutputTypeCountGraduationRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GraduationRequestWhereInput
-  }
-
-  /**
-   * StudentProfileCountOutputType without action
-   */
-  export type StudentProfileCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentSubscriptionWhereInput
-  }
-
-  /**
-   * StudentProfileCountOutputType without action
-   */
-  export type StudentProfileCountOutputTypeCountLicensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentLicenseWhereInput
-  }
-
-  /**
-   * StudentProfileCountOutputType without action
-   */
-  export type StudentProfileCountOutputTypeCountStudentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentFeeWhereInput
-  }
-
-  /**
-   * StudentProfileCountOutputType without action
-   */
-  export type StudentProfileCountOutputTypeCountStudentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentDiscountWhereInput
-  }
-
-  /**
-   * StudentProfileCountOutputType without action
-   */
-  export type StudentProfileCountOutputTypeCountBankMandatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: BankMandateWhereInput
   }
 
 
@@ -3403,11 +3983,15 @@ export namespace Prisma {
    */
 
   export type FederationCountOutputType = {
-    licenses: number
+    charges: number
+    contacts: number
+    seasons: number
   }
 
   export type FederationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    licenses?: boolean | FederationCountOutputTypeCountLicensesArgs
+    charges?: boolean | FederationCountOutputTypeCountChargesArgs
+    contacts?: boolean | FederationCountOutputTypeCountContactsArgs
+    seasons?: boolean | FederationCountOutputTypeCountSeasonsArgs
   }
 
   // Custom InputTypes
@@ -3424,8 +4008,84 @@ export namespace Prisma {
   /**
    * FederationCountOutputType without action
    */
-  export type FederationCountOutputTypeCountLicensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentLicenseWhereInput
+  export type FederationCountOutputTypeCountChargesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationSeasonChargeWhereInput
+  }
+
+  /**
+   * FederationCountOutputType without action
+   */
+  export type FederationCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationContactWhereInput
+  }
+
+  /**
+   * FederationCountOutputType without action
+   */
+  export type FederationCountOutputTypeCountSeasonsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationSeasonWhereInput
+  }
+
+
+  /**
+   * Count Type FederationSeasonCountOutputType
+   */
+
+  export type FederationSeasonCountOutputType = {
+    licenseTypes: number
+  }
+
+  export type FederationSeasonCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    licenseTypes?: boolean | FederationSeasonCountOutputTypeCountLicenseTypesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FederationSeasonCountOutputType without action
+   */
+  export type FederationSeasonCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCountOutputType
+     */
+    select?: FederationSeasonCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FederationSeasonCountOutputType without action
+   */
+  export type FederationSeasonCountOutputTypeCountLicenseTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationLicenseTypeWhereInput
+  }
+
+
+  /**
+   * Count Type FederationLicenseTypeCountOutputType
+   */
+
+  export type FederationLicenseTypeCountOutputType = {
+    priceRows: number
+  }
+
+  export type FederationLicenseTypeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    priceRows?: boolean | FederationLicenseTypeCountOutputTypeCountPriceRowsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FederationLicenseTypeCountOutputType without action
+   */
+  export type FederationLicenseTypeCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseTypeCountOutputType
+     */
+    select?: FederationLicenseTypeCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FederationLicenseTypeCountOutputType without action
+   */
+  export type FederationLicenseTypeCountOutputTypeCountPriceRowsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationLicensePriceRowWhereInput
   }
 
 
@@ -3449,14 +4109,7 @@ export namespace Prisma {
     passwordHash: string | null
     firstName: string | null
     lastName: string | null
-    dni: string | null
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
+    gender: $Enums.Gender | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3468,14 +4121,7 @@ export namespace Prisma {
     passwordHash: string | null
     firstName: string | null
     lastName: string | null
-    dni: string | null
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
+    gender: $Enums.Gender | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3487,14 +4133,7 @@ export namespace Prisma {
     passwordHash: number
     firstName: number
     lastName: number
-    dni: number
-    birthDate: number
-    phone: number
-    address: number
-    city: number
-    state: number
-    postalCode: number
-    country: number
+    gender: number
     isActive: number
     roles: number
     createdAt: number
@@ -3509,14 +4148,7 @@ export namespace Prisma {
     passwordHash?: true
     firstName?: true
     lastName?: true
-    dni?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
+    gender?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -3528,14 +4160,7 @@ export namespace Prisma {
     passwordHash?: true
     firstName?: true
     lastName?: true
-    dni?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
+    gender?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -3547,14 +4172,7 @@ export namespace Prisma {
     passwordHash?: true
     firstName?: true
     lastName?: true
-    dni?: true
-    birthDate?: true
-    phone?: true
-    address?: true
-    city?: true
-    state?: true
-    postalCode?: true
-    country?: true
+    gender?: true
     isActive?: true
     roles?: true
     createdAt?: true
@@ -3640,14 +4258,7 @@ export namespace Prisma {
     passwordHash: string
     firstName: string
     lastName: string
-    dni: string | null
-    birthDate: Date | null
-    phone: string | null
-    address: string | null
-    city: string | null
-    state: string | null
-    postalCode: string | null
-    country: string | null
+    gender: $Enums.Gender | null
     isActive: boolean
     roles: $Enums.Role[]
     createdAt: Date
@@ -3677,14 +4288,7 @@ export namespace Prisma {
     passwordHash?: boolean
     firstName?: boolean
     lastName?: boolean
-    dni?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
+    gender?: boolean
     isActive?: boolean
     roles?: boolean
     createdAt?: boolean
@@ -3697,14 +4301,7 @@ export namespace Prisma {
     passwordHash?: boolean
     firstName?: boolean
     lastName?: boolean
-    dni?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
+    gender?: boolean
     isActive?: boolean
     roles?: boolean
     createdAt?: boolean
@@ -3717,14 +4314,7 @@ export namespace Prisma {
     passwordHash?: boolean
     firstName?: boolean
     lastName?: boolean
-    dni?: boolean
-    birthDate?: boolean
-    phone?: boolean
-    address?: boolean
-    city?: boolean
-    state?: boolean
-    postalCode?: boolean
-    country?: boolean
+    gender?: boolean
     isActive?: boolean
     roles?: boolean
     createdAt?: boolean
@@ -3741,14 +4331,10 @@ export namespace Prisma {
       passwordHash: string
       firstName: string
       lastName: string
-      dni: string | null
-      birthDate: Date | null
-      phone: string | null
-      address: string | null
-      city: string | null
-      state: string | null
-      postalCode: string | null
-      country: string | null
+      /**
+       * Optional; used for competition categories and academy stats. Null on historical imports.
+       */
+      gender: $Enums.Gender | null
       isActive: boolean
       roles: $Enums.Role[]
       createdAt: Date
@@ -4151,14 +4737,7 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly firstName: FieldRef<"User", 'String'>
     readonly lastName: FieldRef<"User", 'String'>
-    readonly dni: FieldRef<"User", 'String'>
-    readonly birthDate: FieldRef<"User", 'DateTime'>
-    readonly phone: FieldRef<"User", 'String'>
-    readonly address: FieldRef<"User", 'String'>
-    readonly city: FieldRef<"User", 'String'>
-    readonly state: FieldRef<"User", 'String'>
-    readonly postalCode: FieldRef<"User", 'String'>
-    readonly country: FieldRef<"User", 'String'>
+    readonly gender: FieldRef<"User", 'Gender'>
     readonly isActive: FieldRef<"User", 'Boolean'>
     readonly roles: FieldRef<"User", 'Role[]'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
@@ -4464,6 +5043,18 @@ export namespace Prisma {
   export type StudentProfileMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    firstName: string | null
+    lastName: string | null
+    dni: string | null
+    birthDate: Date | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    state: string | null
+    postalCode: string | null
+    country: string | null
+    gender: $Enums.Gender | null
+    bankMandateId: string | null
     status: $Enums.StudentStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4472,6 +5063,18 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    firstName: string | null
+    lastName: string | null
+    dni: string | null
+    birthDate: Date | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    state: string | null
+    postalCode: string | null
+    country: string | null
+    gender: $Enums.Gender | null
+    bankMandateId: string | null
     status: $Enums.StudentStatus | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4480,6 +5083,18 @@ export namespace Prisma {
   export type StudentProfileCountAggregateOutputType = {
     id: number
     userId: number
+    firstName: number
+    lastName: number
+    dni: number
+    birthDate: number
+    phone: number
+    address: number
+    city: number
+    state: number
+    postalCode: number
+    country: number
+    gender: number
+    bankMandateId: number
     status: number
     emergencyContacts: number
     createdAt: number
@@ -4491,6 +5106,18 @@ export namespace Prisma {
   export type StudentProfileMinAggregateInputType = {
     id?: true
     userId?: true
+    firstName?: true
+    lastName?: true
+    dni?: true
+    birthDate?: true
+    phone?: true
+    address?: true
+    city?: true
+    state?: true
+    postalCode?: true
+    country?: true
+    gender?: true
+    bankMandateId?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -4499,6 +5126,18 @@ export namespace Prisma {
   export type StudentProfileMaxAggregateInputType = {
     id?: true
     userId?: true
+    firstName?: true
+    lastName?: true
+    dni?: true
+    birthDate?: true
+    phone?: true
+    address?: true
+    city?: true
+    state?: true
+    postalCode?: true
+    country?: true
+    gender?: true
+    bankMandateId?: true
     status?: true
     createdAt?: true
     updatedAt?: true
@@ -4507,6 +5146,18 @@ export namespace Prisma {
   export type StudentProfileCountAggregateInputType = {
     id?: true
     userId?: true
+    firstName?: true
+    lastName?: true
+    dni?: true
+    birthDate?: true
+    phone?: true
+    address?: true
+    city?: true
+    state?: true
+    postalCode?: true
+    country?: true
+    gender?: true
+    bankMandateId?: true
     status?: true
     emergencyContacts?: true
     createdAt?: true
@@ -4588,7 +5239,19 @@ export namespace Prisma {
 
   export type StudentProfileGroupByOutputType = {
     id: string
-    userId: string
+    userId: string | null
+    firstName: string
+    lastName: string
+    dni: string | null
+    birthDate: Date | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    state: string | null
+    postalCode: string | null
+    country: string | null
+    gender: $Enums.Gender | null
+    bankMandateId: string | null
     status: $Enums.StudentStatus
     emergencyContacts: JsonValue | null
     createdAt: Date
@@ -4615,6 +5278,18 @@ export namespace Prisma {
   export type StudentProfileSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    dni?: boolean
+    birthDate?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    state?: boolean
+    postalCode?: boolean
+    country?: boolean
+    gender?: boolean
+    bankMandateId?: boolean
     status?: boolean
     emergencyContacts?: boolean
     createdAt?: boolean
@@ -4625,17 +5300,24 @@ export namespace Prisma {
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
     updateRequests?: boolean | StudentProfile$updateRequestsArgs<ExtArgs>
     graduationRequests?: boolean | StudentProfile$graduationRequestsArgs<ExtArgs>
-    subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
-    licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
-    studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
-    studentDiscounts?: boolean | StudentProfile$studentDiscountsArgs<ExtArgs>
-    bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentProfile"]>
 
   export type StudentProfileSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    dni?: boolean
+    birthDate?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    state?: boolean
+    postalCode?: boolean
+    country?: boolean
+    gender?: boolean
+    bankMandateId?: boolean
     status?: boolean
     emergencyContacts?: boolean
     createdAt?: boolean
@@ -4645,6 +5327,18 @@ export namespace Prisma {
   export type StudentProfileSelectScalar = {
     id?: boolean
     userId?: boolean
+    firstName?: boolean
+    lastName?: boolean
+    dni?: boolean
+    birthDate?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    state?: boolean
+    postalCode?: boolean
+    country?: boolean
+    gender?: boolean
+    bankMandateId?: boolean
     status?: boolean
     emergencyContacts?: boolean
     createdAt?: boolean
@@ -4658,11 +5352,6 @@ export namespace Prisma {
     attendances?: boolean | StudentProfile$attendancesArgs<ExtArgs>
     updateRequests?: boolean | StudentProfile$updateRequestsArgs<ExtArgs>
     graduationRequests?: boolean | StudentProfile$graduationRequestsArgs<ExtArgs>
-    subscriptions?: boolean | StudentProfile$subscriptionsArgs<ExtArgs>
-    licenses?: boolean | StudentProfile$licensesArgs<ExtArgs>
-    studentFees?: boolean | StudentProfile$studentFeesArgs<ExtArgs>
-    studentDiscounts?: boolean | StudentProfile$studentDiscountsArgs<ExtArgs>
-    bankMandates?: boolean | StudentProfile$bankMandatesArgs<ExtArgs>
     _count?: boolean | StudentProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type StudentProfileIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4676,18 +5365,31 @@ export namespace Prisma {
       attendances: Prisma.$AttendancePayload<ExtArgs>[]
       updateRequests: Prisma.$ProfileUpdateRequestPayload<ExtArgs>[]
       graduationRequests: Prisma.$GraduationRequestPayload<ExtArgs>[]
-      subscriptions: Prisma.$StudentSubscriptionPayload<ExtArgs>[]
-      licenses: Prisma.$StudentLicensePayload<ExtArgs>[]
-      studentFees: Prisma.$StudentFeePayload<ExtArgs>[]
-      studentDiscounts: Prisma.$StudentDiscountPayload<ExtArgs>[]
-      bankMandates: Prisma.$BankMandatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       /**
-       * Logical reference to the identity owned by auth-service (no physical FK; resolve over HTTP)
+       * Login identity in auth-service. Null for minors (they have no User; parents link via StudentGuardian).
        */
-      userId: string
+      userId: string | null
+      /**
+       * Academic identity of the person-as-student. Adults may also have a User; minors only have these fields.
+       */
+      firstName: string
+      lastName: string
+      dni: string | null
+      birthDate: Date | null
+      phone: string | null
+      address: string | null
+      city: string | null
+      state: string | null
+      postalCode: string | null
+      country: string | null
+      gender: $Enums.Gender | null
+      /**
+       * Logical financial-service mandate that covers this student's fees (no physical FK).
+       */
+      bankMandateId: string | null
       /**
        * Student Lifecycle Management
        */
@@ -5068,11 +5770,6 @@ export namespace Prisma {
     attendances<T extends StudentProfile$attendancesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendancePayload<ExtArgs>, T, "findMany"> | Null>
     updateRequests<T extends StudentProfile$updateRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$updateRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProfileUpdateRequestPayload<ExtArgs>, T, "findMany"> | Null>
     graduationRequests<T extends StudentProfile$graduationRequestsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$graduationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GraduationRequestPayload<ExtArgs>, T, "findMany"> | Null>
-    subscriptions<T extends StudentProfile$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
-    licenses<T extends StudentProfile$licensesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findMany"> | Null>
-    studentFees<T extends StudentProfile$studentFeesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentFeesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentFeePayload<ExtArgs>, T, "findMany"> | Null>
-    studentDiscounts<T extends StudentProfile$studentDiscountsArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$studentDiscountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentDiscountPayload<ExtArgs>, T, "findMany"> | Null>
-    bankMandates<T extends StudentProfile$bankMandatesArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfile$bankMandatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BankMandatePayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5104,6 +5801,18 @@ export namespace Prisma {
   interface StudentProfileFieldRefs {
     readonly id: FieldRef<"StudentProfile", 'String'>
     readonly userId: FieldRef<"StudentProfile", 'String'>
+    readonly firstName: FieldRef<"StudentProfile", 'String'>
+    readonly lastName: FieldRef<"StudentProfile", 'String'>
+    readonly dni: FieldRef<"StudentProfile", 'String'>
+    readonly birthDate: FieldRef<"StudentProfile", 'DateTime'>
+    readonly phone: FieldRef<"StudentProfile", 'String'>
+    readonly address: FieldRef<"StudentProfile", 'String'>
+    readonly city: FieldRef<"StudentProfile", 'String'>
+    readonly state: FieldRef<"StudentProfile", 'String'>
+    readonly postalCode: FieldRef<"StudentProfile", 'String'>
+    readonly country: FieldRef<"StudentProfile", 'String'>
+    readonly gender: FieldRef<"StudentProfile", 'Gender'>
+    readonly bankMandateId: FieldRef<"StudentProfile", 'String'>
     readonly status: FieldRef<"StudentProfile", 'StudentStatus'>
     readonly emergencyContacts: FieldRef<"StudentProfile", 'Json'>
     readonly createdAt: FieldRef<"StudentProfile", 'DateTime'>
@@ -5542,106 +6251,6 @@ export namespace Prisma {
   }
 
   /**
-   * StudentProfile.subscriptions
-   */
-  export type StudentProfile$subscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentSubscription
-     */
-    select?: StudentSubscriptionSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentSubscriptionInclude<ExtArgs> | null
-    where?: StudentSubscriptionWhereInput
-    orderBy?: StudentSubscriptionOrderByWithRelationInput | StudentSubscriptionOrderByWithRelationInput[]
-    cursor?: StudentSubscriptionWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StudentSubscriptionScalarFieldEnum | StudentSubscriptionScalarFieldEnum[]
-  }
-
-  /**
-   * StudentProfile.licenses
-   */
-  export type StudentProfile$licensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentLicense
-     */
-    select?: StudentLicenseSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentLicenseInclude<ExtArgs> | null
-    where?: StudentLicenseWhereInput
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
-    cursor?: StudentLicenseWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
-  }
-
-  /**
-   * StudentProfile.studentFees
-   */
-  export type StudentProfile$studentFeesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentFee
-     */
-    select?: StudentFeeSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentFeeInclude<ExtArgs> | null
-    where?: StudentFeeWhereInput
-    orderBy?: StudentFeeOrderByWithRelationInput | StudentFeeOrderByWithRelationInput[]
-    cursor?: StudentFeeWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StudentFeeScalarFieldEnum | StudentFeeScalarFieldEnum[]
-  }
-
-  /**
-   * StudentProfile.studentDiscounts
-   */
-  export type StudentProfile$studentDiscountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StudentDiscount
-     */
-    select?: StudentDiscountSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: StudentDiscountInclude<ExtArgs> | null
-    where?: StudentDiscountWhereInput
-    orderBy?: StudentDiscountOrderByWithRelationInput | StudentDiscountOrderByWithRelationInput[]
-    cursor?: StudentDiscountWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: StudentDiscountScalarFieldEnum | StudentDiscountScalarFieldEnum[]
-  }
-
-  /**
-   * StudentProfile.bankMandates
-   */
-  export type StudentProfile$bankMandatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the BankMandate
-     */
-    select?: BankMandateSelect<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BankMandateInclude<ExtArgs> | null
-    where?: BankMandateWhereInput
-    orderBy?: BankMandateOrderByWithRelationInput | BankMandateOrderByWithRelationInput[]
-    cursor?: BankMandateWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: BankMandateScalarFieldEnum | BankMandateScalarFieldEnum[]
-  }
-
-  /**
    * StudentProfile without action
    */
   export type StudentProfileDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5672,6 +6281,9 @@ export namespace Prisma {
     previousStatus: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus | null
     reason: string | null
+    leaveReason: $Enums.LeaveReason | null
+    leaveNoticeMethod: $Enums.LeaveNoticeMethod | null
+    customReasonDetails: string | null
     changedById: string | null
     createdAt: Date | null
   }
@@ -5682,6 +6294,9 @@ export namespace Prisma {
     previousStatus: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus | null
     reason: string | null
+    leaveReason: $Enums.LeaveReason | null
+    leaveNoticeMethod: $Enums.LeaveNoticeMethod | null
+    customReasonDetails: string | null
     changedById: string | null
     createdAt: Date | null
   }
@@ -5692,6 +6307,9 @@ export namespace Prisma {
     previousStatus: number
     newStatus: number
     reason: number
+    leaveReason: number
+    leaveNoticeMethod: number
+    customReasonDetails: number
     changedById: number
     createdAt: number
     _all: number
@@ -5704,6 +6322,9 @@ export namespace Prisma {
     previousStatus?: true
     newStatus?: true
     reason?: true
+    leaveReason?: true
+    leaveNoticeMethod?: true
+    customReasonDetails?: true
     changedById?: true
     createdAt?: true
   }
@@ -5714,6 +6335,9 @@ export namespace Prisma {
     previousStatus?: true
     newStatus?: true
     reason?: true
+    leaveReason?: true
+    leaveNoticeMethod?: true
+    customReasonDetails?: true
     changedById?: true
     createdAt?: true
   }
@@ -5724,6 +6348,9 @@ export namespace Prisma {
     previousStatus?: true
     newStatus?: true
     reason?: true
+    leaveReason?: true
+    leaveNoticeMethod?: true
+    customReasonDetails?: true
     changedById?: true
     createdAt?: true
     _all?: true
@@ -5807,6 +6434,9 @@ export namespace Prisma {
     previousStatus: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason: string | null
+    leaveReason: $Enums.LeaveReason | null
+    leaveNoticeMethod: $Enums.LeaveNoticeMethod | null
+    customReasonDetails: string | null
     changedById: string | null
     createdAt: Date
     _count: StudentStatusHistoryCountAggregateOutputType | null
@@ -5834,6 +6464,9 @@ export namespace Prisma {
     previousStatus?: boolean
     newStatus?: boolean
     reason?: boolean
+    leaveReason?: boolean
+    leaveNoticeMethod?: boolean
+    customReasonDetails?: boolean
     changedById?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
@@ -5845,6 +6478,9 @@ export namespace Prisma {
     previousStatus?: boolean
     newStatus?: boolean
     reason?: boolean
+    leaveReason?: boolean
+    leaveNoticeMethod?: boolean
+    customReasonDetails?: boolean
     changedById?: boolean
     createdAt?: boolean
     studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
@@ -5856,6 +6492,9 @@ export namespace Prisma {
     previousStatus?: boolean
     newStatus?: boolean
     reason?: boolean
+    leaveReason?: boolean
+    leaveNoticeMethod?: boolean
+    customReasonDetails?: boolean
     changedById?: boolean
     createdAt?: boolean
   }
@@ -5877,7 +6516,16 @@ export namespace Prisma {
       studentProfileId: string
       previousStatus: $Enums.StudentStatus | null
       newStatus: $Enums.StudentStatus
+      /**
+       * Legacy free-text note. Prefer `leaveReason` / `customReasonDetails` for PAUSED and DROPPED.
+       */
       reason: string | null
+      leaveReason: $Enums.LeaveReason | null
+      leaveNoticeMethod: $Enums.LeaveNoticeMethod | null
+      /**
+       * Free-text complement when `leaveReason` is OTHER (or extra context for any reason).
+       */
+      customReasonDetails: string | null
       /**
        * Logical reference to the actor in auth-service (no physical FK).
        */
@@ -6282,6 +6930,9 @@ export namespace Prisma {
     readonly previousStatus: FieldRef<"StudentStatusHistory", 'StudentStatus'>
     readonly newStatus: FieldRef<"StudentStatusHistory", 'StudentStatus'>
     readonly reason: FieldRef<"StudentStatusHistory", 'String'>
+    readonly leaveReason: FieldRef<"StudentStatusHistory", 'LeaveReason'>
+    readonly leaveNoticeMethod: FieldRef<"StudentStatusHistory", 'LeaveNoticeMethod'>
+    readonly customReasonDetails: FieldRef<"StudentStatusHistory", 'String'>
     readonly changedById: FieldRef<"StudentStatusHistory", 'String'>
     readonly createdAt: FieldRef<"StudentStatusHistory", 'DateTime'>
   }
@@ -8471,18 +9122,21 @@ export namespace Prisma {
   export type DisciplineMinAggregateOutputType = {
     id: string | null
     name: string | null
+    acronym: string | null
     description: string | null
   }
 
   export type DisciplineMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    acronym: string | null
     description: string | null
   }
 
   export type DisciplineCountAggregateOutputType = {
     id: number
     name: number
+    acronym: number
     description: number
     _all: number
   }
@@ -8491,18 +9145,21 @@ export namespace Prisma {
   export type DisciplineMinAggregateInputType = {
     id?: true
     name?: true
+    acronym?: true
     description?: true
   }
 
   export type DisciplineMaxAggregateInputType = {
     id?: true
     name?: true
+    acronym?: true
     description?: true
   }
 
   export type DisciplineCountAggregateInputType = {
     id?: true
     name?: true
+    acronym?: true
     description?: true
     _all?: true
   }
@@ -8582,6 +9239,7 @@ export namespace Prisma {
   export type DisciplineGroupByOutputType = {
     id: string
     name: string
+    acronym: string | null
     description: string | null
     _count: DisciplineCountAggregateOutputType | null
     _min: DisciplineMinAggregateOutputType | null
@@ -8605,6 +9263,7 @@ export namespace Prisma {
   export type DisciplineSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    acronym?: boolean
     description?: boolean
     programs?: boolean | Discipline$programsArgs<ExtArgs>
     _count?: boolean | DisciplineCountOutputTypeDefaultArgs<ExtArgs>
@@ -8613,12 +9272,14 @@ export namespace Prisma {
   export type DisciplineSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    acronym?: boolean
     description?: boolean
   }, ExtArgs["result"]["discipline"]>
 
   export type DisciplineSelectScalar = {
     id?: boolean
     name?: boolean
+    acronym?: boolean
     description?: boolean
   }
 
@@ -8636,6 +9297,10 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
+      /**
+       * Short staff-facing label shown in dense tables (e.g. BJJ). Null falls back to `name`.
+       */
+      acronym: string | null
       description: string | null
     }, ExtArgs["result"]["discipline"]>
     composites: {}
@@ -9033,6 +9698,7 @@ export namespace Prisma {
   interface DisciplineFieldRefs {
     readonly id: FieldRef<"Discipline", 'String'>
     readonly name: FieldRef<"Discipline", 'String'>
+    readonly acronym: FieldRef<"Discipline", 'String'>
     readonly description: FieldRef<"Discipline", 'String'>
   }
     
@@ -16560,7 +17226,6 @@ export namespace Prisma {
     effectiveTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
   }, ExtArgs["result"]["studentFee"]>
 
@@ -16574,7 +17239,6 @@ export namespace Prisma {
     effectiveTo?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
   }, ExtArgs["result"]["studentFee"]>
 
@@ -16591,22 +17255,22 @@ export namespace Prisma {
   }
 
   export type StudentFeeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
   }
   export type StudentFeeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | StudentFee$feeTierArgs<ExtArgs>
   }
 
   export type $StudentFeePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentFee"
     objects: {
-      student: Prisma.$StudentProfilePayload<ExtArgs>
       feeTier: Prisma.$FeeTierPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Logical academic-service StudentProfile id (no physical FK across bounded contexts).
+       */
       studentProfileId: string
       feeTierId: string | null
       customAmount: Prisma.Decimal | null
@@ -16979,7 +17643,6 @@ export namespace Prisma {
    */
   export interface Prisma__StudentFeeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     feeTier<T extends StudentFee$feeTierArgs<ExtArgs> = {}>(args?: Subset<T, StudentFee$feeTierArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -18596,7 +19259,6 @@ export namespace Prisma {
     discountId?: boolean
     assignedAt?: boolean
     expiresAt?: boolean
-    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentDiscount"]>
 
@@ -18606,7 +19268,6 @@ export namespace Prisma {
     discountId?: boolean
     assignedAt?: boolean
     expiresAt?: boolean
-    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentDiscount"]>
 
@@ -18619,22 +19280,22 @@ export namespace Prisma {
   }
 
   export type StudentDiscountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }
   export type StudentDiscountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    studentProfile?: boolean | StudentProfileDefaultArgs<ExtArgs>
     discount?: boolean | DiscountDefaultArgs<ExtArgs>
   }
 
   export type $StudentDiscountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentDiscount"
     objects: {
-      studentProfile: Prisma.$StudentProfilePayload<ExtArgs>
       discount: Prisma.$DiscountPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Logical academic-service StudentProfile id (no physical FK across bounded contexts).
+       */
       studentProfileId: string
       discountId: string
       assignedAt: Date
@@ -19003,7 +19664,6 @@ export namespace Prisma {
    */
   export interface Prisma__StudentDiscountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    studentProfile<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     discount<T extends DiscountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DiscountDefaultArgs<ExtArgs>>): Prisma__DiscountClient<$Result.GetResult<Prisma.$DiscountPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -19527,7 +20187,6 @@ export namespace Prisma {
     studentProfileId?: boolean
     feeTierId?: boolean
     isActive?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentSubscription"]>
 
@@ -19536,7 +20195,6 @@ export namespace Prisma {
     studentProfileId?: boolean
     feeTierId?: boolean
     isActive?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["studentSubscription"]>
 
@@ -19548,22 +20206,22 @@ export namespace Prisma {
   }
 
   export type StudentSubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }
   export type StudentSubscriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     feeTier?: boolean | FeeTierDefaultArgs<ExtArgs>
   }
 
   export type $StudentSubscriptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "StudentSubscription"
     objects: {
-      student: Prisma.$StudentProfilePayload<ExtArgs>
       feeTier: Prisma.$FeeTierPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Logical academic-service StudentProfile id (no physical FK across bounded contexts).
+       */
       studentProfileId: string
       feeTierId: string
       isActive: boolean
@@ -19931,7 +20589,6 @@ export namespace Prisma {
    */
   export interface Prisma__StudentSubscriptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     feeTier<T extends FeeTierDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FeeTierDefaultArgs<ExtArgs>>): Prisma__FeeTierClient<$Result.GetResult<Prisma.$FeeTierPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -22416,6 +23073,983 @@ export namespace Prisma {
 
 
   /**
+   * Model TenantFinancialConfig
+   */
+
+  export type AggregateTenantFinancialConfig = {
+    _count: TenantFinancialConfigCountAggregateOutputType | null
+    _min: TenantFinancialConfigMinAggregateOutputType | null
+    _max: TenantFinancialConfigMaxAggregateOutputType | null
+  }
+
+  export type TenantFinancialConfigMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    legalName: string | null
+    taxId: string | null
+    address: string | null
+    city: string | null
+    postalCode: string | null
+    country: string | null
+    creditorId: string | null
+    iban: string | null
+    bic: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TenantFinancialConfigMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    legalName: string | null
+    taxId: string | null
+    address: string | null
+    city: string | null
+    postalCode: string | null
+    country: string | null
+    creditorId: string | null
+    iban: string | null
+    bic: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type TenantFinancialConfigCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    legalName: number
+    taxId: number
+    address: number
+    city: number
+    postalCode: number
+    country: number
+    creditorId: number
+    iban: number
+    bic: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type TenantFinancialConfigMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    taxId?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    creditorId?: true
+    iban?: true
+    bic?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TenantFinancialConfigMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    taxId?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    creditorId?: true
+    iban?: true
+    bic?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type TenantFinancialConfigCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    taxId?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    creditorId?: true
+    iban?: true
+    bic?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type TenantFinancialConfigAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TenantFinancialConfig to aggregate.
+     */
+    where?: TenantFinancialConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TenantFinancialConfigs to fetch.
+     */
+    orderBy?: TenantFinancialConfigOrderByWithRelationInput | TenantFinancialConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TenantFinancialConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TenantFinancialConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TenantFinancialConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TenantFinancialConfigs
+    **/
+    _count?: true | TenantFinancialConfigCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TenantFinancialConfigMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TenantFinancialConfigMaxAggregateInputType
+  }
+
+  export type GetTenantFinancialConfigAggregateType<T extends TenantFinancialConfigAggregateArgs> = {
+        [P in keyof T & keyof AggregateTenantFinancialConfig]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTenantFinancialConfig[P]>
+      : GetScalarType<T[P], AggregateTenantFinancialConfig[P]>
+  }
+
+
+
+
+  export type TenantFinancialConfigGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TenantFinancialConfigWhereInput
+    orderBy?: TenantFinancialConfigOrderByWithAggregationInput | TenantFinancialConfigOrderByWithAggregationInput[]
+    by: TenantFinancialConfigScalarFieldEnum[] | TenantFinancialConfigScalarFieldEnum
+    having?: TenantFinancialConfigScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TenantFinancialConfigCountAggregateInputType | true
+    _min?: TenantFinancialConfigMinAggregateInputType
+    _max?: TenantFinancialConfigMaxAggregateInputType
+  }
+
+  export type TenantFinancialConfigGroupByOutputType = {
+    id: string
+    tenantId: string
+    legalName: string
+    taxId: string
+    address: string
+    city: string
+    postalCode: string
+    country: string
+    creditorId: string
+    iban: string
+    bic: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: TenantFinancialConfigCountAggregateOutputType | null
+    _min: TenantFinancialConfigMinAggregateOutputType | null
+    _max: TenantFinancialConfigMaxAggregateOutputType | null
+  }
+
+  type GetTenantFinancialConfigGroupByPayload<T extends TenantFinancialConfigGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TenantFinancialConfigGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TenantFinancialConfigGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TenantFinancialConfigGroupByOutputType[P]>
+            : GetScalarType<T[P], TenantFinancialConfigGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TenantFinancialConfigSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    taxId?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    creditorId?: boolean
+    iban?: boolean
+    bic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["tenantFinancialConfig"]>
+
+  export type TenantFinancialConfigSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    taxId?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    creditorId?: boolean
+    iban?: boolean
+    bic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["tenantFinancialConfig"]>
+
+  export type TenantFinancialConfigSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    taxId?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    creditorId?: boolean
+    iban?: boolean
+    bic?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $TenantFinancialConfigPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TenantFinancialConfig"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tenantId: string
+      legalName: string
+      taxId: string
+      address: string
+      city: string
+      postalCode: string
+      country: string
+      /**
+       * SEPA Creditor Identifier (e.g. ES12ZZZ1234567) used in pain.008.
+       */
+      creditorId: string
+      iban: string
+      bic: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["tenantFinancialConfig"]>
+    composites: {}
+  }
+
+  type TenantFinancialConfigGetPayload<S extends boolean | null | undefined | TenantFinancialConfigDefaultArgs> = $Result.GetResult<Prisma.$TenantFinancialConfigPayload, S>
+
+  type TenantFinancialConfigCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<TenantFinancialConfigFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: TenantFinancialConfigCountAggregateInputType | true
+    }
+
+  export interface TenantFinancialConfigDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TenantFinancialConfig'], meta: { name: 'TenantFinancialConfig' } }
+    /**
+     * Find zero or one TenantFinancialConfig that matches the filter.
+     * @param {TenantFinancialConfigFindUniqueArgs} args - Arguments to find a TenantFinancialConfig
+     * @example
+     * // Get one TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TenantFinancialConfigFindUniqueArgs>(args: SelectSubset<T, TenantFinancialConfigFindUniqueArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one TenantFinancialConfig that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {TenantFinancialConfigFindUniqueOrThrowArgs} args - Arguments to find a TenantFinancialConfig
+     * @example
+     * // Get one TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TenantFinancialConfigFindUniqueOrThrowArgs>(args: SelectSubset<T, TenantFinancialConfigFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first TenantFinancialConfig that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigFindFirstArgs} args - Arguments to find a TenantFinancialConfig
+     * @example
+     * // Get one TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TenantFinancialConfigFindFirstArgs>(args?: SelectSubset<T, TenantFinancialConfigFindFirstArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first TenantFinancialConfig that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigFindFirstOrThrowArgs} args - Arguments to find a TenantFinancialConfig
+     * @example
+     * // Get one TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TenantFinancialConfigFindFirstOrThrowArgs>(args?: SelectSubset<T, TenantFinancialConfigFindFirstOrThrowArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more TenantFinancialConfigs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TenantFinancialConfigs
+     * const tenantFinancialConfigs = await prisma.tenantFinancialConfig.findMany()
+     * 
+     * // Get first 10 TenantFinancialConfigs
+     * const tenantFinancialConfigs = await prisma.tenantFinancialConfig.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tenantFinancialConfigWithIdOnly = await prisma.tenantFinancialConfig.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TenantFinancialConfigFindManyArgs>(args?: SelectSubset<T, TenantFinancialConfigFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a TenantFinancialConfig.
+     * @param {TenantFinancialConfigCreateArgs} args - Arguments to create a TenantFinancialConfig.
+     * @example
+     * // Create one TenantFinancialConfig
+     * const TenantFinancialConfig = await prisma.tenantFinancialConfig.create({
+     *   data: {
+     *     // ... data to create a TenantFinancialConfig
+     *   }
+     * })
+     * 
+     */
+    create<T extends TenantFinancialConfigCreateArgs>(args: SelectSubset<T, TenantFinancialConfigCreateArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many TenantFinancialConfigs.
+     * @param {TenantFinancialConfigCreateManyArgs} args - Arguments to create many TenantFinancialConfigs.
+     * @example
+     * // Create many TenantFinancialConfigs
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TenantFinancialConfigCreateManyArgs>(args?: SelectSubset<T, TenantFinancialConfigCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TenantFinancialConfigs and returns the data saved in the database.
+     * @param {TenantFinancialConfigCreateManyAndReturnArgs} args - Arguments to create many TenantFinancialConfigs.
+     * @example
+     * // Create many TenantFinancialConfigs
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TenantFinancialConfigs and only return the `id`
+     * const tenantFinancialConfigWithIdOnly = await prisma.tenantFinancialConfig.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TenantFinancialConfigCreateManyAndReturnArgs>(args?: SelectSubset<T, TenantFinancialConfigCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a TenantFinancialConfig.
+     * @param {TenantFinancialConfigDeleteArgs} args - Arguments to delete one TenantFinancialConfig.
+     * @example
+     * // Delete one TenantFinancialConfig
+     * const TenantFinancialConfig = await prisma.tenantFinancialConfig.delete({
+     *   where: {
+     *     // ... filter to delete one TenantFinancialConfig
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TenantFinancialConfigDeleteArgs>(args: SelectSubset<T, TenantFinancialConfigDeleteArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one TenantFinancialConfig.
+     * @param {TenantFinancialConfigUpdateArgs} args - Arguments to update one TenantFinancialConfig.
+     * @example
+     * // Update one TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TenantFinancialConfigUpdateArgs>(args: SelectSubset<T, TenantFinancialConfigUpdateArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more TenantFinancialConfigs.
+     * @param {TenantFinancialConfigDeleteManyArgs} args - Arguments to filter TenantFinancialConfigs to delete.
+     * @example
+     * // Delete a few TenantFinancialConfigs
+     * const { count } = await prisma.tenantFinancialConfig.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TenantFinancialConfigDeleteManyArgs>(args?: SelectSubset<T, TenantFinancialConfigDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TenantFinancialConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TenantFinancialConfigs
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TenantFinancialConfigUpdateManyArgs>(args: SelectSubset<T, TenantFinancialConfigUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one TenantFinancialConfig.
+     * @param {TenantFinancialConfigUpsertArgs} args - Arguments to update or create a TenantFinancialConfig.
+     * @example
+     * // Update or create a TenantFinancialConfig
+     * const tenantFinancialConfig = await prisma.tenantFinancialConfig.upsert({
+     *   create: {
+     *     // ... data to create a TenantFinancialConfig
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TenantFinancialConfig we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TenantFinancialConfigUpsertArgs>(args: SelectSubset<T, TenantFinancialConfigUpsertArgs<ExtArgs>>): Prisma__TenantFinancialConfigClient<$Result.GetResult<Prisma.$TenantFinancialConfigPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of TenantFinancialConfigs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigCountArgs} args - Arguments to filter TenantFinancialConfigs to count.
+     * @example
+     * // Count the number of TenantFinancialConfigs
+     * const count = await prisma.tenantFinancialConfig.count({
+     *   where: {
+     *     // ... the filter for the TenantFinancialConfigs we want to count
+     *   }
+     * })
+    **/
+    count<T extends TenantFinancialConfigCountArgs>(
+      args?: Subset<T, TenantFinancialConfigCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TenantFinancialConfigCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TenantFinancialConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TenantFinancialConfigAggregateArgs>(args: Subset<T, TenantFinancialConfigAggregateArgs>): Prisma.PrismaPromise<GetTenantFinancialConfigAggregateType<T>>
+
+    /**
+     * Group by TenantFinancialConfig.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TenantFinancialConfigGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TenantFinancialConfigGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TenantFinancialConfigGroupByArgs['orderBy'] }
+        : { orderBy?: TenantFinancialConfigGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TenantFinancialConfigGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTenantFinancialConfigGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TenantFinancialConfig model
+   */
+  readonly fields: TenantFinancialConfigFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TenantFinancialConfig.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TenantFinancialConfigClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TenantFinancialConfig model
+   */ 
+  interface TenantFinancialConfigFieldRefs {
+    readonly id: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly tenantId: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly legalName: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly taxId: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly address: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly city: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly postalCode: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly country: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly creditorId: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly iban: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly bic: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly createdAt: FieldRef<"TenantFinancialConfig", 'DateTime'>
+    readonly updatedAt: FieldRef<"TenantFinancialConfig", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TenantFinancialConfig findUnique
+   */
+  export type TenantFinancialConfigFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TenantFinancialConfig to fetch.
+     */
+    where: TenantFinancialConfigWhereUniqueInput
+  }
+
+  /**
+   * TenantFinancialConfig findUniqueOrThrow
+   */
+  export type TenantFinancialConfigFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TenantFinancialConfig to fetch.
+     */
+    where: TenantFinancialConfigWhereUniqueInput
+  }
+
+  /**
+   * TenantFinancialConfig findFirst
+   */
+  export type TenantFinancialConfigFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TenantFinancialConfig to fetch.
+     */
+    where?: TenantFinancialConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TenantFinancialConfigs to fetch.
+     */
+    orderBy?: TenantFinancialConfigOrderByWithRelationInput | TenantFinancialConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TenantFinancialConfigs.
+     */
+    cursor?: TenantFinancialConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TenantFinancialConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TenantFinancialConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TenantFinancialConfigs.
+     */
+    distinct?: TenantFinancialConfigScalarFieldEnum | TenantFinancialConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TenantFinancialConfig findFirstOrThrow
+   */
+  export type TenantFinancialConfigFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TenantFinancialConfig to fetch.
+     */
+    where?: TenantFinancialConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TenantFinancialConfigs to fetch.
+     */
+    orderBy?: TenantFinancialConfigOrderByWithRelationInput | TenantFinancialConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TenantFinancialConfigs.
+     */
+    cursor?: TenantFinancialConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TenantFinancialConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TenantFinancialConfigs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TenantFinancialConfigs.
+     */
+    distinct?: TenantFinancialConfigScalarFieldEnum | TenantFinancialConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TenantFinancialConfig findMany
+   */
+  export type TenantFinancialConfigFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter, which TenantFinancialConfigs to fetch.
+     */
+    where?: TenantFinancialConfigWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TenantFinancialConfigs to fetch.
+     */
+    orderBy?: TenantFinancialConfigOrderByWithRelationInput | TenantFinancialConfigOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TenantFinancialConfigs.
+     */
+    cursor?: TenantFinancialConfigWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TenantFinancialConfigs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TenantFinancialConfigs.
+     */
+    skip?: number
+    distinct?: TenantFinancialConfigScalarFieldEnum | TenantFinancialConfigScalarFieldEnum[]
+  }
+
+  /**
+   * TenantFinancialConfig create
+   */
+  export type TenantFinancialConfigCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * The data needed to create a TenantFinancialConfig.
+     */
+    data: XOR<TenantFinancialConfigCreateInput, TenantFinancialConfigUncheckedCreateInput>
+  }
+
+  /**
+   * TenantFinancialConfig createMany
+   */
+  export type TenantFinancialConfigCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TenantFinancialConfigs.
+     */
+    data: TenantFinancialConfigCreateManyInput | TenantFinancialConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TenantFinancialConfig createManyAndReturn
+   */
+  export type TenantFinancialConfigCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many TenantFinancialConfigs.
+     */
+    data: TenantFinancialConfigCreateManyInput | TenantFinancialConfigCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TenantFinancialConfig update
+   */
+  export type TenantFinancialConfigUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * The data needed to update a TenantFinancialConfig.
+     */
+    data: XOR<TenantFinancialConfigUpdateInput, TenantFinancialConfigUncheckedUpdateInput>
+    /**
+     * Choose, which TenantFinancialConfig to update.
+     */
+    where: TenantFinancialConfigWhereUniqueInput
+  }
+
+  /**
+   * TenantFinancialConfig updateMany
+   */
+  export type TenantFinancialConfigUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TenantFinancialConfigs.
+     */
+    data: XOR<TenantFinancialConfigUpdateManyMutationInput, TenantFinancialConfigUncheckedUpdateManyInput>
+    /**
+     * Filter which TenantFinancialConfigs to update
+     */
+    where?: TenantFinancialConfigWhereInput
+  }
+
+  /**
+   * TenantFinancialConfig upsert
+   */
+  export type TenantFinancialConfigUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * The filter to search for the TenantFinancialConfig to update in case it exists.
+     */
+    where: TenantFinancialConfigWhereUniqueInput
+    /**
+     * In case the TenantFinancialConfig found by the `where` argument doesn't exist, create a new TenantFinancialConfig with this data.
+     */
+    create: XOR<TenantFinancialConfigCreateInput, TenantFinancialConfigUncheckedCreateInput>
+    /**
+     * In case the TenantFinancialConfig was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TenantFinancialConfigUpdateInput, TenantFinancialConfigUncheckedUpdateInput>
+  }
+
+  /**
+   * TenantFinancialConfig delete
+   */
+  export type TenantFinancialConfigDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+    /**
+     * Filter which TenantFinancialConfig to delete.
+     */
+    where: TenantFinancialConfigWhereUniqueInput
+  }
+
+  /**
+   * TenantFinancialConfig deleteMany
+   */
+  export type TenantFinancialConfigDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TenantFinancialConfigs to delete
+     */
+    where?: TenantFinancialConfigWhereInput
+  }
+
+  /**
+   * TenantFinancialConfig without action
+   */
+  export type TenantFinancialConfigDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TenantFinancialConfig
+     */
+    select?: TenantFinancialConfigSelect<ExtArgs> | null
+  }
+
+
+  /**
    * Model BankMandate
    */
 
@@ -22427,11 +24061,18 @@ export namespace Prisma {
 
   export type BankMandateMinAggregateOutputType = {
     id: string | null
-    studentProfileId: string | null
+    payerUserId: string | null
     iban: string | null
     bic: string | null
     mandateReference: string | null
     signatureDate: Date | null
+    accountHolderName: string | null
+    accountHolderDni: string | null
+    tenantId: string | null
+    isSigned: boolean | null
+    signedAt: Date | null
+    signedByUserId: string | null
+    signatureIp: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -22439,11 +24080,18 @@ export namespace Prisma {
 
   export type BankMandateMaxAggregateOutputType = {
     id: string | null
-    studentProfileId: string | null
+    payerUserId: string | null
     iban: string | null
     bic: string | null
     mandateReference: string | null
     signatureDate: Date | null
+    accountHolderName: string | null
+    accountHolderDni: string | null
+    tenantId: string | null
+    isSigned: boolean | null
+    signedAt: Date | null
+    signedByUserId: string | null
+    signatureIp: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -22451,11 +24099,18 @@ export namespace Prisma {
 
   export type BankMandateCountAggregateOutputType = {
     id: number
-    studentProfileId: number
+    payerUserId: number
     iban: number
     bic: number
     mandateReference: number
     signatureDate: number
+    accountHolderName: number
+    accountHolderDni: number
+    tenantId: number
+    isSigned: number
+    signedAt: number
+    signedByUserId: number
+    signatureIp: number
     isActive: number
     createdAt: number
     updatedAt: number
@@ -22465,11 +24120,18 @@ export namespace Prisma {
 
   export type BankMandateMinAggregateInputType = {
     id?: true
-    studentProfileId?: true
+    payerUserId?: true
     iban?: true
     bic?: true
     mandateReference?: true
     signatureDate?: true
+    accountHolderName?: true
+    accountHolderDni?: true
+    tenantId?: true
+    isSigned?: true
+    signedAt?: true
+    signedByUserId?: true
+    signatureIp?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -22477,11 +24139,18 @@ export namespace Prisma {
 
   export type BankMandateMaxAggregateInputType = {
     id?: true
-    studentProfileId?: true
+    payerUserId?: true
     iban?: true
     bic?: true
     mandateReference?: true
     signatureDate?: true
+    accountHolderName?: true
+    accountHolderDni?: true
+    tenantId?: true
+    isSigned?: true
+    signedAt?: true
+    signedByUserId?: true
+    signatureIp?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -22489,11 +24158,18 @@ export namespace Prisma {
 
   export type BankMandateCountAggregateInputType = {
     id?: true
-    studentProfileId?: true
+    payerUserId?: true
     iban?: true
     bic?: true
     mandateReference?: true
     signatureDate?: true
+    accountHolderName?: true
+    accountHolderDni?: true
+    tenantId?: true
+    isSigned?: true
+    signedAt?: true
+    signedByUserId?: true
+    signatureIp?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -22574,11 +24250,18 @@ export namespace Prisma {
 
   export type BankMandateGroupByOutputType = {
     id: string
-    studentProfileId: string
+    payerUserId: string
     iban: string
     bic: string | null
     mandateReference: string
     signatureDate: Date
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId: string
+    isSigned: boolean
+    signedAt: Date | null
+    signedByUserId: string | null
+    signatureIp: string | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -22603,66 +24286,106 @@ export namespace Prisma {
 
   export type BankMandateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    studentProfileId?: boolean
+    payerUserId?: boolean
     iban?: boolean
     bic?: boolean
     mandateReference?: boolean
     signatureDate?: boolean
+    accountHolderName?: boolean
+    accountHolderDni?: boolean
+    tenantId?: boolean
+    isSigned?: boolean
+    signedAt?: boolean
+    signedByUserId?: boolean
+    signatureIp?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     remittanceItems?: boolean | BankMandate$remittanceItemsArgs<ExtArgs>
     _count?: boolean | BankMandateCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["bankMandate"]>
 
   export type BankMandateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    studentProfileId?: boolean
+    payerUserId?: boolean
     iban?: boolean
     bic?: boolean
     mandateReference?: boolean
     signatureDate?: boolean
+    accountHolderName?: boolean
+    accountHolderDni?: boolean
+    tenantId?: boolean
+    isSigned?: boolean
+    signedAt?: boolean
+    signedByUserId?: boolean
+    signatureIp?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["bankMandate"]>
 
   export type BankMandateSelectScalar = {
     id?: boolean
-    studentProfileId?: boolean
+    payerUserId?: boolean
     iban?: boolean
     bic?: boolean
     mandateReference?: boolean
     signatureDate?: boolean
+    accountHolderName?: boolean
+    accountHolderDni?: boolean
+    tenantId?: boolean
+    isSigned?: boolean
+    signedAt?: boolean
+    signedByUserId?: boolean
+    signatureIp?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
   export type BankMandateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
     remittanceItems?: boolean | BankMandate$remittanceItemsArgs<ExtArgs>
     _count?: boolean | BankMandateCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type BankMandateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
-  }
+  export type BankMandateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $BankMandatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "BankMandate"
     objects: {
-      student: Prisma.$StudentProfilePayload<ExtArgs>
       remittanceItems: Prisma.$RemittanceItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      studentProfileId: string
+      /**
+       * Logical auth-service user id of the payer who owns the IBAN (parent or adult student). Not a User FK.
+       */
+      payerUserId: string
       iban: string
       bic: string | null
       mandateReference: string
       signatureDate: Date
+      /**
+       * Legal name of the bank-account holder (SEPA debtor).
+       */
+      accountHolderName: string
+      /**
+       * National ID (DNI/NIF/NIE) of the account holder. Required by Spanish banks (e.g. CaixaBank) on SEPA Direct Debit.
+       */
+      accountHolderDni: string
+      /**
+       * Academy key from `x-school-id`. Logical tenant isolation (no Tenant table FK).
+       */
+      tenantId: string
+      /**
+       * Clickwrap acceptance. `signatureDate` is the SEPA mandate date; `signedAt` is the audit timestamp.
+       */
+      isSigned: boolean
+      signedAt: Date | null
+      /**
+       * Logical auth-service user id of the person who ticked accept (no User @relation).
+       */
+      signedByUserId: string | null
+      signatureIp: string | null
       isActive: boolean
       createdAt: Date
       updatedAt: Date
@@ -23030,7 +24753,6 @@ export namespace Prisma {
    */
   export interface Prisma__BankMandateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     remittanceItems<T extends BankMandate$remittanceItemsArgs<ExtArgs> = {}>(args?: Subset<T, BankMandate$remittanceItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RemittanceItemPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -23062,11 +24784,18 @@ export namespace Prisma {
    */ 
   interface BankMandateFieldRefs {
     readonly id: FieldRef<"BankMandate", 'String'>
-    readonly studentProfileId: FieldRef<"BankMandate", 'String'>
+    readonly payerUserId: FieldRef<"BankMandate", 'String'>
     readonly iban: FieldRef<"BankMandate", 'String'>
     readonly bic: FieldRef<"BankMandate", 'String'>
     readonly mandateReference: FieldRef<"BankMandate", 'String'>
     readonly signatureDate: FieldRef<"BankMandate", 'DateTime'>
+    readonly accountHolderName: FieldRef<"BankMandate", 'String'>
+    readonly accountHolderDni: FieldRef<"BankMandate", 'String'>
+    readonly tenantId: FieldRef<"BankMandate", 'String'>
+    readonly isSigned: FieldRef<"BankMandate", 'Boolean'>
+    readonly signedAt: FieldRef<"BankMandate", 'DateTime'>
+    readonly signedByUserId: FieldRef<"BankMandate", 'String'>
+    readonly signatureIp: FieldRef<"BankMandate", 'String'>
     readonly isActive: FieldRef<"BankMandate", 'Boolean'>
     readonly createdAt: FieldRef<"BankMandate", 'DateTime'>
     readonly updatedAt: FieldRef<"BankMandate", 'DateTime'>
@@ -23291,10 +25020,6 @@ export namespace Prisma {
      */
     data: BankMandateCreateManyInput | BankMandateCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: BankMandateIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -25489,40 +27214,82 @@ export namespace Prisma {
 
   export type FederationMinAggregateOutputType = {
     id: string | null
+    tenantId: string | null
     name: string | null
+    acronym: string | null
     country: string | null
+    email: string | null
+    isActive: boolean | null
+    deletedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type FederationMaxAggregateOutputType = {
     id: string | null
+    tenantId: string | null
     name: string | null
+    acronym: string | null
     country: string | null
+    email: string | null
+    isActive: boolean | null
+    deletedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type FederationCountAggregateOutputType = {
     id: number
+    tenantId: number
     name: number
+    acronym: number
     country: number
+    email: number
+    isActive: number
+    deletedAt: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
   export type FederationMinAggregateInputType = {
     id?: true
+    tenantId?: true
     name?: true
+    acronym?: true
     country?: true
+    email?: true
+    isActive?: true
+    deletedAt?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type FederationMaxAggregateInputType = {
     id?: true
+    tenantId?: true
     name?: true
+    acronym?: true
     country?: true
+    email?: true
+    isActive?: true
+    deletedAt?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
   export type FederationCountAggregateInputType = {
     id?: true
+    tenantId?: true
     name?: true
+    acronym?: true
     country?: true
+    email?: true
+    isActive?: true
+    deletedAt?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -25600,8 +27367,15 @@ export namespace Prisma {
 
   export type FederationGroupByOutputType = {
     id: string
+    tenantId: string
     name: string
+    acronym: string
     country: string
+    email: string
+    isActive: boolean
+    deletedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
     _count: FederationCountAggregateOutputType | null
     _min: FederationMinAggregateOutputType | null
     _max: FederationMaxAggregateOutputType | null
@@ -25623,26 +27397,51 @@ export namespace Prisma {
 
   export type FederationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    tenantId?: boolean
     name?: boolean
+    acronym?: boolean
     country?: boolean
-    licenses?: boolean | Federation$licensesArgs<ExtArgs>
+    email?: boolean
+    isActive?: boolean
+    deletedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    charges?: boolean | Federation$chargesArgs<ExtArgs>
+    contacts?: boolean | Federation$contactsArgs<ExtArgs>
+    seasons?: boolean | Federation$seasonsArgs<ExtArgs>
     _count?: boolean | FederationCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["federation"]>
 
   export type FederationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    tenantId?: boolean
     name?: boolean
+    acronym?: boolean
     country?: boolean
+    email?: boolean
+    isActive?: boolean
+    deletedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }, ExtArgs["result"]["federation"]>
 
   export type FederationSelectScalar = {
     id?: boolean
+    tenantId?: boolean
     name?: boolean
+    acronym?: boolean
     country?: boolean
+    email?: boolean
+    isActive?: boolean
+    deletedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
   export type FederationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    licenses?: boolean | Federation$licensesArgs<ExtArgs>
+    charges?: boolean | Federation$chargesArgs<ExtArgs>
+    contacts?: boolean | Federation$contactsArgs<ExtArgs>
+    seasons?: boolean | Federation$seasonsArgs<ExtArgs>
     _count?: boolean | FederationCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type FederationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -25650,12 +27449,33 @@ export namespace Prisma {
   export type $FederationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Federation"
     objects: {
-      licenses: Prisma.$StudentLicensePayload<ExtArgs>[]
+      charges: Prisma.$FederationSeasonChargePayload<ExtArgs>[]
+      contacts: Prisma.$FederationContactPayload<ExtArgs>[]
+      seasons: Prisma.$FederationSeasonPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      /**
+       * Academy key from `x-school-id`. Catalogs are tenant-scoped (no global sharing).
+       */
+      tenantId: string
       name: string
+      acronym: string
+      /**
+       * ISO 3166-1 alpha-2 (e.g. "ES").
+       */
       country: string
+      /**
+       * Official federation contact email (mandatory).
+       */
+      email: string
+      isActive: boolean
+      /**
+       * Soft-delete timestamp. Live uniqueness of `(tenantId, name)` is a partial SQL index (`deletedAt IS NULL`).
+       */
+      deletedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["federation"]>
     composites: {}
   }
@@ -26020,7 +27840,9 @@ export namespace Prisma {
    */
   export interface Prisma__FederationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    licenses<T extends Federation$licensesArgs<ExtArgs> = {}>(args?: Subset<T, Federation$licensesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findMany"> | Null>
+    charges<T extends Federation$chargesArgs<ExtArgs> = {}>(args?: Subset<T, Federation$chargesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findMany"> | Null>
+    contacts<T extends Federation$contactsArgs<ExtArgs> = {}>(args?: Subset<T, Federation$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findMany"> | Null>
+    seasons<T extends Federation$seasonsArgs<ExtArgs> = {}>(args?: Subset<T, Federation$seasonsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findMany"> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -26051,8 +27873,15 @@ export namespace Prisma {
    */ 
   interface FederationFieldRefs {
     readonly id: FieldRef<"Federation", 'String'>
+    readonly tenantId: FieldRef<"Federation", 'String'>
     readonly name: FieldRef<"Federation", 'String'>
+    readonly acronym: FieldRef<"Federation", 'String'>
     readonly country: FieldRef<"Federation", 'String'>
+    readonly email: FieldRef<"Federation", 'String'>
+    readonly isActive: FieldRef<"Federation", 'Boolean'>
+    readonly deletedAt: FieldRef<"Federation", 'DateTime'>
+    readonly createdAt: FieldRef<"Federation", 'DateTime'>
+    readonly updatedAt: FieldRef<"Federation", 'DateTime'>
   }
     
 
@@ -26367,23 +28196,63 @@ export namespace Prisma {
   }
 
   /**
-   * Federation.licenses
+   * Federation.charges
    */
-  export type Federation$licensesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Federation$chargesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationSeasonCharge
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
-    where?: StudentLicenseWhereInput
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
-    cursor?: StudentLicenseWhereUniqueInput
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    where?: FederationSeasonChargeWhereInput
+    orderBy?: FederationSeasonChargeOrderByWithRelationInput | FederationSeasonChargeOrderByWithRelationInput[]
+    cursor?: FederationSeasonChargeWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
+    distinct?: FederationSeasonChargeScalarFieldEnum | FederationSeasonChargeScalarFieldEnum[]
+  }
+
+  /**
+   * Federation.contacts
+   */
+  export type Federation$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationContact
+     */
+    select?: FederationContactSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationContactInclude<ExtArgs> | null
+    where?: FederationContactWhereInput
+    orderBy?: FederationContactOrderByWithRelationInput | FederationContactOrderByWithRelationInput[]
+    cursor?: FederationContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FederationContactScalarFieldEnum | FederationContactScalarFieldEnum[]
+  }
+
+  /**
+   * Federation.seasons
+   */
+  export type Federation$seasonsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    where?: FederationSeasonWhereInput
+    orderBy?: FederationSeasonOrderByWithRelationInput | FederationSeasonOrderByWithRelationInput[]
+    cursor?: FederationSeasonWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FederationSeasonScalarFieldEnum | FederationSeasonScalarFieldEnum[]
   }
 
   /**
@@ -26402,353 +28271,362 @@ export namespace Prisma {
 
 
   /**
-   * Model StudentLicense
+   * Model FederationContact
    */
 
-  export type AggregateStudentLicense = {
-    _count: StudentLicenseCountAggregateOutputType | null
-    _min: StudentLicenseMinAggregateOutputType | null
-    _max: StudentLicenseMaxAggregateOutputType | null
+  export type AggregateFederationContact = {
+    _count: FederationContactCountAggregateOutputType | null
+    _min: FederationContactMinAggregateOutputType | null
+    _max: FederationContactMaxAggregateOutputType | null
   }
 
-  export type StudentLicenseMinAggregateOutputType = {
+  export type FederationContactMinAggregateOutputType = {
     id: string | null
-    studentProfileId: string | null
     federationId: string | null
-    licenseNumber: string | null
-    validUntil: Date | null
-    isActive: boolean | null
+    medium: $Enums.FederationContactMedium | null
+    value: string | null
+    tag: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
-  export type StudentLicenseMaxAggregateOutputType = {
+  export type FederationContactMaxAggregateOutputType = {
     id: string | null
-    studentProfileId: string | null
     federationId: string | null
-    licenseNumber: string | null
-    validUntil: Date | null
-    isActive: boolean | null
+    medium: $Enums.FederationContactMedium | null
+    value: string | null
+    tag: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
   }
 
-  export type StudentLicenseCountAggregateOutputType = {
+  export type FederationContactCountAggregateOutputType = {
     id: number
-    studentProfileId: number
     federationId: number
-    licenseNumber: number
-    validUntil: number
-    isActive: number
+    medium: number
+    value: number
+    tag: number
+    createdAt: number
+    updatedAt: number
     _all: number
   }
 
 
-  export type StudentLicenseMinAggregateInputType = {
+  export type FederationContactMinAggregateInputType = {
     id?: true
-    studentProfileId?: true
     federationId?: true
-    licenseNumber?: true
-    validUntil?: true
-    isActive?: true
+    medium?: true
+    value?: true
+    tag?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
-  export type StudentLicenseMaxAggregateInputType = {
+  export type FederationContactMaxAggregateInputType = {
     id?: true
-    studentProfileId?: true
     federationId?: true
-    licenseNumber?: true
-    validUntil?: true
-    isActive?: true
+    medium?: true
+    value?: true
+    tag?: true
+    createdAt?: true
+    updatedAt?: true
   }
 
-  export type StudentLicenseCountAggregateInputType = {
+  export type FederationContactCountAggregateInputType = {
     id?: true
-    studentProfileId?: true
     federationId?: true
-    licenseNumber?: true
-    validUntil?: true
-    isActive?: true
+    medium?: true
+    value?: true
+    tag?: true
+    createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
-  export type StudentLicenseAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which StudentLicense to aggregate.
+     * Filter which FederationContact to aggregate.
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentLicenses to fetch.
+     * Determine the order of FederationContacts to fetch.
      */
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
+    orderBy?: FederationContactOrderByWithRelationInput | FederationContactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: StudentLicenseWhereUniqueInput
+    cursor?: FederationContactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentLicenses from the position of the cursor.
+     * Take `±n` FederationContacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentLicenses.
+     * Skip the first `n` FederationContacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned StudentLicenses
+     * Count returned FederationContacts
     **/
-    _count?: true | StudentLicenseCountAggregateInputType
+    _count?: true | FederationContactCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: StudentLicenseMinAggregateInputType
+    _min?: FederationContactMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: StudentLicenseMaxAggregateInputType
+    _max?: FederationContactMaxAggregateInputType
   }
 
-  export type GetStudentLicenseAggregateType<T extends StudentLicenseAggregateArgs> = {
-        [P in keyof T & keyof AggregateStudentLicense]: P extends '_count' | 'count'
+  export type GetFederationContactAggregateType<T extends FederationContactAggregateArgs> = {
+        [P in keyof T & keyof AggregateFederationContact]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateStudentLicense[P]>
-      : GetScalarType<T[P], AggregateStudentLicense[P]>
+        : GetScalarType<T[P], AggregateFederationContact[P]>
+      : GetScalarType<T[P], AggregateFederationContact[P]>
   }
 
 
 
 
-  export type StudentLicenseGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StudentLicenseWhereInput
-    orderBy?: StudentLicenseOrderByWithAggregationInput | StudentLicenseOrderByWithAggregationInput[]
-    by: StudentLicenseScalarFieldEnum[] | StudentLicenseScalarFieldEnum
-    having?: StudentLicenseScalarWhereWithAggregatesInput
+  export type FederationContactGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationContactWhereInput
+    orderBy?: FederationContactOrderByWithAggregationInput | FederationContactOrderByWithAggregationInput[]
+    by: FederationContactScalarFieldEnum[] | FederationContactScalarFieldEnum
+    having?: FederationContactScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: StudentLicenseCountAggregateInputType | true
-    _min?: StudentLicenseMinAggregateInputType
-    _max?: StudentLicenseMaxAggregateInputType
+    _count?: FederationContactCountAggregateInputType | true
+    _min?: FederationContactMinAggregateInputType
+    _max?: FederationContactMaxAggregateInputType
   }
 
-  export type StudentLicenseGroupByOutputType = {
+  export type FederationContactGroupByOutputType = {
     id: string
-    studentProfileId: string
     federationId: string
-    licenseNumber: string
-    validUntil: Date
-    isActive: boolean
-    _count: StudentLicenseCountAggregateOutputType | null
-    _min: StudentLicenseMinAggregateOutputType | null
-    _max: StudentLicenseMaxAggregateOutputType | null
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag: string
+    createdAt: Date
+    updatedAt: Date
+    _count: FederationContactCountAggregateOutputType | null
+    _min: FederationContactMinAggregateOutputType | null
+    _max: FederationContactMaxAggregateOutputType | null
   }
 
-  type GetStudentLicenseGroupByPayload<T extends StudentLicenseGroupByArgs> = Prisma.PrismaPromise<
+  type GetFederationContactGroupByPayload<T extends FederationContactGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<StudentLicenseGroupByOutputType, T['by']> &
+      PickEnumerable<FederationContactGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof StudentLicenseGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof FederationContactGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], StudentLicenseGroupByOutputType[P]>
-            : GetScalarType<T[P], StudentLicenseGroupByOutputType[P]>
+              : GetScalarType<T[P], FederationContactGroupByOutputType[P]>
+            : GetScalarType<T[P], FederationContactGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type StudentLicenseSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type FederationContactSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    studentProfileId?: boolean
     federationId?: boolean
-    licenseNumber?: boolean
-    validUntil?: boolean
-    isActive?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    medium?: boolean
+    value?: boolean
+    tag?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     federation?: boolean | FederationDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["studentLicense"]>
+  }, ExtArgs["result"]["federationContact"]>
 
-  export type StudentLicenseSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type FederationContactSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    studentProfileId?: boolean
     federationId?: boolean
-    licenseNumber?: boolean
-    validUntil?: boolean
-    isActive?: boolean
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+    medium?: boolean
+    value?: boolean
+    tag?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
     federation?: boolean | FederationDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["studentLicense"]>
+  }, ExtArgs["result"]["federationContact"]>
 
-  export type StudentLicenseSelectScalar = {
+  export type FederationContactSelectScalar = {
     id?: boolean
-    studentProfileId?: boolean
     federationId?: boolean
-    licenseNumber?: boolean
-    validUntil?: boolean
-    isActive?: boolean
+    medium?: boolean
+    value?: boolean
+    tag?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type StudentLicenseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  export type FederationContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     federation?: boolean | FederationDefaultArgs<ExtArgs>
   }
-  export type StudentLicenseIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    student?: boolean | StudentProfileDefaultArgs<ExtArgs>
+  export type FederationContactIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     federation?: boolean | FederationDefaultArgs<ExtArgs>
   }
 
-  export type $StudentLicensePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "StudentLicense"
+  export type $FederationContactPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FederationContact"
     objects: {
-      student: Prisma.$StudentProfilePayload<ExtArgs>
       federation: Prisma.$FederationPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      studentProfileId: string
       federationId: string
-      licenseNumber: string
-      validUntil: Date
-      isActive: boolean
-    }, ExtArgs["result"]["studentLicense"]>
+      medium: $Enums.FederationContactMedium
+      value: string
+      /**
+       * Staff label, e.g. "Sede nacional", "Presidencia", "Secretaria".
+       */
+      tag: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["federationContact"]>
     composites: {}
   }
 
-  type StudentLicenseGetPayload<S extends boolean | null | undefined | StudentLicenseDefaultArgs> = $Result.GetResult<Prisma.$StudentLicensePayload, S>
+  type FederationContactGetPayload<S extends boolean | null | undefined | FederationContactDefaultArgs> = $Result.GetResult<Prisma.$FederationContactPayload, S>
 
-  type StudentLicenseCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<StudentLicenseFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: StudentLicenseCountAggregateInputType | true
+  type FederationContactCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FederationContactFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FederationContactCountAggregateInputType | true
     }
 
-  export interface StudentLicenseDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StudentLicense'], meta: { name: 'StudentLicense' } }
+  export interface FederationContactDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FederationContact'], meta: { name: 'FederationContact' } }
     /**
-     * Find zero or one StudentLicense that matches the filter.
-     * @param {StudentLicenseFindUniqueArgs} args - Arguments to find a StudentLicense
+     * Find zero or one FederationContact that matches the filter.
+     * @param {FederationContactFindUniqueArgs} args - Arguments to find a FederationContact
      * @example
-     * // Get one StudentLicense
-     * const studentLicense = await prisma.studentLicense.findUnique({
+     * // Get one FederationContact
+     * const federationContact = await prisma.federationContact.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends StudentLicenseFindUniqueArgs>(args: SelectSubset<T, StudentLicenseFindUniqueArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+    findUnique<T extends FederationContactFindUniqueArgs>(args: SelectSubset<T, FederationContactFindUniqueArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
 
     /**
-     * Find one StudentLicense that matches the filter or throw an error with `error.code='P2025'` 
+     * Find one FederationContact that matches the filter or throw an error with `error.code='P2025'` 
      * if no matches were found.
-     * @param {StudentLicenseFindUniqueOrThrowArgs} args - Arguments to find a StudentLicense
+     * @param {FederationContactFindUniqueOrThrowArgs} args - Arguments to find a FederationContact
      * @example
-     * // Get one StudentLicense
-     * const studentLicense = await prisma.studentLicense.findUniqueOrThrow({
+     * // Get one FederationContact
+     * const federationContact = await prisma.federationContact.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends StudentLicenseFindUniqueOrThrowArgs>(args: SelectSubset<T, StudentLicenseFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+    findUniqueOrThrow<T extends FederationContactFindUniqueOrThrowArgs>(args: SelectSubset<T, FederationContactFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
 
     /**
-     * Find the first StudentLicense that matches the filter.
+     * Find the first FederationContact that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseFindFirstArgs} args - Arguments to find a StudentLicense
+     * @param {FederationContactFindFirstArgs} args - Arguments to find a FederationContact
      * @example
-     * // Get one StudentLicense
-     * const studentLicense = await prisma.studentLicense.findFirst({
+     * // Get one FederationContact
+     * const federationContact = await prisma.federationContact.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends StudentLicenseFindFirstArgs>(args?: SelectSubset<T, StudentLicenseFindFirstArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+    findFirst<T extends FederationContactFindFirstArgs>(args?: SelectSubset<T, FederationContactFindFirstArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
 
     /**
-     * Find the first StudentLicense that matches the filter or
+     * Find the first FederationContact that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseFindFirstOrThrowArgs} args - Arguments to find a StudentLicense
+     * @param {FederationContactFindFirstOrThrowArgs} args - Arguments to find a FederationContact
      * @example
-     * // Get one StudentLicense
-     * const studentLicense = await prisma.studentLicense.findFirstOrThrow({
+     * // Get one FederationContact
+     * const federationContact = await prisma.federationContact.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends StudentLicenseFindFirstOrThrowArgs>(args?: SelectSubset<T, StudentLicenseFindFirstOrThrowArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+    findFirstOrThrow<T extends FederationContactFindFirstOrThrowArgs>(args?: SelectSubset<T, FederationContactFindFirstOrThrowArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
 
     /**
-     * Find zero or more StudentLicenses that matches the filter.
+     * Find zero or more FederationContacts that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {FederationContactFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all StudentLicenses
-     * const studentLicenses = await prisma.studentLicense.findMany()
+     * // Get all FederationContacts
+     * const federationContacts = await prisma.federationContact.findMany()
      * 
-     * // Get first 10 StudentLicenses
-     * const studentLicenses = await prisma.studentLicense.findMany({ take: 10 })
+     * // Get first 10 FederationContacts
+     * const federationContacts = await prisma.federationContact.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const studentLicenseWithIdOnly = await prisma.studentLicense.findMany({ select: { id: true } })
+     * const federationContactWithIdOnly = await prisma.federationContact.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends StudentLicenseFindManyArgs>(args?: SelectSubset<T, StudentLicenseFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "findMany">>
+    findMany<T extends FederationContactFindManyArgs>(args?: SelectSubset<T, FederationContactFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "findMany">>
 
     /**
-     * Create a StudentLicense.
-     * @param {StudentLicenseCreateArgs} args - Arguments to create a StudentLicense.
+     * Create a FederationContact.
+     * @param {FederationContactCreateArgs} args - Arguments to create a FederationContact.
      * @example
-     * // Create one StudentLicense
-     * const StudentLicense = await prisma.studentLicense.create({
+     * // Create one FederationContact
+     * const FederationContact = await prisma.federationContact.create({
      *   data: {
-     *     // ... data to create a StudentLicense
+     *     // ... data to create a FederationContact
      *   }
      * })
      * 
      */
-    create<T extends StudentLicenseCreateArgs>(args: SelectSubset<T, StudentLicenseCreateArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "create">, never, ExtArgs>
+    create<T extends FederationContactCreateArgs>(args: SelectSubset<T, FederationContactCreateArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "create">, never, ExtArgs>
 
     /**
-     * Create many StudentLicenses.
-     * @param {StudentLicenseCreateManyArgs} args - Arguments to create many StudentLicenses.
+     * Create many FederationContacts.
+     * @param {FederationContactCreateManyArgs} args - Arguments to create many FederationContacts.
      * @example
-     * // Create many StudentLicenses
-     * const studentLicense = await prisma.studentLicense.createMany({
+     * // Create many FederationContacts
+     * const federationContact = await prisma.federationContact.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends StudentLicenseCreateManyArgs>(args?: SelectSubset<T, StudentLicenseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends FederationContactCreateManyArgs>(args?: SelectSubset<T, FederationContactCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many StudentLicenses and returns the data saved in the database.
-     * @param {StudentLicenseCreateManyAndReturnArgs} args - Arguments to create many StudentLicenses.
+     * Create many FederationContacts and returns the data saved in the database.
+     * @param {FederationContactCreateManyAndReturnArgs} args - Arguments to create many FederationContacts.
      * @example
-     * // Create many StudentLicenses
-     * const studentLicense = await prisma.studentLicense.createManyAndReturn({
+     * // Create many FederationContacts
+     * const federationContact = await prisma.federationContact.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many StudentLicenses and only return the `id`
-     * const studentLicenseWithIdOnly = await prisma.studentLicense.createManyAndReturn({ 
+     * // Create many FederationContacts and only return the `id`
+     * const federationContactWithIdOnly = await prisma.federationContact.createManyAndReturn({ 
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -26758,28 +28636,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends StudentLicenseCreateManyAndReturnArgs>(args?: SelectSubset<T, StudentLicenseCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "createManyAndReturn">>
+    createManyAndReturn<T extends FederationContactCreateManyAndReturnArgs>(args?: SelectSubset<T, FederationContactCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "createManyAndReturn">>
 
     /**
-     * Delete a StudentLicense.
-     * @param {StudentLicenseDeleteArgs} args - Arguments to delete one StudentLicense.
+     * Delete a FederationContact.
+     * @param {FederationContactDeleteArgs} args - Arguments to delete one FederationContact.
      * @example
-     * // Delete one StudentLicense
-     * const StudentLicense = await prisma.studentLicense.delete({
+     * // Delete one FederationContact
+     * const FederationContact = await prisma.federationContact.delete({
      *   where: {
-     *     // ... filter to delete one StudentLicense
+     *     // ... filter to delete one FederationContact
      *   }
      * })
      * 
      */
-    delete<T extends StudentLicenseDeleteArgs>(args: SelectSubset<T, StudentLicenseDeleteArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+    delete<T extends FederationContactDeleteArgs>(args: SelectSubset<T, FederationContactDeleteArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "delete">, never, ExtArgs>
 
     /**
-     * Update one StudentLicense.
-     * @param {StudentLicenseUpdateArgs} args - Arguments to update one StudentLicense.
+     * Update one FederationContact.
+     * @param {FederationContactUpdateArgs} args - Arguments to update one FederationContact.
      * @example
-     * // Update one StudentLicense
-     * const studentLicense = await prisma.studentLicense.update({
+     * // Update one FederationContact
+     * const federationContact = await prisma.federationContact.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -26789,30 +28667,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends StudentLicenseUpdateArgs>(args: SelectSubset<T, StudentLicenseUpdateArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "update">, never, ExtArgs>
+    update<T extends FederationContactUpdateArgs>(args: SelectSubset<T, FederationContactUpdateArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "update">, never, ExtArgs>
 
     /**
-     * Delete zero or more StudentLicenses.
-     * @param {StudentLicenseDeleteManyArgs} args - Arguments to filter StudentLicenses to delete.
+     * Delete zero or more FederationContacts.
+     * @param {FederationContactDeleteManyArgs} args - Arguments to filter FederationContacts to delete.
      * @example
-     * // Delete a few StudentLicenses
-     * const { count } = await prisma.studentLicense.deleteMany({
+     * // Delete a few FederationContacts
+     * const { count } = await prisma.federationContact.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends StudentLicenseDeleteManyArgs>(args?: SelectSubset<T, StudentLicenseDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends FederationContactDeleteManyArgs>(args?: SelectSubset<T, FederationContactDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more StudentLicenses.
+     * Update zero or more FederationContacts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {FederationContactUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many StudentLicenses
-     * const studentLicense = await prisma.studentLicense.updateMany({
+     * // Update many FederationContacts
+     * const federationContact = await prisma.federationContact.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -26822,56 +28700,56 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends StudentLicenseUpdateManyArgs>(args: SelectSubset<T, StudentLicenseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends FederationContactUpdateManyArgs>(args: SelectSubset<T, FederationContactUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create or update one StudentLicense.
-     * @param {StudentLicenseUpsertArgs} args - Arguments to update or create a StudentLicense.
+     * Create or update one FederationContact.
+     * @param {FederationContactUpsertArgs} args - Arguments to update or create a FederationContact.
      * @example
-     * // Update or create a StudentLicense
-     * const studentLicense = await prisma.studentLicense.upsert({
+     * // Update or create a FederationContact
+     * const federationContact = await prisma.federationContact.upsert({
      *   create: {
-     *     // ... data to create a StudentLicense
+     *     // ... data to create a FederationContact
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the StudentLicense we want to update
+     *     // ... the filter for the FederationContact we want to update
      *   }
      * })
      */
-    upsert<T extends StudentLicenseUpsertArgs>(args: SelectSubset<T, StudentLicenseUpsertArgs<ExtArgs>>): Prisma__StudentLicenseClient<$Result.GetResult<Prisma.$StudentLicensePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+    upsert<T extends FederationContactUpsertArgs>(args: SelectSubset<T, FederationContactUpsertArgs<ExtArgs>>): Prisma__FederationContactClient<$Result.GetResult<Prisma.$FederationContactPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
 
 
     /**
-     * Count the number of StudentLicenses.
+     * Count the number of FederationContacts.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseCountArgs} args - Arguments to filter StudentLicenses to count.
+     * @param {FederationContactCountArgs} args - Arguments to filter FederationContacts to count.
      * @example
-     * // Count the number of StudentLicenses
-     * const count = await prisma.studentLicense.count({
+     * // Count the number of FederationContacts
+     * const count = await prisma.federationContact.count({
      *   where: {
-     *     // ... the filter for the StudentLicenses we want to count
+     *     // ... the filter for the FederationContacts we want to count
      *   }
      * })
     **/
-    count<T extends StudentLicenseCountArgs>(
-      args?: Subset<T, StudentLicenseCountArgs>,
+    count<T extends FederationContactCountArgs>(
+      args?: Subset<T, FederationContactCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], StudentLicenseCountAggregateOutputType>
+          : GetScalarType<T['select'], FederationContactCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a StudentLicense.
+     * Allows you to perform aggregations operations on a FederationContact.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {FederationContactAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -26891,13 +28769,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends StudentLicenseAggregateArgs>(args: Subset<T, StudentLicenseAggregateArgs>): Prisma.PrismaPromise<GetStudentLicenseAggregateType<T>>
+    aggregate<T extends FederationContactAggregateArgs>(args: Subset<T, FederationContactAggregateArgs>): Prisma.PrismaPromise<GetFederationContactAggregateType<T>>
 
     /**
-     * Group by StudentLicense.
+     * Group by FederationContact.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {StudentLicenseGroupByArgs} args - Group by arguments.
+     * @param {FederationContactGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -26912,14 +28790,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends StudentLicenseGroupByArgs,
+      T extends FederationContactGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StudentLicenseGroupByArgs['orderBy'] }
-        : { orderBy?: StudentLicenseGroupByArgs['orderBy'] },
+        ? { orderBy: FederationContactGroupByArgs['orderBy'] }
+        : { orderBy?: FederationContactGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -26968,22 +28846,21 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, StudentLicenseGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStudentLicenseGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, FederationContactGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFederationContactGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the StudentLicense model
+   * Fields of the FederationContact model
    */
-  readonly fields: StudentLicenseFieldRefs;
+  readonly fields: FederationContactFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for StudentLicense.
+   * The delegate class that acts as a "Promise-like" for FederationContact.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__StudentLicenseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__FederationContactClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    student<T extends StudentProfileDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StudentProfileDefaultArgs<ExtArgs>>): Prisma__StudentProfileClient<$Result.GetResult<Prisma.$StudentProfilePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     federation<T extends FederationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FederationDefaultArgs<ExtArgs>>): Prisma__FederationClient<$Result.GetResult<Prisma.$FederationPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -27011,344 +28888,5586 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the StudentLicense model
+   * Fields of the FederationContact model
    */ 
-  interface StudentLicenseFieldRefs {
-    readonly id: FieldRef<"StudentLicense", 'String'>
-    readonly studentProfileId: FieldRef<"StudentLicense", 'String'>
-    readonly federationId: FieldRef<"StudentLicense", 'String'>
-    readonly licenseNumber: FieldRef<"StudentLicense", 'String'>
-    readonly validUntil: FieldRef<"StudentLicense", 'DateTime'>
-    readonly isActive: FieldRef<"StudentLicense", 'Boolean'>
+  interface FederationContactFieldRefs {
+    readonly id: FieldRef<"FederationContact", 'String'>
+    readonly federationId: FieldRef<"FederationContact", 'String'>
+    readonly medium: FieldRef<"FederationContact", 'FederationContactMedium'>
+    readonly value: FieldRef<"FederationContact", 'String'>
+    readonly tag: FieldRef<"FederationContact", 'String'>
+    readonly createdAt: FieldRef<"FederationContact", 'DateTime'>
+    readonly updatedAt: FieldRef<"FederationContact", 'DateTime'>
   }
     
 
   // Custom InputTypes
   /**
-   * StudentLicense findUnique
+   * FederationContact findUnique
    */
-  export type StudentLicenseFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter, which StudentLicense to fetch.
+     * Filter, which FederationContact to fetch.
      */
-    where: StudentLicenseWhereUniqueInput
+    where: FederationContactWhereUniqueInput
   }
 
   /**
-   * StudentLicense findUniqueOrThrow
+   * FederationContact findUniqueOrThrow
    */
-  export type StudentLicenseFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter, which StudentLicense to fetch.
+     * Filter, which FederationContact to fetch.
      */
-    where: StudentLicenseWhereUniqueInput
+    where: FederationContactWhereUniqueInput
   }
 
   /**
-   * StudentLicense findFirst
+   * FederationContact findFirst
    */
-  export type StudentLicenseFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter, which StudentLicense to fetch.
+     * Filter, which FederationContact to fetch.
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentLicenses to fetch.
+     * Determine the order of FederationContacts to fetch.
      */
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
+    orderBy?: FederationContactOrderByWithRelationInput | FederationContactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for StudentLicenses.
+     * Sets the position for searching for FederationContacts.
      */
-    cursor?: StudentLicenseWhereUniqueInput
+    cursor?: FederationContactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentLicenses from the position of the cursor.
+     * Take `±n` FederationContacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentLicenses.
+     * Skip the first `n` FederationContacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of StudentLicenses.
+     * Filter by unique combinations of FederationContacts.
      */
-    distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
+    distinct?: FederationContactScalarFieldEnum | FederationContactScalarFieldEnum[]
   }
 
   /**
-   * StudentLicense findFirstOrThrow
+   * FederationContact findFirstOrThrow
    */
-  export type StudentLicenseFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter, which StudentLicense to fetch.
+     * Filter, which FederationContact to fetch.
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentLicenses to fetch.
+     * Determine the order of FederationContacts to fetch.
      */
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
+    orderBy?: FederationContactOrderByWithRelationInput | FederationContactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for StudentLicenses.
+     * Sets the position for searching for FederationContacts.
      */
-    cursor?: StudentLicenseWhereUniqueInput
+    cursor?: FederationContactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentLicenses from the position of the cursor.
+     * Take `±n` FederationContacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentLicenses.
+     * Skip the first `n` FederationContacts.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of StudentLicenses.
+     * Filter by unique combinations of FederationContacts.
      */
-    distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
+    distinct?: FederationContactScalarFieldEnum | FederationContactScalarFieldEnum[]
   }
 
   /**
-   * StudentLicense findMany
+   * FederationContact findMany
    */
-  export type StudentLicenseFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter, which StudentLicenses to fetch.
+     * Filter, which FederationContacts to fetch.
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of StudentLicenses to fetch.
+     * Determine the order of FederationContacts to fetch.
      */
-    orderBy?: StudentLicenseOrderByWithRelationInput | StudentLicenseOrderByWithRelationInput[]
+    orderBy?: FederationContactOrderByWithRelationInput | FederationContactOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing StudentLicenses.
+     * Sets the position for listing FederationContacts.
      */
-    cursor?: StudentLicenseWhereUniqueInput
+    cursor?: FederationContactWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` StudentLicenses from the position of the cursor.
+     * Take `±n` FederationContacts from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` StudentLicenses.
+     * Skip the first `n` FederationContacts.
      */
     skip?: number
-    distinct?: StudentLicenseScalarFieldEnum | StudentLicenseScalarFieldEnum[]
+    distinct?: FederationContactScalarFieldEnum | FederationContactScalarFieldEnum[]
   }
 
   /**
-   * StudentLicense create
+   * FederationContact create
    */
-  export type StudentLicenseCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * The data needed to create a StudentLicense.
+     * The data needed to create a FederationContact.
      */
-    data: XOR<StudentLicenseCreateInput, StudentLicenseUncheckedCreateInput>
+    data: XOR<FederationContactCreateInput, FederationContactUncheckedCreateInput>
   }
 
   /**
-   * StudentLicense createMany
+   * FederationContact createMany
    */
-  export type StudentLicenseCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many StudentLicenses.
+     * The data used to create many FederationContacts.
      */
-    data: StudentLicenseCreateManyInput | StudentLicenseCreateManyInput[]
+    data: FederationContactCreateManyInput | FederationContactCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * StudentLicense createManyAndReturn
+   * FederationContact createManyAndReturn
    */
-  export type StudentLicenseCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelectCreateManyAndReturn<ExtArgs> | null
+    select?: FederationContactSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * The data used to create many StudentLicenses.
+     * The data used to create many FederationContacts.
      */
-    data: StudentLicenseCreateManyInput | StudentLicenseCreateManyInput[]
+    data: FederationContactCreateManyInput | FederationContactCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: FederationContactIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * StudentLicense update
+   * FederationContact update
    */
-  export type StudentLicenseUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * The data needed to update a StudentLicense.
+     * The data needed to update a FederationContact.
      */
-    data: XOR<StudentLicenseUpdateInput, StudentLicenseUncheckedUpdateInput>
+    data: XOR<FederationContactUpdateInput, FederationContactUncheckedUpdateInput>
     /**
-     * Choose, which StudentLicense to update.
+     * Choose, which FederationContact to update.
      */
-    where: StudentLicenseWhereUniqueInput
+    where: FederationContactWhereUniqueInput
   }
 
   /**
-   * StudentLicense updateMany
+   * FederationContact updateMany
    */
-  export type StudentLicenseUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update StudentLicenses.
+     * The data used to update FederationContacts.
      */
-    data: XOR<StudentLicenseUpdateManyMutationInput, StudentLicenseUncheckedUpdateManyInput>
+    data: XOR<FederationContactUpdateManyMutationInput, FederationContactUncheckedUpdateManyInput>
     /**
-     * Filter which StudentLicenses to update
+     * Filter which FederationContacts to update
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
   }
 
   /**
-   * StudentLicense upsert
+   * FederationContact upsert
    */
-  export type StudentLicenseUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * The filter to search for the StudentLicense to update in case it exists.
+     * The filter to search for the FederationContact to update in case it exists.
      */
-    where: StudentLicenseWhereUniqueInput
+    where: FederationContactWhereUniqueInput
     /**
-     * In case the StudentLicense found by the `where` argument doesn't exist, create a new StudentLicense with this data.
+     * In case the FederationContact found by the `where` argument doesn't exist, create a new FederationContact with this data.
      */
-    create: XOR<StudentLicenseCreateInput, StudentLicenseUncheckedCreateInput>
+    create: XOR<FederationContactCreateInput, FederationContactUncheckedCreateInput>
     /**
-     * In case the StudentLicense was found with the provided `where` argument, update it with this data.
+     * In case the FederationContact was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<StudentLicenseUpdateInput, StudentLicenseUncheckedUpdateInput>
+    update: XOR<FederationContactUpdateInput, FederationContactUncheckedUpdateInput>
   }
 
   /**
-   * StudentLicense delete
+   * FederationContact delete
    */
-  export type StudentLicenseDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
     /**
-     * Filter which StudentLicense to delete.
+     * Filter which FederationContact to delete.
      */
-    where: StudentLicenseWhereUniqueInput
+    where: FederationContactWhereUniqueInput
   }
 
   /**
-   * StudentLicense deleteMany
+   * FederationContact deleteMany
    */
-  export type StudentLicenseDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which StudentLicenses to delete
+     * Filter which FederationContacts to delete
      */
-    where?: StudentLicenseWhereInput
+    where?: FederationContactWhereInput
   }
 
   /**
-   * StudentLicense without action
+   * FederationContact without action
    */
-  export type StudentLicenseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type FederationContactDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the StudentLicense
+     * Select specific fields to fetch from the FederationContact
      */
-    select?: StudentLicenseSelect<ExtArgs> | null
+    select?: FederationContactSelect<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: StudentLicenseInclude<ExtArgs> | null
+    include?: FederationContactInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FederationSeason
+   */
+
+  export type AggregateFederationSeason = {
+    _count: FederationSeasonCountAggregateOutputType | null
+    _avg: FederationSeasonAvgAggregateOutputType | null
+    _sum: FederationSeasonSumAggregateOutputType | null
+    _min: FederationSeasonMinAggregateOutputType | null
+    _max: FederationSeasonMaxAggregateOutputType | null
+  }
+
+  export type FederationSeasonAvgAggregateOutputType = {
+    clubCost: Decimal | null
+  }
+
+  export type FederationSeasonSumAggregateOutputType = {
+    clubCost: Decimal | null
+  }
+
+  export type FederationSeasonMinAggregateOutputType = {
+    id: string | null
+    federationId: string | null
+    seasonName: string | null
+    currency: string | null
+    clubCost: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationSeasonMaxAggregateOutputType = {
+    id: string | null
+    federationId: string | null
+    seasonName: string | null
+    currency: string | null
+    clubCost: Decimal | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationSeasonCountAggregateOutputType = {
+    id: number
+    federationId: number
+    seasonName: number
+    currency: number
+    clubCost: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FederationSeasonAvgAggregateInputType = {
+    clubCost?: true
+  }
+
+  export type FederationSeasonSumAggregateInputType = {
+    clubCost?: true
+  }
+
+  export type FederationSeasonMinAggregateInputType = {
+    id?: true
+    federationId?: true
+    seasonName?: true
+    currency?: true
+    clubCost?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationSeasonMaxAggregateInputType = {
+    id?: true
+    federationId?: true
+    seasonName?: true
+    currency?: true
+    clubCost?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationSeasonCountAggregateInputType = {
+    id?: true
+    federationId?: true
+    seasonName?: true
+    currency?: true
+    clubCost?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FederationSeasonAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationSeason to aggregate.
+     */
+    where?: FederationSeasonWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasons to fetch.
+     */
+    orderBy?: FederationSeasonOrderByWithRelationInput | FederationSeasonOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FederationSeasonWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasons from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasons.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FederationSeasons
+    **/
+    _count?: true | FederationSeasonCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FederationSeasonAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FederationSeasonSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FederationSeasonMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FederationSeasonMaxAggregateInputType
+  }
+
+  export type GetFederationSeasonAggregateType<T extends FederationSeasonAggregateArgs> = {
+        [P in keyof T & keyof AggregateFederationSeason]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFederationSeason[P]>
+      : GetScalarType<T[P], AggregateFederationSeason[P]>
+  }
+
+
+
+
+  export type FederationSeasonGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationSeasonWhereInput
+    orderBy?: FederationSeasonOrderByWithAggregationInput | FederationSeasonOrderByWithAggregationInput[]
+    by: FederationSeasonScalarFieldEnum[] | FederationSeasonScalarFieldEnum
+    having?: FederationSeasonScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FederationSeasonCountAggregateInputType | true
+    _avg?: FederationSeasonAvgAggregateInputType
+    _sum?: FederationSeasonSumAggregateInputType
+    _min?: FederationSeasonMinAggregateInputType
+    _max?: FederationSeasonMaxAggregateInputType
+  }
+
+  export type FederationSeasonGroupByOutputType = {
+    id: string
+    federationId: string
+    seasonName: string
+    currency: string
+    clubCost: Decimal
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: FederationSeasonCountAggregateOutputType | null
+    _avg: FederationSeasonAvgAggregateOutputType | null
+    _sum: FederationSeasonSumAggregateOutputType | null
+    _min: FederationSeasonMinAggregateOutputType | null
+    _max: FederationSeasonMaxAggregateOutputType | null
+  }
+
+  type GetFederationSeasonGroupByPayload<T extends FederationSeasonGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FederationSeasonGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FederationSeasonGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FederationSeasonGroupByOutputType[P]>
+            : GetScalarType<T[P], FederationSeasonGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FederationSeasonSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    federationId?: boolean
+    seasonName?: boolean
+    currency?: boolean
+    clubCost?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+    licenseTypes?: boolean | FederationSeason$licenseTypesArgs<ExtArgs>
+    _count?: boolean | FederationSeasonCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationSeason"]>
+
+  export type FederationSeasonSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    federationId?: boolean
+    seasonName?: boolean
+    currency?: boolean
+    clubCost?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationSeason"]>
+
+  export type FederationSeasonSelectScalar = {
+    id?: boolean
+    federationId?: boolean
+    seasonName?: boolean
+    currency?: boolean
+    clubCost?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FederationSeasonInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+    licenseTypes?: boolean | FederationSeason$licenseTypesArgs<ExtArgs>
+    _count?: boolean | FederationSeasonCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FederationSeasonIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }
+
+  export type $FederationSeasonPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FederationSeason"
+    objects: {
+      federation: Prisma.$FederationPayload<ExtArgs>
+      licenseTypes: Prisma.$FederationLicenseTypePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      federationId: string
+      /**
+       * Display label, e.g. "2026" or "26/27".
+       */
+      seasonName: string
+      /**
+       * ISO 4217, e.g. "EUR".
+       */
+      currency: string
+      clubCost: Prisma.Decimal
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["federationSeason"]>
+    composites: {}
+  }
+
+  type FederationSeasonGetPayload<S extends boolean | null | undefined | FederationSeasonDefaultArgs> = $Result.GetResult<Prisma.$FederationSeasonPayload, S>
+
+  type FederationSeasonCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FederationSeasonFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FederationSeasonCountAggregateInputType | true
+    }
+
+  export interface FederationSeasonDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FederationSeason'], meta: { name: 'FederationSeason' } }
+    /**
+     * Find zero or one FederationSeason that matches the filter.
+     * @param {FederationSeasonFindUniqueArgs} args - Arguments to find a FederationSeason
+     * @example
+     * // Get one FederationSeason
+     * const federationSeason = await prisma.federationSeason.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FederationSeasonFindUniqueArgs>(args: SelectSubset<T, FederationSeasonFindUniqueArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FederationSeason that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FederationSeasonFindUniqueOrThrowArgs} args - Arguments to find a FederationSeason
+     * @example
+     * // Get one FederationSeason
+     * const federationSeason = await prisma.federationSeason.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FederationSeasonFindUniqueOrThrowArgs>(args: SelectSubset<T, FederationSeasonFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FederationSeason that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonFindFirstArgs} args - Arguments to find a FederationSeason
+     * @example
+     * // Get one FederationSeason
+     * const federationSeason = await prisma.federationSeason.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FederationSeasonFindFirstArgs>(args?: SelectSubset<T, FederationSeasonFindFirstArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FederationSeason that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonFindFirstOrThrowArgs} args - Arguments to find a FederationSeason
+     * @example
+     * // Get one FederationSeason
+     * const federationSeason = await prisma.federationSeason.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FederationSeasonFindFirstOrThrowArgs>(args?: SelectSubset<T, FederationSeasonFindFirstOrThrowArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FederationSeasons that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FederationSeasons
+     * const federationSeasons = await prisma.federationSeason.findMany()
+     * 
+     * // Get first 10 FederationSeasons
+     * const federationSeasons = await prisma.federationSeason.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const federationSeasonWithIdOnly = await prisma.federationSeason.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FederationSeasonFindManyArgs>(args?: SelectSubset<T, FederationSeasonFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FederationSeason.
+     * @param {FederationSeasonCreateArgs} args - Arguments to create a FederationSeason.
+     * @example
+     * // Create one FederationSeason
+     * const FederationSeason = await prisma.federationSeason.create({
+     *   data: {
+     *     // ... data to create a FederationSeason
+     *   }
+     * })
+     * 
+     */
+    create<T extends FederationSeasonCreateArgs>(args: SelectSubset<T, FederationSeasonCreateArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FederationSeasons.
+     * @param {FederationSeasonCreateManyArgs} args - Arguments to create many FederationSeasons.
+     * @example
+     * // Create many FederationSeasons
+     * const federationSeason = await prisma.federationSeason.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FederationSeasonCreateManyArgs>(args?: SelectSubset<T, FederationSeasonCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FederationSeasons and returns the data saved in the database.
+     * @param {FederationSeasonCreateManyAndReturnArgs} args - Arguments to create many FederationSeasons.
+     * @example
+     * // Create many FederationSeasons
+     * const federationSeason = await prisma.federationSeason.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FederationSeasons and only return the `id`
+     * const federationSeasonWithIdOnly = await prisma.federationSeason.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FederationSeasonCreateManyAndReturnArgs>(args?: SelectSubset<T, FederationSeasonCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FederationSeason.
+     * @param {FederationSeasonDeleteArgs} args - Arguments to delete one FederationSeason.
+     * @example
+     * // Delete one FederationSeason
+     * const FederationSeason = await prisma.federationSeason.delete({
+     *   where: {
+     *     // ... filter to delete one FederationSeason
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FederationSeasonDeleteArgs>(args: SelectSubset<T, FederationSeasonDeleteArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FederationSeason.
+     * @param {FederationSeasonUpdateArgs} args - Arguments to update one FederationSeason.
+     * @example
+     * // Update one FederationSeason
+     * const federationSeason = await prisma.federationSeason.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FederationSeasonUpdateArgs>(args: SelectSubset<T, FederationSeasonUpdateArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FederationSeasons.
+     * @param {FederationSeasonDeleteManyArgs} args - Arguments to filter FederationSeasons to delete.
+     * @example
+     * // Delete a few FederationSeasons
+     * const { count } = await prisma.federationSeason.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FederationSeasonDeleteManyArgs>(args?: SelectSubset<T, FederationSeasonDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FederationSeasons.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FederationSeasons
+     * const federationSeason = await prisma.federationSeason.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FederationSeasonUpdateManyArgs>(args: SelectSubset<T, FederationSeasonUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FederationSeason.
+     * @param {FederationSeasonUpsertArgs} args - Arguments to update or create a FederationSeason.
+     * @example
+     * // Update or create a FederationSeason
+     * const federationSeason = await prisma.federationSeason.upsert({
+     *   create: {
+     *     // ... data to create a FederationSeason
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FederationSeason we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FederationSeasonUpsertArgs>(args: SelectSubset<T, FederationSeasonUpsertArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FederationSeasons.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonCountArgs} args - Arguments to filter FederationSeasons to count.
+     * @example
+     * // Count the number of FederationSeasons
+     * const count = await prisma.federationSeason.count({
+     *   where: {
+     *     // ... the filter for the FederationSeasons we want to count
+     *   }
+     * })
+    **/
+    count<T extends FederationSeasonCountArgs>(
+      args?: Subset<T, FederationSeasonCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FederationSeasonCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FederationSeason.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FederationSeasonAggregateArgs>(args: Subset<T, FederationSeasonAggregateArgs>): Prisma.PrismaPromise<GetFederationSeasonAggregateType<T>>
+
+    /**
+     * Group by FederationSeason.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FederationSeasonGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FederationSeasonGroupByArgs['orderBy'] }
+        : { orderBy?: FederationSeasonGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FederationSeasonGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFederationSeasonGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FederationSeason model
+   */
+  readonly fields: FederationSeasonFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FederationSeason.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FederationSeasonClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    federation<T extends FederationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FederationDefaultArgs<ExtArgs>>): Prisma__FederationClient<$Result.GetResult<Prisma.$FederationPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    licenseTypes<T extends FederationSeason$licenseTypesArgs<ExtArgs> = {}>(args?: Subset<T, FederationSeason$licenseTypesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FederationSeason model
+   */ 
+  interface FederationSeasonFieldRefs {
+    readonly id: FieldRef<"FederationSeason", 'String'>
+    readonly federationId: FieldRef<"FederationSeason", 'String'>
+    readonly seasonName: FieldRef<"FederationSeason", 'String'>
+    readonly currency: FieldRef<"FederationSeason", 'String'>
+    readonly clubCost: FieldRef<"FederationSeason", 'Decimal'>
+    readonly isActive: FieldRef<"FederationSeason", 'Boolean'>
+    readonly createdAt: FieldRef<"FederationSeason", 'DateTime'>
+    readonly updatedAt: FieldRef<"FederationSeason", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FederationSeason findUnique
+   */
+  export type FederationSeasonFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeason to fetch.
+     */
+    where: FederationSeasonWhereUniqueInput
+  }
+
+  /**
+   * FederationSeason findUniqueOrThrow
+   */
+  export type FederationSeasonFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeason to fetch.
+     */
+    where: FederationSeasonWhereUniqueInput
+  }
+
+  /**
+   * FederationSeason findFirst
+   */
+  export type FederationSeasonFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeason to fetch.
+     */
+    where?: FederationSeasonWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasons to fetch.
+     */
+    orderBy?: FederationSeasonOrderByWithRelationInput | FederationSeasonOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationSeasons.
+     */
+    cursor?: FederationSeasonWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasons from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasons.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationSeasons.
+     */
+    distinct?: FederationSeasonScalarFieldEnum | FederationSeasonScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeason findFirstOrThrow
+   */
+  export type FederationSeasonFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeason to fetch.
+     */
+    where?: FederationSeasonWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasons to fetch.
+     */
+    orderBy?: FederationSeasonOrderByWithRelationInput | FederationSeasonOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationSeasons.
+     */
+    cursor?: FederationSeasonWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasons from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasons.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationSeasons.
+     */
+    distinct?: FederationSeasonScalarFieldEnum | FederationSeasonScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeason findMany
+   */
+  export type FederationSeasonFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasons to fetch.
+     */
+    where?: FederationSeasonWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasons to fetch.
+     */
+    orderBy?: FederationSeasonOrderByWithRelationInput | FederationSeasonOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FederationSeasons.
+     */
+    cursor?: FederationSeasonWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasons from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasons.
+     */
+    skip?: number
+    distinct?: FederationSeasonScalarFieldEnum | FederationSeasonScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeason create
+   */
+  export type FederationSeasonCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FederationSeason.
+     */
+    data: XOR<FederationSeasonCreateInput, FederationSeasonUncheckedCreateInput>
+  }
+
+  /**
+   * FederationSeason createMany
+   */
+  export type FederationSeasonCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FederationSeasons.
+     */
+    data: FederationSeasonCreateManyInput | FederationSeasonCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FederationSeason createManyAndReturn
+   */
+  export type FederationSeasonCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FederationSeasons.
+     */
+    data: FederationSeasonCreateManyInput | FederationSeasonCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FederationSeason update
+   */
+  export type FederationSeasonUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FederationSeason.
+     */
+    data: XOR<FederationSeasonUpdateInput, FederationSeasonUncheckedUpdateInput>
+    /**
+     * Choose, which FederationSeason to update.
+     */
+    where: FederationSeasonWhereUniqueInput
+  }
+
+  /**
+   * FederationSeason updateMany
+   */
+  export type FederationSeasonUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FederationSeasons.
+     */
+    data: XOR<FederationSeasonUpdateManyMutationInput, FederationSeasonUncheckedUpdateManyInput>
+    /**
+     * Filter which FederationSeasons to update
+     */
+    where?: FederationSeasonWhereInput
+  }
+
+  /**
+   * FederationSeason upsert
+   */
+  export type FederationSeasonUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FederationSeason to update in case it exists.
+     */
+    where: FederationSeasonWhereUniqueInput
+    /**
+     * In case the FederationSeason found by the `where` argument doesn't exist, create a new FederationSeason with this data.
+     */
+    create: XOR<FederationSeasonCreateInput, FederationSeasonUncheckedCreateInput>
+    /**
+     * In case the FederationSeason was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FederationSeasonUpdateInput, FederationSeasonUncheckedUpdateInput>
+  }
+
+  /**
+   * FederationSeason delete
+   */
+  export type FederationSeasonDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+    /**
+     * Filter which FederationSeason to delete.
+     */
+    where: FederationSeasonWhereUniqueInput
+  }
+
+  /**
+   * FederationSeason deleteMany
+   */
+  export type FederationSeasonDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationSeasons to delete
+     */
+    where?: FederationSeasonWhereInput
+  }
+
+  /**
+   * FederationSeason.licenseTypes
+   */
+  export type FederationSeason$licenseTypesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    where?: FederationLicenseTypeWhereInput
+    orderBy?: FederationLicenseTypeOrderByWithRelationInput | FederationLicenseTypeOrderByWithRelationInput[]
+    cursor?: FederationLicenseTypeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FederationLicenseTypeScalarFieldEnum | FederationLicenseTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeason without action
+   */
+  export type FederationSeasonDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeason
+     */
+    select?: FederationSeasonSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FederationLicenseType
+   */
+
+  export type AggregateFederationLicenseType = {
+    _count: FederationLicenseTypeCountAggregateOutputType | null
+    _min: FederationLicenseTypeMinAggregateOutputType | null
+    _max: FederationLicenseTypeMaxAggregateOutputType | null
+  }
+
+  export type FederationLicenseTypeMinAggregateOutputType = {
+    id: string | null
+    seasonId: string | null
+    name: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationLicenseTypeMaxAggregateOutputType = {
+    id: string | null
+    seasonId: string | null
+    name: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationLicenseTypeCountAggregateOutputType = {
+    id: number
+    seasonId: number
+    name: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FederationLicenseTypeMinAggregateInputType = {
+    id?: true
+    seasonId?: true
+    name?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationLicenseTypeMaxAggregateInputType = {
+    id?: true
+    seasonId?: true
+    name?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationLicenseTypeCountAggregateInputType = {
+    id?: true
+    seasonId?: true
+    name?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FederationLicenseTypeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationLicenseType to aggregate.
+     */
+    where?: FederationLicenseTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicenseTypes to fetch.
+     */
+    orderBy?: FederationLicenseTypeOrderByWithRelationInput | FederationLicenseTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FederationLicenseTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicenseTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicenseTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FederationLicenseTypes
+    **/
+    _count?: true | FederationLicenseTypeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FederationLicenseTypeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FederationLicenseTypeMaxAggregateInputType
+  }
+
+  export type GetFederationLicenseTypeAggregateType<T extends FederationLicenseTypeAggregateArgs> = {
+        [P in keyof T & keyof AggregateFederationLicenseType]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFederationLicenseType[P]>
+      : GetScalarType<T[P], AggregateFederationLicenseType[P]>
+  }
+
+
+
+
+  export type FederationLicenseTypeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationLicenseTypeWhereInput
+    orderBy?: FederationLicenseTypeOrderByWithAggregationInput | FederationLicenseTypeOrderByWithAggregationInput[]
+    by: FederationLicenseTypeScalarFieldEnum[] | FederationLicenseTypeScalarFieldEnum
+    having?: FederationLicenseTypeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FederationLicenseTypeCountAggregateInputType | true
+    _min?: FederationLicenseTypeMinAggregateInputType
+    _max?: FederationLicenseTypeMaxAggregateInputType
+  }
+
+  export type FederationLicenseTypeGroupByOutputType = {
+    id: string
+    seasonId: string
+    name: string
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: FederationLicenseTypeCountAggregateOutputType | null
+    _min: FederationLicenseTypeMinAggregateOutputType | null
+    _max: FederationLicenseTypeMaxAggregateOutputType | null
+  }
+
+  type GetFederationLicenseTypeGroupByPayload<T extends FederationLicenseTypeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FederationLicenseTypeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FederationLicenseTypeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FederationLicenseTypeGroupByOutputType[P]>
+            : GetScalarType<T[P], FederationLicenseTypeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FederationLicenseTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    seasonId?: boolean
+    name?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    season?: boolean | FederationSeasonDefaultArgs<ExtArgs>
+    priceRows?: boolean | FederationLicenseType$priceRowsArgs<ExtArgs>
+    _count?: boolean | FederationLicenseTypeCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationLicenseType"]>
+
+  export type FederationLicenseTypeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    seasonId?: boolean
+    name?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    season?: boolean | FederationSeasonDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationLicenseType"]>
+
+  export type FederationLicenseTypeSelectScalar = {
+    id?: boolean
+    seasonId?: boolean
+    name?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FederationLicenseTypeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    season?: boolean | FederationSeasonDefaultArgs<ExtArgs>
+    priceRows?: boolean | FederationLicenseType$priceRowsArgs<ExtArgs>
+    _count?: boolean | FederationLicenseTypeCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FederationLicenseTypeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    season?: boolean | FederationSeasonDefaultArgs<ExtArgs>
+  }
+
+  export type $FederationLicenseTypePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FederationLicenseType"
+    objects: {
+      season: Prisma.$FederationSeasonPayload<ExtArgs>
+      priceRows: Prisma.$FederationLicensePriceRowPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      seasonId: string
+      name: string
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["federationLicenseType"]>
+    composites: {}
+  }
+
+  type FederationLicenseTypeGetPayload<S extends boolean | null | undefined | FederationLicenseTypeDefaultArgs> = $Result.GetResult<Prisma.$FederationLicenseTypePayload, S>
+
+  type FederationLicenseTypeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FederationLicenseTypeFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FederationLicenseTypeCountAggregateInputType | true
+    }
+
+  export interface FederationLicenseTypeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FederationLicenseType'], meta: { name: 'FederationLicenseType' } }
+    /**
+     * Find zero or one FederationLicenseType that matches the filter.
+     * @param {FederationLicenseTypeFindUniqueArgs} args - Arguments to find a FederationLicenseType
+     * @example
+     * // Get one FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FederationLicenseTypeFindUniqueArgs>(args: SelectSubset<T, FederationLicenseTypeFindUniqueArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FederationLicenseType that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FederationLicenseTypeFindUniqueOrThrowArgs} args - Arguments to find a FederationLicenseType
+     * @example
+     * // Get one FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FederationLicenseTypeFindUniqueOrThrowArgs>(args: SelectSubset<T, FederationLicenseTypeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FederationLicenseType that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeFindFirstArgs} args - Arguments to find a FederationLicenseType
+     * @example
+     * // Get one FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FederationLicenseTypeFindFirstArgs>(args?: SelectSubset<T, FederationLicenseTypeFindFirstArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FederationLicenseType that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeFindFirstOrThrowArgs} args - Arguments to find a FederationLicenseType
+     * @example
+     * // Get one FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FederationLicenseTypeFindFirstOrThrowArgs>(args?: SelectSubset<T, FederationLicenseTypeFindFirstOrThrowArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FederationLicenseTypes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FederationLicenseTypes
+     * const federationLicenseTypes = await prisma.federationLicenseType.findMany()
+     * 
+     * // Get first 10 FederationLicenseTypes
+     * const federationLicenseTypes = await prisma.federationLicenseType.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const federationLicenseTypeWithIdOnly = await prisma.federationLicenseType.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FederationLicenseTypeFindManyArgs>(args?: SelectSubset<T, FederationLicenseTypeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FederationLicenseType.
+     * @param {FederationLicenseTypeCreateArgs} args - Arguments to create a FederationLicenseType.
+     * @example
+     * // Create one FederationLicenseType
+     * const FederationLicenseType = await prisma.federationLicenseType.create({
+     *   data: {
+     *     // ... data to create a FederationLicenseType
+     *   }
+     * })
+     * 
+     */
+    create<T extends FederationLicenseTypeCreateArgs>(args: SelectSubset<T, FederationLicenseTypeCreateArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FederationLicenseTypes.
+     * @param {FederationLicenseTypeCreateManyArgs} args - Arguments to create many FederationLicenseTypes.
+     * @example
+     * // Create many FederationLicenseTypes
+     * const federationLicenseType = await prisma.federationLicenseType.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FederationLicenseTypeCreateManyArgs>(args?: SelectSubset<T, FederationLicenseTypeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FederationLicenseTypes and returns the data saved in the database.
+     * @param {FederationLicenseTypeCreateManyAndReturnArgs} args - Arguments to create many FederationLicenseTypes.
+     * @example
+     * // Create many FederationLicenseTypes
+     * const federationLicenseType = await prisma.federationLicenseType.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FederationLicenseTypes and only return the `id`
+     * const federationLicenseTypeWithIdOnly = await prisma.federationLicenseType.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FederationLicenseTypeCreateManyAndReturnArgs>(args?: SelectSubset<T, FederationLicenseTypeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FederationLicenseType.
+     * @param {FederationLicenseTypeDeleteArgs} args - Arguments to delete one FederationLicenseType.
+     * @example
+     * // Delete one FederationLicenseType
+     * const FederationLicenseType = await prisma.federationLicenseType.delete({
+     *   where: {
+     *     // ... filter to delete one FederationLicenseType
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FederationLicenseTypeDeleteArgs>(args: SelectSubset<T, FederationLicenseTypeDeleteArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FederationLicenseType.
+     * @param {FederationLicenseTypeUpdateArgs} args - Arguments to update one FederationLicenseType.
+     * @example
+     * // Update one FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FederationLicenseTypeUpdateArgs>(args: SelectSubset<T, FederationLicenseTypeUpdateArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FederationLicenseTypes.
+     * @param {FederationLicenseTypeDeleteManyArgs} args - Arguments to filter FederationLicenseTypes to delete.
+     * @example
+     * // Delete a few FederationLicenseTypes
+     * const { count } = await prisma.federationLicenseType.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FederationLicenseTypeDeleteManyArgs>(args?: SelectSubset<T, FederationLicenseTypeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FederationLicenseTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FederationLicenseTypes
+     * const federationLicenseType = await prisma.federationLicenseType.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FederationLicenseTypeUpdateManyArgs>(args: SelectSubset<T, FederationLicenseTypeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FederationLicenseType.
+     * @param {FederationLicenseTypeUpsertArgs} args - Arguments to update or create a FederationLicenseType.
+     * @example
+     * // Update or create a FederationLicenseType
+     * const federationLicenseType = await prisma.federationLicenseType.upsert({
+     *   create: {
+     *     // ... data to create a FederationLicenseType
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FederationLicenseType we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FederationLicenseTypeUpsertArgs>(args: SelectSubset<T, FederationLicenseTypeUpsertArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FederationLicenseTypes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeCountArgs} args - Arguments to filter FederationLicenseTypes to count.
+     * @example
+     * // Count the number of FederationLicenseTypes
+     * const count = await prisma.federationLicenseType.count({
+     *   where: {
+     *     // ... the filter for the FederationLicenseTypes we want to count
+     *   }
+     * })
+    **/
+    count<T extends FederationLicenseTypeCountArgs>(
+      args?: Subset<T, FederationLicenseTypeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FederationLicenseTypeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FederationLicenseType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FederationLicenseTypeAggregateArgs>(args: Subset<T, FederationLicenseTypeAggregateArgs>): Prisma.PrismaPromise<GetFederationLicenseTypeAggregateType<T>>
+
+    /**
+     * Group by FederationLicenseType.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicenseTypeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FederationLicenseTypeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FederationLicenseTypeGroupByArgs['orderBy'] }
+        : { orderBy?: FederationLicenseTypeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FederationLicenseTypeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFederationLicenseTypeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FederationLicenseType model
+   */
+  readonly fields: FederationLicenseTypeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FederationLicenseType.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FederationLicenseTypeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    season<T extends FederationSeasonDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FederationSeasonDefaultArgs<ExtArgs>>): Prisma__FederationSeasonClient<$Result.GetResult<Prisma.$FederationSeasonPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    priceRows<T extends FederationLicenseType$priceRowsArgs<ExtArgs> = {}>(args?: Subset<T, FederationLicenseType$priceRowsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FederationLicenseType model
+   */ 
+  interface FederationLicenseTypeFieldRefs {
+    readonly id: FieldRef<"FederationLicenseType", 'String'>
+    readonly seasonId: FieldRef<"FederationLicenseType", 'String'>
+    readonly name: FieldRef<"FederationLicenseType", 'String'>
+    readonly isActive: FieldRef<"FederationLicenseType", 'Boolean'>
+    readonly createdAt: FieldRef<"FederationLicenseType", 'DateTime'>
+    readonly updatedAt: FieldRef<"FederationLicenseType", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FederationLicenseType findUnique
+   */
+  export type FederationLicenseTypeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicenseType to fetch.
+     */
+    where: FederationLicenseTypeWhereUniqueInput
+  }
+
+  /**
+   * FederationLicenseType findUniqueOrThrow
+   */
+  export type FederationLicenseTypeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicenseType to fetch.
+     */
+    where: FederationLicenseTypeWhereUniqueInput
+  }
+
+  /**
+   * FederationLicenseType findFirst
+   */
+  export type FederationLicenseTypeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicenseType to fetch.
+     */
+    where?: FederationLicenseTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicenseTypes to fetch.
+     */
+    orderBy?: FederationLicenseTypeOrderByWithRelationInput | FederationLicenseTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationLicenseTypes.
+     */
+    cursor?: FederationLicenseTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicenseTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicenseTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationLicenseTypes.
+     */
+    distinct?: FederationLicenseTypeScalarFieldEnum | FederationLicenseTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicenseType findFirstOrThrow
+   */
+  export type FederationLicenseTypeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicenseType to fetch.
+     */
+    where?: FederationLicenseTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicenseTypes to fetch.
+     */
+    orderBy?: FederationLicenseTypeOrderByWithRelationInput | FederationLicenseTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationLicenseTypes.
+     */
+    cursor?: FederationLicenseTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicenseTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicenseTypes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationLicenseTypes.
+     */
+    distinct?: FederationLicenseTypeScalarFieldEnum | FederationLicenseTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicenseType findMany
+   */
+  export type FederationLicenseTypeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicenseTypes to fetch.
+     */
+    where?: FederationLicenseTypeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicenseTypes to fetch.
+     */
+    orderBy?: FederationLicenseTypeOrderByWithRelationInput | FederationLicenseTypeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FederationLicenseTypes.
+     */
+    cursor?: FederationLicenseTypeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicenseTypes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicenseTypes.
+     */
+    skip?: number
+    distinct?: FederationLicenseTypeScalarFieldEnum | FederationLicenseTypeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicenseType create
+   */
+  export type FederationLicenseTypeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FederationLicenseType.
+     */
+    data: XOR<FederationLicenseTypeCreateInput, FederationLicenseTypeUncheckedCreateInput>
+  }
+
+  /**
+   * FederationLicenseType createMany
+   */
+  export type FederationLicenseTypeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FederationLicenseTypes.
+     */
+    data: FederationLicenseTypeCreateManyInput | FederationLicenseTypeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FederationLicenseType createManyAndReturn
+   */
+  export type FederationLicenseTypeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FederationLicenseTypes.
+     */
+    data: FederationLicenseTypeCreateManyInput | FederationLicenseTypeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FederationLicenseType update
+   */
+  export type FederationLicenseTypeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FederationLicenseType.
+     */
+    data: XOR<FederationLicenseTypeUpdateInput, FederationLicenseTypeUncheckedUpdateInput>
+    /**
+     * Choose, which FederationLicenseType to update.
+     */
+    where: FederationLicenseTypeWhereUniqueInput
+  }
+
+  /**
+   * FederationLicenseType updateMany
+   */
+  export type FederationLicenseTypeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FederationLicenseTypes.
+     */
+    data: XOR<FederationLicenseTypeUpdateManyMutationInput, FederationLicenseTypeUncheckedUpdateManyInput>
+    /**
+     * Filter which FederationLicenseTypes to update
+     */
+    where?: FederationLicenseTypeWhereInput
+  }
+
+  /**
+   * FederationLicenseType upsert
+   */
+  export type FederationLicenseTypeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FederationLicenseType to update in case it exists.
+     */
+    where: FederationLicenseTypeWhereUniqueInput
+    /**
+     * In case the FederationLicenseType found by the `where` argument doesn't exist, create a new FederationLicenseType with this data.
+     */
+    create: XOR<FederationLicenseTypeCreateInput, FederationLicenseTypeUncheckedCreateInput>
+    /**
+     * In case the FederationLicenseType was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FederationLicenseTypeUpdateInput, FederationLicenseTypeUncheckedUpdateInput>
+  }
+
+  /**
+   * FederationLicenseType delete
+   */
+  export type FederationLicenseTypeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+    /**
+     * Filter which FederationLicenseType to delete.
+     */
+    where: FederationLicenseTypeWhereUniqueInput
+  }
+
+  /**
+   * FederationLicenseType deleteMany
+   */
+  export type FederationLicenseTypeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationLicenseTypes to delete
+     */
+    where?: FederationLicenseTypeWhereInput
+  }
+
+  /**
+   * FederationLicenseType.priceRows
+   */
+  export type FederationLicenseType$priceRowsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    where?: FederationLicensePriceRowWhereInput
+    orderBy?: FederationLicensePriceRowOrderByWithRelationInput | FederationLicensePriceRowOrderByWithRelationInput[]
+    cursor?: FederationLicensePriceRowWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FederationLicensePriceRowScalarFieldEnum | FederationLicensePriceRowScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicenseType without action
+   */
+  export type FederationLicenseTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicenseType
+     */
+    select?: FederationLicenseTypeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicenseTypeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FederationLicensePriceRow
+   */
+
+  export type AggregateFederationLicensePriceRow = {
+    _count: FederationLicensePriceRowCountAggregateOutputType | null
+    _avg: FederationLicensePriceRowAvgAggregateOutputType | null
+    _sum: FederationLicensePriceRowSumAggregateOutputType | null
+    _min: FederationLicensePriceRowMinAggregateOutputType | null
+    _max: FederationLicensePriceRowMaxAggregateOutputType | null
+  }
+
+  export type FederationLicensePriceRowAvgAggregateOutputType = {
+    birthYearFrom: number | null
+    cost: Decimal | null
+    reduction: Decimal | null
+    chargePrice: Decimal | null
+    sortOrder: number | null
+  }
+
+  export type FederationLicensePriceRowSumAggregateOutputType = {
+    birthYearFrom: number | null
+    cost: Decimal | null
+    reduction: Decimal | null
+    chargePrice: Decimal | null
+    sortOrder: number | null
+  }
+
+  export type FederationLicensePriceRowMinAggregateOutputType = {
+    id: string | null
+    licenseTypeId: string | null
+    kind: $Enums.LicensePriceRowKind | null
+    label: string | null
+    birthYearFrom: number | null
+    cost: Decimal | null
+    reduction: Decimal | null
+    chargePrice: Decimal | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationLicensePriceRowMaxAggregateOutputType = {
+    id: string | null
+    licenseTypeId: string | null
+    kind: $Enums.LicensePriceRowKind | null
+    label: string | null
+    birthYearFrom: number | null
+    cost: Decimal | null
+    reduction: Decimal | null
+    chargePrice: Decimal | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationLicensePriceRowCountAggregateOutputType = {
+    id: number
+    licenseTypeId: number
+    kind: number
+    label: number
+    birthYearFrom: number
+    cost: number
+    reduction: number
+    chargePrice: number
+    sortOrder: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FederationLicensePriceRowAvgAggregateInputType = {
+    birthYearFrom?: true
+    cost?: true
+    reduction?: true
+    chargePrice?: true
+    sortOrder?: true
+  }
+
+  export type FederationLicensePriceRowSumAggregateInputType = {
+    birthYearFrom?: true
+    cost?: true
+    reduction?: true
+    chargePrice?: true
+    sortOrder?: true
+  }
+
+  export type FederationLicensePriceRowMinAggregateInputType = {
+    id?: true
+    licenseTypeId?: true
+    kind?: true
+    label?: true
+    birthYearFrom?: true
+    cost?: true
+    reduction?: true
+    chargePrice?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationLicensePriceRowMaxAggregateInputType = {
+    id?: true
+    licenseTypeId?: true
+    kind?: true
+    label?: true
+    birthYearFrom?: true
+    cost?: true
+    reduction?: true
+    chargePrice?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationLicensePriceRowCountAggregateInputType = {
+    id?: true
+    licenseTypeId?: true
+    kind?: true
+    label?: true
+    birthYearFrom?: true
+    cost?: true
+    reduction?: true
+    chargePrice?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FederationLicensePriceRowAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationLicensePriceRow to aggregate.
+     */
+    where?: FederationLicensePriceRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicensePriceRows to fetch.
+     */
+    orderBy?: FederationLicensePriceRowOrderByWithRelationInput | FederationLicensePriceRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FederationLicensePriceRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicensePriceRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicensePriceRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FederationLicensePriceRows
+    **/
+    _count?: true | FederationLicensePriceRowCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FederationLicensePriceRowAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FederationLicensePriceRowSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FederationLicensePriceRowMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FederationLicensePriceRowMaxAggregateInputType
+  }
+
+  export type GetFederationLicensePriceRowAggregateType<T extends FederationLicensePriceRowAggregateArgs> = {
+        [P in keyof T & keyof AggregateFederationLicensePriceRow]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFederationLicensePriceRow[P]>
+      : GetScalarType<T[P], AggregateFederationLicensePriceRow[P]>
+  }
+
+
+
+
+  export type FederationLicensePriceRowGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationLicensePriceRowWhereInput
+    orderBy?: FederationLicensePriceRowOrderByWithAggregationInput | FederationLicensePriceRowOrderByWithAggregationInput[]
+    by: FederationLicensePriceRowScalarFieldEnum[] | FederationLicensePriceRowScalarFieldEnum
+    having?: FederationLicensePriceRowScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FederationLicensePriceRowCountAggregateInputType | true
+    _avg?: FederationLicensePriceRowAvgAggregateInputType
+    _sum?: FederationLicensePriceRowSumAggregateInputType
+    _min?: FederationLicensePriceRowMinAggregateInputType
+    _max?: FederationLicensePriceRowMaxAggregateInputType
+  }
+
+  export type FederationLicensePriceRowGroupByOutputType = {
+    id: string
+    licenseTypeId: string
+    kind: $Enums.LicensePriceRowKind
+    label: string
+    birthYearFrom: number | null
+    cost: Decimal
+    reduction: Decimal
+    chargePrice: Decimal
+    sortOrder: number
+    createdAt: Date
+    updatedAt: Date
+    _count: FederationLicensePriceRowCountAggregateOutputType | null
+    _avg: FederationLicensePriceRowAvgAggregateOutputType | null
+    _sum: FederationLicensePriceRowSumAggregateOutputType | null
+    _min: FederationLicensePriceRowMinAggregateOutputType | null
+    _max: FederationLicensePriceRowMaxAggregateOutputType | null
+  }
+
+  type GetFederationLicensePriceRowGroupByPayload<T extends FederationLicensePriceRowGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FederationLicensePriceRowGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FederationLicensePriceRowGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FederationLicensePriceRowGroupByOutputType[P]>
+            : GetScalarType<T[P], FederationLicensePriceRowGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FederationLicensePriceRowSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    licenseTypeId?: boolean
+    kind?: boolean
+    label?: boolean
+    birthYearFrom?: boolean
+    cost?: boolean
+    reduction?: boolean
+    chargePrice?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    licenseType?: boolean | FederationLicenseTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationLicensePriceRow"]>
+
+  export type FederationLicensePriceRowSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    licenseTypeId?: boolean
+    kind?: boolean
+    label?: boolean
+    birthYearFrom?: boolean
+    cost?: boolean
+    reduction?: boolean
+    chargePrice?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    licenseType?: boolean | FederationLicenseTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationLicensePriceRow"]>
+
+  export type FederationLicensePriceRowSelectScalar = {
+    id?: boolean
+    licenseTypeId?: boolean
+    kind?: boolean
+    label?: boolean
+    birthYearFrom?: boolean
+    cost?: boolean
+    reduction?: boolean
+    chargePrice?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FederationLicensePriceRowInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    licenseType?: boolean | FederationLicenseTypeDefaultArgs<ExtArgs>
+  }
+  export type FederationLicensePriceRowIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    licenseType?: boolean | FederationLicenseTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $FederationLicensePriceRowPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FederationLicensePriceRow"
+    objects: {
+      licenseType: Prisma.$FederationLicenseTypePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      licenseTypeId: string
+      kind: $Enums.LicensePriceRowKind
+      /**
+       * Editable label for CUSTOM rows (e.g. "Infantil/Juvenil").
+       */
+      label: string
+      /**
+       * Inclusive birth year: members born in this year or later use this row.
+       */
+      birthYearFrom: number | null
+      cost: Prisma.Decimal
+      reduction: Prisma.Decimal
+      /**
+       * Face value charged to the member (`precio cobro`).
+       */
+      chargePrice: Prisma.Decimal
+      sortOrder: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["federationLicensePriceRow"]>
+    composites: {}
+  }
+
+  type FederationLicensePriceRowGetPayload<S extends boolean | null | undefined | FederationLicensePriceRowDefaultArgs> = $Result.GetResult<Prisma.$FederationLicensePriceRowPayload, S>
+
+  type FederationLicensePriceRowCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FederationLicensePriceRowFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FederationLicensePriceRowCountAggregateInputType | true
+    }
+
+  export interface FederationLicensePriceRowDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FederationLicensePriceRow'], meta: { name: 'FederationLicensePriceRow' } }
+    /**
+     * Find zero or one FederationLicensePriceRow that matches the filter.
+     * @param {FederationLicensePriceRowFindUniqueArgs} args - Arguments to find a FederationLicensePriceRow
+     * @example
+     * // Get one FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FederationLicensePriceRowFindUniqueArgs>(args: SelectSubset<T, FederationLicensePriceRowFindUniqueArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FederationLicensePriceRow that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FederationLicensePriceRowFindUniqueOrThrowArgs} args - Arguments to find a FederationLicensePriceRow
+     * @example
+     * // Get one FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FederationLicensePriceRowFindUniqueOrThrowArgs>(args: SelectSubset<T, FederationLicensePriceRowFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FederationLicensePriceRow that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowFindFirstArgs} args - Arguments to find a FederationLicensePriceRow
+     * @example
+     * // Get one FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FederationLicensePriceRowFindFirstArgs>(args?: SelectSubset<T, FederationLicensePriceRowFindFirstArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FederationLicensePriceRow that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowFindFirstOrThrowArgs} args - Arguments to find a FederationLicensePriceRow
+     * @example
+     * // Get one FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FederationLicensePriceRowFindFirstOrThrowArgs>(args?: SelectSubset<T, FederationLicensePriceRowFindFirstOrThrowArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FederationLicensePriceRows that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FederationLicensePriceRows
+     * const federationLicensePriceRows = await prisma.federationLicensePriceRow.findMany()
+     * 
+     * // Get first 10 FederationLicensePriceRows
+     * const federationLicensePriceRows = await prisma.federationLicensePriceRow.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const federationLicensePriceRowWithIdOnly = await prisma.federationLicensePriceRow.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FederationLicensePriceRowFindManyArgs>(args?: SelectSubset<T, FederationLicensePriceRowFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FederationLicensePriceRow.
+     * @param {FederationLicensePriceRowCreateArgs} args - Arguments to create a FederationLicensePriceRow.
+     * @example
+     * // Create one FederationLicensePriceRow
+     * const FederationLicensePriceRow = await prisma.federationLicensePriceRow.create({
+     *   data: {
+     *     // ... data to create a FederationLicensePriceRow
+     *   }
+     * })
+     * 
+     */
+    create<T extends FederationLicensePriceRowCreateArgs>(args: SelectSubset<T, FederationLicensePriceRowCreateArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FederationLicensePriceRows.
+     * @param {FederationLicensePriceRowCreateManyArgs} args - Arguments to create many FederationLicensePriceRows.
+     * @example
+     * // Create many FederationLicensePriceRows
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FederationLicensePriceRowCreateManyArgs>(args?: SelectSubset<T, FederationLicensePriceRowCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FederationLicensePriceRows and returns the data saved in the database.
+     * @param {FederationLicensePriceRowCreateManyAndReturnArgs} args - Arguments to create many FederationLicensePriceRows.
+     * @example
+     * // Create many FederationLicensePriceRows
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FederationLicensePriceRows and only return the `id`
+     * const federationLicensePriceRowWithIdOnly = await prisma.federationLicensePriceRow.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FederationLicensePriceRowCreateManyAndReturnArgs>(args?: SelectSubset<T, FederationLicensePriceRowCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FederationLicensePriceRow.
+     * @param {FederationLicensePriceRowDeleteArgs} args - Arguments to delete one FederationLicensePriceRow.
+     * @example
+     * // Delete one FederationLicensePriceRow
+     * const FederationLicensePriceRow = await prisma.federationLicensePriceRow.delete({
+     *   where: {
+     *     // ... filter to delete one FederationLicensePriceRow
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FederationLicensePriceRowDeleteArgs>(args: SelectSubset<T, FederationLicensePriceRowDeleteArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FederationLicensePriceRow.
+     * @param {FederationLicensePriceRowUpdateArgs} args - Arguments to update one FederationLicensePriceRow.
+     * @example
+     * // Update one FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FederationLicensePriceRowUpdateArgs>(args: SelectSubset<T, FederationLicensePriceRowUpdateArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FederationLicensePriceRows.
+     * @param {FederationLicensePriceRowDeleteManyArgs} args - Arguments to filter FederationLicensePriceRows to delete.
+     * @example
+     * // Delete a few FederationLicensePriceRows
+     * const { count } = await prisma.federationLicensePriceRow.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FederationLicensePriceRowDeleteManyArgs>(args?: SelectSubset<T, FederationLicensePriceRowDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FederationLicensePriceRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FederationLicensePriceRows
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FederationLicensePriceRowUpdateManyArgs>(args: SelectSubset<T, FederationLicensePriceRowUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FederationLicensePriceRow.
+     * @param {FederationLicensePriceRowUpsertArgs} args - Arguments to update or create a FederationLicensePriceRow.
+     * @example
+     * // Update or create a FederationLicensePriceRow
+     * const federationLicensePriceRow = await prisma.federationLicensePriceRow.upsert({
+     *   create: {
+     *     // ... data to create a FederationLicensePriceRow
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FederationLicensePriceRow we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FederationLicensePriceRowUpsertArgs>(args: SelectSubset<T, FederationLicensePriceRowUpsertArgs<ExtArgs>>): Prisma__FederationLicensePriceRowClient<$Result.GetResult<Prisma.$FederationLicensePriceRowPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FederationLicensePriceRows.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowCountArgs} args - Arguments to filter FederationLicensePriceRows to count.
+     * @example
+     * // Count the number of FederationLicensePriceRows
+     * const count = await prisma.federationLicensePriceRow.count({
+     *   where: {
+     *     // ... the filter for the FederationLicensePriceRows we want to count
+     *   }
+     * })
+    **/
+    count<T extends FederationLicensePriceRowCountArgs>(
+      args?: Subset<T, FederationLicensePriceRowCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FederationLicensePriceRowCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FederationLicensePriceRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FederationLicensePriceRowAggregateArgs>(args: Subset<T, FederationLicensePriceRowAggregateArgs>): Prisma.PrismaPromise<GetFederationLicensePriceRowAggregateType<T>>
+
+    /**
+     * Group by FederationLicensePriceRow.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationLicensePriceRowGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FederationLicensePriceRowGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FederationLicensePriceRowGroupByArgs['orderBy'] }
+        : { orderBy?: FederationLicensePriceRowGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FederationLicensePriceRowGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFederationLicensePriceRowGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FederationLicensePriceRow model
+   */
+  readonly fields: FederationLicensePriceRowFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FederationLicensePriceRow.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FederationLicensePriceRowClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    licenseType<T extends FederationLicenseTypeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FederationLicenseTypeDefaultArgs<ExtArgs>>): Prisma__FederationLicenseTypeClient<$Result.GetResult<Prisma.$FederationLicenseTypePayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FederationLicensePriceRow model
+   */ 
+  interface FederationLicensePriceRowFieldRefs {
+    readonly id: FieldRef<"FederationLicensePriceRow", 'String'>
+    readonly licenseTypeId: FieldRef<"FederationLicensePriceRow", 'String'>
+    readonly kind: FieldRef<"FederationLicensePriceRow", 'LicensePriceRowKind'>
+    readonly label: FieldRef<"FederationLicensePriceRow", 'String'>
+    readonly birthYearFrom: FieldRef<"FederationLicensePriceRow", 'Int'>
+    readonly cost: FieldRef<"FederationLicensePriceRow", 'Decimal'>
+    readonly reduction: FieldRef<"FederationLicensePriceRow", 'Decimal'>
+    readonly chargePrice: FieldRef<"FederationLicensePriceRow", 'Decimal'>
+    readonly sortOrder: FieldRef<"FederationLicensePriceRow", 'Int'>
+    readonly createdAt: FieldRef<"FederationLicensePriceRow", 'DateTime'>
+    readonly updatedAt: FieldRef<"FederationLicensePriceRow", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FederationLicensePriceRow findUnique
+   */
+  export type FederationLicensePriceRowFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicensePriceRow to fetch.
+     */
+    where: FederationLicensePriceRowWhereUniqueInput
+  }
+
+  /**
+   * FederationLicensePriceRow findUniqueOrThrow
+   */
+  export type FederationLicensePriceRowFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicensePriceRow to fetch.
+     */
+    where: FederationLicensePriceRowWhereUniqueInput
+  }
+
+  /**
+   * FederationLicensePriceRow findFirst
+   */
+  export type FederationLicensePriceRowFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicensePriceRow to fetch.
+     */
+    where?: FederationLicensePriceRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicensePriceRows to fetch.
+     */
+    orderBy?: FederationLicensePriceRowOrderByWithRelationInput | FederationLicensePriceRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationLicensePriceRows.
+     */
+    cursor?: FederationLicensePriceRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicensePriceRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicensePriceRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationLicensePriceRows.
+     */
+    distinct?: FederationLicensePriceRowScalarFieldEnum | FederationLicensePriceRowScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicensePriceRow findFirstOrThrow
+   */
+  export type FederationLicensePriceRowFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicensePriceRow to fetch.
+     */
+    where?: FederationLicensePriceRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicensePriceRows to fetch.
+     */
+    orderBy?: FederationLicensePriceRowOrderByWithRelationInput | FederationLicensePriceRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationLicensePriceRows.
+     */
+    cursor?: FederationLicensePriceRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicensePriceRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicensePriceRows.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationLicensePriceRows.
+     */
+    distinct?: FederationLicensePriceRowScalarFieldEnum | FederationLicensePriceRowScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicensePriceRow findMany
+   */
+  export type FederationLicensePriceRowFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationLicensePriceRows to fetch.
+     */
+    where?: FederationLicensePriceRowWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationLicensePriceRows to fetch.
+     */
+    orderBy?: FederationLicensePriceRowOrderByWithRelationInput | FederationLicensePriceRowOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FederationLicensePriceRows.
+     */
+    cursor?: FederationLicensePriceRowWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationLicensePriceRows from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationLicensePriceRows.
+     */
+    skip?: number
+    distinct?: FederationLicensePriceRowScalarFieldEnum | FederationLicensePriceRowScalarFieldEnum[]
+  }
+
+  /**
+   * FederationLicensePriceRow create
+   */
+  export type FederationLicensePriceRowCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FederationLicensePriceRow.
+     */
+    data: XOR<FederationLicensePriceRowCreateInput, FederationLicensePriceRowUncheckedCreateInput>
+  }
+
+  /**
+   * FederationLicensePriceRow createMany
+   */
+  export type FederationLicensePriceRowCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FederationLicensePriceRows.
+     */
+    data: FederationLicensePriceRowCreateManyInput | FederationLicensePriceRowCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FederationLicensePriceRow createManyAndReturn
+   */
+  export type FederationLicensePriceRowCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FederationLicensePriceRows.
+     */
+    data: FederationLicensePriceRowCreateManyInput | FederationLicensePriceRowCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FederationLicensePriceRow update
+   */
+  export type FederationLicensePriceRowUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FederationLicensePriceRow.
+     */
+    data: XOR<FederationLicensePriceRowUpdateInput, FederationLicensePriceRowUncheckedUpdateInput>
+    /**
+     * Choose, which FederationLicensePriceRow to update.
+     */
+    where: FederationLicensePriceRowWhereUniqueInput
+  }
+
+  /**
+   * FederationLicensePriceRow updateMany
+   */
+  export type FederationLicensePriceRowUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FederationLicensePriceRows.
+     */
+    data: XOR<FederationLicensePriceRowUpdateManyMutationInput, FederationLicensePriceRowUncheckedUpdateManyInput>
+    /**
+     * Filter which FederationLicensePriceRows to update
+     */
+    where?: FederationLicensePriceRowWhereInput
+  }
+
+  /**
+   * FederationLicensePriceRow upsert
+   */
+  export type FederationLicensePriceRowUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FederationLicensePriceRow to update in case it exists.
+     */
+    where: FederationLicensePriceRowWhereUniqueInput
+    /**
+     * In case the FederationLicensePriceRow found by the `where` argument doesn't exist, create a new FederationLicensePriceRow with this data.
+     */
+    create: XOR<FederationLicensePriceRowCreateInput, FederationLicensePriceRowUncheckedCreateInput>
+    /**
+     * In case the FederationLicensePriceRow was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FederationLicensePriceRowUpdateInput, FederationLicensePriceRowUncheckedUpdateInput>
+  }
+
+  /**
+   * FederationLicensePriceRow delete
+   */
+  export type FederationLicensePriceRowDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+    /**
+     * Filter which FederationLicensePriceRow to delete.
+     */
+    where: FederationLicensePriceRowWhereUniqueInput
+  }
+
+  /**
+   * FederationLicensePriceRow deleteMany
+   */
+  export type FederationLicensePriceRowDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationLicensePriceRows to delete
+     */
+    where?: FederationLicensePriceRowWhereInput
+  }
+
+  /**
+   * FederationLicensePriceRow without action
+   */
+  export type FederationLicensePriceRowDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationLicensePriceRow
+     */
+    select?: FederationLicensePriceRowSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationLicensePriceRowInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FederationSeasonCharge
+   */
+
+  export type AggregateFederationSeasonCharge = {
+    _count: FederationSeasonChargeCountAggregateOutputType | null
+    _avg: FederationSeasonChargeAvgAggregateOutputType | null
+    _sum: FederationSeasonChargeSumAggregateOutputType | null
+    _min: FederationSeasonChargeMinAggregateOutputType | null
+    _max: FederationSeasonChargeMaxAggregateOutputType | null
+  }
+
+  export type FederationSeasonChargeAvgAggregateOutputType = {
+    costAmount: Decimal | null
+    saleAmount: Decimal | null
+  }
+
+  export type FederationSeasonChargeSumAggregateOutputType = {
+    costAmount: Decimal | null
+    saleAmount: Decimal | null
+  }
+
+  export type FederationSeasonChargeMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    federationId: string | null
+    season: string | null
+    holderType: $Enums.LicenseHolderType | null
+    holderUserId: string | null
+    studentProfileId: string | null
+    licenseId: string | null
+    costAmount: Decimal | null
+    saleAmount: Decimal | null
+    isPaid: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationSeasonChargeMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    federationId: string | null
+    season: string | null
+    holderType: $Enums.LicenseHolderType | null
+    holderUserId: string | null
+    studentProfileId: string | null
+    licenseId: string | null
+    costAmount: Decimal | null
+    saleAmount: Decimal | null
+    isPaid: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FederationSeasonChargeCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    federationId: number
+    season: number
+    holderType: number
+    holderUserId: number
+    studentProfileId: number
+    licenseId: number
+    costAmount: number
+    saleAmount: number
+    isPaid: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FederationSeasonChargeAvgAggregateInputType = {
+    costAmount?: true
+    saleAmount?: true
+  }
+
+  export type FederationSeasonChargeSumAggregateInputType = {
+    costAmount?: true
+    saleAmount?: true
+  }
+
+  export type FederationSeasonChargeMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    federationId?: true
+    season?: true
+    holderType?: true
+    holderUserId?: true
+    studentProfileId?: true
+    licenseId?: true
+    costAmount?: true
+    saleAmount?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationSeasonChargeMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    federationId?: true
+    season?: true
+    holderType?: true
+    holderUserId?: true
+    studentProfileId?: true
+    licenseId?: true
+    costAmount?: true
+    saleAmount?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FederationSeasonChargeCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    federationId?: true
+    season?: true
+    holderType?: true
+    holderUserId?: true
+    studentProfileId?: true
+    licenseId?: true
+    costAmount?: true
+    saleAmount?: true
+    isPaid?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FederationSeasonChargeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationSeasonCharge to aggregate.
+     */
+    where?: FederationSeasonChargeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasonCharges to fetch.
+     */
+    orderBy?: FederationSeasonChargeOrderByWithRelationInput | FederationSeasonChargeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FederationSeasonChargeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasonCharges from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasonCharges.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FederationSeasonCharges
+    **/
+    _count?: true | FederationSeasonChargeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FederationSeasonChargeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FederationSeasonChargeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FederationSeasonChargeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FederationSeasonChargeMaxAggregateInputType
+  }
+
+  export type GetFederationSeasonChargeAggregateType<T extends FederationSeasonChargeAggregateArgs> = {
+        [P in keyof T & keyof AggregateFederationSeasonCharge]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFederationSeasonCharge[P]>
+      : GetScalarType<T[P], AggregateFederationSeasonCharge[P]>
+  }
+
+
+
+
+  export type FederationSeasonChargeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FederationSeasonChargeWhereInput
+    orderBy?: FederationSeasonChargeOrderByWithAggregationInput | FederationSeasonChargeOrderByWithAggregationInput[]
+    by: FederationSeasonChargeScalarFieldEnum[] | FederationSeasonChargeScalarFieldEnum
+    having?: FederationSeasonChargeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FederationSeasonChargeCountAggregateInputType | true
+    _avg?: FederationSeasonChargeAvgAggregateInputType
+    _sum?: FederationSeasonChargeSumAggregateInputType
+    _min?: FederationSeasonChargeMinAggregateInputType
+    _max?: FederationSeasonChargeMaxAggregateInputType
+  }
+
+  export type FederationSeasonChargeGroupByOutputType = {
+    id: string
+    tenantId: string
+    federationId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId: string | null
+    studentProfileId: string | null
+    licenseId: string | null
+    costAmount: Decimal
+    saleAmount: Decimal
+    isPaid: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: FederationSeasonChargeCountAggregateOutputType | null
+    _avg: FederationSeasonChargeAvgAggregateOutputType | null
+    _sum: FederationSeasonChargeSumAggregateOutputType | null
+    _min: FederationSeasonChargeMinAggregateOutputType | null
+    _max: FederationSeasonChargeMaxAggregateOutputType | null
+  }
+
+  type GetFederationSeasonChargeGroupByPayload<T extends FederationSeasonChargeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FederationSeasonChargeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FederationSeasonChargeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FederationSeasonChargeGroupByOutputType[P]>
+            : GetScalarType<T[P], FederationSeasonChargeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FederationSeasonChargeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    federationId?: boolean
+    season?: boolean
+    holderType?: boolean
+    holderUserId?: boolean
+    studentProfileId?: boolean
+    licenseId?: boolean
+    costAmount?: boolean
+    saleAmount?: boolean
+    isPaid?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationSeasonCharge"]>
+
+  export type FederationSeasonChargeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    federationId?: boolean
+    season?: boolean
+    holderType?: boolean
+    holderUserId?: boolean
+    studentProfileId?: boolean
+    licenseId?: boolean
+    costAmount?: boolean
+    saleAmount?: boolean
+    isPaid?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["federationSeasonCharge"]>
+
+  export type FederationSeasonChargeSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    federationId?: boolean
+    season?: boolean
+    holderType?: boolean
+    holderUserId?: boolean
+    studentProfileId?: boolean
+    licenseId?: boolean
+    costAmount?: boolean
+    saleAmount?: boolean
+    isPaid?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FederationSeasonChargeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }
+  export type FederationSeasonChargeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    federation?: boolean | FederationDefaultArgs<ExtArgs>
+  }
+
+  export type $FederationSeasonChargePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FederationSeasonCharge"
+    objects: {
+      federation: Prisma.$FederationPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tenantId: string
+      federationId: string
+      season: string
+      holderType: $Enums.LicenseHolderType
+      /**
+       * Logical auth-service user id. Null only for `CLUB` rows.
+       */
+      holderUserId: string | null
+      /**
+       * Logical academic student profile id. Null for staff and club rows.
+       */
+      studentProfileId: string | null
+      /**
+       * Logical academic license id (issued in academic-service).
+       */
+      licenseId: string | null
+      /**
+       * What the academy owes the federation for this holder.
+       */
+      costAmount: Prisma.Decimal
+      /**
+       * What the academy charges the member (0 for club).
+       */
+      saleAmount: Prisma.Decimal
+      isPaid: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["federationSeasonCharge"]>
+    composites: {}
+  }
+
+  type FederationSeasonChargeGetPayload<S extends boolean | null | undefined | FederationSeasonChargeDefaultArgs> = $Result.GetResult<Prisma.$FederationSeasonChargePayload, S>
+
+  type FederationSeasonChargeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<FederationSeasonChargeFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: FederationSeasonChargeCountAggregateInputType | true
+    }
+
+  export interface FederationSeasonChargeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FederationSeasonCharge'], meta: { name: 'FederationSeasonCharge' } }
+    /**
+     * Find zero or one FederationSeasonCharge that matches the filter.
+     * @param {FederationSeasonChargeFindUniqueArgs} args - Arguments to find a FederationSeasonCharge
+     * @example
+     * // Get one FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FederationSeasonChargeFindUniqueArgs>(args: SelectSubset<T, FederationSeasonChargeFindUniqueArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one FederationSeasonCharge that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {FederationSeasonChargeFindUniqueOrThrowArgs} args - Arguments to find a FederationSeasonCharge
+     * @example
+     * // Get one FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FederationSeasonChargeFindUniqueOrThrowArgs>(args: SelectSubset<T, FederationSeasonChargeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first FederationSeasonCharge that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeFindFirstArgs} args - Arguments to find a FederationSeasonCharge
+     * @example
+     * // Get one FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FederationSeasonChargeFindFirstArgs>(args?: SelectSubset<T, FederationSeasonChargeFindFirstArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first FederationSeasonCharge that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeFindFirstOrThrowArgs} args - Arguments to find a FederationSeasonCharge
+     * @example
+     * // Get one FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FederationSeasonChargeFindFirstOrThrowArgs>(args?: SelectSubset<T, FederationSeasonChargeFindFirstOrThrowArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more FederationSeasonCharges that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FederationSeasonCharges
+     * const federationSeasonCharges = await prisma.federationSeasonCharge.findMany()
+     * 
+     * // Get first 10 FederationSeasonCharges
+     * const federationSeasonCharges = await prisma.federationSeasonCharge.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const federationSeasonChargeWithIdOnly = await prisma.federationSeasonCharge.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FederationSeasonChargeFindManyArgs>(args?: SelectSubset<T, FederationSeasonChargeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a FederationSeasonCharge.
+     * @param {FederationSeasonChargeCreateArgs} args - Arguments to create a FederationSeasonCharge.
+     * @example
+     * // Create one FederationSeasonCharge
+     * const FederationSeasonCharge = await prisma.federationSeasonCharge.create({
+     *   data: {
+     *     // ... data to create a FederationSeasonCharge
+     *   }
+     * })
+     * 
+     */
+    create<T extends FederationSeasonChargeCreateArgs>(args: SelectSubset<T, FederationSeasonChargeCreateArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many FederationSeasonCharges.
+     * @param {FederationSeasonChargeCreateManyArgs} args - Arguments to create many FederationSeasonCharges.
+     * @example
+     * // Create many FederationSeasonCharges
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FederationSeasonChargeCreateManyArgs>(args?: SelectSubset<T, FederationSeasonChargeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FederationSeasonCharges and returns the data saved in the database.
+     * @param {FederationSeasonChargeCreateManyAndReturnArgs} args - Arguments to create many FederationSeasonCharges.
+     * @example
+     * // Create many FederationSeasonCharges
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FederationSeasonCharges and only return the `id`
+     * const federationSeasonChargeWithIdOnly = await prisma.federationSeasonCharge.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FederationSeasonChargeCreateManyAndReturnArgs>(args?: SelectSubset<T, FederationSeasonChargeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a FederationSeasonCharge.
+     * @param {FederationSeasonChargeDeleteArgs} args - Arguments to delete one FederationSeasonCharge.
+     * @example
+     * // Delete one FederationSeasonCharge
+     * const FederationSeasonCharge = await prisma.federationSeasonCharge.delete({
+     *   where: {
+     *     // ... filter to delete one FederationSeasonCharge
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FederationSeasonChargeDeleteArgs>(args: SelectSubset<T, FederationSeasonChargeDeleteArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one FederationSeasonCharge.
+     * @param {FederationSeasonChargeUpdateArgs} args - Arguments to update one FederationSeasonCharge.
+     * @example
+     * // Update one FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FederationSeasonChargeUpdateArgs>(args: SelectSubset<T, FederationSeasonChargeUpdateArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more FederationSeasonCharges.
+     * @param {FederationSeasonChargeDeleteManyArgs} args - Arguments to filter FederationSeasonCharges to delete.
+     * @example
+     * // Delete a few FederationSeasonCharges
+     * const { count } = await prisma.federationSeasonCharge.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FederationSeasonChargeDeleteManyArgs>(args?: SelectSubset<T, FederationSeasonChargeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FederationSeasonCharges.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FederationSeasonCharges
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FederationSeasonChargeUpdateManyArgs>(args: SelectSubset<T, FederationSeasonChargeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one FederationSeasonCharge.
+     * @param {FederationSeasonChargeUpsertArgs} args - Arguments to update or create a FederationSeasonCharge.
+     * @example
+     * // Update or create a FederationSeasonCharge
+     * const federationSeasonCharge = await prisma.federationSeasonCharge.upsert({
+     *   create: {
+     *     // ... data to create a FederationSeasonCharge
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FederationSeasonCharge we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FederationSeasonChargeUpsertArgs>(args: SelectSubset<T, FederationSeasonChargeUpsertArgs<ExtArgs>>): Prisma__FederationSeasonChargeClient<$Result.GetResult<Prisma.$FederationSeasonChargePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of FederationSeasonCharges.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeCountArgs} args - Arguments to filter FederationSeasonCharges to count.
+     * @example
+     * // Count the number of FederationSeasonCharges
+     * const count = await prisma.federationSeasonCharge.count({
+     *   where: {
+     *     // ... the filter for the FederationSeasonCharges we want to count
+     *   }
+     * })
+    **/
+    count<T extends FederationSeasonChargeCountArgs>(
+      args?: Subset<T, FederationSeasonChargeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FederationSeasonChargeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FederationSeasonCharge.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FederationSeasonChargeAggregateArgs>(args: Subset<T, FederationSeasonChargeAggregateArgs>): Prisma.PrismaPromise<GetFederationSeasonChargeAggregateType<T>>
+
+    /**
+     * Group by FederationSeasonCharge.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FederationSeasonChargeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FederationSeasonChargeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FederationSeasonChargeGroupByArgs['orderBy'] }
+        : { orderBy?: FederationSeasonChargeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FederationSeasonChargeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFederationSeasonChargeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FederationSeasonCharge model
+   */
+  readonly fields: FederationSeasonChargeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FederationSeasonCharge.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FederationSeasonChargeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    federation<T extends FederationDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FederationDefaultArgs<ExtArgs>>): Prisma__FederationClient<$Result.GetResult<Prisma.$FederationPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FederationSeasonCharge model
+   */ 
+  interface FederationSeasonChargeFieldRefs {
+    readonly id: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly tenantId: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly federationId: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly season: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly holderType: FieldRef<"FederationSeasonCharge", 'LicenseHolderType'>
+    readonly holderUserId: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly studentProfileId: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly licenseId: FieldRef<"FederationSeasonCharge", 'String'>
+    readonly costAmount: FieldRef<"FederationSeasonCharge", 'Decimal'>
+    readonly saleAmount: FieldRef<"FederationSeasonCharge", 'Decimal'>
+    readonly isPaid: FieldRef<"FederationSeasonCharge", 'Boolean'>
+    readonly createdAt: FieldRef<"FederationSeasonCharge", 'DateTime'>
+    readonly updatedAt: FieldRef<"FederationSeasonCharge", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FederationSeasonCharge findUnique
+   */
+  export type FederationSeasonChargeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasonCharge to fetch.
+     */
+    where: FederationSeasonChargeWhereUniqueInput
+  }
+
+  /**
+   * FederationSeasonCharge findUniqueOrThrow
+   */
+  export type FederationSeasonChargeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasonCharge to fetch.
+     */
+    where: FederationSeasonChargeWhereUniqueInput
+  }
+
+  /**
+   * FederationSeasonCharge findFirst
+   */
+  export type FederationSeasonChargeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasonCharge to fetch.
+     */
+    where?: FederationSeasonChargeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasonCharges to fetch.
+     */
+    orderBy?: FederationSeasonChargeOrderByWithRelationInput | FederationSeasonChargeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationSeasonCharges.
+     */
+    cursor?: FederationSeasonChargeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasonCharges from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasonCharges.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationSeasonCharges.
+     */
+    distinct?: FederationSeasonChargeScalarFieldEnum | FederationSeasonChargeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeasonCharge findFirstOrThrow
+   */
+  export type FederationSeasonChargeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasonCharge to fetch.
+     */
+    where?: FederationSeasonChargeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasonCharges to fetch.
+     */
+    orderBy?: FederationSeasonChargeOrderByWithRelationInput | FederationSeasonChargeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FederationSeasonCharges.
+     */
+    cursor?: FederationSeasonChargeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasonCharges from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasonCharges.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FederationSeasonCharges.
+     */
+    distinct?: FederationSeasonChargeScalarFieldEnum | FederationSeasonChargeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeasonCharge findMany
+   */
+  export type FederationSeasonChargeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter, which FederationSeasonCharges to fetch.
+     */
+    where?: FederationSeasonChargeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FederationSeasonCharges to fetch.
+     */
+    orderBy?: FederationSeasonChargeOrderByWithRelationInput | FederationSeasonChargeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FederationSeasonCharges.
+     */
+    cursor?: FederationSeasonChargeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FederationSeasonCharges from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FederationSeasonCharges.
+     */
+    skip?: number
+    distinct?: FederationSeasonChargeScalarFieldEnum | FederationSeasonChargeScalarFieldEnum[]
+  }
+
+  /**
+   * FederationSeasonCharge create
+   */
+  export type FederationSeasonChargeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FederationSeasonCharge.
+     */
+    data: XOR<FederationSeasonChargeCreateInput, FederationSeasonChargeUncheckedCreateInput>
+  }
+
+  /**
+   * FederationSeasonCharge createMany
+   */
+  export type FederationSeasonChargeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FederationSeasonCharges.
+     */
+    data: FederationSeasonChargeCreateManyInput | FederationSeasonChargeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FederationSeasonCharge createManyAndReturn
+   */
+  export type FederationSeasonChargeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many FederationSeasonCharges.
+     */
+    data: FederationSeasonChargeCreateManyInput | FederationSeasonChargeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FederationSeasonCharge update
+   */
+  export type FederationSeasonChargeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FederationSeasonCharge.
+     */
+    data: XOR<FederationSeasonChargeUpdateInput, FederationSeasonChargeUncheckedUpdateInput>
+    /**
+     * Choose, which FederationSeasonCharge to update.
+     */
+    where: FederationSeasonChargeWhereUniqueInput
+  }
+
+  /**
+   * FederationSeasonCharge updateMany
+   */
+  export type FederationSeasonChargeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FederationSeasonCharges.
+     */
+    data: XOR<FederationSeasonChargeUpdateManyMutationInput, FederationSeasonChargeUncheckedUpdateManyInput>
+    /**
+     * Filter which FederationSeasonCharges to update
+     */
+    where?: FederationSeasonChargeWhereInput
+  }
+
+  /**
+   * FederationSeasonCharge upsert
+   */
+  export type FederationSeasonChargeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FederationSeasonCharge to update in case it exists.
+     */
+    where: FederationSeasonChargeWhereUniqueInput
+    /**
+     * In case the FederationSeasonCharge found by the `where` argument doesn't exist, create a new FederationSeasonCharge with this data.
+     */
+    create: XOR<FederationSeasonChargeCreateInput, FederationSeasonChargeUncheckedCreateInput>
+    /**
+     * In case the FederationSeasonCharge was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FederationSeasonChargeUpdateInput, FederationSeasonChargeUncheckedUpdateInput>
+  }
+
+  /**
+   * FederationSeasonCharge delete
+   */
+  export type FederationSeasonChargeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+    /**
+     * Filter which FederationSeasonCharge to delete.
+     */
+    where: FederationSeasonChargeWhereUniqueInput
+  }
+
+  /**
+   * FederationSeasonCharge deleteMany
+   */
+  export type FederationSeasonChargeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FederationSeasonCharges to delete
+     */
+    where?: FederationSeasonChargeWhereInput
+  }
+
+  /**
+   * FederationSeasonCharge without action
+   */
+  export type FederationSeasonChargeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FederationSeasonCharge
+     */
+    select?: FederationSeasonChargeSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FederationSeasonChargeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AffiliationLicense
+   */
+
+  export type AggregateAffiliationLicense = {
+    _count: AffiliationLicenseCountAggregateOutputType | null
+    _avg: AffiliationLicenseAvgAggregateOutputType | null
+    _sum: AffiliationLicenseSumAggregateOutputType | null
+    _min: AffiliationLicenseMinAggregateOutputType | null
+    _max: AffiliationLicenseMaxAggregateOutputType | null
+  }
+
+  export type AffiliationLicenseAvgAggregateOutputType = {
+    amountCharged: Decimal | null
+  }
+
+  export type AffiliationLicenseSumAggregateOutputType = {
+    amountCharged: Decimal | null
+  }
+
+  export type AffiliationLicenseMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    studentProfileId: string | null
+    holderUserId: string | null
+    holderType: $Enums.LicenseHolderType | null
+    federationId: string | null
+    licenseTypeId: string | null
+    licenseNumber: string | null
+    season: string | null
+    validUntil: Date | null
+    isActive: boolean | null
+    isPaid: boolean | null
+    amountCharged: Decimal | null
+    status: $Enums.AffiliationLicenseStatus | null
+    payerUserId: string | null
+    isExempt: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AffiliationLicenseMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    studentProfileId: string | null
+    holderUserId: string | null
+    holderType: $Enums.LicenseHolderType | null
+    federationId: string | null
+    licenseTypeId: string | null
+    licenseNumber: string | null
+    season: string | null
+    validUntil: Date | null
+    isActive: boolean | null
+    isPaid: boolean | null
+    amountCharged: Decimal | null
+    status: $Enums.AffiliationLicenseStatus | null
+    payerUserId: string | null
+    isExempt: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AffiliationLicenseCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    studentProfileId: number
+    holderUserId: number
+    holderType: number
+    federationId: number
+    licenseTypeId: number
+    licenseNumber: number
+    season: number
+    validUntil: number
+    isActive: number
+    isPaid: number
+    amountCharged: number
+    status: number
+    payerUserId: number
+    isExempt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AffiliationLicenseAvgAggregateInputType = {
+    amountCharged?: true
+  }
+
+  export type AffiliationLicenseSumAggregateInputType = {
+    amountCharged?: true
+  }
+
+  export type AffiliationLicenseMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    studentProfileId?: true
+    holderUserId?: true
+    holderType?: true
+    federationId?: true
+    licenseTypeId?: true
+    licenseNumber?: true
+    season?: true
+    validUntil?: true
+    isActive?: true
+    isPaid?: true
+    amountCharged?: true
+    status?: true
+    payerUserId?: true
+    isExempt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AffiliationLicenseMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    studentProfileId?: true
+    holderUserId?: true
+    holderType?: true
+    federationId?: true
+    licenseTypeId?: true
+    licenseNumber?: true
+    season?: true
+    validUntil?: true
+    isActive?: true
+    isPaid?: true
+    amountCharged?: true
+    status?: true
+    payerUserId?: true
+    isExempt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AffiliationLicenseCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    studentProfileId?: true
+    holderUserId?: true
+    holderType?: true
+    federationId?: true
+    licenseTypeId?: true
+    licenseNumber?: true
+    season?: true
+    validUntil?: true
+    isActive?: true
+    isPaid?: true
+    amountCharged?: true
+    status?: true
+    payerUserId?: true
+    isExempt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AffiliationLicenseAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AffiliationLicense to aggregate.
+     */
+    where?: AffiliationLicenseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AffiliationLicenses to fetch.
+     */
+    orderBy?: AffiliationLicenseOrderByWithRelationInput | AffiliationLicenseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AffiliationLicenseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AffiliationLicenses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AffiliationLicenses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AffiliationLicenses
+    **/
+    _count?: true | AffiliationLicenseCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AffiliationLicenseAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AffiliationLicenseSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AffiliationLicenseMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AffiliationLicenseMaxAggregateInputType
+  }
+
+  export type GetAffiliationLicenseAggregateType<T extends AffiliationLicenseAggregateArgs> = {
+        [P in keyof T & keyof AggregateAffiliationLicense]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAffiliationLicense[P]>
+      : GetScalarType<T[P], AggregateAffiliationLicense[P]>
+  }
+
+
+
+
+  export type AffiliationLicenseGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AffiliationLicenseWhereInput
+    orderBy?: AffiliationLicenseOrderByWithAggregationInput | AffiliationLicenseOrderByWithAggregationInput[]
+    by: AffiliationLicenseScalarFieldEnum[] | AffiliationLicenseScalarFieldEnum
+    having?: AffiliationLicenseScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AffiliationLicenseCountAggregateInputType | true
+    _avg?: AffiliationLicenseAvgAggregateInputType
+    _sum?: AffiliationLicenseSumAggregateInputType
+    _min?: AffiliationLicenseMinAggregateInputType
+    _max?: AffiliationLicenseMaxAggregateInputType
+  }
+
+  export type AffiliationLicenseGroupByOutputType = {
+    id: string
+    tenantId: string
+    studentProfileId: string | null
+    holderUserId: string | null
+    holderType: $Enums.LicenseHolderType
+    federationId: string
+    licenseTypeId: string | null
+    licenseNumber: string
+    season: string
+    validUntil: Date
+    isActive: boolean
+    isPaid: boolean
+    amountCharged: Decimal
+    status: $Enums.AffiliationLicenseStatus
+    payerUserId: string | null
+    isExempt: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: AffiliationLicenseCountAggregateOutputType | null
+    _avg: AffiliationLicenseAvgAggregateOutputType | null
+    _sum: AffiliationLicenseSumAggregateOutputType | null
+    _min: AffiliationLicenseMinAggregateOutputType | null
+    _max: AffiliationLicenseMaxAggregateOutputType | null
+  }
+
+  type GetAffiliationLicenseGroupByPayload<T extends AffiliationLicenseGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AffiliationLicenseGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AffiliationLicenseGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AffiliationLicenseGroupByOutputType[P]>
+            : GetScalarType<T[P], AffiliationLicenseGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AffiliationLicenseSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    studentProfileId?: boolean
+    holderUserId?: boolean
+    holderType?: boolean
+    federationId?: boolean
+    licenseTypeId?: boolean
+    licenseNumber?: boolean
+    season?: boolean
+    validUntil?: boolean
+    isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: boolean
+    status?: boolean
+    payerUserId?: boolean
+    isExempt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["affiliationLicense"]>
+
+  export type AffiliationLicenseSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    studentProfileId?: boolean
+    holderUserId?: boolean
+    holderType?: boolean
+    federationId?: boolean
+    licenseTypeId?: boolean
+    licenseNumber?: boolean
+    season?: boolean
+    validUntil?: boolean
+    isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: boolean
+    status?: boolean
+    payerUserId?: boolean
+    isExempt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["affiliationLicense"]>
+
+  export type AffiliationLicenseSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    studentProfileId?: boolean
+    holderUserId?: boolean
+    holderType?: boolean
+    federationId?: boolean
+    licenseTypeId?: boolean
+    licenseNumber?: boolean
+    season?: boolean
+    validUntil?: boolean
+    isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: boolean
+    status?: boolean
+    payerUserId?: boolean
+    isExempt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $AffiliationLicensePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AffiliationLicense"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tenantId: string
+      /**
+       * Logical academic StudentProfile id. Required for STUDENT holders, including minors (no User).
+       */
+      studentProfileId: string | null
+      /**
+       * Logical auth-service identity. Null for minors who have no User.
+       */
+      holderUserId: string | null
+      holderType: $Enums.LicenseHolderType
+      /**
+       * Logical financial-service federation id (no Federation @relation).
+       */
+      federationId: string
+      /**
+       * Logical financial-service `FederationLicenseType` id (no cross-context @relation).
+       */
+      licenseTypeId: string | null
+      licenseNumber: string
+      /**
+       * Season label, e.g. "2026-2027".
+       */
+      season: string
+      validUntil: Date
+      isActive: boolean
+      isPaid: boolean
+      amountCharged: Prisma.Decimal
+      status: $Enums.AffiliationLicenseStatus
+      /**
+       * Logical auth-service identity that funds this license (adult student or parent payer).
+       */
+      payerUserId: string | null
+      /**
+       * Staff, instructors, or designated profiles issued at zero sale amount.
+       */
+      isExempt: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["affiliationLicense"]>
+    composites: {}
+  }
+
+  type AffiliationLicenseGetPayload<S extends boolean | null | undefined | AffiliationLicenseDefaultArgs> = $Result.GetResult<Prisma.$AffiliationLicensePayload, S>
+
+  type AffiliationLicenseCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AffiliationLicenseFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AffiliationLicenseCountAggregateInputType | true
+    }
+
+  export interface AffiliationLicenseDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AffiliationLicense'], meta: { name: 'AffiliationLicense' } }
+    /**
+     * Find zero or one AffiliationLicense that matches the filter.
+     * @param {AffiliationLicenseFindUniqueArgs} args - Arguments to find a AffiliationLicense
+     * @example
+     * // Get one AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AffiliationLicenseFindUniqueArgs>(args: SelectSubset<T, AffiliationLicenseFindUniqueArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AffiliationLicense that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AffiliationLicenseFindUniqueOrThrowArgs} args - Arguments to find a AffiliationLicense
+     * @example
+     * // Get one AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AffiliationLicenseFindUniqueOrThrowArgs>(args: SelectSubset<T, AffiliationLicenseFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AffiliationLicense that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseFindFirstArgs} args - Arguments to find a AffiliationLicense
+     * @example
+     * // Get one AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AffiliationLicenseFindFirstArgs>(args?: SelectSubset<T, AffiliationLicenseFindFirstArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AffiliationLicense that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseFindFirstOrThrowArgs} args - Arguments to find a AffiliationLicense
+     * @example
+     * // Get one AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AffiliationLicenseFindFirstOrThrowArgs>(args?: SelectSubset<T, AffiliationLicenseFindFirstOrThrowArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AffiliationLicenses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AffiliationLicenses
+     * const affiliationLicenses = await prisma.affiliationLicense.findMany()
+     * 
+     * // Get first 10 AffiliationLicenses
+     * const affiliationLicenses = await prisma.affiliationLicense.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const affiliationLicenseWithIdOnly = await prisma.affiliationLicense.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AffiliationLicenseFindManyArgs>(args?: SelectSubset<T, AffiliationLicenseFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AffiliationLicense.
+     * @param {AffiliationLicenseCreateArgs} args - Arguments to create a AffiliationLicense.
+     * @example
+     * // Create one AffiliationLicense
+     * const AffiliationLicense = await prisma.affiliationLicense.create({
+     *   data: {
+     *     // ... data to create a AffiliationLicense
+     *   }
+     * })
+     * 
+     */
+    create<T extends AffiliationLicenseCreateArgs>(args: SelectSubset<T, AffiliationLicenseCreateArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AffiliationLicenses.
+     * @param {AffiliationLicenseCreateManyArgs} args - Arguments to create many AffiliationLicenses.
+     * @example
+     * // Create many AffiliationLicenses
+     * const affiliationLicense = await prisma.affiliationLicense.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AffiliationLicenseCreateManyArgs>(args?: SelectSubset<T, AffiliationLicenseCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AffiliationLicenses and returns the data saved in the database.
+     * @param {AffiliationLicenseCreateManyAndReturnArgs} args - Arguments to create many AffiliationLicenses.
+     * @example
+     * // Create many AffiliationLicenses
+     * const affiliationLicense = await prisma.affiliationLicense.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AffiliationLicenses and only return the `id`
+     * const affiliationLicenseWithIdOnly = await prisma.affiliationLicense.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AffiliationLicenseCreateManyAndReturnArgs>(args?: SelectSubset<T, AffiliationLicenseCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AffiliationLicense.
+     * @param {AffiliationLicenseDeleteArgs} args - Arguments to delete one AffiliationLicense.
+     * @example
+     * // Delete one AffiliationLicense
+     * const AffiliationLicense = await prisma.affiliationLicense.delete({
+     *   where: {
+     *     // ... filter to delete one AffiliationLicense
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AffiliationLicenseDeleteArgs>(args: SelectSubset<T, AffiliationLicenseDeleteArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AffiliationLicense.
+     * @param {AffiliationLicenseUpdateArgs} args - Arguments to update one AffiliationLicense.
+     * @example
+     * // Update one AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AffiliationLicenseUpdateArgs>(args: SelectSubset<T, AffiliationLicenseUpdateArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AffiliationLicenses.
+     * @param {AffiliationLicenseDeleteManyArgs} args - Arguments to filter AffiliationLicenses to delete.
+     * @example
+     * // Delete a few AffiliationLicenses
+     * const { count } = await prisma.affiliationLicense.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AffiliationLicenseDeleteManyArgs>(args?: SelectSubset<T, AffiliationLicenseDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AffiliationLicenses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AffiliationLicenses
+     * const affiliationLicense = await prisma.affiliationLicense.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AffiliationLicenseUpdateManyArgs>(args: SelectSubset<T, AffiliationLicenseUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AffiliationLicense.
+     * @param {AffiliationLicenseUpsertArgs} args - Arguments to update or create a AffiliationLicense.
+     * @example
+     * // Update or create a AffiliationLicense
+     * const affiliationLicense = await prisma.affiliationLicense.upsert({
+     *   create: {
+     *     // ... data to create a AffiliationLicense
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AffiliationLicense we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AffiliationLicenseUpsertArgs>(args: SelectSubset<T, AffiliationLicenseUpsertArgs<ExtArgs>>): Prisma__AffiliationLicenseClient<$Result.GetResult<Prisma.$AffiliationLicensePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AffiliationLicenses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseCountArgs} args - Arguments to filter AffiliationLicenses to count.
+     * @example
+     * // Count the number of AffiliationLicenses
+     * const count = await prisma.affiliationLicense.count({
+     *   where: {
+     *     // ... the filter for the AffiliationLicenses we want to count
+     *   }
+     * })
+    **/
+    count<T extends AffiliationLicenseCountArgs>(
+      args?: Subset<T, AffiliationLicenseCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AffiliationLicenseCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AffiliationLicense.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AffiliationLicenseAggregateArgs>(args: Subset<T, AffiliationLicenseAggregateArgs>): Prisma.PrismaPromise<GetAffiliationLicenseAggregateType<T>>
+
+    /**
+     * Group by AffiliationLicense.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AffiliationLicenseGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AffiliationLicenseGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AffiliationLicenseGroupByArgs['orderBy'] }
+        : { orderBy?: AffiliationLicenseGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AffiliationLicenseGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAffiliationLicenseGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AffiliationLicense model
+   */
+  readonly fields: AffiliationLicenseFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AffiliationLicense.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AffiliationLicenseClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AffiliationLicense model
+   */ 
+  interface AffiliationLicenseFieldRefs {
+    readonly id: FieldRef<"AffiliationLicense", 'String'>
+    readonly tenantId: FieldRef<"AffiliationLicense", 'String'>
+    readonly studentProfileId: FieldRef<"AffiliationLicense", 'String'>
+    readonly holderUserId: FieldRef<"AffiliationLicense", 'String'>
+    readonly holderType: FieldRef<"AffiliationLicense", 'LicenseHolderType'>
+    readonly federationId: FieldRef<"AffiliationLicense", 'String'>
+    readonly licenseTypeId: FieldRef<"AffiliationLicense", 'String'>
+    readonly licenseNumber: FieldRef<"AffiliationLicense", 'String'>
+    readonly season: FieldRef<"AffiliationLicense", 'String'>
+    readonly validUntil: FieldRef<"AffiliationLicense", 'DateTime'>
+    readonly isActive: FieldRef<"AffiliationLicense", 'Boolean'>
+    readonly isPaid: FieldRef<"AffiliationLicense", 'Boolean'>
+    readonly amountCharged: FieldRef<"AffiliationLicense", 'Decimal'>
+    readonly status: FieldRef<"AffiliationLicense", 'AffiliationLicenseStatus'>
+    readonly payerUserId: FieldRef<"AffiliationLicense", 'String'>
+    readonly isExempt: FieldRef<"AffiliationLicense", 'Boolean'>
+    readonly createdAt: FieldRef<"AffiliationLicense", 'DateTime'>
+    readonly updatedAt: FieldRef<"AffiliationLicense", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AffiliationLicense findUnique
+   */
+  export type AffiliationLicenseFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter, which AffiliationLicense to fetch.
+     */
+    where: AffiliationLicenseWhereUniqueInput
+  }
+
+  /**
+   * AffiliationLicense findUniqueOrThrow
+   */
+  export type AffiliationLicenseFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter, which AffiliationLicense to fetch.
+     */
+    where: AffiliationLicenseWhereUniqueInput
+  }
+
+  /**
+   * AffiliationLicense findFirst
+   */
+  export type AffiliationLicenseFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter, which AffiliationLicense to fetch.
+     */
+    where?: AffiliationLicenseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AffiliationLicenses to fetch.
+     */
+    orderBy?: AffiliationLicenseOrderByWithRelationInput | AffiliationLicenseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AffiliationLicenses.
+     */
+    cursor?: AffiliationLicenseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AffiliationLicenses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AffiliationLicenses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AffiliationLicenses.
+     */
+    distinct?: AffiliationLicenseScalarFieldEnum | AffiliationLicenseScalarFieldEnum[]
+  }
+
+  /**
+   * AffiliationLicense findFirstOrThrow
+   */
+  export type AffiliationLicenseFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter, which AffiliationLicense to fetch.
+     */
+    where?: AffiliationLicenseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AffiliationLicenses to fetch.
+     */
+    orderBy?: AffiliationLicenseOrderByWithRelationInput | AffiliationLicenseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AffiliationLicenses.
+     */
+    cursor?: AffiliationLicenseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AffiliationLicenses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AffiliationLicenses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AffiliationLicenses.
+     */
+    distinct?: AffiliationLicenseScalarFieldEnum | AffiliationLicenseScalarFieldEnum[]
+  }
+
+  /**
+   * AffiliationLicense findMany
+   */
+  export type AffiliationLicenseFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter, which AffiliationLicenses to fetch.
+     */
+    where?: AffiliationLicenseWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AffiliationLicenses to fetch.
+     */
+    orderBy?: AffiliationLicenseOrderByWithRelationInput | AffiliationLicenseOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AffiliationLicenses.
+     */
+    cursor?: AffiliationLicenseWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AffiliationLicenses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AffiliationLicenses.
+     */
+    skip?: number
+    distinct?: AffiliationLicenseScalarFieldEnum | AffiliationLicenseScalarFieldEnum[]
+  }
+
+  /**
+   * AffiliationLicense create
+   */
+  export type AffiliationLicenseCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AffiliationLicense.
+     */
+    data: XOR<AffiliationLicenseCreateInput, AffiliationLicenseUncheckedCreateInput>
+  }
+
+  /**
+   * AffiliationLicense createMany
+   */
+  export type AffiliationLicenseCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AffiliationLicenses.
+     */
+    data: AffiliationLicenseCreateManyInput | AffiliationLicenseCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AffiliationLicense createManyAndReturn
+   */
+  export type AffiliationLicenseCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AffiliationLicenses.
+     */
+    data: AffiliationLicenseCreateManyInput | AffiliationLicenseCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AffiliationLicense update
+   */
+  export type AffiliationLicenseUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AffiliationLicense.
+     */
+    data: XOR<AffiliationLicenseUpdateInput, AffiliationLicenseUncheckedUpdateInput>
+    /**
+     * Choose, which AffiliationLicense to update.
+     */
+    where: AffiliationLicenseWhereUniqueInput
+  }
+
+  /**
+   * AffiliationLicense updateMany
+   */
+  export type AffiliationLicenseUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AffiliationLicenses.
+     */
+    data: XOR<AffiliationLicenseUpdateManyMutationInput, AffiliationLicenseUncheckedUpdateManyInput>
+    /**
+     * Filter which AffiliationLicenses to update
+     */
+    where?: AffiliationLicenseWhereInput
+  }
+
+  /**
+   * AffiliationLicense upsert
+   */
+  export type AffiliationLicenseUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AffiliationLicense to update in case it exists.
+     */
+    where: AffiliationLicenseWhereUniqueInput
+    /**
+     * In case the AffiliationLicense found by the `where` argument doesn't exist, create a new AffiliationLicense with this data.
+     */
+    create: XOR<AffiliationLicenseCreateInput, AffiliationLicenseUncheckedCreateInput>
+    /**
+     * In case the AffiliationLicense was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AffiliationLicenseUpdateInput, AffiliationLicenseUncheckedUpdateInput>
+  }
+
+  /**
+   * AffiliationLicense delete
+   */
+  export type AffiliationLicenseDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
+    /**
+     * Filter which AffiliationLicense to delete.
+     */
+    where: AffiliationLicenseWhereUniqueInput
+  }
+
+  /**
+   * AffiliationLicense deleteMany
+   */
+  export type AffiliationLicenseDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AffiliationLicenses to delete
+     */
+    where?: AffiliationLicenseWhereInput
+  }
+
+  /**
+   * AffiliationLicense without action
+   */
+  export type AffiliationLicenseDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AffiliationLicense
+     */
+    select?: AffiliationLicenseSelect<ExtArgs> | null
   }
 
 
@@ -27372,14 +34491,7 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     firstName: 'firstName',
     lastName: 'lastName',
-    dni: 'dni',
-    birthDate: 'birthDate',
-    phone: 'phone',
-    address: 'address',
-    city: 'city',
-    state: 'state',
-    postalCode: 'postalCode',
-    country: 'country',
+    gender: 'gender',
     isActive: 'isActive',
     roles: 'roles',
     createdAt: 'createdAt',
@@ -27392,6 +34504,18 @@ export namespace Prisma {
   export const StudentProfileScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    dni: 'dni',
+    birthDate: 'birthDate',
+    phone: 'phone',
+    address: 'address',
+    city: 'city',
+    state: 'state',
+    postalCode: 'postalCode',
+    country: 'country',
+    gender: 'gender',
+    bankMandateId: 'bankMandateId',
     status: 'status',
     emergencyContacts: 'emergencyContacts',
     createdAt: 'createdAt',
@@ -27407,6 +34531,9 @@ export namespace Prisma {
     previousStatus: 'previousStatus',
     newStatus: 'newStatus',
     reason: 'reason',
+    leaveReason: 'leaveReason',
+    leaveNoticeMethod: 'leaveNoticeMethod',
+    customReasonDetails: 'customReasonDetails',
     changedById: 'changedById',
     createdAt: 'createdAt'
   };
@@ -27435,6 +34562,7 @@ export namespace Prisma {
   export const DisciplineScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    acronym: 'acronym',
     description: 'description'
   };
 
@@ -27618,13 +34746,39 @@ export namespace Prisma {
   export type CashTransactionScalarFieldEnum = (typeof CashTransactionScalarFieldEnum)[keyof typeof CashTransactionScalarFieldEnum]
 
 
+  export const TenantFinancialConfigScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    legalName: 'legalName',
+    taxId: 'taxId',
+    address: 'address',
+    city: 'city',
+    postalCode: 'postalCode',
+    country: 'country',
+    creditorId: 'creditorId',
+    iban: 'iban',
+    bic: 'bic',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type TenantFinancialConfigScalarFieldEnum = (typeof TenantFinancialConfigScalarFieldEnum)[keyof typeof TenantFinancialConfigScalarFieldEnum]
+
+
   export const BankMandateScalarFieldEnum: {
     id: 'id',
-    studentProfileId: 'studentProfileId',
+    payerUserId: 'payerUserId',
     iban: 'iban',
     bic: 'bic',
     mandateReference: 'mandateReference',
     signatureDate: 'signatureDate',
+    accountHolderName: 'accountHolderName',
+    accountHolderDni: 'accountHolderDni',
+    tenantId: 'tenantId',
+    isSigned: 'isSigned',
+    signedAt: 'signedAt',
+    signedByUserId: 'signedByUserId',
+    signatureIp: 'signatureIp',
     isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -27665,23 +34819,117 @@ export namespace Prisma {
 
   export const FederationScalarFieldEnum: {
     id: 'id',
+    tenantId: 'tenantId',
     name: 'name',
-    country: 'country'
+    acronym: 'acronym',
+    country: 'country',
+    email: 'email',
+    isActive: 'isActive',
+    deletedAt: 'deletedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type FederationScalarFieldEnum = (typeof FederationScalarFieldEnum)[keyof typeof FederationScalarFieldEnum]
 
 
-  export const StudentLicenseScalarFieldEnum: {
+  export const FederationContactScalarFieldEnum: {
     id: 'id',
-    studentProfileId: 'studentProfileId',
     federationId: 'federationId',
-    licenseNumber: 'licenseNumber',
-    validUntil: 'validUntil',
-    isActive: 'isActive'
+    medium: 'medium',
+    value: 'value',
+    tag: 'tag',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
-  export type StudentLicenseScalarFieldEnum = (typeof StudentLicenseScalarFieldEnum)[keyof typeof StudentLicenseScalarFieldEnum]
+  export type FederationContactScalarFieldEnum = (typeof FederationContactScalarFieldEnum)[keyof typeof FederationContactScalarFieldEnum]
+
+
+  export const FederationSeasonScalarFieldEnum: {
+    id: 'id',
+    federationId: 'federationId',
+    seasonName: 'seasonName',
+    currency: 'currency',
+    clubCost: 'clubCost',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FederationSeasonScalarFieldEnum = (typeof FederationSeasonScalarFieldEnum)[keyof typeof FederationSeasonScalarFieldEnum]
+
+
+  export const FederationLicenseTypeScalarFieldEnum: {
+    id: 'id',
+    seasonId: 'seasonId',
+    name: 'name',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FederationLicenseTypeScalarFieldEnum = (typeof FederationLicenseTypeScalarFieldEnum)[keyof typeof FederationLicenseTypeScalarFieldEnum]
+
+
+  export const FederationLicensePriceRowScalarFieldEnum: {
+    id: 'id',
+    licenseTypeId: 'licenseTypeId',
+    kind: 'kind',
+    label: 'label',
+    birthYearFrom: 'birthYearFrom',
+    cost: 'cost',
+    reduction: 'reduction',
+    chargePrice: 'chargePrice',
+    sortOrder: 'sortOrder',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FederationLicensePriceRowScalarFieldEnum = (typeof FederationLicensePriceRowScalarFieldEnum)[keyof typeof FederationLicensePriceRowScalarFieldEnum]
+
+
+  export const FederationSeasonChargeScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    federationId: 'federationId',
+    season: 'season',
+    holderType: 'holderType',
+    holderUserId: 'holderUserId',
+    studentProfileId: 'studentProfileId',
+    licenseId: 'licenseId',
+    costAmount: 'costAmount',
+    saleAmount: 'saleAmount',
+    isPaid: 'isPaid',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FederationSeasonChargeScalarFieldEnum = (typeof FederationSeasonChargeScalarFieldEnum)[keyof typeof FederationSeasonChargeScalarFieldEnum]
+
+
+  export const AffiliationLicenseScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    studentProfileId: 'studentProfileId',
+    holderUserId: 'holderUserId',
+    holderType: 'holderType',
+    federationId: 'federationId',
+    licenseTypeId: 'licenseTypeId',
+    licenseNumber: 'licenseNumber',
+    season: 'season',
+    validUntil: 'validUntil',
+    isActive: 'isActive',
+    isPaid: 'isPaid',
+    amountCharged: 'amountCharged',
+    status: 'status',
+    payerUserId: 'payerUserId',
+    isExempt: 'isExempt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AffiliationLicenseScalarFieldEnum = (typeof AffiliationLicenseScalarFieldEnum)[keyof typeof AffiliationLicenseScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -27752,16 +35000,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
+   * Reference to a field of type 'Gender'
    */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+  export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
     
 
 
   /**
-   * Reference to a field of type 'DateTime[]'
+   * Reference to a field of type 'Gender[]'
    */
-  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+  export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
     
 
 
@@ -27787,6 +35035,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
    * Reference to a field of type 'StudentStatus'
    */
   export type EnumStudentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StudentStatus'>
@@ -27804,6 +35066,34 @@ export namespace Prisma {
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'LeaveReason'
+   */
+  export type EnumLeaveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveReason'>
+    
+
+
+  /**
+   * Reference to a field of type 'LeaveReason[]'
+   */
+  export type ListEnumLeaveReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveReason[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'LeaveNoticeMethod'
+   */
+  export type EnumLeaveNoticeMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveNoticeMethod'>
+    
+
+
+  /**
+   * Reference to a field of type 'LeaveNoticeMethod[]'
+   */
+  export type ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LeaveNoticeMethod[]'>
     
 
 
@@ -27962,6 +35252,62 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'FederationContactMedium'
+   */
+  export type EnumFederationContactMediumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FederationContactMedium'>
+    
+
+
+  /**
+   * Reference to a field of type 'FederationContactMedium[]'
+   */
+  export type ListEnumFederationContactMediumFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FederationContactMedium[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'LicensePriceRowKind'
+   */
+  export type EnumLicensePriceRowKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LicensePriceRowKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'LicensePriceRowKind[]'
+   */
+  export type ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LicensePriceRowKind[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'LicenseHolderType'
+   */
+  export type EnumLicenseHolderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LicenseHolderType'>
+    
+
+
+  /**
+   * Reference to a field of type 'LicenseHolderType[]'
+   */
+  export type ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LicenseHolderType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AffiliationLicenseStatus'
+   */
+  export type EnumAffiliationLicenseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AffiliationLicenseStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AffiliationLicenseStatus[]'
+   */
+  export type ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AffiliationLicenseStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -27987,14 +35333,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     firstName?: StringFilter<"User"> | string
     lastName?: StringFilter<"User"> | string
-    dni?: StringNullableFilter<"User"> | string | null
-    birthDate?: DateTimeNullableFilter<"User"> | Date | string | null
-    phone?: StringNullableFilter<"User"> | string | null
-    address?: StringNullableFilter<"User"> | string | null
-    city?: StringNullableFilter<"User"> | string | null
-    state?: StringNullableFilter<"User"> | string | null
-    postalCode?: StringNullableFilter<"User"> | string | null
-    country?: StringNullableFilter<"User"> | string | null
+    gender?: EnumGenderNullableFilter<"User"> | $Enums.Gender | null
     isActive?: BoolFilter<"User"> | boolean
     roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -28007,14 +35346,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    dni?: SortOrderInput | SortOrder
-    birthDate?: SortOrderInput | SortOrder
-    phone?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    city?: SortOrderInput | SortOrder
-    state?: SortOrderInput | SortOrder
-    postalCode?: SortOrderInput | SortOrder
-    country?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
     isActive?: SortOrder
     roles?: SortOrder
     createdAt?: SortOrder
@@ -28024,25 +35356,18 @@ export namespace Prisma {
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
-    dni?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     firstName?: StringFilter<"User"> | string
     lastName?: StringFilter<"User"> | string
-    birthDate?: DateTimeNullableFilter<"User"> | Date | string | null
-    phone?: StringNullableFilter<"User"> | string | null
-    address?: StringNullableFilter<"User"> | string | null
-    city?: StringNullableFilter<"User"> | string | null
-    state?: StringNullableFilter<"User"> | string | null
-    postalCode?: StringNullableFilter<"User"> | string | null
-    country?: StringNullableFilter<"User"> | string | null
+    gender?: EnumGenderNullableFilter<"User"> | $Enums.Gender | null
     isActive?: BoolFilter<"User"> | boolean
     roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-  }, "id" | "email" | "dni">
+  }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -28050,14 +35375,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    dni?: SortOrderInput | SortOrder
-    birthDate?: SortOrderInput | SortOrder
-    phone?: SortOrderInput | SortOrder
-    address?: SortOrderInput | SortOrder
-    city?: SortOrderInput | SortOrder
-    state?: SortOrderInput | SortOrder
-    postalCode?: SortOrderInput | SortOrder
-    country?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
     isActive?: SortOrder
     roles?: SortOrder
     createdAt?: SortOrder
@@ -28076,14 +35394,7 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     firstName?: StringWithAggregatesFilter<"User"> | string
     lastName?: StringWithAggregatesFilter<"User"> | string
-    dni?: StringNullableWithAggregatesFilter<"User"> | string | null
-    birthDate?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-    phone?: StringNullableWithAggregatesFilter<"User"> | string | null
-    address?: StringNullableWithAggregatesFilter<"User"> | string | null
-    city?: StringNullableWithAggregatesFilter<"User"> | string | null
-    state?: StringNullableWithAggregatesFilter<"User"> | string | null
-    postalCode?: StringNullableWithAggregatesFilter<"User"> | string | null
-    country?: StringNullableWithAggregatesFilter<"User"> | string | null
+    gender?: EnumGenderNullableWithAggregatesFilter<"User"> | $Enums.Gender | null
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
     roles?: EnumRoleNullableListFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -28095,7 +35406,19 @@ export namespace Prisma {
     OR?: StudentProfileWhereInput[]
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
     id?: StringFilter<"StudentProfile"> | string
-    userId?: StringFilter<"StudentProfile"> | string
+    userId?: StringNullableFilter<"StudentProfile"> | string | null
+    firstName?: StringFilter<"StudentProfile"> | string
+    lastName?: StringFilter<"StudentProfile"> | string
+    dni?: StringNullableFilter<"StudentProfile"> | string | null
+    birthDate?: DateTimeNullableFilter<"StudentProfile"> | Date | string | null
+    phone?: StringNullableFilter<"StudentProfile"> | string | null
+    address?: StringNullableFilter<"StudentProfile"> | string | null
+    city?: StringNullableFilter<"StudentProfile"> | string | null
+    state?: StringNullableFilter<"StudentProfile"> | string | null
+    postalCode?: StringNullableFilter<"StudentProfile"> | string | null
+    country?: StringNullableFilter<"StudentProfile"> | string | null
+    gender?: EnumGenderNullableFilter<"StudentProfile"> | $Enums.Gender | null
+    bankMandateId?: StringNullableFilter<"StudentProfile"> | string | null
     status?: EnumStudentStatusFilter<"StudentProfile"> | $Enums.StudentStatus
     emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
@@ -28106,16 +35429,23 @@ export namespace Prisma {
     attendances?: AttendanceListRelationFilter
     updateRequests?: ProfileUpdateRequestListRelationFilter
     graduationRequests?: GraduationRequestListRelationFilter
-    subscriptions?: StudentSubscriptionListRelationFilter
-    licenses?: StudentLicenseListRelationFilter
-    studentFees?: StudentFeeListRelationFilter
-    studentDiscounts?: StudentDiscountListRelationFilter
-    bankMandates?: BankMandateListRelationFilter
   }
 
   export type StudentProfileOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    dni?: SortOrderInput | SortOrder
+    birthDate?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    postalCode?: SortOrderInput | SortOrder
+    country?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
+    bankMandateId?: SortOrderInput | SortOrder
     status?: SortOrder
     emergencyContacts?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -28126,11 +35456,6 @@ export namespace Prisma {
     attendances?: AttendanceOrderByRelationAggregateInput
     updateRequests?: ProfileUpdateRequestOrderByRelationAggregateInput
     graduationRequests?: GraduationRequestOrderByRelationAggregateInput
-    subscriptions?: StudentSubscriptionOrderByRelationAggregateInput
-    licenses?: StudentLicenseOrderByRelationAggregateInput
-    studentFees?: StudentFeeOrderByRelationAggregateInput
-    studentDiscounts?: StudentDiscountOrderByRelationAggregateInput
-    bankMandates?: BankMandateOrderByRelationAggregateInput
   }
 
   export type StudentProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -28139,6 +35464,18 @@ export namespace Prisma {
     AND?: StudentProfileWhereInput | StudentProfileWhereInput[]
     OR?: StudentProfileWhereInput[]
     NOT?: StudentProfileWhereInput | StudentProfileWhereInput[]
+    firstName?: StringFilter<"StudentProfile"> | string
+    lastName?: StringFilter<"StudentProfile"> | string
+    dni?: StringNullableFilter<"StudentProfile"> | string | null
+    birthDate?: DateTimeNullableFilter<"StudentProfile"> | Date | string | null
+    phone?: StringNullableFilter<"StudentProfile"> | string | null
+    address?: StringNullableFilter<"StudentProfile"> | string | null
+    city?: StringNullableFilter<"StudentProfile"> | string | null
+    state?: StringNullableFilter<"StudentProfile"> | string | null
+    postalCode?: StringNullableFilter<"StudentProfile"> | string | null
+    country?: StringNullableFilter<"StudentProfile"> | string | null
+    gender?: EnumGenderNullableFilter<"StudentProfile"> | $Enums.Gender | null
+    bankMandateId?: StringNullableFilter<"StudentProfile"> | string | null
     status?: EnumStudentStatusFilter<"StudentProfile"> | $Enums.StudentStatus
     emergencyContacts?: JsonNullableFilter<"StudentProfile">
     createdAt?: DateTimeFilter<"StudentProfile"> | Date | string
@@ -28149,16 +35486,23 @@ export namespace Prisma {
     attendances?: AttendanceListRelationFilter
     updateRequests?: ProfileUpdateRequestListRelationFilter
     graduationRequests?: GraduationRequestListRelationFilter
-    subscriptions?: StudentSubscriptionListRelationFilter
-    licenses?: StudentLicenseListRelationFilter
-    studentFees?: StudentFeeListRelationFilter
-    studentDiscounts?: StudentDiscountListRelationFilter
-    bankMandates?: BankMandateListRelationFilter
   }, "id" | "userId">
 
   export type StudentProfileOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    dni?: SortOrderInput | SortOrder
+    birthDate?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    state?: SortOrderInput | SortOrder
+    postalCode?: SortOrderInput | SortOrder
+    country?: SortOrderInput | SortOrder
+    gender?: SortOrderInput | SortOrder
+    bankMandateId?: SortOrderInput | SortOrder
     status?: SortOrder
     emergencyContacts?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -28173,7 +35517,19 @@ export namespace Prisma {
     OR?: StudentProfileScalarWhereWithAggregatesInput[]
     NOT?: StudentProfileScalarWhereWithAggregatesInput | StudentProfileScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"StudentProfile"> | string
-    userId?: StringWithAggregatesFilter<"StudentProfile"> | string
+    userId?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    firstName?: StringWithAggregatesFilter<"StudentProfile"> | string
+    lastName?: StringWithAggregatesFilter<"StudentProfile"> | string
+    dni?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    birthDate?: DateTimeNullableWithAggregatesFilter<"StudentProfile"> | Date | string | null
+    phone?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    address?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    city?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    state?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    postalCode?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    country?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
+    gender?: EnumGenderNullableWithAggregatesFilter<"StudentProfile"> | $Enums.Gender | null
+    bankMandateId?: StringNullableWithAggregatesFilter<"StudentProfile"> | string | null
     status?: EnumStudentStatusWithAggregatesFilter<"StudentProfile"> | $Enums.StudentStatus
     emergencyContacts?: JsonNullableWithAggregatesFilter<"StudentProfile">
     createdAt?: DateTimeWithAggregatesFilter<"StudentProfile"> | Date | string
@@ -28189,6 +35545,9 @@ export namespace Prisma {
     previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
     reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    leaveReason?: EnumLeaveReasonNullableFilter<"StudentStatusHistory"> | $Enums.LeaveReason | null
+    leaveNoticeMethod?: EnumLeaveNoticeMethodNullableFilter<"StudentStatusHistory"> | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: StringNullableFilter<"StudentStatusHistory"> | string | null
     changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
@@ -28200,6 +35559,9 @@ export namespace Prisma {
     previousStatus?: SortOrderInput | SortOrder
     newStatus?: SortOrder
     reason?: SortOrderInput | SortOrder
+    leaveReason?: SortOrderInput | SortOrder
+    leaveNoticeMethod?: SortOrderInput | SortOrder
+    customReasonDetails?: SortOrderInput | SortOrder
     changedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     studentProfile?: StudentProfileOrderByWithRelationInput
@@ -28214,6 +35576,9 @@ export namespace Prisma {
     previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
     reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    leaveReason?: EnumLeaveReasonNullableFilter<"StudentStatusHistory"> | $Enums.LeaveReason | null
+    leaveNoticeMethod?: EnumLeaveNoticeMethodNullableFilter<"StudentStatusHistory"> | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: StringNullableFilter<"StudentStatusHistory"> | string | null
     changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
     studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
@@ -28225,6 +35590,9 @@ export namespace Prisma {
     previousStatus?: SortOrderInput | SortOrder
     newStatus?: SortOrder
     reason?: SortOrderInput | SortOrder
+    leaveReason?: SortOrderInput | SortOrder
+    leaveNoticeMethod?: SortOrderInput | SortOrder
+    customReasonDetails?: SortOrderInput | SortOrder
     changedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: StudentStatusHistoryCountOrderByAggregateInput
@@ -28241,6 +35609,9 @@ export namespace Prisma {
     previousStatus?: EnumStudentStatusNullableWithAggregatesFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusWithAggregatesFilter<"StudentStatusHistory"> | $Enums.StudentStatus
     reason?: StringNullableWithAggregatesFilter<"StudentStatusHistory"> | string | null
+    leaveReason?: EnumLeaveReasonNullableWithAggregatesFilter<"StudentStatusHistory"> | $Enums.LeaveReason | null
+    leaveNoticeMethod?: EnumLeaveNoticeMethodNullableWithAggregatesFilter<"StudentStatusHistory"> | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: StringNullableWithAggregatesFilter<"StudentStatusHistory"> | string | null
     changedById?: StringNullableWithAggregatesFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StudentStatusHistory"> | Date | string
   }
@@ -28345,6 +35716,7 @@ export namespace Prisma {
     NOT?: DisciplineWhereInput | DisciplineWhereInput[]
     id?: StringFilter<"Discipline"> | string
     name?: StringFilter<"Discipline"> | string
+    acronym?: StringNullableFilter<"Discipline"> | string | null
     description?: StringNullableFilter<"Discipline"> | string | null
     programs?: DisciplineProgramListRelationFilter
   }
@@ -28352,6 +35724,7 @@ export namespace Prisma {
   export type DisciplineOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    acronym?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     programs?: DisciplineProgramOrderByRelationAggregateInput
   }
@@ -28362,6 +35735,7 @@ export namespace Prisma {
     AND?: DisciplineWhereInput | DisciplineWhereInput[]
     OR?: DisciplineWhereInput[]
     NOT?: DisciplineWhereInput | DisciplineWhereInput[]
+    acronym?: StringNullableFilter<"Discipline"> | string | null
     description?: StringNullableFilter<"Discipline"> | string | null
     programs?: DisciplineProgramListRelationFilter
   }, "id" | "name">
@@ -28369,6 +35743,7 @@ export namespace Prisma {
   export type DisciplineOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
+    acronym?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     _count?: DisciplineCountOrderByAggregateInput
     _max?: DisciplineMaxOrderByAggregateInput
@@ -28381,6 +35756,7 @@ export namespace Prisma {
     NOT?: DisciplineScalarWhereWithAggregatesInput | DisciplineScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Discipline"> | string
     name?: StringWithAggregatesFilter<"Discipline"> | string
+    acronym?: StringNullableWithAggregatesFilter<"Discipline"> | string | null
     description?: StringNullableWithAggregatesFilter<"Discipline"> | string | null
   }
 
@@ -28859,7 +36235,6 @@ export namespace Prisma {
     effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
     createdAt?: DateTimeFilter<"StudentFee"> | Date | string
     updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     feeTier?: XOR<FeeTierNullableRelationFilter, FeeTierWhereInput> | null
   }
 
@@ -28873,7 +36248,6 @@ export namespace Prisma {
     effectiveTo?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    student?: StudentProfileOrderByWithRelationInput
     feeTier?: FeeTierOrderByWithRelationInput
   }
 
@@ -28890,7 +36264,6 @@ export namespace Prisma {
     effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
     createdAt?: DateTimeFilter<"StudentFee"> | Date | string
     updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     feeTier?: XOR<FeeTierNullableRelationFilter, FeeTierWhereInput> | null
   }, "id">
 
@@ -29027,7 +36400,6 @@ export namespace Prisma {
     discountId?: StringFilter<"StudentDiscount"> | string
     assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
     expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
-    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     discount?: XOR<DiscountRelationFilter, DiscountWhereInput>
   }
 
@@ -29037,7 +36409,6 @@ export namespace Prisma {
     discountId?: SortOrder
     assignedAt?: SortOrder
     expiresAt?: SortOrderInput | SortOrder
-    studentProfile?: StudentProfileOrderByWithRelationInput
     discount?: DiscountOrderByWithRelationInput
   }
 
@@ -29051,7 +36422,6 @@ export namespace Prisma {
     discountId?: StringFilter<"StudentDiscount"> | string
     assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
     expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
-    studentProfile?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     discount?: XOR<DiscountRelationFilter, DiscountWhereInput>
   }, "id" | "studentProfileId_discountId">
 
@@ -29085,7 +36455,6 @@ export namespace Prisma {
     studentProfileId?: StringFilter<"StudentSubscription"> | string
     feeTierId?: StringFilter<"StudentSubscription"> | string
     isActive?: BoolFilter<"StudentSubscription"> | boolean
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     feeTier?: XOR<FeeTierRelationFilter, FeeTierWhereInput>
   }
 
@@ -29094,7 +36463,6 @@ export namespace Prisma {
     studentProfileId?: SortOrder
     feeTierId?: SortOrder
     isActive?: SortOrder
-    student?: StudentProfileOrderByWithRelationInput
     feeTier?: FeeTierOrderByWithRelationInput
   }
 
@@ -29106,7 +36474,6 @@ export namespace Prisma {
     studentProfileId?: StringFilter<"StudentSubscription"> | string
     feeTierId?: StringFilter<"StudentSubscription"> | string
     isActive?: BoolFilter<"StudentSubscription"> | boolean
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     feeTier?: XOR<FeeTierRelationFilter, FeeTierWhereInput>
   }, "id">
 
@@ -29309,34 +36676,138 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"CashTransaction"> | Date | string
   }
 
+  export type TenantFinancialConfigWhereInput = {
+    AND?: TenantFinancialConfigWhereInput | TenantFinancialConfigWhereInput[]
+    OR?: TenantFinancialConfigWhereInput[]
+    NOT?: TenantFinancialConfigWhereInput | TenantFinancialConfigWhereInput[]
+    id?: StringFilter<"TenantFinancialConfig"> | string
+    tenantId?: StringFilter<"TenantFinancialConfig"> | string
+    legalName?: StringFilter<"TenantFinancialConfig"> | string
+    taxId?: StringFilter<"TenantFinancialConfig"> | string
+    address?: StringFilter<"TenantFinancialConfig"> | string
+    city?: StringFilter<"TenantFinancialConfig"> | string
+    postalCode?: StringFilter<"TenantFinancialConfig"> | string
+    country?: StringFilter<"TenantFinancialConfig"> | string
+    creditorId?: StringFilter<"TenantFinancialConfig"> | string
+    iban?: StringFilter<"TenantFinancialConfig"> | string
+    bic?: StringNullableFilter<"TenantFinancialConfig"> | string | null
+    createdAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
+  }
+
+  export type TenantFinancialConfigOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    taxId?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    creditorId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TenantFinancialConfigWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId?: string
+    AND?: TenantFinancialConfigWhereInput | TenantFinancialConfigWhereInput[]
+    OR?: TenantFinancialConfigWhereInput[]
+    NOT?: TenantFinancialConfigWhereInput | TenantFinancialConfigWhereInput[]
+    legalName?: StringFilter<"TenantFinancialConfig"> | string
+    taxId?: StringFilter<"TenantFinancialConfig"> | string
+    address?: StringFilter<"TenantFinancialConfig"> | string
+    city?: StringFilter<"TenantFinancialConfig"> | string
+    postalCode?: StringFilter<"TenantFinancialConfig"> | string
+    country?: StringFilter<"TenantFinancialConfig"> | string
+    creditorId?: StringFilter<"TenantFinancialConfig"> | string
+    iban?: StringFilter<"TenantFinancialConfig"> | string
+    bic?: StringNullableFilter<"TenantFinancialConfig"> | string | null
+    createdAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
+    updatedAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
+  }, "id" | "tenantId">
+
+  export type TenantFinancialConfigOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    taxId?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    creditorId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: TenantFinancialConfigCountOrderByAggregateInput
+    _max?: TenantFinancialConfigMaxOrderByAggregateInput
+    _min?: TenantFinancialConfigMinOrderByAggregateInput
+  }
+
+  export type TenantFinancialConfigScalarWhereWithAggregatesInput = {
+    AND?: TenantFinancialConfigScalarWhereWithAggregatesInput | TenantFinancialConfigScalarWhereWithAggregatesInput[]
+    OR?: TenantFinancialConfigScalarWhereWithAggregatesInput[]
+    NOT?: TenantFinancialConfigScalarWhereWithAggregatesInput | TenantFinancialConfigScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    tenantId?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    legalName?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    taxId?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    address?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    city?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    postalCode?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    country?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    creditorId?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    iban?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
+    bic?: StringNullableWithAggregatesFilter<"TenantFinancialConfig"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TenantFinancialConfig"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"TenantFinancialConfig"> | Date | string
+  }
+
   export type BankMandateWhereInput = {
     AND?: BankMandateWhereInput | BankMandateWhereInput[]
     OR?: BankMandateWhereInput[]
     NOT?: BankMandateWhereInput | BankMandateWhereInput[]
     id?: StringFilter<"BankMandate"> | string
-    studentProfileId?: StringFilter<"BankMandate"> | string
+    payerUserId?: StringFilter<"BankMandate"> | string
     iban?: StringFilter<"BankMandate"> | string
     bic?: StringNullableFilter<"BankMandate"> | string | null
     mandateReference?: StringFilter<"BankMandate"> | string
     signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
+    accountHolderName?: StringFilter<"BankMandate"> | string
+    accountHolderDni?: StringFilter<"BankMandate"> | string
+    tenantId?: StringFilter<"BankMandate"> | string
+    isSigned?: BoolFilter<"BankMandate"> | boolean
+    signedAt?: DateTimeNullableFilter<"BankMandate"> | Date | string | null
+    signedByUserId?: StringNullableFilter<"BankMandate"> | string | null
+    signatureIp?: StringNullableFilter<"BankMandate"> | string | null
     isActive?: BoolFilter<"BankMandate"> | boolean
     createdAt?: DateTimeFilter<"BankMandate"> | Date | string
     updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     remittanceItems?: RemittanceItemListRelationFilter
   }
 
   export type BankMandateOrderByWithRelationInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
+    payerUserId?: SortOrder
     iban?: SortOrder
     bic?: SortOrderInput | SortOrder
     mandateReference?: SortOrder
     signatureDate?: SortOrder
+    accountHolderName?: SortOrder
+    accountHolderDni?: SortOrder
+    tenantId?: SortOrder
+    isSigned?: SortOrder
+    signedAt?: SortOrderInput | SortOrder
+    signedByUserId?: SortOrderInput | SortOrder
+    signatureIp?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    student?: StudentProfileOrderByWithRelationInput
     remittanceItems?: RemittanceItemOrderByRelationAggregateInput
   }
 
@@ -29346,24 +36817,37 @@ export namespace Prisma {
     AND?: BankMandateWhereInput | BankMandateWhereInput[]
     OR?: BankMandateWhereInput[]
     NOT?: BankMandateWhereInput | BankMandateWhereInput[]
-    studentProfileId?: StringFilter<"BankMandate"> | string
+    payerUserId?: StringFilter<"BankMandate"> | string
     iban?: StringFilter<"BankMandate"> | string
     bic?: StringNullableFilter<"BankMandate"> | string | null
     signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
+    accountHolderName?: StringFilter<"BankMandate"> | string
+    accountHolderDni?: StringFilter<"BankMandate"> | string
+    tenantId?: StringFilter<"BankMandate"> | string
+    isSigned?: BoolFilter<"BankMandate"> | boolean
+    signedAt?: DateTimeNullableFilter<"BankMandate"> | Date | string | null
+    signedByUserId?: StringNullableFilter<"BankMandate"> | string | null
+    signatureIp?: StringNullableFilter<"BankMandate"> | string | null
     isActive?: BoolFilter<"BankMandate"> | boolean
     createdAt?: DateTimeFilter<"BankMandate"> | Date | string
     updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
     remittanceItems?: RemittanceItemListRelationFilter
   }, "id" | "mandateReference">
 
   export type BankMandateOrderByWithAggregationInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
+    payerUserId?: SortOrder
     iban?: SortOrder
     bic?: SortOrderInput | SortOrder
     mandateReference?: SortOrder
     signatureDate?: SortOrder
+    accountHolderName?: SortOrder
+    accountHolderDni?: SortOrder
+    tenantId?: SortOrder
+    isSigned?: SortOrder
+    signedAt?: SortOrderInput | SortOrder
+    signedByUserId?: SortOrderInput | SortOrder
+    signatureIp?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29377,11 +36861,18 @@ export namespace Prisma {
     OR?: BankMandateScalarWhereWithAggregatesInput[]
     NOT?: BankMandateScalarWhereWithAggregatesInput | BankMandateScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"BankMandate"> | string
-    studentProfileId?: StringWithAggregatesFilter<"BankMandate"> | string
+    payerUserId?: StringWithAggregatesFilter<"BankMandate"> | string
     iban?: StringWithAggregatesFilter<"BankMandate"> | string
     bic?: StringNullableWithAggregatesFilter<"BankMandate"> | string | null
     mandateReference?: StringWithAggregatesFilter<"BankMandate"> | string
     signatureDate?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
+    accountHolderName?: StringWithAggregatesFilter<"BankMandate"> | string
+    accountHolderDni?: StringWithAggregatesFilter<"BankMandate"> | string
+    tenantId?: StringWithAggregatesFilter<"BankMandate"> | string
+    isSigned?: BoolWithAggregatesFilter<"BankMandate"> | boolean
+    signedAt?: DateTimeNullableWithAggregatesFilter<"BankMandate"> | Date | string | null
+    signedByUserId?: StringNullableWithAggregatesFilter<"BankMandate"> | string | null
+    signatureIp?: StringNullableWithAggregatesFilter<"BankMandate"> | string | null
     isActive?: BoolWithAggregatesFilter<"BankMandate"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"BankMandate"> | Date | string
@@ -29549,16 +37040,34 @@ export namespace Prisma {
     OR?: FederationWhereInput[]
     NOT?: FederationWhereInput | FederationWhereInput[]
     id?: StringFilter<"Federation"> | string
+    tenantId?: StringFilter<"Federation"> | string
     name?: StringFilter<"Federation"> | string
+    acronym?: StringFilter<"Federation"> | string
     country?: StringFilter<"Federation"> | string
-    licenses?: StudentLicenseListRelationFilter
+    email?: StringFilter<"Federation"> | string
+    isActive?: BoolFilter<"Federation"> | boolean
+    deletedAt?: DateTimeNullableFilter<"Federation"> | Date | string | null
+    createdAt?: DateTimeFilter<"Federation"> | Date | string
+    updatedAt?: DateTimeFilter<"Federation"> | Date | string
+    charges?: FederationSeasonChargeListRelationFilter
+    contacts?: FederationContactListRelationFilter
+    seasons?: FederationSeasonListRelationFilter
   }
 
   export type FederationOrderByWithRelationInput = {
     id?: SortOrder
+    tenantId?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     country?: SortOrder
-    licenses?: StudentLicenseOrderByRelationAggregateInput
+    email?: SortOrder
+    isActive?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    charges?: FederationSeasonChargeOrderByRelationAggregateInput
+    contacts?: FederationContactOrderByRelationAggregateInput
+    seasons?: FederationSeasonOrderByRelationAggregateInput
   }
 
   export type FederationWhereUniqueInput = Prisma.AtLeast<{
@@ -29566,15 +37075,31 @@ export namespace Prisma {
     AND?: FederationWhereInput | FederationWhereInput[]
     OR?: FederationWhereInput[]
     NOT?: FederationWhereInput | FederationWhereInput[]
+    tenantId?: StringFilter<"Federation"> | string
     name?: StringFilter<"Federation"> | string
+    acronym?: StringFilter<"Federation"> | string
     country?: StringFilter<"Federation"> | string
-    licenses?: StudentLicenseListRelationFilter
+    email?: StringFilter<"Federation"> | string
+    isActive?: BoolFilter<"Federation"> | boolean
+    deletedAt?: DateTimeNullableFilter<"Federation"> | Date | string | null
+    createdAt?: DateTimeFilter<"Federation"> | Date | string
+    updatedAt?: DateTimeFilter<"Federation"> | Date | string
+    charges?: FederationSeasonChargeListRelationFilter
+    contacts?: FederationContactListRelationFilter
+    seasons?: FederationSeasonListRelationFilter
   }, "id">
 
   export type FederationOrderByWithAggregationInput = {
     id?: SortOrder
+    tenantId?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     country?: SortOrder
+    email?: SortOrder
+    isActive?: SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: FederationCountOrderByAggregateInput
     _max?: FederationMaxOrderByAggregateInput
     _min?: FederationMinOrderByAggregateInput
@@ -29585,71 +37110,526 @@ export namespace Prisma {
     OR?: FederationScalarWhereWithAggregatesInput[]
     NOT?: FederationScalarWhereWithAggregatesInput | FederationScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Federation"> | string
+    tenantId?: StringWithAggregatesFilter<"Federation"> | string
     name?: StringWithAggregatesFilter<"Federation"> | string
+    acronym?: StringWithAggregatesFilter<"Federation"> | string
     country?: StringWithAggregatesFilter<"Federation"> | string
+    email?: StringWithAggregatesFilter<"Federation"> | string
+    isActive?: BoolWithAggregatesFilter<"Federation"> | boolean
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"Federation"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Federation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Federation"> | Date | string
   }
 
-  export type StudentLicenseWhereInput = {
-    AND?: StudentLicenseWhereInput | StudentLicenseWhereInput[]
-    OR?: StudentLicenseWhereInput[]
-    NOT?: StudentLicenseWhereInput | StudentLicenseWhereInput[]
-    id?: StringFilter<"StudentLicense"> | string
-    studentProfileId?: StringFilter<"StudentLicense"> | string
-    federationId?: StringFilter<"StudentLicense"> | string
-    licenseNumber?: StringFilter<"StudentLicense"> | string
-    validUntil?: DateTimeFilter<"StudentLicense"> | Date | string
-    isActive?: BoolFilter<"StudentLicense"> | boolean
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+  export type FederationContactWhereInput = {
+    AND?: FederationContactWhereInput | FederationContactWhereInput[]
+    OR?: FederationContactWhereInput[]
+    NOT?: FederationContactWhereInput | FederationContactWhereInput[]
+    id?: StringFilter<"FederationContact"> | string
+    federationId?: StringFilter<"FederationContact"> | string
+    medium?: EnumFederationContactMediumFilter<"FederationContact"> | $Enums.FederationContactMedium
+    value?: StringFilter<"FederationContact"> | string
+    tag?: StringFilter<"FederationContact"> | string
+    createdAt?: DateTimeFilter<"FederationContact"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationContact"> | Date | string
     federation?: XOR<FederationRelationFilter, FederationWhereInput>
   }
 
-  export type StudentLicenseOrderByWithRelationInput = {
+  export type FederationContactOrderByWithRelationInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
     federationId?: SortOrder
-    licenseNumber?: SortOrder
-    validUntil?: SortOrder
-    isActive?: SortOrder
-    student?: StudentProfileOrderByWithRelationInput
+    medium?: SortOrder
+    value?: SortOrder
+    tag?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
     federation?: FederationOrderByWithRelationInput
   }
 
-  export type StudentLicenseWhereUniqueInput = Prisma.AtLeast<{
+  export type FederationContactWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    AND?: StudentLicenseWhereInput | StudentLicenseWhereInput[]
-    OR?: StudentLicenseWhereInput[]
-    NOT?: StudentLicenseWhereInput | StudentLicenseWhereInput[]
-    studentProfileId?: StringFilter<"StudentLicense"> | string
-    federationId?: StringFilter<"StudentLicense"> | string
-    licenseNumber?: StringFilter<"StudentLicense"> | string
-    validUntil?: DateTimeFilter<"StudentLicense"> | Date | string
-    isActive?: BoolFilter<"StudentLicense"> | boolean
-    student?: XOR<StudentProfileRelationFilter, StudentProfileWhereInput>
+    AND?: FederationContactWhereInput | FederationContactWhereInput[]
+    OR?: FederationContactWhereInput[]
+    NOT?: FederationContactWhereInput | FederationContactWhereInput[]
+    federationId?: StringFilter<"FederationContact"> | string
+    medium?: EnumFederationContactMediumFilter<"FederationContact"> | $Enums.FederationContactMedium
+    value?: StringFilter<"FederationContact"> | string
+    tag?: StringFilter<"FederationContact"> | string
+    createdAt?: DateTimeFilter<"FederationContact"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationContact"> | Date | string
     federation?: XOR<FederationRelationFilter, FederationWhereInput>
   }, "id">
 
-  export type StudentLicenseOrderByWithAggregationInput = {
+  export type FederationContactOrderByWithAggregationInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
     federationId?: SortOrder
-    licenseNumber?: SortOrder
-    validUntil?: SortOrder
-    isActive?: SortOrder
-    _count?: StudentLicenseCountOrderByAggregateInput
-    _max?: StudentLicenseMaxOrderByAggregateInput
-    _min?: StudentLicenseMinOrderByAggregateInput
+    medium?: SortOrder
+    value?: SortOrder
+    tag?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FederationContactCountOrderByAggregateInput
+    _max?: FederationContactMaxOrderByAggregateInput
+    _min?: FederationContactMinOrderByAggregateInput
   }
 
-  export type StudentLicenseScalarWhereWithAggregatesInput = {
-    AND?: StudentLicenseScalarWhereWithAggregatesInput | StudentLicenseScalarWhereWithAggregatesInput[]
-    OR?: StudentLicenseScalarWhereWithAggregatesInput[]
-    NOT?: StudentLicenseScalarWhereWithAggregatesInput | StudentLicenseScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StudentLicense"> | string
-    studentProfileId?: StringWithAggregatesFilter<"StudentLicense"> | string
-    federationId?: StringWithAggregatesFilter<"StudentLicense"> | string
-    licenseNumber?: StringWithAggregatesFilter<"StudentLicense"> | string
-    validUntil?: DateTimeWithAggregatesFilter<"StudentLicense"> | Date | string
-    isActive?: BoolWithAggregatesFilter<"StudentLicense"> | boolean
+  export type FederationContactScalarWhereWithAggregatesInput = {
+    AND?: FederationContactScalarWhereWithAggregatesInput | FederationContactScalarWhereWithAggregatesInput[]
+    OR?: FederationContactScalarWhereWithAggregatesInput[]
+    NOT?: FederationContactScalarWhereWithAggregatesInput | FederationContactScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FederationContact"> | string
+    federationId?: StringWithAggregatesFilter<"FederationContact"> | string
+    medium?: EnumFederationContactMediumWithAggregatesFilter<"FederationContact"> | $Enums.FederationContactMedium
+    value?: StringWithAggregatesFilter<"FederationContact"> | string
+    tag?: StringWithAggregatesFilter<"FederationContact"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"FederationContact"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FederationContact"> | Date | string
+  }
+
+  export type FederationSeasonWhereInput = {
+    AND?: FederationSeasonWhereInput | FederationSeasonWhereInput[]
+    OR?: FederationSeasonWhereInput[]
+    NOT?: FederationSeasonWhereInput | FederationSeasonWhereInput[]
+    id?: StringFilter<"FederationSeason"> | string
+    federationId?: StringFilter<"FederationSeason"> | string
+    seasonName?: StringFilter<"FederationSeason"> | string
+    currency?: StringFilter<"FederationSeason"> | string
+    clubCost?: DecimalFilter<"FederationSeason"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFilter<"FederationSeason"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeason"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeason"> | Date | string
+    federation?: XOR<FederationRelationFilter, FederationWhereInput>
+    licenseTypes?: FederationLicenseTypeListRelationFilter
+  }
+
+  export type FederationSeasonOrderByWithRelationInput = {
+    id?: SortOrder
+    federationId?: SortOrder
+    seasonName?: SortOrder
+    currency?: SortOrder
+    clubCost?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    federation?: FederationOrderByWithRelationInput
+    licenseTypes?: FederationLicenseTypeOrderByRelationAggregateInput
+  }
+
+  export type FederationSeasonWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    federationId_seasonName?: FederationSeasonFederationIdSeasonNameCompoundUniqueInput
+    AND?: FederationSeasonWhereInput | FederationSeasonWhereInput[]
+    OR?: FederationSeasonWhereInput[]
+    NOT?: FederationSeasonWhereInput | FederationSeasonWhereInput[]
+    federationId?: StringFilter<"FederationSeason"> | string
+    seasonName?: StringFilter<"FederationSeason"> | string
+    currency?: StringFilter<"FederationSeason"> | string
+    clubCost?: DecimalFilter<"FederationSeason"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFilter<"FederationSeason"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeason"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeason"> | Date | string
+    federation?: XOR<FederationRelationFilter, FederationWhereInput>
+    licenseTypes?: FederationLicenseTypeListRelationFilter
+  }, "id" | "federationId_seasonName">
+
+  export type FederationSeasonOrderByWithAggregationInput = {
+    id?: SortOrder
+    federationId?: SortOrder
+    seasonName?: SortOrder
+    currency?: SortOrder
+    clubCost?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FederationSeasonCountOrderByAggregateInput
+    _avg?: FederationSeasonAvgOrderByAggregateInput
+    _max?: FederationSeasonMaxOrderByAggregateInput
+    _min?: FederationSeasonMinOrderByAggregateInput
+    _sum?: FederationSeasonSumOrderByAggregateInput
+  }
+
+  export type FederationSeasonScalarWhereWithAggregatesInput = {
+    AND?: FederationSeasonScalarWhereWithAggregatesInput | FederationSeasonScalarWhereWithAggregatesInput[]
+    OR?: FederationSeasonScalarWhereWithAggregatesInput[]
+    NOT?: FederationSeasonScalarWhereWithAggregatesInput | FederationSeasonScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FederationSeason"> | string
+    federationId?: StringWithAggregatesFilter<"FederationSeason"> | string
+    seasonName?: StringWithAggregatesFilter<"FederationSeason"> | string
+    currency?: StringWithAggregatesFilter<"FederationSeason"> | string
+    clubCost?: DecimalWithAggregatesFilter<"FederationSeason"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolWithAggregatesFilter<"FederationSeason"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"FederationSeason"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FederationSeason"> | Date | string
+  }
+
+  export type FederationLicenseTypeWhereInput = {
+    AND?: FederationLicenseTypeWhereInput | FederationLicenseTypeWhereInput[]
+    OR?: FederationLicenseTypeWhereInput[]
+    NOT?: FederationLicenseTypeWhereInput | FederationLicenseTypeWhereInput[]
+    id?: StringFilter<"FederationLicenseType"> | string
+    seasonId?: StringFilter<"FederationLicenseType"> | string
+    name?: StringFilter<"FederationLicenseType"> | string
+    isActive?: BoolFilter<"FederationLicenseType"> | boolean
+    createdAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+    season?: XOR<FederationSeasonRelationFilter, FederationSeasonWhereInput>
+    priceRows?: FederationLicensePriceRowListRelationFilter
+  }
+
+  export type FederationLicenseTypeOrderByWithRelationInput = {
+    id?: SortOrder
+    seasonId?: SortOrder
+    name?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    season?: FederationSeasonOrderByWithRelationInput
+    priceRows?: FederationLicensePriceRowOrderByRelationAggregateInput
+  }
+
+  export type FederationLicenseTypeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    seasonId_name?: FederationLicenseTypeSeasonIdNameCompoundUniqueInput
+    AND?: FederationLicenseTypeWhereInput | FederationLicenseTypeWhereInput[]
+    OR?: FederationLicenseTypeWhereInput[]
+    NOT?: FederationLicenseTypeWhereInput | FederationLicenseTypeWhereInput[]
+    seasonId?: StringFilter<"FederationLicenseType"> | string
+    name?: StringFilter<"FederationLicenseType"> | string
+    isActive?: BoolFilter<"FederationLicenseType"> | boolean
+    createdAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+    season?: XOR<FederationSeasonRelationFilter, FederationSeasonWhereInput>
+    priceRows?: FederationLicensePriceRowListRelationFilter
+  }, "id" | "seasonId_name">
+
+  export type FederationLicenseTypeOrderByWithAggregationInput = {
+    id?: SortOrder
+    seasonId?: SortOrder
+    name?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FederationLicenseTypeCountOrderByAggregateInput
+    _max?: FederationLicenseTypeMaxOrderByAggregateInput
+    _min?: FederationLicenseTypeMinOrderByAggregateInput
+  }
+
+  export type FederationLicenseTypeScalarWhereWithAggregatesInput = {
+    AND?: FederationLicenseTypeScalarWhereWithAggregatesInput | FederationLicenseTypeScalarWhereWithAggregatesInput[]
+    OR?: FederationLicenseTypeScalarWhereWithAggregatesInput[]
+    NOT?: FederationLicenseTypeScalarWhereWithAggregatesInput | FederationLicenseTypeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FederationLicenseType"> | string
+    seasonId?: StringWithAggregatesFilter<"FederationLicenseType"> | string
+    name?: StringWithAggregatesFilter<"FederationLicenseType"> | string
+    isActive?: BoolWithAggregatesFilter<"FederationLicenseType"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"FederationLicenseType"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FederationLicenseType"> | Date | string
+  }
+
+  export type FederationLicensePriceRowWhereInput = {
+    AND?: FederationLicensePriceRowWhereInput | FederationLicensePriceRowWhereInput[]
+    OR?: FederationLicensePriceRowWhereInput[]
+    NOT?: FederationLicensePriceRowWhereInput | FederationLicensePriceRowWhereInput[]
+    id?: StringFilter<"FederationLicensePriceRow"> | string
+    licenseTypeId?: StringFilter<"FederationLicensePriceRow"> | string
+    kind?: EnumLicensePriceRowKindFilter<"FederationLicensePriceRow"> | $Enums.LicensePriceRowKind
+    label?: StringFilter<"FederationLicensePriceRow"> | string
+    birthYearFrom?: IntNullableFilter<"FederationLicensePriceRow"> | number | null
+    cost?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFilter<"FederationLicensePriceRow"> | number
+    createdAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+    licenseType?: XOR<FederationLicenseTypeRelationFilter, FederationLicenseTypeWhereInput>
+  }
+
+  export type FederationLicensePriceRowOrderByWithRelationInput = {
+    id?: SortOrder
+    licenseTypeId?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    birthYearFrom?: SortOrderInput | SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    licenseType?: FederationLicenseTypeOrderByWithRelationInput
+  }
+
+  export type FederationLicensePriceRowWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FederationLicensePriceRowWhereInput | FederationLicensePriceRowWhereInput[]
+    OR?: FederationLicensePriceRowWhereInput[]
+    NOT?: FederationLicensePriceRowWhereInput | FederationLicensePriceRowWhereInput[]
+    licenseTypeId?: StringFilter<"FederationLicensePriceRow"> | string
+    kind?: EnumLicensePriceRowKindFilter<"FederationLicensePriceRow"> | $Enums.LicensePriceRowKind
+    label?: StringFilter<"FederationLicensePriceRow"> | string
+    birthYearFrom?: IntNullableFilter<"FederationLicensePriceRow"> | number | null
+    cost?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFilter<"FederationLicensePriceRow"> | number
+    createdAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+    licenseType?: XOR<FederationLicenseTypeRelationFilter, FederationLicenseTypeWhereInput>
+  }, "id">
+
+  export type FederationLicensePriceRowOrderByWithAggregationInput = {
+    id?: SortOrder
+    licenseTypeId?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    birthYearFrom?: SortOrderInput | SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FederationLicensePriceRowCountOrderByAggregateInput
+    _avg?: FederationLicensePriceRowAvgOrderByAggregateInput
+    _max?: FederationLicensePriceRowMaxOrderByAggregateInput
+    _min?: FederationLicensePriceRowMinOrderByAggregateInput
+    _sum?: FederationLicensePriceRowSumOrderByAggregateInput
+  }
+
+  export type FederationLicensePriceRowScalarWhereWithAggregatesInput = {
+    AND?: FederationLicensePriceRowScalarWhereWithAggregatesInput | FederationLicensePriceRowScalarWhereWithAggregatesInput[]
+    OR?: FederationLicensePriceRowScalarWhereWithAggregatesInput[]
+    NOT?: FederationLicensePriceRowScalarWhereWithAggregatesInput | FederationLicensePriceRowScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FederationLicensePriceRow"> | string
+    licenseTypeId?: StringWithAggregatesFilter<"FederationLicensePriceRow"> | string
+    kind?: EnumLicensePriceRowKindWithAggregatesFilter<"FederationLicensePriceRow"> | $Enums.LicensePriceRowKind
+    label?: StringWithAggregatesFilter<"FederationLicensePriceRow"> | string
+    birthYearFrom?: IntNullableWithAggregatesFilter<"FederationLicensePriceRow"> | number | null
+    cost?: DecimalWithAggregatesFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalWithAggregatesFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalWithAggregatesFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntWithAggregatesFilter<"FederationLicensePriceRow"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"FederationLicensePriceRow"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FederationLicensePriceRow"> | Date | string
+  }
+
+  export type FederationSeasonChargeWhereInput = {
+    AND?: FederationSeasonChargeWhereInput | FederationSeasonChargeWhereInput[]
+    OR?: FederationSeasonChargeWhereInput[]
+    NOT?: FederationSeasonChargeWhereInput | FederationSeasonChargeWhereInput[]
+    id?: StringFilter<"FederationSeasonCharge"> | string
+    tenantId?: StringFilter<"FederationSeasonCharge"> | string
+    federationId?: StringFilter<"FederationSeasonCharge"> | string
+    season?: StringFilter<"FederationSeasonCharge"> | string
+    holderType?: EnumLicenseHolderTypeFilter<"FederationSeasonCharge"> | $Enums.LicenseHolderType
+    holderUserId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    studentProfileId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    licenseId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    costAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"FederationSeasonCharge"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+    federation?: XOR<FederationRelationFilter, FederationWhereInput>
+  }
+
+  export type FederationSeasonChargeOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    federationId?: SortOrder
+    season?: SortOrder
+    holderType?: SortOrder
+    holderUserId?: SortOrderInput | SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    licenseId?: SortOrderInput | SortOrder
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    federation?: FederationOrderByWithRelationInput
+  }
+
+  export type FederationSeasonChargeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId_federationId_season_holderType_holderUserId?: FederationSeasonChargeTenantIdFederationIdSeasonHolderTypeHolderUserIdCompoundUniqueInput
+    AND?: FederationSeasonChargeWhereInput | FederationSeasonChargeWhereInput[]
+    OR?: FederationSeasonChargeWhereInput[]
+    NOT?: FederationSeasonChargeWhereInput | FederationSeasonChargeWhereInput[]
+    tenantId?: StringFilter<"FederationSeasonCharge"> | string
+    federationId?: StringFilter<"FederationSeasonCharge"> | string
+    season?: StringFilter<"FederationSeasonCharge"> | string
+    holderType?: EnumLicenseHolderTypeFilter<"FederationSeasonCharge"> | $Enums.LicenseHolderType
+    holderUserId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    studentProfileId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    licenseId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    costAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"FederationSeasonCharge"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+    federation?: XOR<FederationRelationFilter, FederationWhereInput>
+  }, "id" | "tenantId_federationId_season_holderType_holderUserId">
+
+  export type FederationSeasonChargeOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    federationId?: SortOrder
+    season?: SortOrder
+    holderType?: SortOrder
+    holderUserId?: SortOrderInput | SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    licenseId?: SortOrderInput | SortOrder
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FederationSeasonChargeCountOrderByAggregateInput
+    _avg?: FederationSeasonChargeAvgOrderByAggregateInput
+    _max?: FederationSeasonChargeMaxOrderByAggregateInput
+    _min?: FederationSeasonChargeMinOrderByAggregateInput
+    _sum?: FederationSeasonChargeSumOrderByAggregateInput
+  }
+
+  export type FederationSeasonChargeScalarWhereWithAggregatesInput = {
+    AND?: FederationSeasonChargeScalarWhereWithAggregatesInput | FederationSeasonChargeScalarWhereWithAggregatesInput[]
+    OR?: FederationSeasonChargeScalarWhereWithAggregatesInput[]
+    NOT?: FederationSeasonChargeScalarWhereWithAggregatesInput | FederationSeasonChargeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FederationSeasonCharge"> | string
+    tenantId?: StringWithAggregatesFilter<"FederationSeasonCharge"> | string
+    federationId?: StringWithAggregatesFilter<"FederationSeasonCharge"> | string
+    season?: StringWithAggregatesFilter<"FederationSeasonCharge"> | string
+    holderType?: EnumLicenseHolderTypeWithAggregatesFilter<"FederationSeasonCharge"> | $Enums.LicenseHolderType
+    holderUserId?: StringNullableWithAggregatesFilter<"FederationSeasonCharge"> | string | null
+    studentProfileId?: StringNullableWithAggregatesFilter<"FederationSeasonCharge"> | string | null
+    licenseId?: StringNullableWithAggregatesFilter<"FederationSeasonCharge"> | string | null
+    costAmount?: DecimalWithAggregatesFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalWithAggregatesFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolWithAggregatesFilter<"FederationSeasonCharge"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"FederationSeasonCharge"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FederationSeasonCharge"> | Date | string
+  }
+
+  export type AffiliationLicenseWhereInput = {
+    AND?: AffiliationLicenseWhereInput | AffiliationLicenseWhereInput[]
+    OR?: AffiliationLicenseWhereInput[]
+    NOT?: AffiliationLicenseWhereInput | AffiliationLicenseWhereInput[]
+    id?: StringFilter<"AffiliationLicense"> | string
+    tenantId?: StringFilter<"AffiliationLicense"> | string
+    studentProfileId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    holderUserId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    holderType?: EnumLicenseHolderTypeFilter<"AffiliationLicense"> | $Enums.LicenseHolderType
+    federationId?: StringFilter<"AffiliationLicense"> | string
+    licenseTypeId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    licenseNumber?: StringFilter<"AffiliationLicense"> | string
+    season?: StringFilter<"AffiliationLicense"> | string
+    validUntil?: DateTimeFilter<"AffiliationLicense"> | Date | string
+    isActive?: BoolFilter<"AffiliationLicense"> | boolean
+    isPaid?: BoolFilter<"AffiliationLicense"> | boolean
+    amountCharged?: DecimalFilter<"AffiliationLicense"> | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFilter<"AffiliationLicense"> | $Enums.AffiliationLicenseStatus
+    payerUserId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    isExempt?: BoolFilter<"AffiliationLicense"> | boolean
+    createdAt?: DateTimeFilter<"AffiliationLicense"> | Date | string
+    updatedAt?: DateTimeFilter<"AffiliationLicense"> | Date | string
+  }
+
+  export type AffiliationLicenseOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    holderUserId?: SortOrderInput | SortOrder
+    holderType?: SortOrder
+    federationId?: SortOrder
+    licenseTypeId?: SortOrderInput | SortOrder
+    licenseNumber?: SortOrder
+    season?: SortOrder
+    validUntil?: SortOrder
+    isActive?: SortOrder
+    isPaid?: SortOrder
+    amountCharged?: SortOrder
+    status?: SortOrder
+    payerUserId?: SortOrderInput | SortOrder
+    isExempt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AffiliationLicenseWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId_federationId_holderUserId_season?: AffiliationLicenseTenantIdFederationIdHolderUserIdSeasonCompoundUniqueInput
+    tenantId_federationId_studentProfileId_season?: AffiliationLicenseTenantIdFederationIdStudentProfileIdSeasonCompoundUniqueInput
+    AND?: AffiliationLicenseWhereInput | AffiliationLicenseWhereInput[]
+    OR?: AffiliationLicenseWhereInput[]
+    NOT?: AffiliationLicenseWhereInput | AffiliationLicenseWhereInput[]
+    tenantId?: StringFilter<"AffiliationLicense"> | string
+    studentProfileId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    holderUserId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    holderType?: EnumLicenseHolderTypeFilter<"AffiliationLicense"> | $Enums.LicenseHolderType
+    federationId?: StringFilter<"AffiliationLicense"> | string
+    licenseTypeId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    licenseNumber?: StringFilter<"AffiliationLicense"> | string
+    season?: StringFilter<"AffiliationLicense"> | string
+    validUntil?: DateTimeFilter<"AffiliationLicense"> | Date | string
+    isActive?: BoolFilter<"AffiliationLicense"> | boolean
+    isPaid?: BoolFilter<"AffiliationLicense"> | boolean
+    amountCharged?: DecimalFilter<"AffiliationLicense"> | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFilter<"AffiliationLicense"> | $Enums.AffiliationLicenseStatus
+    payerUserId?: StringNullableFilter<"AffiliationLicense"> | string | null
+    isExempt?: BoolFilter<"AffiliationLicense"> | boolean
+    createdAt?: DateTimeFilter<"AffiliationLicense"> | Date | string
+    updatedAt?: DateTimeFilter<"AffiliationLicense"> | Date | string
+  }, "id" | "tenantId_federationId_holderUserId_season" | "tenantId_federationId_studentProfileId_season">
+
+  export type AffiliationLicenseOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    studentProfileId?: SortOrderInput | SortOrder
+    holderUserId?: SortOrderInput | SortOrder
+    holderType?: SortOrder
+    federationId?: SortOrder
+    licenseTypeId?: SortOrderInput | SortOrder
+    licenseNumber?: SortOrder
+    season?: SortOrder
+    validUntil?: SortOrder
+    isActive?: SortOrder
+    isPaid?: SortOrder
+    amountCharged?: SortOrder
+    status?: SortOrder
+    payerUserId?: SortOrderInput | SortOrder
+    isExempt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AffiliationLicenseCountOrderByAggregateInput
+    _avg?: AffiliationLicenseAvgOrderByAggregateInput
+    _max?: AffiliationLicenseMaxOrderByAggregateInput
+    _min?: AffiliationLicenseMinOrderByAggregateInput
+    _sum?: AffiliationLicenseSumOrderByAggregateInput
+  }
+
+  export type AffiliationLicenseScalarWhereWithAggregatesInput = {
+    AND?: AffiliationLicenseScalarWhereWithAggregatesInput | AffiliationLicenseScalarWhereWithAggregatesInput[]
+    OR?: AffiliationLicenseScalarWhereWithAggregatesInput[]
+    NOT?: AffiliationLicenseScalarWhereWithAggregatesInput | AffiliationLicenseScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AffiliationLicense"> | string
+    tenantId?: StringWithAggregatesFilter<"AffiliationLicense"> | string
+    studentProfileId?: StringNullableWithAggregatesFilter<"AffiliationLicense"> | string | null
+    holderUserId?: StringNullableWithAggregatesFilter<"AffiliationLicense"> | string | null
+    holderType?: EnumLicenseHolderTypeWithAggregatesFilter<"AffiliationLicense"> | $Enums.LicenseHolderType
+    federationId?: StringWithAggregatesFilter<"AffiliationLicense"> | string
+    licenseTypeId?: StringNullableWithAggregatesFilter<"AffiliationLicense"> | string | null
+    licenseNumber?: StringWithAggregatesFilter<"AffiliationLicense"> | string
+    season?: StringWithAggregatesFilter<"AffiliationLicense"> | string
+    validUntil?: DateTimeWithAggregatesFilter<"AffiliationLicense"> | Date | string
+    isActive?: BoolWithAggregatesFilter<"AffiliationLicense"> | boolean
+    isPaid?: BoolWithAggregatesFilter<"AffiliationLicense"> | boolean
+    amountCharged?: DecimalWithAggregatesFilter<"AffiliationLicense"> | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusWithAggregatesFilter<"AffiliationLicense"> | $Enums.AffiliationLicenseStatus
+    payerUserId?: StringNullableWithAggregatesFilter<"AffiliationLicense"> | string | null
+    isExempt?: BoolWithAggregatesFilter<"AffiliationLicense"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"AffiliationLicense"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AffiliationLicense"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -29658,14 +37638,7 @@ export namespace Prisma {
     passwordHash: string
     firstName: string
     lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
+    gender?: $Enums.Gender | null
     isActive?: boolean
     roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
@@ -29678,14 +37651,7 @@ export namespace Prisma {
     passwordHash: string
     firstName: string
     lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
+    gender?: $Enums.Gender | null
     isActive?: boolean
     roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
@@ -29698,14 +37664,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29718,14 +37677,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29738,14 +37690,7 @@ export namespace Prisma {
     passwordHash: string
     firstName: string
     lastName: string
-    dni?: string | null
-    birthDate?: Date | string | null
-    phone?: string | null
-    address?: string | null
-    city?: string | null
-    state?: string | null
-    postalCode?: string | null
-    country?: string | null
+    gender?: $Enums.Gender | null
     isActive?: boolean
     roles?: UserCreaterolesInput | $Enums.Role[]
     createdAt?: Date | string
@@ -29758,14 +37703,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29778,14 +37716,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
-    dni?: NullableStringFieldUpdateOperationsInput | string | null
-    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
-    address?: NullableStringFieldUpdateOperationsInput | string | null
-    city?: NullableStringFieldUpdateOperationsInput | string | null
-    state?: NullableStringFieldUpdateOperationsInput | string | null
-    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
-    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     roles?: UserUpdaterolesInput | $Enums.Role[]
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29794,7 +37725,19 @@ export namespace Prisma {
 
   export type StudentProfileCreateInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -29805,16 +37748,23 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -29825,16 +37775,23 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29845,16 +37802,23 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29865,16 +37829,23 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateManyInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -29883,7 +37854,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29892,7 +37875,19 @@ export namespace Prisma {
 
   export type StudentProfileUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29904,6 +37899,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
     studentProfile: StudentProfileCreateNestedOneWithoutStatusHistoryInput
@@ -29915,6 +37913,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
   }
@@ -29924,6 +37925,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     studentProfile?: StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput
@@ -29935,6 +37939,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29945,6 +37952,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
   }
@@ -29954,6 +37964,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -29964,6 +37977,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -30057,6 +38073,7 @@ export namespace Prisma {
   export type DisciplineCreateInput = {
     id?: string
     name: string
+    acronym?: string | null
     description?: string | null
     programs?: DisciplineProgramCreateNestedManyWithoutDisciplineInput
   }
@@ -30064,6 +38081,7 @@ export namespace Prisma {
   export type DisciplineUncheckedCreateInput = {
     id?: string
     name: string
+    acronym?: string | null
     description?: string | null
     programs?: DisciplineProgramUncheckedCreateNestedManyWithoutDisciplineInput
   }
@@ -30071,6 +38089,7 @@ export namespace Prisma {
   export type DisciplineUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     programs?: DisciplineProgramUpdateManyWithoutDisciplineNestedInput
   }
@@ -30078,6 +38097,7 @@ export namespace Prisma {
   export type DisciplineUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     programs?: DisciplineProgramUncheckedUpdateManyWithoutDisciplineNestedInput
   }
@@ -30085,18 +38105,21 @@ export namespace Prisma {
   export type DisciplineCreateManyInput = {
     id?: string
     name: string
+    acronym?: string | null
     description?: string | null
   }
 
   export type DisciplineUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DisciplineUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -30580,13 +38603,13 @@ export namespace Prisma {
 
   export type StudentFeeCreateInput = {
     id?: string
+    studentProfileId: string
     customAmount?: Decimal | DecimalJsLike | number | string | null
     ipcApplied?: boolean
     effectiveFrom?: Date | string
     effectiveTo?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    student: StudentProfileCreateNestedOneWithoutStudentFeesInput
     feeTier?: FeeTierCreateNestedOneWithoutStudentFeesInput
   }
 
@@ -30604,13 +38627,13 @@ export namespace Prisma {
 
   export type StudentFeeUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ipcApplied?: BoolFieldUpdateOperationsInput | boolean
     effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
     effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    student?: StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput
     feeTier?: FeeTierUpdateOneWithoutStudentFeesNestedInput
   }
 
@@ -30640,6 +38663,7 @@ export namespace Prisma {
 
   export type StudentFeeUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ipcApplied?: BoolFieldUpdateOperationsInput | boolean
     effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30771,9 +38795,9 @@ export namespace Prisma {
 
   export type StudentDiscountCreateInput = {
     id?: string
+    studentProfileId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
-    studentProfile: StudentProfileCreateNestedOneWithoutStudentDiscountsInput
     discount: DiscountCreateNestedOneWithoutStudentDiscountsInput
   }
 
@@ -30787,9 +38811,9 @@ export namespace Prisma {
 
   export type StudentDiscountUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput
     discount?: DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput
   }
 
@@ -30811,6 +38835,7 @@ export namespace Prisma {
 
   export type StudentDiscountUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -30825,8 +38850,8 @@ export namespace Prisma {
 
   export type StudentSubscriptionCreateInput = {
     id?: string
+    studentProfileId: string
     isActive?: boolean
-    student: StudentProfileCreateNestedOneWithoutSubscriptionsInput
     feeTier: FeeTierCreateNestedOneWithoutSubscriptionsInput
   }
 
@@ -30839,8 +38864,8 @@ export namespace Prisma {
 
   export type StudentSubscriptionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    student?: StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput
     feeTier?: FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
@@ -30860,6 +38885,7 @@ export namespace Prisma {
 
   export type StudentSubscriptionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
   }
 
@@ -31076,26 +39102,152 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type TenantFinancialConfigCreateInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    taxId?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    creditorId?: string
+    iban?: string
+    bic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TenantFinancialConfigUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    taxId?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    creditorId?: string
+    iban?: string
+    bic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TenantFinancialConfigUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    creditorId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TenantFinancialConfigUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    creditorId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TenantFinancialConfigCreateManyInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    taxId?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    creditorId?: string
+    iban?: string
+    bic?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TenantFinancialConfigUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    creditorId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TenantFinancialConfigUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    creditorId?: StringFieldUpdateOperationsInput | string
+    iban?: StringFieldUpdateOperationsInput | string
+    bic?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type BankMandateCreateInput = {
     id?: string
+    payerUserId: string
     iban: string
     bic?: string | null
     mandateReference: string
     signatureDate: Date | string
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId?: string
+    isSigned?: boolean
+    signedAt?: Date | string | null
+    signedByUserId?: string | null
+    signatureIp?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    student: StudentProfileCreateNestedOneWithoutBankMandatesInput
     remittanceItems?: RemittanceItemCreateNestedManyWithoutMandateInput
   }
 
   export type BankMandateUncheckedCreateInput = {
     id?: string
-    studentProfileId: string
+    payerUserId: string
     iban: string
     bic?: string | null
     mandateReference: string
     signatureDate: Date | string
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId?: string
+    isSigned?: boolean
+    signedAt?: Date | string | null
+    signedByUserId?: string | null
+    signatureIp?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31104,24 +39256,38 @@ export namespace Prisma {
 
   export type BankMandateUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    student?: StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput
     remittanceItems?: RemittanceItemUpdateManyWithoutMandateNestedInput
   }
 
   export type BankMandateUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31130,11 +39296,18 @@ export namespace Prisma {
 
   export type BankMandateCreateManyInput = {
     id?: string
-    studentProfileId: string
+    payerUserId: string
     iban: string
     bic?: string | null
     mandateReference: string
     signatureDate: Date | string
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId?: string
+    isSigned?: boolean
+    signedAt?: Date | string | null
+    signedByUserId?: string | null
+    signatureIp?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31142,10 +39315,18 @@ export namespace Prisma {
 
   export type BankMandateUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31153,11 +39334,18 @@ export namespace Prisma {
 
   export type BankMandateUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31335,109 +39523,675 @@ export namespace Prisma {
 
   export type FederationCreateInput = {
     id?: string
+    tenantId: string
     name: string
-    country: string
-    licenses?: StudentLicenseCreateNestedManyWithoutFederationInput
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeCreateNestedManyWithoutFederationInput
+    contacts?: FederationContactCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonCreateNestedManyWithoutFederationInput
   }
 
   export type FederationUncheckedCreateInput = {
     id?: string
+    tenantId: string
     name: string
-    country: string
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutFederationInput
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeUncheckedCreateNestedManyWithoutFederationInput
+    contacts?: FederationContactUncheckedCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonUncheckedCreateNestedManyWithoutFederationInput
   }
 
   export type FederationUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
-    licenses?: StudentLicenseUpdateManyWithoutFederationNestedInput
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUpdateManyWithoutFederationNestedInput
+    contacts?: FederationContactUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUpdateManyWithoutFederationNestedInput
   }
 
   export type FederationUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutFederationNestedInput
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUncheckedUpdateManyWithoutFederationNestedInput
+    contacts?: FederationContactUncheckedUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUncheckedUpdateManyWithoutFederationNestedInput
   }
 
   export type FederationCreateManyInput = {
     id?: string
+    tenantId: string
     name: string
-    country: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type FederationUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FederationUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseCreateInput = {
+  export type FederationContactCreateInput = {
     id?: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
-    student: StudentProfileCreateNestedOneWithoutLicensesInput
-    federation: FederationCreateNestedOneWithoutLicensesInput
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    federation: FederationCreateNestedOneWithoutContactsInput
   }
 
-  export type StudentLicenseUncheckedCreateInput = {
+  export type FederationContactUncheckedCreateInput = {
     id?: string
-    studentProfileId: string
     federationId: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseUpdateInput = {
+  export type FederationContactUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    student?: StudentProfileUpdateOneRequiredWithoutLicensesNestedInput
-    federation?: FederationUpdateOneRequiredWithoutLicensesNestedInput
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    federation?: FederationUpdateOneRequiredWithoutContactsNestedInput
   }
 
-  export type StudentLicenseUncheckedUpdateInput = {
+  export type FederationContactUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
     federationId?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseCreateManyInput = {
+  export type FederationContactCreateManyInput = {
     id?: string
-    studentProfileId: string
     federationId: string
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationContactUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationContactUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonCreateInput = {
+    id?: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    federation: FederationCreateNestedOneWithoutSeasonsInput
+    licenseTypes?: FederationLicenseTypeCreateNestedManyWithoutSeasonInput
+  }
+
+  export type FederationSeasonUncheckedCreateInput = {
+    id?: string
+    federationId: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    licenseTypes?: FederationLicenseTypeUncheckedCreateNestedManyWithoutSeasonInput
+  }
+
+  export type FederationSeasonUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    federation?: FederationUpdateOneRequiredWithoutSeasonsNestedInput
+    licenseTypes?: FederationLicenseTypeUpdateManyWithoutSeasonNestedInput
+  }
+
+  export type FederationSeasonUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    licenseTypes?: FederationLicenseTypeUncheckedUpdateManyWithoutSeasonNestedInput
+  }
+
+  export type FederationSeasonCreateManyInput = {
+    id?: string
+    federationId: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationSeasonUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicenseTypeCreateInput = {
+    id?: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    season: FederationSeasonCreateNestedOneWithoutLicenseTypesInput
+    priceRows?: FederationLicensePriceRowCreateNestedManyWithoutLicenseTypeInput
+  }
+
+  export type FederationLicenseTypeUncheckedCreateInput = {
+    id?: string
+    seasonId: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    priceRows?: FederationLicensePriceRowUncheckedCreateNestedManyWithoutLicenseTypeInput
+  }
+
+  export type FederationLicenseTypeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: FederationSeasonUpdateOneRequiredWithoutLicenseTypesNestedInput
+    priceRows?: FederationLicensePriceRowUpdateManyWithoutLicenseTypeNestedInput
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    priceRows?: FederationLicensePriceRowUncheckedUpdateManyWithoutLicenseTypeNestedInput
+  }
+
+  export type FederationLicenseTypeCreateManyInput = {
+    id?: string
+    seasonId: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicenseTypeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowCreateInput = {
+    id?: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    licenseType: FederationLicenseTypeCreateNestedOneWithoutPriceRowsInput
+  }
+
+  export type FederationLicensePriceRowUncheckedCreateInput = {
+    id?: string
+    licenseTypeId: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicensePriceRowUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    licenseType?: FederationLicenseTypeUpdateOneRequiredWithoutPriceRowsNestedInput
+  }
+
+  export type FederationLicensePriceRowUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowCreateManyInput = {
+    id?: string
+    licenseTypeId: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicensePriceRowUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonChargeCreateInput = {
+    id?: string
+    tenantId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    federation: FederationCreateNestedOneWithoutChargesInput
+  }
+
+  export type FederationSeasonChargeUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    federationId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationSeasonChargeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    federation?: FederationUpdateOneRequiredWithoutChargesNestedInput
+  }
+
+  export type FederationSeasonChargeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonChargeCreateManyInput = {
+    id?: string
+    tenantId: string
+    federationId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationSeasonChargeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonChargeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AffiliationLicenseCreateInput = {
+    id?: string
+    tenantId: string
+    studentProfileId?: string | null
+    holderUserId?: string | null
+    holderType: $Enums.LicenseHolderType
+    federationId: string
+    licenseTypeId?: string | null
     licenseNumber: string
+    season: string
     validUntil: Date | string
     isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.AffiliationLicenseStatus
+    payerUserId?: string | null
+    isExempt?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+  export type AffiliationLicenseUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    studentProfileId?: string | null
+    holderUserId?: string | null
+    holderType: $Enums.LicenseHolderType
+    federationId: string
+    licenseTypeId?: string | null
+    licenseNumber: string
+    season: string
+    validUntil: Date | string
+    isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.AffiliationLicenseStatus
+    payerUserId?: string | null
+    isExempt?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseUncheckedUpdateManyInput = {
+  export type AffiliationLicenseUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
     federationId?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: NullableStringFieldUpdateOperationsInput | string | null
     licenseNumber?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
     validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    amountCharged?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFieldUpdateOperationsInput | $Enums.AffiliationLicenseStatus
+    payerUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isExempt?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AffiliationLicenseUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    federationId?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    amountCharged?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFieldUpdateOperationsInput | $Enums.AffiliationLicenseStatus
+    payerUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isExempt?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AffiliationLicenseCreateManyInput = {
+    id?: string
+    tenantId: string
+    studentProfileId?: string | null
+    holderUserId?: string | null
+    holderType: $Enums.LicenseHolderType
+    federationId: string
+    licenseTypeId?: string | null
+    licenseNumber: string
+    season: string
+    validUntil: Date | string
+    isActive?: boolean
+    isPaid?: boolean
+    amountCharged?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.AffiliationLicenseStatus
+    payerUserId?: string | null
+    isExempt?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AffiliationLicenseUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    federationId?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    amountCharged?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFieldUpdateOperationsInput | $Enums.AffiliationLicenseStatus
+    payerUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isExempt?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AffiliationLicenseUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    federationId?: StringFieldUpdateOperationsInput | string
+    licenseTypeId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseNumber?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    amountCharged?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumAffiliationLicenseStatusFieldUpdateOperationsInput | $Enums.AffiliationLicenseStatus
+    payerUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    isExempt?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -31455,30 +40209,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  export type EnumGenderNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Gender | EnumGenderFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumGenderNullableFilter<$PrismaModel> | $Enums.Gender | null
   }
 
   export type BoolFilter<$PrismaModel = never> = {
@@ -31516,14 +40251,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    dni?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
+    gender?: SortOrder
     isActive?: SortOrder
     roles?: SortOrder
     createdAt?: SortOrder
@@ -31536,14 +40264,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    dni?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
+    gender?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31555,14 +40276,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     firstName?: SortOrder
     lastName?: SortOrder
-    dni?: SortOrder
-    birthDate?: SortOrder
-    phone?: SortOrder
-    address?: SortOrder
-    city?: SortOrder
-    state?: SortOrder
-    postalCode?: SortOrder
-    country?: SortOrder
+    gender?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31586,36 +40300,14 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+  export type EnumGenderNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Gender | EnumGenderFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumGenderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Gender | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+    _min?: NestedEnumGenderNullableFilter<$PrismaModel>
+    _max?: NestedEnumGenderNullableFilter<$PrismaModel>
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -31638,6 +40330,32 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type EnumStudentStatusFilter<$PrismaModel = never> = {
@@ -31705,36 +40423,6 @@ export namespace Prisma {
     none?: GraduationRequestWhereInput
   }
 
-  export type StudentSubscriptionListRelationFilter = {
-    every?: StudentSubscriptionWhereInput
-    some?: StudentSubscriptionWhereInput
-    none?: StudentSubscriptionWhereInput
-  }
-
-  export type StudentLicenseListRelationFilter = {
-    every?: StudentLicenseWhereInput
-    some?: StudentLicenseWhereInput
-    none?: StudentLicenseWhereInput
-  }
-
-  export type StudentFeeListRelationFilter = {
-    every?: StudentFeeWhereInput
-    some?: StudentFeeWhereInput
-    none?: StudentFeeWhereInput
-  }
-
-  export type StudentDiscountListRelationFilter = {
-    every?: StudentDiscountWhereInput
-    some?: StudentDiscountWhereInput
-    none?: StudentDiscountWhereInput
-  }
-
-  export type BankMandateListRelationFilter = {
-    every?: BankMandateWhereInput
-    some?: BankMandateWhereInput
-    none?: BankMandateWhereInput
-  }
-
   export type StudentStatusHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -31759,29 +40447,21 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type StudentSubscriptionOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type StudentLicenseOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type StudentFeeOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type StudentDiscountOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type BankMandateOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type StudentProfileCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    dni?: SortOrder
+    birthDate?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    gender?: SortOrder
+    bankMandateId?: SortOrder
     status?: SortOrder
     emergencyContacts?: SortOrder
     createdAt?: SortOrder
@@ -31791,6 +40471,18 @@ export namespace Prisma {
   export type StudentProfileMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    dni?: SortOrder
+    birthDate?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    gender?: SortOrder
+    bankMandateId?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -31799,9 +40491,53 @@ export namespace Prisma {
   export type StudentProfileMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    firstName?: SortOrder
+    lastName?: SortOrder
+    dni?: SortOrder
+    birthDate?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    state?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    gender?: SortOrder
+    bankMandateId?: SortOrder
     status?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumStudentStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -31846,6 +40582,20 @@ export namespace Prisma {
     not?: NestedEnumStudentStatusNullableFilter<$PrismaModel> | $Enums.StudentStatus | null
   }
 
+  export type EnumLeaveReasonNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveReason | EnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveReasonNullableFilter<$PrismaModel> | $Enums.LeaveReason | null
+  }
+
+  export type EnumLeaveNoticeMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveNoticeMethod | EnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel> | $Enums.LeaveNoticeMethod | null
+  }
+
   export type StudentProfileRelationFilter = {
     is?: StudentProfileWhereInput
     isNot?: StudentProfileWhereInput
@@ -31857,6 +40607,9 @@ export namespace Prisma {
     previousStatus?: SortOrder
     newStatus?: SortOrder
     reason?: SortOrder
+    leaveReason?: SortOrder
+    leaveNoticeMethod?: SortOrder
+    customReasonDetails?: SortOrder
     changedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -31867,6 +40620,9 @@ export namespace Prisma {
     previousStatus?: SortOrder
     newStatus?: SortOrder
     reason?: SortOrder
+    leaveReason?: SortOrder
+    leaveNoticeMethod?: SortOrder
+    customReasonDetails?: SortOrder
     changedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -31877,6 +40633,9 @@ export namespace Prisma {
     previousStatus?: SortOrder
     newStatus?: SortOrder
     reason?: SortOrder
+    leaveReason?: SortOrder
+    leaveNoticeMethod?: SortOrder
+    customReasonDetails?: SortOrder
     changedById?: SortOrder
     createdAt?: SortOrder
   }
@@ -31889,6 +40648,26 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
     _max?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
+  }
+
+  export type EnumLeaveReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveReason | EnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveReason | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumLeaveReasonNullableFilter<$PrismaModel>
+    _max?: NestedEnumLeaveReasonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumLeaveNoticeMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveNoticeMethod | EnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveNoticeMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveNoticeMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel>
   }
 
   export type GuardianCountOrderByAggregateInput = {
@@ -31950,18 +40729,21 @@ export namespace Prisma {
   export type DisciplineCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     description?: SortOrder
   }
 
   export type DisciplineMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     description?: SortOrder
   }
 
   export type DisciplineMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     description?: SortOrder
   }
 
@@ -32327,6 +41109,26 @@ export namespace Prisma {
     not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
   }
 
+  export type StudentFeeListRelationFilter = {
+    every?: StudentFeeWhereInput
+    some?: StudentFeeWhereInput
+    none?: StudentFeeWhereInput
+  }
+
+  export type StudentSubscriptionListRelationFilter = {
+    every?: StudentSubscriptionWhereInput
+    some?: StudentSubscriptionWhereInput
+    none?: StudentSubscriptionWhereInput
+  }
+
+  export type StudentFeeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StudentSubscriptionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type FeeTierCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -32470,6 +41272,16 @@ export namespace Prisma {
     in?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
     notIn?: $Enums.DiscountCategory[] | ListEnumDiscountCategoryFieldRefInput<$PrismaModel>
     not?: NestedEnumDiscountCategoryFilter<$PrismaModel> | $Enums.DiscountCategory
+  }
+
+  export type StudentDiscountListRelationFilter = {
+    every?: StudentDiscountWhereInput
+    some?: StudentDiscountWhereInput
+    none?: StudentDiscountWhereInput
+  }
+
+  export type StudentDiscountOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type DiscountCountOrderByAggregateInput = {
@@ -32797,6 +41609,54 @@ export namespace Prisma {
     _max?: NestedEnumPaymentMethodFilter<$PrismaModel>
   }
 
+  export type TenantFinancialConfigCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    taxId?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    creditorId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TenantFinancialConfigMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    taxId?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    creditorId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type TenantFinancialConfigMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    taxId?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    creditorId?: SortOrder
+    iban?: SortOrder
+    bic?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type RemittanceItemListRelationFilter = {
     every?: RemittanceItemWhereInput
     some?: RemittanceItemWhereInput
@@ -32809,11 +41669,18 @@ export namespace Prisma {
 
   export type BankMandateCountOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
+    payerUserId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
     mandateReference?: SortOrder
     signatureDate?: SortOrder
+    accountHolderName?: SortOrder
+    accountHolderDni?: SortOrder
+    tenantId?: SortOrder
+    isSigned?: SortOrder
+    signedAt?: SortOrder
+    signedByUserId?: SortOrder
+    signatureIp?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -32821,11 +41688,18 @@ export namespace Prisma {
 
   export type BankMandateMaxOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
+    payerUserId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
     mandateReference?: SortOrder
     signatureDate?: SortOrder
+    accountHolderName?: SortOrder
+    accountHolderDni?: SortOrder
+    tenantId?: SortOrder
+    isSigned?: SortOrder
+    signedAt?: SortOrder
+    signedByUserId?: SortOrder
+    signatureIp?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -32833,11 +41707,18 @@ export namespace Prisma {
 
   export type BankMandateMinOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
+    payerUserId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
     mandateReference?: SortOrder
     signatureDate?: SortOrder
+    accountHolderName?: SortOrder
+    accountHolderDni?: SortOrder
+    tenantId?: SortOrder
+    isSigned?: SortOrder
+    signedAt?: SortOrder
+    signedByUserId?: SortOrder
+    signatureIp?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -32977,22 +41858,80 @@ export namespace Prisma {
     _max?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
   }
 
+  export type FederationSeasonChargeListRelationFilter = {
+    every?: FederationSeasonChargeWhereInput
+    some?: FederationSeasonChargeWhereInput
+    none?: FederationSeasonChargeWhereInput
+  }
+
+  export type FederationContactListRelationFilter = {
+    every?: FederationContactWhereInput
+    some?: FederationContactWhereInput
+    none?: FederationContactWhereInput
+  }
+
+  export type FederationSeasonListRelationFilter = {
+    every?: FederationSeasonWhereInput
+    some?: FederationSeasonWhereInput
+    none?: FederationSeasonWhereInput
+  }
+
+  export type FederationSeasonChargeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FederationContactOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FederationSeasonOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type FederationCountOrderByAggregateInput = {
     id?: SortOrder
+    tenantId?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     country?: SortOrder
+    email?: SortOrder
+    isActive?: SortOrder
+    deletedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type FederationMaxOrderByAggregateInput = {
     id?: SortOrder
+    tenantId?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     country?: SortOrder
+    email?: SortOrder
+    isActive?: SortOrder
+    deletedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type FederationMinOrderByAggregateInput = {
     id?: SortOrder
+    tenantId?: SortOrder
     name?: SortOrder
+    acronym?: SortOrder
     country?: SortOrder
+    email?: SortOrder
+    isActive?: SortOrder
+    deletedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumFederationContactMediumFilter<$PrismaModel = never> = {
+    equals?: $Enums.FederationContactMedium | EnumFederationContactMediumFieldRefInput<$PrismaModel>
+    in?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    not?: NestedEnumFederationContactMediumFilter<$PrismaModel> | $Enums.FederationContactMedium
   }
 
   export type FederationRelationFilter = {
@@ -33000,31 +41939,412 @@ export namespace Prisma {
     isNot?: FederationWhereInput
   }
 
-  export type StudentLicenseCountOrderByAggregateInput = {
+  export type FederationContactCountOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
     federationId?: SortOrder
-    licenseNumber?: SortOrder
-    validUntil?: SortOrder
-    isActive?: SortOrder
+    medium?: SortOrder
+    value?: SortOrder
+    tag?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type StudentLicenseMaxOrderByAggregateInput = {
+  export type FederationContactMaxOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
     federationId?: SortOrder
-    licenseNumber?: SortOrder
-    validUntil?: SortOrder
-    isActive?: SortOrder
+    medium?: SortOrder
+    value?: SortOrder
+    tag?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
-  export type StudentLicenseMinOrderByAggregateInput = {
+  export type FederationContactMinOrderByAggregateInput = {
     id?: SortOrder
-    studentProfileId?: SortOrder
     federationId?: SortOrder
+    medium?: SortOrder
+    value?: SortOrder
+    tag?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumFederationContactMediumWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FederationContactMedium | EnumFederationContactMediumFieldRefInput<$PrismaModel>
+    in?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    not?: NestedEnumFederationContactMediumWithAggregatesFilter<$PrismaModel> | $Enums.FederationContactMedium
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFederationContactMediumFilter<$PrismaModel>
+    _max?: NestedEnumFederationContactMediumFilter<$PrismaModel>
+  }
+
+  export type FederationLicenseTypeListRelationFilter = {
+    every?: FederationLicenseTypeWhereInput
+    some?: FederationLicenseTypeWhereInput
+    none?: FederationLicenseTypeWhereInput
+  }
+
+  export type FederationLicenseTypeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FederationSeasonFederationIdSeasonNameCompoundUniqueInput = {
+    federationId: string
+    seasonName: string
+  }
+
+  export type FederationSeasonCountOrderByAggregateInput = {
+    id?: SortOrder
+    federationId?: SortOrder
+    seasonName?: SortOrder
+    currency?: SortOrder
+    clubCost?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonAvgOrderByAggregateInput = {
+    clubCost?: SortOrder
+  }
+
+  export type FederationSeasonMaxOrderByAggregateInput = {
+    id?: SortOrder
+    federationId?: SortOrder
+    seasonName?: SortOrder
+    currency?: SortOrder
+    clubCost?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonMinOrderByAggregateInput = {
+    id?: SortOrder
+    federationId?: SortOrder
+    seasonName?: SortOrder
+    currency?: SortOrder
+    clubCost?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonSumOrderByAggregateInput = {
+    clubCost?: SortOrder
+  }
+
+  export type FederationSeasonRelationFilter = {
+    is?: FederationSeasonWhereInput
+    isNot?: FederationSeasonWhereInput
+  }
+
+  export type FederationLicensePriceRowListRelationFilter = {
+    every?: FederationLicensePriceRowWhereInput
+    some?: FederationLicensePriceRowWhereInput
+    none?: FederationLicensePriceRowWhereInput
+  }
+
+  export type FederationLicensePriceRowOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FederationLicenseTypeSeasonIdNameCompoundUniqueInput = {
+    seasonId: string
+    name: string
+  }
+
+  export type FederationLicenseTypeCountOrderByAggregateInput = {
+    id?: SortOrder
+    seasonId?: SortOrder
+    name?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationLicenseTypeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    seasonId?: SortOrder
+    name?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationLicenseTypeMinOrderByAggregateInput = {
+    id?: SortOrder
+    seasonId?: SortOrder
+    name?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumLicensePriceRowKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicensePriceRowKind | EnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    in?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicensePriceRowKindFilter<$PrismaModel> | $Enums.LicensePriceRowKind
+  }
+
+  export type FederationLicenseTypeRelationFilter = {
+    is?: FederationLicenseTypeWhereInput
+    isNot?: FederationLicenseTypeWhereInput
+  }
+
+  export type FederationLicensePriceRowCountOrderByAggregateInput = {
+    id?: SortOrder
+    licenseTypeId?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    birthYearFrom?: SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationLicensePriceRowAvgOrderByAggregateInput = {
+    birthYearFrom?: SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type FederationLicensePriceRowMaxOrderByAggregateInput = {
+    id?: SortOrder
+    licenseTypeId?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    birthYearFrom?: SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationLicensePriceRowMinOrderByAggregateInput = {
+    id?: SortOrder
+    licenseTypeId?: SortOrder
+    kind?: SortOrder
+    label?: SortOrder
+    birthYearFrom?: SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationLicensePriceRowSumOrderByAggregateInput = {
+    birthYearFrom?: SortOrder
+    cost?: SortOrder
+    reduction?: SortOrder
+    chargePrice?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type EnumLicensePriceRowKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicensePriceRowKind | EnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    in?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicensePriceRowKindWithAggregatesFilter<$PrismaModel> | $Enums.LicensePriceRowKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLicensePriceRowKindFilter<$PrismaModel>
+    _max?: NestedEnumLicensePriceRowKindFilter<$PrismaModel>
+  }
+
+  export type EnumLicenseHolderTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicenseHolderType | EnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicenseHolderTypeFilter<$PrismaModel> | $Enums.LicenseHolderType
+  }
+
+  export type FederationSeasonChargeTenantIdFederationIdSeasonHolderTypeHolderUserIdCompoundUniqueInput = {
+    tenantId: string
+    federationId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId: string
+  }
+
+  export type FederationSeasonChargeCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    federationId?: SortOrder
+    season?: SortOrder
+    holderType?: SortOrder
+    holderUserId?: SortOrder
+    studentProfileId?: SortOrder
+    licenseId?: SortOrder
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonChargeAvgOrderByAggregateInput = {
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+  }
+
+  export type FederationSeasonChargeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    federationId?: SortOrder
+    season?: SortOrder
+    holderType?: SortOrder
+    holderUserId?: SortOrder
+    studentProfileId?: SortOrder
+    licenseId?: SortOrder
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonChargeMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    federationId?: SortOrder
+    season?: SortOrder
+    holderType?: SortOrder
+    holderUserId?: SortOrder
+    studentProfileId?: SortOrder
+    licenseId?: SortOrder
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+    isPaid?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FederationSeasonChargeSumOrderByAggregateInput = {
+    costAmount?: SortOrder
+    saleAmount?: SortOrder
+  }
+
+  export type EnumLicenseHolderTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicenseHolderType | EnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicenseHolderTypeWithAggregatesFilter<$PrismaModel> | $Enums.LicenseHolderType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLicenseHolderTypeFilter<$PrismaModel>
+    _max?: NestedEnumLicenseHolderTypeFilter<$PrismaModel>
+  }
+
+  export type EnumAffiliationLicenseStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AffiliationLicenseStatus | EnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel> | $Enums.AffiliationLicenseStatus
+  }
+
+  export type AffiliationLicenseTenantIdFederationIdHolderUserIdSeasonCompoundUniqueInput = {
+    tenantId: string
+    federationId: string
+    holderUserId: string
+    season: string
+  }
+
+  export type AffiliationLicenseTenantIdFederationIdStudentProfileIdSeasonCompoundUniqueInput = {
+    tenantId: string
+    federationId: string
+    studentProfileId: string
+    season: string
+  }
+
+  export type AffiliationLicenseCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    studentProfileId?: SortOrder
+    holderUserId?: SortOrder
+    holderType?: SortOrder
+    federationId?: SortOrder
+    licenseTypeId?: SortOrder
     licenseNumber?: SortOrder
+    season?: SortOrder
     validUntil?: SortOrder
     isActive?: SortOrder
+    isPaid?: SortOrder
+    amountCharged?: SortOrder
+    status?: SortOrder
+    payerUserId?: SortOrder
+    isExempt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AffiliationLicenseAvgOrderByAggregateInput = {
+    amountCharged?: SortOrder
+  }
+
+  export type AffiliationLicenseMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    studentProfileId?: SortOrder
+    holderUserId?: SortOrder
+    holderType?: SortOrder
+    federationId?: SortOrder
+    licenseTypeId?: SortOrder
+    licenseNumber?: SortOrder
+    season?: SortOrder
+    validUntil?: SortOrder
+    isActive?: SortOrder
+    isPaid?: SortOrder
+    amountCharged?: SortOrder
+    status?: SortOrder
+    payerUserId?: SortOrder
+    isExempt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AffiliationLicenseMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    studentProfileId?: SortOrder
+    holderUserId?: SortOrder
+    holderType?: SortOrder
+    federationId?: SortOrder
+    licenseTypeId?: SortOrder
+    licenseNumber?: SortOrder
+    season?: SortOrder
+    validUntil?: SortOrder
+    isActive?: SortOrder
+    isPaid?: SortOrder
+    amountCharged?: SortOrder
+    status?: SortOrder
+    payerUserId?: SortOrder
+    isExempt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AffiliationLicenseSumOrderByAggregateInput = {
+    amountCharged?: SortOrder
+  }
+
+  export type EnumAffiliationLicenseStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AffiliationLicenseStatus | EnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAffiliationLicenseStatusWithAggregatesFilter<$PrismaModel> | $Enums.AffiliationLicenseStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel>
+    _max?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel>
   }
 
   export type UserCreaterolesInput = {
@@ -33035,12 +42355,8 @@ export namespace Prisma {
     set?: string
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
+  export type NullableEnumGenderFieldUpdateOperationsInput = {
+    set?: $Enums.Gender | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -33098,41 +42414,6 @@ export namespace Prisma {
     connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
-  export type StudentSubscriptionCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput> | StudentSubscriptionCreateWithoutStudentInput[] | StudentSubscriptionUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutStudentInput | StudentSubscriptionCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentSubscriptionCreateManyStudentInputEnvelope
-    connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-  }
-
-  export type StudentLicenseCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput> | StudentLicenseCreateWithoutStudentInput[] | StudentLicenseUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutStudentInput | StudentLicenseCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentLicenseCreateManyStudentInputEnvelope
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-  }
-
-  export type StudentFeeCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentFeeCreateManyStudentInputEnvelope
-    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-  }
-
-  export type StudentDiscountCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
-    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-  }
-
-  export type BankMandateCreateNestedManyWithoutStudentInput = {
-    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
-    createMany?: BankMandateCreateManyStudentInputEnvelope
-    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-  }
-
   export type StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput = {
     create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
     connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
@@ -33175,39 +42456,12 @@ export namespace Prisma {
     connect?: GraduationRequestWhereUniqueInput | GraduationRequestWhereUniqueInput[]
   }
 
-  export type StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput> | StudentSubscriptionCreateWithoutStudentInput[] | StudentSubscriptionUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutStudentInput | StudentSubscriptionCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentSubscriptionCreateManyStudentInputEnvelope
-    connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
   }
 
-  export type StudentLicenseUncheckedCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput> | StudentLicenseCreateWithoutStudentInput[] | StudentLicenseUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutStudentInput | StudentLicenseCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentLicenseCreateManyStudentInputEnvelope
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-  }
-
-  export type StudentFeeUncheckedCreateNestedManyWithoutStudentInput = {
-    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
-    createMany?: StudentFeeCreateManyStudentInputEnvelope
-    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-  }
-
-  export type StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput = {
-    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
-    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
-    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-  }
-
-  export type BankMandateUncheckedCreateNestedManyWithoutStudentInput = {
-    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
-    createMany?: BankMandateCreateManyStudentInputEnvelope
-    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type EnumStudentStatusFieldUpdateOperationsInput = {
@@ -33298,76 +42552,6 @@ export namespace Prisma {
     deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
-  export type StudentSubscriptionUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput> | StudentSubscriptionCreateWithoutStudentInput[] | StudentSubscriptionUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutStudentInput | StudentSubscriptionCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput | StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentSubscriptionCreateManyStudentInputEnvelope
-    set?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    disconnect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    delete?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutStudentInput | StudentSubscriptionUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutStudentInput | StudentSubscriptionUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
-  }
-
-  export type StudentLicenseUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput> | StudentLicenseCreateWithoutStudentInput[] | StudentLicenseUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutStudentInput | StudentLicenseCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentLicenseUpsertWithWhereUniqueWithoutStudentInput | StudentLicenseUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentLicenseCreateManyStudentInputEnvelope
-    set?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    disconnect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    delete?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    update?: StudentLicenseUpdateWithWhereUniqueWithoutStudentInput | StudentLicenseUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentLicenseUpdateManyWithWhereWithoutStudentInput | StudentLicenseUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
-  }
-
-  export type StudentFeeUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentFeeUpsertWithWhereUniqueWithoutStudentInput | StudentFeeUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentFeeCreateManyStudentInputEnvelope
-    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    update?: StudentFeeUpdateWithWhereUniqueWithoutStudentInput | StudentFeeUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentFeeUpdateManyWithWhereWithoutStudentInput | StudentFeeUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
-  }
-
-  export type StudentDiscountUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
-    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    update?: StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput | StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
-  }
-
-  export type BankMandateUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
-    upsert?: BankMandateUpsertWithWhereUniqueWithoutStudentInput | BankMandateUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: BankMandateCreateManyStudentInputEnvelope
-    set?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    disconnect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    delete?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    update?: BankMandateUpdateWithWhereUniqueWithoutStudentInput | BankMandateUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: BankMandateUpdateManyWithWhereWithoutStudentInput | BankMandateUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
-  }
-
   export type StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput = {
     create?: XOR<StudentStatusHistoryCreateWithoutStudentProfileInput, StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput> | StudentStatusHistoryCreateWithoutStudentProfileInput[] | StudentStatusHistoryUncheckedCreateWithoutStudentProfileInput[]
     connectOrCreate?: StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput | StudentStatusHistoryCreateOrConnectWithoutStudentProfileInput[]
@@ -33452,76 +42636,6 @@ export namespace Prisma {
     deleteMany?: GraduationRequestScalarWhereInput | GraduationRequestScalarWhereInput[]
   }
 
-  export type StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput> | StudentSubscriptionCreateWithoutStudentInput[] | StudentSubscriptionUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentSubscriptionCreateOrConnectWithoutStudentInput | StudentSubscriptionCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput | StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentSubscriptionCreateManyStudentInputEnvelope
-    set?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    disconnect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    delete?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    connect?: StudentSubscriptionWhereUniqueInput | StudentSubscriptionWhereUniqueInput[]
-    update?: StudentSubscriptionUpdateWithWhereUniqueWithoutStudentInput | StudentSubscriptionUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentSubscriptionUpdateManyWithWhereWithoutStudentInput | StudentSubscriptionUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
-  }
-
-  export type StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput> | StudentLicenseCreateWithoutStudentInput[] | StudentLicenseUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutStudentInput | StudentLicenseCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentLicenseUpsertWithWhereUniqueWithoutStudentInput | StudentLicenseUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentLicenseCreateManyStudentInputEnvelope
-    set?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    disconnect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    delete?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    update?: StudentLicenseUpdateWithWhereUniqueWithoutStudentInput | StudentLicenseUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentLicenseUpdateManyWithWhereWithoutStudentInput | StudentLicenseUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
-  }
-
-  export type StudentFeeUncheckedUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput> | StudentFeeCreateWithoutStudentInput[] | StudentFeeUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: StudentFeeCreateOrConnectWithoutStudentInput | StudentFeeCreateOrConnectWithoutStudentInput[]
-    upsert?: StudentFeeUpsertWithWhereUniqueWithoutStudentInput | StudentFeeUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: StudentFeeCreateManyStudentInputEnvelope
-    set?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    disconnect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    delete?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    connect?: StudentFeeWhereUniqueInput | StudentFeeWhereUniqueInput[]
-    update?: StudentFeeUpdateWithWhereUniqueWithoutStudentInput | StudentFeeUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: StudentFeeUpdateManyWithWhereWithoutStudentInput | StudentFeeUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
-  }
-
-  export type StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput = {
-    create?: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput> | StudentDiscountCreateWithoutStudentProfileInput[] | StudentDiscountUncheckedCreateWithoutStudentProfileInput[]
-    connectOrCreate?: StudentDiscountCreateOrConnectWithoutStudentProfileInput | StudentDiscountCreateOrConnectWithoutStudentProfileInput[]
-    upsert?: StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput[]
-    createMany?: StudentDiscountCreateManyStudentProfileInputEnvelope
-    set?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    disconnect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    delete?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    connect?: StudentDiscountWhereUniqueInput | StudentDiscountWhereUniqueInput[]
-    update?: StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput | StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput[]
-    updateMany?: StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput | StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput[]
-    deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
-  }
-
-  export type BankMandateUncheckedUpdateManyWithoutStudentNestedInput = {
-    create?: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput> | BankMandateCreateWithoutStudentInput[] | BankMandateUncheckedCreateWithoutStudentInput[]
-    connectOrCreate?: BankMandateCreateOrConnectWithoutStudentInput | BankMandateCreateOrConnectWithoutStudentInput[]
-    upsert?: BankMandateUpsertWithWhereUniqueWithoutStudentInput | BankMandateUpsertWithWhereUniqueWithoutStudentInput[]
-    createMany?: BankMandateCreateManyStudentInputEnvelope
-    set?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    disconnect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    delete?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    connect?: BankMandateWhereUniqueInput | BankMandateWhereUniqueInput[]
-    update?: BankMandateUpdateWithWhereUniqueWithoutStudentInput | BankMandateUpdateWithWhereUniqueWithoutStudentInput[]
-    updateMany?: BankMandateUpdateManyWithWhereWithoutStudentInput | BankMandateUpdateManyWithWhereWithoutStudentInput[]
-    deleteMany?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
-  }
-
   export type StudentProfileCreateNestedOneWithoutStatusHistoryInput = {
     create?: XOR<StudentProfileCreateWithoutStatusHistoryInput, StudentProfileUncheckedCreateWithoutStatusHistoryInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutStatusHistoryInput
@@ -33530,6 +42644,14 @@ export namespace Prisma {
 
   export type NullableEnumStudentStatusFieldUpdateOperationsInput = {
     set?: $Enums.StudentStatus | null
+  }
+
+  export type NullableEnumLeaveReasonFieldUpdateOperationsInput = {
+    set?: $Enums.LeaveReason | null
+  }
+
+  export type NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput = {
+    set?: $Enums.LeaveNoticeMethod | null
   }
 
   export type StudentProfileUpdateOneRequiredWithoutStatusHistoryNestedInput = {
@@ -33946,12 +43068,6 @@ export namespace Prisma {
     deleteMany?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
   }
 
-  export type StudentProfileCreateNestedOneWithoutStudentFeesInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentFeesInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
   export type FeeTierCreateNestedOneWithoutStudentFeesInput = {
     create?: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
     connectOrCreate?: FeeTierCreateOrConnectWithoutStudentFeesInput
@@ -33964,14 +43080,6 @@ export namespace Prisma {
     decrement?: Decimal | DecimalJsLike | number | string
     multiply?: Decimal | DecimalJsLike | number | string
     divide?: Decimal | DecimalJsLike | number | string
-  }
-
-  export type StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentFeesInput
-    upsert?: StudentProfileUpsertWithoutStudentFeesInput
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentFeesInput, StudentProfileUpdateWithoutStudentFeesInput>, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
   }
 
   export type FeeTierUpdateOneWithoutStudentFeesNestedInput = {
@@ -34034,24 +43142,10 @@ export namespace Prisma {
     deleteMany?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
   }
 
-  export type StudentProfileCreateNestedOneWithoutStudentDiscountsInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentDiscountsInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
   export type DiscountCreateNestedOneWithoutStudentDiscountsInput = {
     create?: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
     connectOrCreate?: DiscountCreateOrConnectWithoutStudentDiscountsInput
     connect?: DiscountWhereUniqueInput
-  }
-
-  export type StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutStudentDiscountsInput
-    upsert?: StudentProfileUpsertWithoutStudentDiscountsInput
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutStudentDiscountsInput, StudentProfileUpdateWithoutStudentDiscountsInput>, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
   export type DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput = {
@@ -34062,24 +43156,10 @@ export namespace Prisma {
     update?: XOR<XOR<DiscountUpdateToOneWithWhereWithoutStudentDiscountsInput, DiscountUpdateWithoutStudentDiscountsInput>, DiscountUncheckedUpdateWithoutStudentDiscountsInput>
   }
 
-  export type StudentProfileCreateNestedOneWithoutSubscriptionsInput = {
-    create?: XOR<StudentProfileCreateWithoutSubscriptionsInput, StudentProfileUncheckedCreateWithoutSubscriptionsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutSubscriptionsInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
   export type FeeTierCreateNestedOneWithoutSubscriptionsInput = {
     create?: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
     connectOrCreate?: FeeTierCreateOrConnectWithoutSubscriptionsInput
     connect?: FeeTierWhereUniqueInput
-  }
-
-  export type StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutSubscriptionsInput, StudentProfileUncheckedCreateWithoutSubscriptionsInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutSubscriptionsInput
-    upsert?: StudentProfileUpsertWithoutSubscriptionsInput
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutSubscriptionsInput, StudentProfileUpdateWithoutSubscriptionsInput>, StudentProfileUncheckedUpdateWithoutSubscriptionsInput>
   }
 
   export type FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput = {
@@ -34162,12 +43242,6 @@ export namespace Prisma {
     update?: XOR<XOR<CashRegisterSessionUpdateToOneWithWhereWithoutTransactionsInput, CashRegisterSessionUpdateWithoutTransactionsInput>, CashRegisterSessionUncheckedUpdateWithoutTransactionsInput>
   }
 
-  export type StudentProfileCreateNestedOneWithoutBankMandatesInput = {
-    create?: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutBankMandatesInput
-    connect?: StudentProfileWhereUniqueInput
-  }
-
   export type RemittanceItemCreateNestedManyWithoutMandateInput = {
     create?: XOR<RemittanceItemCreateWithoutMandateInput, RemittanceItemUncheckedCreateWithoutMandateInput> | RemittanceItemCreateWithoutMandateInput[] | RemittanceItemUncheckedCreateWithoutMandateInput[]
     connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
@@ -34180,14 +43254,6 @@ export namespace Prisma {
     connectOrCreate?: RemittanceItemCreateOrConnectWithoutMandateInput | RemittanceItemCreateOrConnectWithoutMandateInput[]
     createMany?: RemittanceItemCreateManyMandateInputEnvelope
     connect?: RemittanceItemWhereUniqueInput | RemittanceItemWhereUniqueInput[]
-  }
-
-  export type StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutBankMandatesInput
-    upsert?: StudentProfileUpsertWithoutBankMandatesInput
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutBankMandatesInput, StudentProfileUpdateWithoutBankMandatesInput>, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
   }
 
   export type RemittanceItemUpdateManyWithoutMandateNestedInput = {
@@ -34296,74 +43362,300 @@ export namespace Prisma {
     update?: XOR<XOR<BankMandateUpdateToOneWithWhereWithoutRemittanceItemsInput, BankMandateUpdateWithoutRemittanceItemsInput>, BankMandateUncheckedUpdateWithoutRemittanceItemsInput>
   }
 
-  export type StudentLicenseCreateNestedManyWithoutFederationInput = {
-    create?: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput> | StudentLicenseCreateWithoutFederationInput[] | StudentLicenseUncheckedCreateWithoutFederationInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutFederationInput | StudentLicenseCreateOrConnectWithoutFederationInput[]
-    createMany?: StudentLicenseCreateManyFederationInputEnvelope
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
+  export type FederationSeasonChargeCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput> | FederationSeasonChargeCreateWithoutFederationInput[] | FederationSeasonChargeUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonChargeCreateOrConnectWithoutFederationInput | FederationSeasonChargeCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationSeasonChargeCreateManyFederationInputEnvelope
+    connect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
   }
 
-  export type StudentLicenseUncheckedCreateNestedManyWithoutFederationInput = {
-    create?: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput> | StudentLicenseCreateWithoutFederationInput[] | StudentLicenseUncheckedCreateWithoutFederationInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutFederationInput | StudentLicenseCreateOrConnectWithoutFederationInput[]
-    createMany?: StudentLicenseCreateManyFederationInputEnvelope
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
+  export type FederationContactCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput> | FederationContactCreateWithoutFederationInput[] | FederationContactUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationContactCreateOrConnectWithoutFederationInput | FederationContactCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationContactCreateManyFederationInputEnvelope
+    connect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
   }
 
-  export type StudentLicenseUpdateManyWithoutFederationNestedInput = {
-    create?: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput> | StudentLicenseCreateWithoutFederationInput[] | StudentLicenseUncheckedCreateWithoutFederationInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutFederationInput | StudentLicenseCreateOrConnectWithoutFederationInput[]
-    upsert?: StudentLicenseUpsertWithWhereUniqueWithoutFederationInput | StudentLicenseUpsertWithWhereUniqueWithoutFederationInput[]
-    createMany?: StudentLicenseCreateManyFederationInputEnvelope
-    set?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    disconnect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    delete?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    update?: StudentLicenseUpdateWithWhereUniqueWithoutFederationInput | StudentLicenseUpdateWithWhereUniqueWithoutFederationInput[]
-    updateMany?: StudentLicenseUpdateManyWithWhereWithoutFederationInput | StudentLicenseUpdateManyWithWhereWithoutFederationInput[]
-    deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
+  export type FederationSeasonCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput> | FederationSeasonCreateWithoutFederationInput[] | FederationSeasonUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutFederationInput | FederationSeasonCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationSeasonCreateManyFederationInputEnvelope
+    connect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
   }
 
-  export type StudentLicenseUncheckedUpdateManyWithoutFederationNestedInput = {
-    create?: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput> | StudentLicenseCreateWithoutFederationInput[] | StudentLicenseUncheckedCreateWithoutFederationInput[]
-    connectOrCreate?: StudentLicenseCreateOrConnectWithoutFederationInput | StudentLicenseCreateOrConnectWithoutFederationInput[]
-    upsert?: StudentLicenseUpsertWithWhereUniqueWithoutFederationInput | StudentLicenseUpsertWithWhereUniqueWithoutFederationInput[]
-    createMany?: StudentLicenseCreateManyFederationInputEnvelope
-    set?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    disconnect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    delete?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    connect?: StudentLicenseWhereUniqueInput | StudentLicenseWhereUniqueInput[]
-    update?: StudentLicenseUpdateWithWhereUniqueWithoutFederationInput | StudentLicenseUpdateWithWhereUniqueWithoutFederationInput[]
-    updateMany?: StudentLicenseUpdateManyWithWhereWithoutFederationInput | StudentLicenseUpdateManyWithWhereWithoutFederationInput[]
-    deleteMany?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
+  export type FederationSeasonChargeUncheckedCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput> | FederationSeasonChargeCreateWithoutFederationInput[] | FederationSeasonChargeUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonChargeCreateOrConnectWithoutFederationInput | FederationSeasonChargeCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationSeasonChargeCreateManyFederationInputEnvelope
+    connect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
   }
 
-  export type StudentProfileCreateNestedOneWithoutLicensesInput = {
-    create?: XOR<StudentProfileCreateWithoutLicensesInput, StudentProfileUncheckedCreateWithoutLicensesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutLicensesInput
-    connect?: StudentProfileWhereUniqueInput
+  export type FederationContactUncheckedCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput> | FederationContactCreateWithoutFederationInput[] | FederationContactUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationContactCreateOrConnectWithoutFederationInput | FederationContactCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationContactCreateManyFederationInputEnvelope
+    connect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
   }
 
-  export type FederationCreateNestedOneWithoutLicensesInput = {
-    create?: XOR<FederationCreateWithoutLicensesInput, FederationUncheckedCreateWithoutLicensesInput>
-    connectOrCreate?: FederationCreateOrConnectWithoutLicensesInput
+  export type FederationSeasonUncheckedCreateNestedManyWithoutFederationInput = {
+    create?: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput> | FederationSeasonCreateWithoutFederationInput[] | FederationSeasonUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutFederationInput | FederationSeasonCreateOrConnectWithoutFederationInput[]
+    createMany?: FederationSeasonCreateManyFederationInputEnvelope
+    connect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+  }
+
+  export type FederationSeasonChargeUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput> | FederationSeasonChargeCreateWithoutFederationInput[] | FederationSeasonChargeUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonChargeCreateOrConnectWithoutFederationInput | FederationSeasonChargeCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationSeasonChargeUpsertWithWhereUniqueWithoutFederationInput | FederationSeasonChargeUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationSeasonChargeCreateManyFederationInputEnvelope
+    set?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    disconnect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    delete?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    connect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    update?: FederationSeasonChargeUpdateWithWhereUniqueWithoutFederationInput | FederationSeasonChargeUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationSeasonChargeUpdateManyWithWhereWithoutFederationInput | FederationSeasonChargeUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationSeasonChargeScalarWhereInput | FederationSeasonChargeScalarWhereInput[]
+  }
+
+  export type FederationContactUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput> | FederationContactCreateWithoutFederationInput[] | FederationContactUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationContactCreateOrConnectWithoutFederationInput | FederationContactCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationContactUpsertWithWhereUniqueWithoutFederationInput | FederationContactUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationContactCreateManyFederationInputEnvelope
+    set?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    disconnect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    delete?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    connect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    update?: FederationContactUpdateWithWhereUniqueWithoutFederationInput | FederationContactUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationContactUpdateManyWithWhereWithoutFederationInput | FederationContactUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationContactScalarWhereInput | FederationContactScalarWhereInput[]
+  }
+
+  export type FederationSeasonUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput> | FederationSeasonCreateWithoutFederationInput[] | FederationSeasonUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutFederationInput | FederationSeasonCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationSeasonUpsertWithWhereUniqueWithoutFederationInput | FederationSeasonUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationSeasonCreateManyFederationInputEnvelope
+    set?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    disconnect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    delete?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    connect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    update?: FederationSeasonUpdateWithWhereUniqueWithoutFederationInput | FederationSeasonUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationSeasonUpdateManyWithWhereWithoutFederationInput | FederationSeasonUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationSeasonScalarWhereInput | FederationSeasonScalarWhereInput[]
+  }
+
+  export type FederationSeasonChargeUncheckedUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput> | FederationSeasonChargeCreateWithoutFederationInput[] | FederationSeasonChargeUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonChargeCreateOrConnectWithoutFederationInput | FederationSeasonChargeCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationSeasonChargeUpsertWithWhereUniqueWithoutFederationInput | FederationSeasonChargeUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationSeasonChargeCreateManyFederationInputEnvelope
+    set?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    disconnect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    delete?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    connect?: FederationSeasonChargeWhereUniqueInput | FederationSeasonChargeWhereUniqueInput[]
+    update?: FederationSeasonChargeUpdateWithWhereUniqueWithoutFederationInput | FederationSeasonChargeUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationSeasonChargeUpdateManyWithWhereWithoutFederationInput | FederationSeasonChargeUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationSeasonChargeScalarWhereInput | FederationSeasonChargeScalarWhereInput[]
+  }
+
+  export type FederationContactUncheckedUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput> | FederationContactCreateWithoutFederationInput[] | FederationContactUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationContactCreateOrConnectWithoutFederationInput | FederationContactCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationContactUpsertWithWhereUniqueWithoutFederationInput | FederationContactUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationContactCreateManyFederationInputEnvelope
+    set?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    disconnect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    delete?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    connect?: FederationContactWhereUniqueInput | FederationContactWhereUniqueInput[]
+    update?: FederationContactUpdateWithWhereUniqueWithoutFederationInput | FederationContactUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationContactUpdateManyWithWhereWithoutFederationInput | FederationContactUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationContactScalarWhereInput | FederationContactScalarWhereInput[]
+  }
+
+  export type FederationSeasonUncheckedUpdateManyWithoutFederationNestedInput = {
+    create?: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput> | FederationSeasonCreateWithoutFederationInput[] | FederationSeasonUncheckedCreateWithoutFederationInput[]
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutFederationInput | FederationSeasonCreateOrConnectWithoutFederationInput[]
+    upsert?: FederationSeasonUpsertWithWhereUniqueWithoutFederationInput | FederationSeasonUpsertWithWhereUniqueWithoutFederationInput[]
+    createMany?: FederationSeasonCreateManyFederationInputEnvelope
+    set?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    disconnect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    delete?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    connect?: FederationSeasonWhereUniqueInput | FederationSeasonWhereUniqueInput[]
+    update?: FederationSeasonUpdateWithWhereUniqueWithoutFederationInput | FederationSeasonUpdateWithWhereUniqueWithoutFederationInput[]
+    updateMany?: FederationSeasonUpdateManyWithWhereWithoutFederationInput | FederationSeasonUpdateManyWithWhereWithoutFederationInput[]
+    deleteMany?: FederationSeasonScalarWhereInput | FederationSeasonScalarWhereInput[]
+  }
+
+  export type FederationCreateNestedOneWithoutContactsInput = {
+    create?: XOR<FederationCreateWithoutContactsInput, FederationUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutContactsInput
     connect?: FederationWhereUniqueInput
   }
 
-  export type StudentProfileUpdateOneRequiredWithoutLicensesNestedInput = {
-    create?: XOR<StudentProfileCreateWithoutLicensesInput, StudentProfileUncheckedCreateWithoutLicensesInput>
-    connectOrCreate?: StudentProfileCreateOrConnectWithoutLicensesInput
-    upsert?: StudentProfileUpsertWithoutLicensesInput
-    connect?: StudentProfileWhereUniqueInput
-    update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutLicensesInput, StudentProfileUpdateWithoutLicensesInput>, StudentProfileUncheckedUpdateWithoutLicensesInput>
+  export type EnumFederationContactMediumFieldUpdateOperationsInput = {
+    set?: $Enums.FederationContactMedium
   }
 
-  export type FederationUpdateOneRequiredWithoutLicensesNestedInput = {
-    create?: XOR<FederationCreateWithoutLicensesInput, FederationUncheckedCreateWithoutLicensesInput>
-    connectOrCreate?: FederationCreateOrConnectWithoutLicensesInput
-    upsert?: FederationUpsertWithoutLicensesInput
+  export type FederationUpdateOneRequiredWithoutContactsNestedInput = {
+    create?: XOR<FederationCreateWithoutContactsInput, FederationUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutContactsInput
+    upsert?: FederationUpsertWithoutContactsInput
     connect?: FederationWhereUniqueInput
-    update?: XOR<XOR<FederationUpdateToOneWithWhereWithoutLicensesInput, FederationUpdateWithoutLicensesInput>, FederationUncheckedUpdateWithoutLicensesInput>
+    update?: XOR<XOR<FederationUpdateToOneWithWhereWithoutContactsInput, FederationUpdateWithoutContactsInput>, FederationUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type FederationCreateNestedOneWithoutSeasonsInput = {
+    create?: XOR<FederationCreateWithoutSeasonsInput, FederationUncheckedCreateWithoutSeasonsInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutSeasonsInput
+    connect?: FederationWhereUniqueInput
+  }
+
+  export type FederationLicenseTypeCreateNestedManyWithoutSeasonInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput> | FederationLicenseTypeCreateWithoutSeasonInput[] | FederationLicenseTypeUncheckedCreateWithoutSeasonInput[]
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutSeasonInput | FederationLicenseTypeCreateOrConnectWithoutSeasonInput[]
+    createMany?: FederationLicenseTypeCreateManySeasonInputEnvelope
+    connect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+  }
+
+  export type FederationLicenseTypeUncheckedCreateNestedManyWithoutSeasonInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput> | FederationLicenseTypeCreateWithoutSeasonInput[] | FederationLicenseTypeUncheckedCreateWithoutSeasonInput[]
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutSeasonInput | FederationLicenseTypeCreateOrConnectWithoutSeasonInput[]
+    createMany?: FederationLicenseTypeCreateManySeasonInputEnvelope
+    connect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+  }
+
+  export type FederationUpdateOneRequiredWithoutSeasonsNestedInput = {
+    create?: XOR<FederationCreateWithoutSeasonsInput, FederationUncheckedCreateWithoutSeasonsInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutSeasonsInput
+    upsert?: FederationUpsertWithoutSeasonsInput
+    connect?: FederationWhereUniqueInput
+    update?: XOR<XOR<FederationUpdateToOneWithWhereWithoutSeasonsInput, FederationUpdateWithoutSeasonsInput>, FederationUncheckedUpdateWithoutSeasonsInput>
+  }
+
+  export type FederationLicenseTypeUpdateManyWithoutSeasonNestedInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput> | FederationLicenseTypeCreateWithoutSeasonInput[] | FederationLicenseTypeUncheckedCreateWithoutSeasonInput[]
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutSeasonInput | FederationLicenseTypeCreateOrConnectWithoutSeasonInput[]
+    upsert?: FederationLicenseTypeUpsertWithWhereUniqueWithoutSeasonInput | FederationLicenseTypeUpsertWithWhereUniqueWithoutSeasonInput[]
+    createMany?: FederationLicenseTypeCreateManySeasonInputEnvelope
+    set?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    disconnect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    delete?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    connect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    update?: FederationLicenseTypeUpdateWithWhereUniqueWithoutSeasonInput | FederationLicenseTypeUpdateWithWhereUniqueWithoutSeasonInput[]
+    updateMany?: FederationLicenseTypeUpdateManyWithWhereWithoutSeasonInput | FederationLicenseTypeUpdateManyWithWhereWithoutSeasonInput[]
+    deleteMany?: FederationLicenseTypeScalarWhereInput | FederationLicenseTypeScalarWhereInput[]
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateManyWithoutSeasonNestedInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput> | FederationLicenseTypeCreateWithoutSeasonInput[] | FederationLicenseTypeUncheckedCreateWithoutSeasonInput[]
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutSeasonInput | FederationLicenseTypeCreateOrConnectWithoutSeasonInput[]
+    upsert?: FederationLicenseTypeUpsertWithWhereUniqueWithoutSeasonInput | FederationLicenseTypeUpsertWithWhereUniqueWithoutSeasonInput[]
+    createMany?: FederationLicenseTypeCreateManySeasonInputEnvelope
+    set?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    disconnect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    delete?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    connect?: FederationLicenseTypeWhereUniqueInput | FederationLicenseTypeWhereUniqueInput[]
+    update?: FederationLicenseTypeUpdateWithWhereUniqueWithoutSeasonInput | FederationLicenseTypeUpdateWithWhereUniqueWithoutSeasonInput[]
+    updateMany?: FederationLicenseTypeUpdateManyWithWhereWithoutSeasonInput | FederationLicenseTypeUpdateManyWithWhereWithoutSeasonInput[]
+    deleteMany?: FederationLicenseTypeScalarWhereInput | FederationLicenseTypeScalarWhereInput[]
+  }
+
+  export type FederationSeasonCreateNestedOneWithoutLicenseTypesInput = {
+    create?: XOR<FederationSeasonCreateWithoutLicenseTypesInput, FederationSeasonUncheckedCreateWithoutLicenseTypesInput>
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutLicenseTypesInput
+    connect?: FederationSeasonWhereUniqueInput
+  }
+
+  export type FederationLicensePriceRowCreateNestedManyWithoutLicenseTypeInput = {
+    create?: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput> | FederationLicensePriceRowCreateWithoutLicenseTypeInput[] | FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput[]
+    connectOrCreate?: FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput | FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput[]
+    createMany?: FederationLicensePriceRowCreateManyLicenseTypeInputEnvelope
+    connect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+  }
+
+  export type FederationLicensePriceRowUncheckedCreateNestedManyWithoutLicenseTypeInput = {
+    create?: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput> | FederationLicensePriceRowCreateWithoutLicenseTypeInput[] | FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput[]
+    connectOrCreate?: FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput | FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput[]
+    createMany?: FederationLicensePriceRowCreateManyLicenseTypeInputEnvelope
+    connect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+  }
+
+  export type FederationSeasonUpdateOneRequiredWithoutLicenseTypesNestedInput = {
+    create?: XOR<FederationSeasonCreateWithoutLicenseTypesInput, FederationSeasonUncheckedCreateWithoutLicenseTypesInput>
+    connectOrCreate?: FederationSeasonCreateOrConnectWithoutLicenseTypesInput
+    upsert?: FederationSeasonUpsertWithoutLicenseTypesInput
+    connect?: FederationSeasonWhereUniqueInput
+    update?: XOR<XOR<FederationSeasonUpdateToOneWithWhereWithoutLicenseTypesInput, FederationSeasonUpdateWithoutLicenseTypesInput>, FederationSeasonUncheckedUpdateWithoutLicenseTypesInput>
+  }
+
+  export type FederationLicensePriceRowUpdateManyWithoutLicenseTypeNestedInput = {
+    create?: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput> | FederationLicensePriceRowCreateWithoutLicenseTypeInput[] | FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput[]
+    connectOrCreate?: FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput | FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput[]
+    upsert?: FederationLicensePriceRowUpsertWithWhereUniqueWithoutLicenseTypeInput | FederationLicensePriceRowUpsertWithWhereUniqueWithoutLicenseTypeInput[]
+    createMany?: FederationLicensePriceRowCreateManyLicenseTypeInputEnvelope
+    set?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    disconnect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    delete?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    connect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    update?: FederationLicensePriceRowUpdateWithWhereUniqueWithoutLicenseTypeInput | FederationLicensePriceRowUpdateWithWhereUniqueWithoutLicenseTypeInput[]
+    updateMany?: FederationLicensePriceRowUpdateManyWithWhereWithoutLicenseTypeInput | FederationLicensePriceRowUpdateManyWithWhereWithoutLicenseTypeInput[]
+    deleteMany?: FederationLicensePriceRowScalarWhereInput | FederationLicensePriceRowScalarWhereInput[]
+  }
+
+  export type FederationLicensePriceRowUncheckedUpdateManyWithoutLicenseTypeNestedInput = {
+    create?: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput> | FederationLicensePriceRowCreateWithoutLicenseTypeInput[] | FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput[]
+    connectOrCreate?: FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput | FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput[]
+    upsert?: FederationLicensePriceRowUpsertWithWhereUniqueWithoutLicenseTypeInput | FederationLicensePriceRowUpsertWithWhereUniqueWithoutLicenseTypeInput[]
+    createMany?: FederationLicensePriceRowCreateManyLicenseTypeInputEnvelope
+    set?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    disconnect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    delete?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    connect?: FederationLicensePriceRowWhereUniqueInput | FederationLicensePriceRowWhereUniqueInput[]
+    update?: FederationLicensePriceRowUpdateWithWhereUniqueWithoutLicenseTypeInput | FederationLicensePriceRowUpdateWithWhereUniqueWithoutLicenseTypeInput[]
+    updateMany?: FederationLicensePriceRowUpdateManyWithWhereWithoutLicenseTypeInput | FederationLicensePriceRowUpdateManyWithWhereWithoutLicenseTypeInput[]
+    deleteMany?: FederationLicensePriceRowScalarWhereInput | FederationLicensePriceRowScalarWhereInput[]
+  }
+
+  export type FederationLicenseTypeCreateNestedOneWithoutPriceRowsInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutPriceRowsInput, FederationLicenseTypeUncheckedCreateWithoutPriceRowsInput>
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutPriceRowsInput
+    connect?: FederationLicenseTypeWhereUniqueInput
+  }
+
+  export type EnumLicensePriceRowKindFieldUpdateOperationsInput = {
+    set?: $Enums.LicensePriceRowKind
+  }
+
+  export type FederationLicenseTypeUpdateOneRequiredWithoutPriceRowsNestedInput = {
+    create?: XOR<FederationLicenseTypeCreateWithoutPriceRowsInput, FederationLicenseTypeUncheckedCreateWithoutPriceRowsInput>
+    connectOrCreate?: FederationLicenseTypeCreateOrConnectWithoutPriceRowsInput
+    upsert?: FederationLicenseTypeUpsertWithoutPriceRowsInput
+    connect?: FederationLicenseTypeWhereUniqueInput
+    update?: XOR<XOR<FederationLicenseTypeUpdateToOneWithWhereWithoutPriceRowsInput, FederationLicenseTypeUpdateWithoutPriceRowsInput>, FederationLicenseTypeUncheckedUpdateWithoutPriceRowsInput>
+  }
+
+  export type FederationCreateNestedOneWithoutChargesInput = {
+    create?: XOR<FederationCreateWithoutChargesInput, FederationUncheckedCreateWithoutChargesInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutChargesInput
+    connect?: FederationWhereUniqueInput
+  }
+
+  export type EnumLicenseHolderTypeFieldUpdateOperationsInput = {
+    set?: $Enums.LicenseHolderType
+  }
+
+  export type FederationUpdateOneRequiredWithoutChargesNestedInput = {
+    create?: XOR<FederationCreateWithoutChargesInput, FederationUncheckedCreateWithoutChargesInput>
+    connectOrCreate?: FederationCreateOrConnectWithoutChargesInput
+    upsert?: FederationUpsertWithoutChargesInput
+    connect?: FederationWhereUniqueInput
+    update?: XOR<XOR<FederationUpdateToOneWithWhereWithoutChargesInput, FederationUpdateWithoutChargesInput>, FederationUncheckedUpdateWithoutChargesInput>
+  }
+
+  export type EnumAffiliationLicenseStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AffiliationLicenseStatus
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -34380,29 +43672,11 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  export type NestedEnumGenderNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.Gender | EnumGenderFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumGenderNullableFilter<$PrismaModel> | $Enums.Gender | null
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -34449,21 +43723,14 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+  export type NestedEnumGenderNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Gender | EnumGenderFieldRefInput<$PrismaModel> | null
+    in?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.Gender[] | ListEnumGenderFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumGenderNullableWithAggregatesFilter<$PrismaModel> | $Enums.Gender | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
+    _min?: NestedEnumGenderNullableFilter<$PrismaModel>
+    _max?: NestedEnumGenderNullableFilter<$PrismaModel>
   }
 
   export type NestedIntNullableFilter<$PrismaModel = never> = {
@@ -34475,20 +43742,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -34513,11 +43766,67 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedEnumStudentStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel>
     in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumStudentStatusFilter<$PrismaModel> | $Enums.StudentStatus
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumStudentStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -34559,6 +43868,20 @@ export namespace Prisma {
     not?: NestedEnumStudentStatusNullableFilter<$PrismaModel> | $Enums.StudentStatus | null
   }
 
+  export type NestedEnumLeaveReasonNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveReason | EnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveReasonNullableFilter<$PrismaModel> | $Enums.LeaveReason | null
+  }
+
+  export type NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveNoticeMethod | EnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel> | $Enums.LeaveNoticeMethod | null
+  }
+
   export type NestedEnumStudentStatusNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.StudentStatus | EnumStudentStatusFieldRefInput<$PrismaModel> | null
     in?: $Enums.StudentStatus[] | ListEnumStudentStatusFieldRefInput<$PrismaModel> | null
@@ -34567,6 +43890,26 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
     _max?: NestedEnumStudentStatusNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumLeaveReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveReason | EnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveReason[] | ListEnumLeaveReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveReason | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumLeaveReasonNullableFilter<$PrismaModel>
+    _max?: NestedEnumLeaveReasonNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumLeaveNoticeMethodNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LeaveNoticeMethod | EnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    in?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.LeaveNoticeMethod[] | ListEnumLeaveNoticeMethodFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumLeaveNoticeMethodNullableWithAggregatesFilter<$PrismaModel> | $Enums.LeaveNoticeMethod | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel>
+    _max?: NestedEnumLeaveNoticeMethodNullableFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -34852,11 +44195,82 @@ export namespace Prisma {
     _max?: NestedEnumRemittanceItemStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumFederationContactMediumFilter<$PrismaModel = never> = {
+    equals?: $Enums.FederationContactMedium | EnumFederationContactMediumFieldRefInput<$PrismaModel>
+    in?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    not?: NestedEnumFederationContactMediumFilter<$PrismaModel> | $Enums.FederationContactMedium
+  }
+
+  export type NestedEnumFederationContactMediumWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FederationContactMedium | EnumFederationContactMediumFieldRefInput<$PrismaModel>
+    in?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FederationContactMedium[] | ListEnumFederationContactMediumFieldRefInput<$PrismaModel>
+    not?: NestedEnumFederationContactMediumWithAggregatesFilter<$PrismaModel> | $Enums.FederationContactMedium
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFederationContactMediumFilter<$PrismaModel>
+    _max?: NestedEnumFederationContactMediumFilter<$PrismaModel>
+  }
+
+  export type NestedEnumLicensePriceRowKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicensePriceRowKind | EnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    in?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicensePriceRowKindFilter<$PrismaModel> | $Enums.LicensePriceRowKind
+  }
+
+  export type NestedEnumLicensePriceRowKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicensePriceRowKind | EnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    in?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicensePriceRowKind[] | ListEnumLicensePriceRowKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicensePriceRowKindWithAggregatesFilter<$PrismaModel> | $Enums.LicensePriceRowKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLicensePriceRowKindFilter<$PrismaModel>
+    _max?: NestedEnumLicensePriceRowKindFilter<$PrismaModel>
+  }
+
+  export type NestedEnumLicenseHolderTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicenseHolderType | EnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicenseHolderTypeFilter<$PrismaModel> | $Enums.LicenseHolderType
+  }
+
+  export type NestedEnumLicenseHolderTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.LicenseHolderType | EnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.LicenseHolderType[] | ListEnumLicenseHolderTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumLicenseHolderTypeWithAggregatesFilter<$PrismaModel> | $Enums.LicenseHolderType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumLicenseHolderTypeFilter<$PrismaModel>
+    _max?: NestedEnumLicenseHolderTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumAffiliationLicenseStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AffiliationLicenseStatus | EnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel> | $Enums.AffiliationLicenseStatus
+  }
+
+  export type NestedEnumAffiliationLicenseStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AffiliationLicenseStatus | EnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AffiliationLicenseStatus[] | ListEnumAffiliationLicenseStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAffiliationLicenseStatusWithAggregatesFilter<$PrismaModel> | $Enums.AffiliationLicenseStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel>
+    _max?: NestedEnumAffiliationLicenseStatusFilter<$PrismaModel>
+  }
+
   export type StudentStatusHistoryCreateWithoutStudentProfileInput = {
     id?: string
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
   }
@@ -34866,6 +44280,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
   }
@@ -35008,144 +44425,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type StudentSubscriptionCreateWithoutStudentInput = {
-    id?: string
-    isActive?: boolean
-    feeTier: FeeTierCreateNestedOneWithoutSubscriptionsInput
-  }
-
-  export type StudentSubscriptionUncheckedCreateWithoutStudentInput = {
-    id?: string
-    feeTierId: string
-    isActive?: boolean
-  }
-
-  export type StudentSubscriptionCreateOrConnectWithoutStudentInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    create: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentSubscriptionCreateManyStudentInputEnvelope = {
-    data: StudentSubscriptionCreateManyStudentInput | StudentSubscriptionCreateManyStudentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type StudentLicenseCreateWithoutStudentInput = {
-    id?: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
-    federation: FederationCreateNestedOneWithoutLicensesInput
-  }
-
-  export type StudentLicenseUncheckedCreateWithoutStudentInput = {
-    id?: string
-    federationId: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
-  }
-
-  export type StudentLicenseCreateOrConnectWithoutStudentInput = {
-    where: StudentLicenseWhereUniqueInput
-    create: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentLicenseCreateManyStudentInputEnvelope = {
-    data: StudentLicenseCreateManyStudentInput | StudentLicenseCreateManyStudentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type StudentFeeCreateWithoutStudentInput = {
-    id?: string
-    customAmount?: Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: boolean
-    effectiveFrom?: Date | string
-    effectiveTo?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    feeTier?: FeeTierCreateNestedOneWithoutStudentFeesInput
-  }
-
-  export type StudentFeeUncheckedCreateWithoutStudentInput = {
-    id?: string
-    feeTierId?: string | null
-    customAmount?: Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: boolean
-    effectiveFrom?: Date | string
-    effectiveTo?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StudentFeeCreateOrConnectWithoutStudentInput = {
-    where: StudentFeeWhereUniqueInput
-    create: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentFeeCreateManyStudentInputEnvelope = {
-    data: StudentFeeCreateManyStudentInput | StudentFeeCreateManyStudentInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type StudentDiscountCreateWithoutStudentProfileInput = {
-    id?: string
-    assignedAt?: Date | string
-    expiresAt?: Date | string | null
-    discount: DiscountCreateNestedOneWithoutStudentDiscountsInput
-  }
-
-  export type StudentDiscountUncheckedCreateWithoutStudentProfileInput = {
-    id?: string
-    discountId: string
-    assignedAt?: Date | string
-    expiresAt?: Date | string | null
-  }
-
-  export type StudentDiscountCreateOrConnectWithoutStudentProfileInput = {
-    where: StudentDiscountWhereUniqueInput
-    create: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput>
-  }
-
-  export type StudentDiscountCreateManyStudentProfileInputEnvelope = {
-    data: StudentDiscountCreateManyStudentProfileInput | StudentDiscountCreateManyStudentProfileInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type BankMandateCreateWithoutStudentInput = {
-    id?: string
-    iban: string
-    bic?: string | null
-    mandateReference: string
-    signatureDate: Date | string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    remittanceItems?: RemittanceItemCreateNestedManyWithoutMandateInput
-  }
-
-  export type BankMandateUncheckedCreateWithoutStudentInput = {
-    id?: string
-    iban: string
-    bic?: string | null
-    mandateReference: string
-    signatureDate: Date | string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    remittanceItems?: RemittanceItemUncheckedCreateNestedManyWithoutMandateInput
-  }
-
-  export type BankMandateCreateOrConnectWithoutStudentInput = {
-    where: BankMandateWhereUniqueInput
-    create: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput>
-  }
-
-  export type BankMandateCreateManyStudentInputEnvelope = {
-    data: BankMandateCreateManyStudentInput | BankMandateCreateManyStudentInput[]
-    skipDuplicates?: boolean
-  }
-
   export type StudentStatusHistoryUpsertWithWhereUniqueWithoutStudentProfileInput = {
     where: StudentStatusHistoryWhereUniqueInput
     update: XOR<StudentStatusHistoryUpdateWithoutStudentProfileInput, StudentStatusHistoryUncheckedUpdateWithoutStudentProfileInput>
@@ -35171,6 +44450,9 @@ export namespace Prisma {
     previousStatus?: EnumStudentStatusNullableFilter<"StudentStatusHistory"> | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFilter<"StudentStatusHistory"> | $Enums.StudentStatus
     reason?: StringNullableFilter<"StudentStatusHistory"> | string | null
+    leaveReason?: EnumLeaveReasonNullableFilter<"StudentStatusHistory"> | $Enums.LeaveReason | null
+    leaveNoticeMethod?: EnumLeaveNoticeMethodNullableFilter<"StudentStatusHistory"> | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: StringNullableFilter<"StudentStatusHistory"> | string | null
     changedById?: StringNullableFilter<"StudentStatusHistory"> | string | null
     createdAt?: DateTimeFilter<"StudentStatusHistory"> | Date | string
   }
@@ -35314,152 +44596,21 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"GraduationRequest"> | Date | string
   }
 
-  export type StudentSubscriptionUpsertWithWhereUniqueWithoutStudentInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    update: XOR<StudentSubscriptionUpdateWithoutStudentInput, StudentSubscriptionUncheckedUpdateWithoutStudentInput>
-    create: XOR<StudentSubscriptionCreateWithoutStudentInput, StudentSubscriptionUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentSubscriptionUpdateWithWhereUniqueWithoutStudentInput = {
-    where: StudentSubscriptionWhereUniqueInput
-    data: XOR<StudentSubscriptionUpdateWithoutStudentInput, StudentSubscriptionUncheckedUpdateWithoutStudentInput>
-  }
-
-  export type StudentSubscriptionUpdateManyWithWhereWithoutStudentInput = {
-    where: StudentSubscriptionScalarWhereInput
-    data: XOR<StudentSubscriptionUpdateManyMutationInput, StudentSubscriptionUncheckedUpdateManyWithoutStudentInput>
-  }
-
-  export type StudentSubscriptionScalarWhereInput = {
-    AND?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
-    OR?: StudentSubscriptionScalarWhereInput[]
-    NOT?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
-    id?: StringFilter<"StudentSubscription"> | string
-    studentProfileId?: StringFilter<"StudentSubscription"> | string
-    feeTierId?: StringFilter<"StudentSubscription"> | string
-    isActive?: BoolFilter<"StudentSubscription"> | boolean
-  }
-
-  export type StudentLicenseUpsertWithWhereUniqueWithoutStudentInput = {
-    where: StudentLicenseWhereUniqueInput
-    update: XOR<StudentLicenseUpdateWithoutStudentInput, StudentLicenseUncheckedUpdateWithoutStudentInput>
-    create: XOR<StudentLicenseCreateWithoutStudentInput, StudentLicenseUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentLicenseUpdateWithWhereUniqueWithoutStudentInput = {
-    where: StudentLicenseWhereUniqueInput
-    data: XOR<StudentLicenseUpdateWithoutStudentInput, StudentLicenseUncheckedUpdateWithoutStudentInput>
-  }
-
-  export type StudentLicenseUpdateManyWithWhereWithoutStudentInput = {
-    where: StudentLicenseScalarWhereInput
-    data: XOR<StudentLicenseUpdateManyMutationInput, StudentLicenseUncheckedUpdateManyWithoutStudentInput>
-  }
-
-  export type StudentLicenseScalarWhereInput = {
-    AND?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
-    OR?: StudentLicenseScalarWhereInput[]
-    NOT?: StudentLicenseScalarWhereInput | StudentLicenseScalarWhereInput[]
-    id?: StringFilter<"StudentLicense"> | string
-    studentProfileId?: StringFilter<"StudentLicense"> | string
-    federationId?: StringFilter<"StudentLicense"> | string
-    licenseNumber?: StringFilter<"StudentLicense"> | string
-    validUntil?: DateTimeFilter<"StudentLicense"> | Date | string
-    isActive?: BoolFilter<"StudentLicense"> | boolean
-  }
-
-  export type StudentFeeUpsertWithWhereUniqueWithoutStudentInput = {
-    where: StudentFeeWhereUniqueInput
-    update: XOR<StudentFeeUpdateWithoutStudentInput, StudentFeeUncheckedUpdateWithoutStudentInput>
-    create: XOR<StudentFeeCreateWithoutStudentInput, StudentFeeUncheckedCreateWithoutStudentInput>
-  }
-
-  export type StudentFeeUpdateWithWhereUniqueWithoutStudentInput = {
-    where: StudentFeeWhereUniqueInput
-    data: XOR<StudentFeeUpdateWithoutStudentInput, StudentFeeUncheckedUpdateWithoutStudentInput>
-  }
-
-  export type StudentFeeUpdateManyWithWhereWithoutStudentInput = {
-    where: StudentFeeScalarWhereInput
-    data: XOR<StudentFeeUpdateManyMutationInput, StudentFeeUncheckedUpdateManyWithoutStudentInput>
-  }
-
-  export type StudentFeeScalarWhereInput = {
-    AND?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
-    OR?: StudentFeeScalarWhereInput[]
-    NOT?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
-    id?: StringFilter<"StudentFee"> | string
-    studentProfileId?: StringFilter<"StudentFee"> | string
-    feeTierId?: StringNullableFilter<"StudentFee"> | string | null
-    customAmount?: DecimalNullableFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: BoolFilter<"StudentFee"> | boolean
-    effectiveFrom?: DateTimeFilter<"StudentFee"> | Date | string
-    effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
-    createdAt?: DateTimeFilter<"StudentFee"> | Date | string
-    updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
-  }
-
-  export type StudentDiscountUpsertWithWhereUniqueWithoutStudentProfileInput = {
-    where: StudentDiscountWhereUniqueInput
-    update: XOR<StudentDiscountUpdateWithoutStudentProfileInput, StudentDiscountUncheckedUpdateWithoutStudentProfileInput>
-    create: XOR<StudentDiscountCreateWithoutStudentProfileInput, StudentDiscountUncheckedCreateWithoutStudentProfileInput>
-  }
-
-  export type StudentDiscountUpdateWithWhereUniqueWithoutStudentProfileInput = {
-    where: StudentDiscountWhereUniqueInput
-    data: XOR<StudentDiscountUpdateWithoutStudentProfileInput, StudentDiscountUncheckedUpdateWithoutStudentProfileInput>
-  }
-
-  export type StudentDiscountUpdateManyWithWhereWithoutStudentProfileInput = {
-    where: StudentDiscountScalarWhereInput
-    data: XOR<StudentDiscountUpdateManyMutationInput, StudentDiscountUncheckedUpdateManyWithoutStudentProfileInput>
-  }
-
-  export type StudentDiscountScalarWhereInput = {
-    AND?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
-    OR?: StudentDiscountScalarWhereInput[]
-    NOT?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
-    id?: StringFilter<"StudentDiscount"> | string
-    studentProfileId?: StringFilter<"StudentDiscount"> | string
-    discountId?: StringFilter<"StudentDiscount"> | string
-    assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
-    expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
-  }
-
-  export type BankMandateUpsertWithWhereUniqueWithoutStudentInput = {
-    where: BankMandateWhereUniqueInput
-    update: XOR<BankMandateUpdateWithoutStudentInput, BankMandateUncheckedUpdateWithoutStudentInput>
-    create: XOR<BankMandateCreateWithoutStudentInput, BankMandateUncheckedCreateWithoutStudentInput>
-  }
-
-  export type BankMandateUpdateWithWhereUniqueWithoutStudentInput = {
-    where: BankMandateWhereUniqueInput
-    data: XOR<BankMandateUpdateWithoutStudentInput, BankMandateUncheckedUpdateWithoutStudentInput>
-  }
-
-  export type BankMandateUpdateManyWithWhereWithoutStudentInput = {
-    where: BankMandateScalarWhereInput
-    data: XOR<BankMandateUpdateManyMutationInput, BankMandateUncheckedUpdateManyWithoutStudentInput>
-  }
-
-  export type BankMandateScalarWhereInput = {
-    AND?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
-    OR?: BankMandateScalarWhereInput[]
-    NOT?: BankMandateScalarWhereInput | BankMandateScalarWhereInput[]
-    id?: StringFilter<"BankMandate"> | string
-    studentProfileId?: StringFilter<"BankMandate"> | string
-    iban?: StringFilter<"BankMandate"> | string
-    bic?: StringNullableFilter<"BankMandate"> | string | null
-    mandateReference?: StringFilter<"BankMandate"> | string
-    signatureDate?: DateTimeFilter<"BankMandate"> | Date | string
-    isActive?: BoolFilter<"BankMandate"> | boolean
-    createdAt?: DateTimeFilter<"BankMandate"> | Date | string
-    updatedAt?: DateTimeFilter<"BankMandate"> | Date | string
-  }
-
   export type StudentProfileCreateWithoutStatusHistoryInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35469,16 +44620,23 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutStatusHistoryInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35488,11 +44646,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutStatusHistoryInput = {
@@ -35513,7 +44666,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutStatusHistoryInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35523,16 +44688,23 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutStatusHistoryInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35542,11 +44714,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentGuardianCreateWithoutGuardianInput = {
@@ -35587,7 +44754,19 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutGuardiansInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35597,16 +44776,23 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGuardiansInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35616,11 +44802,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGuardiansInput = {
@@ -35658,7 +44839,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35668,16 +44861,23 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGuardiansInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35687,11 +44887,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type GuardianUpsertWithoutStudentsInput = {
@@ -35773,12 +44968,14 @@ export namespace Prisma {
   export type DisciplineCreateWithoutProgramsInput = {
     id?: string
     name: string
+    acronym?: string | null
     description?: string | null
   }
 
   export type DisciplineUncheckedCreateWithoutProgramsInput = {
     id?: string
     name: string
+    acronym?: string | null
     description?: string | null
   }
 
@@ -35831,12 +45028,14 @@ export namespace Prisma {
   export type DisciplineUpdateWithoutProgramsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DisciplineUncheckedUpdateWithoutProgramsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -35963,7 +45162,19 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutRanksInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35973,16 +45184,23 @@ export namespace Prisma {
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutRanksInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -35992,11 +45210,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutRanksInput = {
@@ -36042,7 +45255,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36052,16 +45277,23 @@ export namespace Prisma {
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutRanksInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36071,11 +45303,6 @@ export namespace Prisma {
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type BeltRankUpsertWithoutStudentRanksInput = {
@@ -36111,7 +45338,19 @@ export namespace Prisma {
 
   export type StudentProfileCreateWithoutAttendancesInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36121,16 +45360,23 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutAttendancesInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36140,11 +45386,6 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutAttendancesInput = {
@@ -36165,7 +45406,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36175,16 +45428,23 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutAttendancesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36194,16 +45454,23 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36213,16 +45480,23 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutUpdateRequestsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36232,11 +45506,6 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutUpdateRequestsInput = {
@@ -36257,7 +45526,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36267,16 +45548,23 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutUpdateRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36286,16 +45574,23 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileCreateWithoutGraduationRequestsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36305,16 +45600,23 @@ export namespace Prisma {
     ranks?: StudentRankCreateNestedManyWithoutStudentInput
     attendances?: AttendanceCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileUncheckedCreateWithoutGraduationRequestsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    firstName?: string
+    lastName?: string
+    dni?: string | null
+    birthDate?: Date | string | null
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    state?: string | null
+    postalCode?: string | null
+    country?: string | null
+    gender?: $Enums.Gender | null
+    bankMandateId?: string | null
     status?: $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
@@ -36324,11 +45626,6 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
     attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
     updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
   export type StudentProfileCreateOrConnectWithoutGraduationRequestsInput = {
@@ -36349,7 +45646,19 @@ export namespace Prisma {
 
   export type StudentProfileUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36359,16 +45668,23 @@ export namespace Prisma {
     ranks?: StudentRankUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentProfileUncheckedUpdateWithoutGraduationRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    dni?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    state?: NullableStringFieldUpdateOperationsInput | string | null
+    postalCode?: NullableStringFieldUpdateOperationsInput | string | null
+    country?: NullableStringFieldUpdateOperationsInput | string | null
+    gender?: NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+    bankMandateId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36378,22 +45694,17 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type StudentFeeCreateWithoutFeeTierInput = {
     id?: string
+    studentProfileId: string
     customAmount?: Decimal | DecimalJsLike | number | string | null
     ipcApplied?: boolean
     effectiveFrom?: Date | string
     effectiveTo?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    student: StudentProfileCreateNestedOneWithoutStudentFeesInput
   }
 
   export type StudentFeeUncheckedCreateWithoutFeeTierInput = {
@@ -36419,8 +45730,8 @@ export namespace Prisma {
 
   export type StudentSubscriptionCreateWithoutFeeTierInput = {
     id?: string
+    studentProfileId: string
     isActive?: boolean
-    student: StudentProfileCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type StudentSubscriptionUncheckedCreateWithoutFeeTierInput = {
@@ -36455,6 +45766,21 @@ export namespace Prisma {
     data: XOR<StudentFeeUpdateManyMutationInput, StudentFeeUncheckedUpdateManyWithoutFeeTierInput>
   }
 
+  export type StudentFeeScalarWhereInput = {
+    AND?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+    OR?: StudentFeeScalarWhereInput[]
+    NOT?: StudentFeeScalarWhereInput | StudentFeeScalarWhereInput[]
+    id?: StringFilter<"StudentFee"> | string
+    studentProfileId?: StringFilter<"StudentFee"> | string
+    feeTierId?: StringNullableFilter<"StudentFee"> | string | null
+    customAmount?: DecimalNullableFilter<"StudentFee"> | Decimal | DecimalJsLike | number | string | null
+    ipcApplied?: BoolFilter<"StudentFee"> | boolean
+    effectiveFrom?: DateTimeFilter<"StudentFee"> | Date | string
+    effectiveTo?: DateTimeNullableFilter<"StudentFee"> | Date | string | null
+    createdAt?: DateTimeFilter<"StudentFee"> | Date | string
+    updatedAt?: DateTimeFilter<"StudentFee"> | Date | string
+  }
+
   export type StudentSubscriptionUpsertWithWhereUniqueWithoutFeeTierInput = {
     where: StudentSubscriptionWhereUniqueInput
     update: XOR<StudentSubscriptionUpdateWithoutFeeTierInput, StudentSubscriptionUncheckedUpdateWithoutFeeTierInput>
@@ -36471,47 +45797,14 @@ export namespace Prisma {
     data: XOR<StudentSubscriptionUpdateManyMutationInput, StudentSubscriptionUncheckedUpdateManyWithoutFeeTierInput>
   }
 
-  export type StudentProfileCreateWithoutStudentFeesInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileUncheckedCreateWithoutStudentFeesInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileCreateOrConnectWithoutStudentFeesInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
+  export type StudentSubscriptionScalarWhereInput = {
+    AND?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
+    OR?: StudentSubscriptionScalarWhereInput[]
+    NOT?: StudentSubscriptionScalarWhereInput | StudentSubscriptionScalarWhereInput[]
+    id?: StringFilter<"StudentSubscription"> | string
+    studentProfileId?: StringFilter<"StudentSubscription"> | string
+    feeTierId?: StringFilter<"StudentSubscription"> | string
+    isActive?: BoolFilter<"StudentSubscription"> | boolean
   }
 
   export type FeeTierCreateWithoutStudentFeesInput = {
@@ -36541,55 +45834,6 @@ export namespace Prisma {
   export type FeeTierCreateOrConnectWithoutStudentFeesInput = {
     where: FeeTierWhereUniqueInput
     create: XOR<FeeTierCreateWithoutStudentFeesInput, FeeTierUncheckedCreateWithoutStudentFeesInput>
-  }
-
-  export type StudentProfileUpsertWithoutStudentFeesInput = {
-    update: XOR<StudentProfileUpdateWithoutStudentFeesInput, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
-    create: XOR<StudentProfileCreateWithoutStudentFeesInput, StudentProfileUncheckedCreateWithoutStudentFeesInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutStudentFeesInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutStudentFeesInput, StudentProfileUncheckedUpdateWithoutStudentFeesInput>
-  }
-
-  export type StudentProfileUpdateWithoutStudentFeesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutStudentFeesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type FeeTierUpsertWithoutStudentFeesInput = {
@@ -36629,9 +45873,9 @@ export namespace Prisma {
 
   export type StudentDiscountCreateWithoutDiscountInput = {
     id?: string
+    studentProfileId: string
     assignedAt?: Date | string
     expiresAt?: Date | string | null
-    studentProfile: StudentProfileCreateNestedOneWithoutStudentDiscountsInput
   }
 
   export type StudentDiscountUncheckedCreateWithoutDiscountInput = {
@@ -36667,47 +45911,15 @@ export namespace Prisma {
     data: XOR<StudentDiscountUpdateManyMutationInput, StudentDiscountUncheckedUpdateManyWithoutDiscountInput>
   }
 
-  export type StudentProfileCreateWithoutStudentDiscountsInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileUncheckedCreateWithoutStudentDiscountsInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileCreateOrConnectWithoutStudentDiscountsInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
+  export type StudentDiscountScalarWhereInput = {
+    AND?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
+    OR?: StudentDiscountScalarWhereInput[]
+    NOT?: StudentDiscountScalarWhereInput | StudentDiscountScalarWhereInput[]
+    id?: StringFilter<"StudentDiscount"> | string
+    studentProfileId?: StringFilter<"StudentDiscount"> | string
+    discountId?: StringFilter<"StudentDiscount"> | string
+    assignedAt?: DateTimeFilter<"StudentDiscount"> | Date | string
+    expiresAt?: DateTimeNullableFilter<"StudentDiscount"> | Date | string | null
   }
 
   export type DiscountCreateWithoutStudentDiscountsInput = {
@@ -36743,55 +45955,6 @@ export namespace Prisma {
   export type DiscountCreateOrConnectWithoutStudentDiscountsInput = {
     where: DiscountWhereUniqueInput
     create: XOR<DiscountCreateWithoutStudentDiscountsInput, DiscountUncheckedCreateWithoutStudentDiscountsInput>
-  }
-
-  export type StudentProfileUpsertWithoutStudentDiscountsInput = {
-    update: XOR<StudentProfileUpdateWithoutStudentDiscountsInput, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
-    create: XOR<StudentProfileCreateWithoutStudentDiscountsInput, StudentProfileUncheckedCreateWithoutStudentDiscountsInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutStudentDiscountsInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutStudentDiscountsInput, StudentProfileUncheckedUpdateWithoutStudentDiscountsInput>
-  }
-
-  export type StudentProfileUpdateWithoutStudentDiscountsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutStudentDiscountsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type DiscountUpsertWithoutStudentDiscountsInput = {
@@ -36835,49 +45998,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentProfileCreateWithoutSubscriptionsInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileUncheckedCreateWithoutSubscriptionsInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
-  }
-
-  export type StudentProfileCreateOrConnectWithoutSubscriptionsInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutSubscriptionsInput, StudentProfileUncheckedCreateWithoutSubscriptionsInput>
-  }
-
   export type FeeTierCreateWithoutSubscriptionsInput = {
     id?: string
     name: string
@@ -36905,55 +46025,6 @@ export namespace Prisma {
   export type FeeTierCreateOrConnectWithoutSubscriptionsInput = {
     where: FeeTierWhereUniqueInput
     create: XOR<FeeTierCreateWithoutSubscriptionsInput, FeeTierUncheckedCreateWithoutSubscriptionsInput>
-  }
-
-  export type StudentProfileUpsertWithoutSubscriptionsInput = {
-    update: XOR<StudentProfileUpdateWithoutSubscriptionsInput, StudentProfileUncheckedUpdateWithoutSubscriptionsInput>
-    create: XOR<StudentProfileCreateWithoutSubscriptionsInput, StudentProfileUncheckedCreateWithoutSubscriptionsInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutSubscriptionsInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutSubscriptionsInput, StudentProfileUncheckedUpdateWithoutSubscriptionsInput>
-  }
-
-  export type StudentProfileUpdateWithoutSubscriptionsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutSubscriptionsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
   }
 
   export type FeeTierUpsertWithoutSubscriptionsInput = {
@@ -37137,49 +46208,6 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentProfileCreateWithoutBankMandatesInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-  }
-
-  export type StudentProfileUncheckedCreateWithoutBankMandatesInput = {
-    id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    licenses?: StudentLicenseUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-  }
-
-  export type StudentProfileCreateOrConnectWithoutBankMandatesInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
-  }
-
   export type RemittanceItemCreateWithoutMandateInput = {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
@@ -37208,55 +46236,6 @@ export namespace Prisma {
   export type RemittanceItemCreateManyMandateInputEnvelope = {
     data: RemittanceItemCreateManyMandateInput | RemittanceItemCreateManyMandateInput[]
     skipDuplicates?: boolean
-  }
-
-  export type StudentProfileUpsertWithoutBankMandatesInput = {
-    update: XOR<StudentProfileUpdateWithoutBankMandatesInput, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
-    create: XOR<StudentProfileCreateWithoutBankMandatesInput, StudentProfileUncheckedCreateWithoutBankMandatesInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutBankMandatesInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutBankMandatesInput, StudentProfileUncheckedUpdateWithoutBankMandatesInput>
-  }
-
-  export type StudentProfileUpdateWithoutBankMandatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutBankMandatesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    licenses?: StudentLicenseUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
   }
 
   export type RemittanceItemUpsertWithWhereUniqueWithoutMandateInput = {
@@ -37368,23 +46347,37 @@ export namespace Prisma {
 
   export type BankMandateCreateWithoutRemittanceItemsInput = {
     id?: string
+    payerUserId: string
     iban: string
     bic?: string | null
     mandateReference: string
     signatureDate: Date | string
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId?: string
+    isSigned?: boolean
+    signedAt?: Date | string | null
+    signedByUserId?: string | null
+    signatureIp?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    student: StudentProfileCreateNestedOneWithoutBankMandatesInput
   }
 
   export type BankMandateUncheckedCreateWithoutRemittanceItemsInput = {
     id?: string
-    studentProfileId: string
+    payerUserId: string
     iban: string
     bic?: string | null
     mandateReference: string
     signatureDate: Date | string
+    accountHolderName: string
+    accountHolderDni: string
+    tenantId?: string
+    isSigned?: boolean
+    signedAt?: Date | string | null
+    signedByUserId?: string | null
+    signatureIp?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37445,200 +46438,699 @@ export namespace Prisma {
 
   export type BankMandateUpdateWithoutRemittanceItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    student?: StudentProfileUpdateOneRequiredWithoutBankMandatesNestedInput
   }
 
   export type BankMandateUncheckedUpdateWithoutRemittanceItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
+    payerUserId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
     mandateReference?: StringFieldUpdateOperationsInput | string
     signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    accountHolderName?: StringFieldUpdateOperationsInput | string
+    accountHolderDni?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    isSigned?: BoolFieldUpdateOperationsInput | boolean
+    signedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    signedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    signatureIp?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseCreateWithoutFederationInput = {
+  export type FederationSeasonChargeCreateWithoutFederationInput = {
     id?: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
-    student: StudentProfileCreateNestedOneWithoutLicensesInput
+    tenantId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseUncheckedCreateWithoutFederationInput = {
+  export type FederationSeasonChargeUncheckedCreateWithoutFederationInput = {
     id?: string
-    studentProfileId: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
+    tenantId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseCreateOrConnectWithoutFederationInput = {
-    where: StudentLicenseWhereUniqueInput
-    create: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput>
+  export type FederationSeasonChargeCreateOrConnectWithoutFederationInput = {
+    where: FederationSeasonChargeWhereUniqueInput
+    create: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput>
   }
 
-  export type StudentLicenseCreateManyFederationInputEnvelope = {
-    data: StudentLicenseCreateManyFederationInput | StudentLicenseCreateManyFederationInput[]
+  export type FederationSeasonChargeCreateManyFederationInputEnvelope = {
+    data: FederationSeasonChargeCreateManyFederationInput | FederationSeasonChargeCreateManyFederationInput[]
     skipDuplicates?: boolean
   }
 
-  export type StudentLicenseUpsertWithWhereUniqueWithoutFederationInput = {
-    where: StudentLicenseWhereUniqueInput
-    update: XOR<StudentLicenseUpdateWithoutFederationInput, StudentLicenseUncheckedUpdateWithoutFederationInput>
-    create: XOR<StudentLicenseCreateWithoutFederationInput, StudentLicenseUncheckedCreateWithoutFederationInput>
-  }
-
-  export type StudentLicenseUpdateWithWhereUniqueWithoutFederationInput = {
-    where: StudentLicenseWhereUniqueInput
-    data: XOR<StudentLicenseUpdateWithoutFederationInput, StudentLicenseUncheckedUpdateWithoutFederationInput>
-  }
-
-  export type StudentLicenseUpdateManyWithWhereWithoutFederationInput = {
-    where: StudentLicenseScalarWhereInput
-    data: XOR<StudentLicenseUpdateManyMutationInput, StudentLicenseUncheckedUpdateManyWithoutFederationInput>
-  }
-
-  export type StudentProfileCreateWithoutLicensesInput = {
+  export type FederationContactCreateWithoutFederationInput = {
     id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileUncheckedCreateWithoutLicensesInput = {
+  export type FederationContactUncheckedCreateWithoutFederationInput = {
     id?: string
-    userId: string
-    status?: $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    statusHistory?: StudentStatusHistoryUncheckedCreateNestedManyWithoutStudentProfileInput
-    guardians?: StudentGuardianUncheckedCreateNestedManyWithoutStudentInput
-    ranks?: StudentRankUncheckedCreateNestedManyWithoutStudentInput
-    attendances?: AttendanceUncheckedCreateNestedManyWithoutStudentInput
-    updateRequests?: ProfileUpdateRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    graduationRequests?: GraduationRequestUncheckedCreateNestedManyWithoutStudentProfileInput
-    subscriptions?: StudentSubscriptionUncheckedCreateNestedManyWithoutStudentInput
-    studentFees?: StudentFeeUncheckedCreateNestedManyWithoutStudentInput
-    studentDiscounts?: StudentDiscountUncheckedCreateNestedManyWithoutStudentProfileInput
-    bankMandates?: BankMandateUncheckedCreateNestedManyWithoutStudentInput
   }
 
-  export type StudentProfileCreateOrConnectWithoutLicensesInput = {
-    where: StudentProfileWhereUniqueInput
-    create: XOR<StudentProfileCreateWithoutLicensesInput, StudentProfileUncheckedCreateWithoutLicensesInput>
+  export type FederationContactCreateOrConnectWithoutFederationInput = {
+    where: FederationContactWhereUniqueInput
+    create: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput>
   }
 
-  export type FederationCreateWithoutLicensesInput = {
+  export type FederationContactCreateManyFederationInputEnvelope = {
+    data: FederationContactCreateManyFederationInput | FederationContactCreateManyFederationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FederationSeasonCreateWithoutFederationInput = {
     id?: string
-    name: string
-    country: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    licenseTypes?: FederationLicenseTypeCreateNestedManyWithoutSeasonInput
   }
 
-  export type FederationUncheckedCreateWithoutLicensesInput = {
+  export type FederationSeasonUncheckedCreateWithoutFederationInput = {
     id?: string
-    name: string
-    country: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    licenseTypes?: FederationLicenseTypeUncheckedCreateNestedManyWithoutSeasonInput
   }
 
-  export type FederationCreateOrConnectWithoutLicensesInput = {
+  export type FederationSeasonCreateOrConnectWithoutFederationInput = {
+    where: FederationSeasonWhereUniqueInput
+    create: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput>
+  }
+
+  export type FederationSeasonCreateManyFederationInputEnvelope = {
+    data: FederationSeasonCreateManyFederationInput | FederationSeasonCreateManyFederationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FederationSeasonChargeUpsertWithWhereUniqueWithoutFederationInput = {
+    where: FederationSeasonChargeWhereUniqueInput
+    update: XOR<FederationSeasonChargeUpdateWithoutFederationInput, FederationSeasonChargeUncheckedUpdateWithoutFederationInput>
+    create: XOR<FederationSeasonChargeCreateWithoutFederationInput, FederationSeasonChargeUncheckedCreateWithoutFederationInput>
+  }
+
+  export type FederationSeasonChargeUpdateWithWhereUniqueWithoutFederationInput = {
+    where: FederationSeasonChargeWhereUniqueInput
+    data: XOR<FederationSeasonChargeUpdateWithoutFederationInput, FederationSeasonChargeUncheckedUpdateWithoutFederationInput>
+  }
+
+  export type FederationSeasonChargeUpdateManyWithWhereWithoutFederationInput = {
+    where: FederationSeasonChargeScalarWhereInput
+    data: XOR<FederationSeasonChargeUpdateManyMutationInput, FederationSeasonChargeUncheckedUpdateManyWithoutFederationInput>
+  }
+
+  export type FederationSeasonChargeScalarWhereInput = {
+    AND?: FederationSeasonChargeScalarWhereInput | FederationSeasonChargeScalarWhereInput[]
+    OR?: FederationSeasonChargeScalarWhereInput[]
+    NOT?: FederationSeasonChargeScalarWhereInput | FederationSeasonChargeScalarWhereInput[]
+    id?: StringFilter<"FederationSeasonCharge"> | string
+    tenantId?: StringFilter<"FederationSeasonCharge"> | string
+    federationId?: StringFilter<"FederationSeasonCharge"> | string
+    season?: StringFilter<"FederationSeasonCharge"> | string
+    holderType?: EnumLicenseHolderTypeFilter<"FederationSeasonCharge"> | $Enums.LicenseHolderType
+    holderUserId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    studentProfileId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    licenseId?: StringNullableFilter<"FederationSeasonCharge"> | string | null
+    costAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFilter<"FederationSeasonCharge"> | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFilter<"FederationSeasonCharge"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeasonCharge"> | Date | string
+  }
+
+  export type FederationContactUpsertWithWhereUniqueWithoutFederationInput = {
+    where: FederationContactWhereUniqueInput
+    update: XOR<FederationContactUpdateWithoutFederationInput, FederationContactUncheckedUpdateWithoutFederationInput>
+    create: XOR<FederationContactCreateWithoutFederationInput, FederationContactUncheckedCreateWithoutFederationInput>
+  }
+
+  export type FederationContactUpdateWithWhereUniqueWithoutFederationInput = {
+    where: FederationContactWhereUniqueInput
+    data: XOR<FederationContactUpdateWithoutFederationInput, FederationContactUncheckedUpdateWithoutFederationInput>
+  }
+
+  export type FederationContactUpdateManyWithWhereWithoutFederationInput = {
+    where: FederationContactScalarWhereInput
+    data: XOR<FederationContactUpdateManyMutationInput, FederationContactUncheckedUpdateManyWithoutFederationInput>
+  }
+
+  export type FederationContactScalarWhereInput = {
+    AND?: FederationContactScalarWhereInput | FederationContactScalarWhereInput[]
+    OR?: FederationContactScalarWhereInput[]
+    NOT?: FederationContactScalarWhereInput | FederationContactScalarWhereInput[]
+    id?: StringFilter<"FederationContact"> | string
+    federationId?: StringFilter<"FederationContact"> | string
+    medium?: EnumFederationContactMediumFilter<"FederationContact"> | $Enums.FederationContactMedium
+    value?: StringFilter<"FederationContact"> | string
+    tag?: StringFilter<"FederationContact"> | string
+    createdAt?: DateTimeFilter<"FederationContact"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationContact"> | Date | string
+  }
+
+  export type FederationSeasonUpsertWithWhereUniqueWithoutFederationInput = {
+    where: FederationSeasonWhereUniqueInput
+    update: XOR<FederationSeasonUpdateWithoutFederationInput, FederationSeasonUncheckedUpdateWithoutFederationInput>
+    create: XOR<FederationSeasonCreateWithoutFederationInput, FederationSeasonUncheckedCreateWithoutFederationInput>
+  }
+
+  export type FederationSeasonUpdateWithWhereUniqueWithoutFederationInput = {
+    where: FederationSeasonWhereUniqueInput
+    data: XOR<FederationSeasonUpdateWithoutFederationInput, FederationSeasonUncheckedUpdateWithoutFederationInput>
+  }
+
+  export type FederationSeasonUpdateManyWithWhereWithoutFederationInput = {
+    where: FederationSeasonScalarWhereInput
+    data: XOR<FederationSeasonUpdateManyMutationInput, FederationSeasonUncheckedUpdateManyWithoutFederationInput>
+  }
+
+  export type FederationSeasonScalarWhereInput = {
+    AND?: FederationSeasonScalarWhereInput | FederationSeasonScalarWhereInput[]
+    OR?: FederationSeasonScalarWhereInput[]
+    NOT?: FederationSeasonScalarWhereInput | FederationSeasonScalarWhereInput[]
+    id?: StringFilter<"FederationSeason"> | string
+    federationId?: StringFilter<"FederationSeason"> | string
+    seasonName?: StringFilter<"FederationSeason"> | string
+    currency?: StringFilter<"FederationSeason"> | string
+    clubCost?: DecimalFilter<"FederationSeason"> | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFilter<"FederationSeason"> | boolean
+    createdAt?: DateTimeFilter<"FederationSeason"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationSeason"> | Date | string
+  }
+
+  export type FederationCreateWithoutContactsInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationUncheckedCreateWithoutContactsInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeUncheckedCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonUncheckedCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationCreateOrConnectWithoutContactsInput = {
     where: FederationWhereUniqueInput
-    create: XOR<FederationCreateWithoutLicensesInput, FederationUncheckedCreateWithoutLicensesInput>
+    create: XOR<FederationCreateWithoutContactsInput, FederationUncheckedCreateWithoutContactsInput>
   }
 
-  export type StudentProfileUpsertWithoutLicensesInput = {
-    update: XOR<StudentProfileUpdateWithoutLicensesInput, StudentProfileUncheckedUpdateWithoutLicensesInput>
-    create: XOR<StudentProfileCreateWithoutLicensesInput, StudentProfileUncheckedCreateWithoutLicensesInput>
-    where?: StudentProfileWhereInput
-  }
-
-  export type StudentProfileUpdateToOneWithWhereWithoutLicensesInput = {
-    where?: StudentProfileWhereInput
-    data: XOR<StudentProfileUpdateWithoutLicensesInput, StudentProfileUncheckedUpdateWithoutLicensesInput>
-  }
-
-  export type StudentProfileUpdateWithoutLicensesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUpdateManyWithoutStudentNestedInput
-  }
-
-  export type StudentProfileUncheckedUpdateWithoutLicensesInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    status?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
-    emergencyContacts?: NullableJsonNullValueInput | InputJsonValue
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    statusHistory?: StudentStatusHistoryUncheckedUpdateManyWithoutStudentProfileNestedInput
-    guardians?: StudentGuardianUncheckedUpdateManyWithoutStudentNestedInput
-    ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
-    attendances?: AttendanceUncheckedUpdateManyWithoutStudentNestedInput
-    updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
-    subscriptions?: StudentSubscriptionUncheckedUpdateManyWithoutStudentNestedInput
-    studentFees?: StudentFeeUncheckedUpdateManyWithoutStudentNestedInput
-    studentDiscounts?: StudentDiscountUncheckedUpdateManyWithoutStudentProfileNestedInput
-    bankMandates?: BankMandateUncheckedUpdateManyWithoutStudentNestedInput
-  }
-
-  export type FederationUpsertWithoutLicensesInput = {
-    update: XOR<FederationUpdateWithoutLicensesInput, FederationUncheckedUpdateWithoutLicensesInput>
-    create: XOR<FederationCreateWithoutLicensesInput, FederationUncheckedCreateWithoutLicensesInput>
+  export type FederationUpsertWithoutContactsInput = {
+    update: XOR<FederationUpdateWithoutContactsInput, FederationUncheckedUpdateWithoutContactsInput>
+    create: XOR<FederationCreateWithoutContactsInput, FederationUncheckedCreateWithoutContactsInput>
     where?: FederationWhereInput
   }
 
-  export type FederationUpdateToOneWithWhereWithoutLicensesInput = {
+  export type FederationUpdateToOneWithWhereWithoutContactsInput = {
     where?: FederationWhereInput
-    data: XOR<FederationUpdateWithoutLicensesInput, FederationUncheckedUpdateWithoutLicensesInput>
+    data: XOR<FederationUpdateWithoutContactsInput, FederationUncheckedUpdateWithoutContactsInput>
   }
 
-  export type FederationUpdateWithoutLicensesInput = {
+  export type FederationUpdateWithoutContactsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUpdateManyWithoutFederationNestedInput
   }
 
-  export type FederationUncheckedUpdateWithoutLicensesInput = {
+  export type FederationUncheckedUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUncheckedUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUncheckedUpdateManyWithoutFederationNestedInput
+  }
+
+  export type FederationCreateWithoutSeasonsInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeCreateNestedManyWithoutFederationInput
+    contacts?: FederationContactCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationUncheckedCreateWithoutSeasonsInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    charges?: FederationSeasonChargeUncheckedCreateNestedManyWithoutFederationInput
+    contacts?: FederationContactUncheckedCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationCreateOrConnectWithoutSeasonsInput = {
+    where: FederationWhereUniqueInput
+    create: XOR<FederationCreateWithoutSeasonsInput, FederationUncheckedCreateWithoutSeasonsInput>
+  }
+
+  export type FederationLicenseTypeCreateWithoutSeasonInput = {
+    id?: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    priceRows?: FederationLicensePriceRowCreateNestedManyWithoutLicenseTypeInput
+  }
+
+  export type FederationLicenseTypeUncheckedCreateWithoutSeasonInput = {
+    id?: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    priceRows?: FederationLicensePriceRowUncheckedCreateNestedManyWithoutLicenseTypeInput
+  }
+
+  export type FederationLicenseTypeCreateOrConnectWithoutSeasonInput = {
+    where: FederationLicenseTypeWhereUniqueInput
+    create: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput>
+  }
+
+  export type FederationLicenseTypeCreateManySeasonInputEnvelope = {
+    data: FederationLicenseTypeCreateManySeasonInput | FederationLicenseTypeCreateManySeasonInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FederationUpsertWithoutSeasonsInput = {
+    update: XOR<FederationUpdateWithoutSeasonsInput, FederationUncheckedUpdateWithoutSeasonsInput>
+    create: XOR<FederationCreateWithoutSeasonsInput, FederationUncheckedCreateWithoutSeasonsInput>
+    where?: FederationWhereInput
+  }
+
+  export type FederationUpdateToOneWithWhereWithoutSeasonsInput = {
+    where?: FederationWhereInput
+    data: XOR<FederationUpdateWithoutSeasonsInput, FederationUncheckedUpdateWithoutSeasonsInput>
+  }
+
+  export type FederationUpdateWithoutSeasonsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUpdateManyWithoutFederationNestedInput
+    contacts?: FederationContactUpdateManyWithoutFederationNestedInput
+  }
+
+  export type FederationUncheckedUpdateWithoutSeasonsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    charges?: FederationSeasonChargeUncheckedUpdateManyWithoutFederationNestedInput
+    contacts?: FederationContactUncheckedUpdateManyWithoutFederationNestedInput
+  }
+
+  export type FederationLicenseTypeUpsertWithWhereUniqueWithoutSeasonInput = {
+    where: FederationLicenseTypeWhereUniqueInput
+    update: XOR<FederationLicenseTypeUpdateWithoutSeasonInput, FederationLicenseTypeUncheckedUpdateWithoutSeasonInput>
+    create: XOR<FederationLicenseTypeCreateWithoutSeasonInput, FederationLicenseTypeUncheckedCreateWithoutSeasonInput>
+  }
+
+  export type FederationLicenseTypeUpdateWithWhereUniqueWithoutSeasonInput = {
+    where: FederationLicenseTypeWhereUniqueInput
+    data: XOR<FederationLicenseTypeUpdateWithoutSeasonInput, FederationLicenseTypeUncheckedUpdateWithoutSeasonInput>
+  }
+
+  export type FederationLicenseTypeUpdateManyWithWhereWithoutSeasonInput = {
+    where: FederationLicenseTypeScalarWhereInput
+    data: XOR<FederationLicenseTypeUpdateManyMutationInput, FederationLicenseTypeUncheckedUpdateManyWithoutSeasonInput>
+  }
+
+  export type FederationLicenseTypeScalarWhereInput = {
+    AND?: FederationLicenseTypeScalarWhereInput | FederationLicenseTypeScalarWhereInput[]
+    OR?: FederationLicenseTypeScalarWhereInput[]
+    NOT?: FederationLicenseTypeScalarWhereInput | FederationLicenseTypeScalarWhereInput[]
+    id?: StringFilter<"FederationLicenseType"> | string
+    seasonId?: StringFilter<"FederationLicenseType"> | string
+    name?: StringFilter<"FederationLicenseType"> | string
+    isActive?: BoolFilter<"FederationLicenseType"> | boolean
+    createdAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicenseType"> | Date | string
+  }
+
+  export type FederationSeasonCreateWithoutLicenseTypesInput = {
+    id?: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    federation: FederationCreateNestedOneWithoutSeasonsInput
+  }
+
+  export type FederationSeasonUncheckedCreateWithoutLicenseTypesInput = {
+    id?: string
+    federationId: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationSeasonCreateOrConnectWithoutLicenseTypesInput = {
+    where: FederationSeasonWhereUniqueInput
+    create: XOR<FederationSeasonCreateWithoutLicenseTypesInput, FederationSeasonUncheckedCreateWithoutLicenseTypesInput>
+  }
+
+  export type FederationLicensePriceRowCreateWithoutLicenseTypeInput = {
+    id?: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput = {
+    id?: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicensePriceRowCreateOrConnectWithoutLicenseTypeInput = {
+    where: FederationLicensePriceRowWhereUniqueInput
+    create: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput>
+  }
+
+  export type FederationLicensePriceRowCreateManyLicenseTypeInputEnvelope = {
+    data: FederationLicensePriceRowCreateManyLicenseTypeInput | FederationLicensePriceRowCreateManyLicenseTypeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FederationSeasonUpsertWithoutLicenseTypesInput = {
+    update: XOR<FederationSeasonUpdateWithoutLicenseTypesInput, FederationSeasonUncheckedUpdateWithoutLicenseTypesInput>
+    create: XOR<FederationSeasonCreateWithoutLicenseTypesInput, FederationSeasonUncheckedCreateWithoutLicenseTypesInput>
+    where?: FederationSeasonWhereInput
+  }
+
+  export type FederationSeasonUpdateToOneWithWhereWithoutLicenseTypesInput = {
+    where?: FederationSeasonWhereInput
+    data: XOR<FederationSeasonUpdateWithoutLicenseTypesInput, FederationSeasonUncheckedUpdateWithoutLicenseTypesInput>
+  }
+
+  export type FederationSeasonUpdateWithoutLicenseTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    federation?: FederationUpdateOneRequiredWithoutSeasonsNestedInput
+  }
+
+  export type FederationSeasonUncheckedUpdateWithoutLicenseTypesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    federationId?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowUpsertWithWhereUniqueWithoutLicenseTypeInput = {
+    where: FederationLicensePriceRowWhereUniqueInput
+    update: XOR<FederationLicensePriceRowUpdateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedUpdateWithoutLicenseTypeInput>
+    create: XOR<FederationLicensePriceRowCreateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedCreateWithoutLicenseTypeInput>
+  }
+
+  export type FederationLicensePriceRowUpdateWithWhereUniqueWithoutLicenseTypeInput = {
+    where: FederationLicensePriceRowWhereUniqueInput
+    data: XOR<FederationLicensePriceRowUpdateWithoutLicenseTypeInput, FederationLicensePriceRowUncheckedUpdateWithoutLicenseTypeInput>
+  }
+
+  export type FederationLicensePriceRowUpdateManyWithWhereWithoutLicenseTypeInput = {
+    where: FederationLicensePriceRowScalarWhereInput
+    data: XOR<FederationLicensePriceRowUpdateManyMutationInput, FederationLicensePriceRowUncheckedUpdateManyWithoutLicenseTypeInput>
+  }
+
+  export type FederationLicensePriceRowScalarWhereInput = {
+    AND?: FederationLicensePriceRowScalarWhereInput | FederationLicensePriceRowScalarWhereInput[]
+    OR?: FederationLicensePriceRowScalarWhereInput[]
+    NOT?: FederationLicensePriceRowScalarWhereInput | FederationLicensePriceRowScalarWhereInput[]
+    id?: StringFilter<"FederationLicensePriceRow"> | string
+    licenseTypeId?: StringFilter<"FederationLicensePriceRow"> | string
+    kind?: EnumLicensePriceRowKindFilter<"FederationLicensePriceRow"> | $Enums.LicensePriceRowKind
+    label?: StringFilter<"FederationLicensePriceRow"> | string
+    birthYearFrom?: IntNullableFilter<"FederationLicensePriceRow"> | number | null
+    cost?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFilter<"FederationLicensePriceRow"> | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFilter<"FederationLicensePriceRow"> | number
+    createdAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+    updatedAt?: DateTimeFilter<"FederationLicensePriceRow"> | Date | string
+  }
+
+  export type FederationLicenseTypeCreateWithoutPriceRowsInput = {
+    id?: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    season: FederationSeasonCreateNestedOneWithoutLicenseTypesInput
+  }
+
+  export type FederationLicenseTypeUncheckedCreateWithoutPriceRowsInput = {
+    id?: string
+    seasonId: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicenseTypeCreateOrConnectWithoutPriceRowsInput = {
+    where: FederationLicenseTypeWhereUniqueInput
+    create: XOR<FederationLicenseTypeCreateWithoutPriceRowsInput, FederationLicenseTypeUncheckedCreateWithoutPriceRowsInput>
+  }
+
+  export type FederationLicenseTypeUpsertWithoutPriceRowsInput = {
+    update: XOR<FederationLicenseTypeUpdateWithoutPriceRowsInput, FederationLicenseTypeUncheckedUpdateWithoutPriceRowsInput>
+    create: XOR<FederationLicenseTypeCreateWithoutPriceRowsInput, FederationLicenseTypeUncheckedCreateWithoutPriceRowsInput>
+    where?: FederationLicenseTypeWhereInput
+  }
+
+  export type FederationLicenseTypeUpdateToOneWithWhereWithoutPriceRowsInput = {
+    where?: FederationLicenseTypeWhereInput
+    data: XOR<FederationLicenseTypeUpdateWithoutPriceRowsInput, FederationLicenseTypeUncheckedUpdateWithoutPriceRowsInput>
+  }
+
+  export type FederationLicenseTypeUpdateWithoutPriceRowsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    season?: FederationSeasonUpdateOneRequiredWithoutLicenseTypesNestedInput
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateWithoutPriceRowsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationCreateWithoutChargesInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: FederationContactCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationUncheckedCreateWithoutChargesInput = {
+    id?: string
+    tenantId: string
+    name: string
+    acronym?: string
+    country?: string
+    email: string
+    isActive?: boolean
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: FederationContactUncheckedCreateNestedManyWithoutFederationInput
+    seasons?: FederationSeasonUncheckedCreateNestedManyWithoutFederationInput
+  }
+
+  export type FederationCreateOrConnectWithoutChargesInput = {
+    where: FederationWhereUniqueInput
+    create: XOR<FederationCreateWithoutChargesInput, FederationUncheckedCreateWithoutChargesInput>
+  }
+
+  export type FederationUpsertWithoutChargesInput = {
+    update: XOR<FederationUpdateWithoutChargesInput, FederationUncheckedUpdateWithoutChargesInput>
+    create: XOR<FederationCreateWithoutChargesInput, FederationUncheckedCreateWithoutChargesInput>
+    where?: FederationWhereInput
+  }
+
+  export type FederationUpdateToOneWithWhereWithoutChargesInput = {
+    where?: FederationWhereInput
+    data: XOR<FederationUpdateWithoutChargesInput, FederationUncheckedUpdateWithoutChargesInput>
+  }
+
+  export type FederationUpdateWithoutChargesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
     country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: FederationContactUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUpdateManyWithoutFederationNestedInput
+  }
+
+  export type FederationUncheckedUpdateWithoutChargesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    acronym?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: FederationContactUncheckedUpdateManyWithoutFederationNestedInput
+    seasons?: FederationSeasonUncheckedUpdateManyWithoutFederationNestedInput
   }
 
   export type StudentStatusHistoryCreateManyStudentProfileInput = {
@@ -37646,6 +47138,9 @@ export namespace Prisma {
     previousStatus?: $Enums.StudentStatus | null
     newStatus: $Enums.StudentStatus
     reason?: string | null
+    leaveReason?: $Enums.LeaveReason | null
+    leaveNoticeMethod?: $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: string | null
     changedById?: string | null
     createdAt?: Date | string
   }
@@ -37689,54 +47184,14 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type StudentSubscriptionCreateManyStudentInput = {
-    id?: string
-    feeTierId: string
-    isActive?: boolean
-  }
-
-  export type StudentLicenseCreateManyStudentInput = {
-    id?: string
-    federationId: string
-    licenseNumber: string
-    validUntil: Date | string
-    isActive?: boolean
-  }
-
-  export type StudentFeeCreateManyStudentInput = {
-    id?: string
-    feeTierId?: string | null
-    customAmount?: Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: boolean
-    effectiveFrom?: Date | string
-    effectiveTo?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type StudentDiscountCreateManyStudentProfileInput = {
-    id?: string
-    discountId: string
-    assignedAt?: Date | string
-    expiresAt?: Date | string | null
-  }
-
-  export type BankMandateCreateManyStudentInput = {
-    id?: string
-    iban: string
-    bic?: string | null
-    mandateReference: string
-    signatureDate: Date | string
-    isActive?: boolean
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
   export type StudentStatusHistoryUpdateWithoutStudentProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -37746,6 +47201,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -37755,6 +47213,9 @@ export namespace Prisma {
     previousStatus?: NullableEnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus | null
     newStatus?: EnumStudentStatusFieldUpdateOperationsInput | $Enums.StudentStatus
     reason?: NullableStringFieldUpdateOperationsInput | string | null
+    leaveReason?: NullableEnumLeaveReasonFieldUpdateOperationsInput | $Enums.LeaveReason | null
+    leaveNoticeMethod?: NullableEnumLeaveNoticeMethodFieldUpdateOperationsInput | $Enums.LeaveNoticeMethod | null
+    customReasonDetails?: NullableStringFieldUpdateOperationsInput | string | null
     changedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -37874,137 +47335,6 @@ export namespace Prisma {
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StudentSubscriptionUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    feeTier?: FeeTierUpdateOneRequiredWithoutSubscriptionsNestedInput
-  }
-
-  export type StudentSubscriptionUncheckedUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    feeTierId?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type StudentSubscriptionUncheckedUpdateManyWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    feeTierId?: StringFieldUpdateOperationsInput | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type StudentLicenseUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    federation?: FederationUpdateOneRequiredWithoutLicensesNestedInput
-  }
-
-  export type StudentLicenseUncheckedUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    federationId?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type StudentLicenseUncheckedUpdateManyWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    federationId?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-  }
-
-  export type StudentFeeUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
-    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
-    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    feeTier?: FeeTierUpdateOneWithoutStudentFeesNestedInput
-  }
-
-  export type StudentFeeUncheckedUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
-    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
-    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
-    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StudentFeeUncheckedUpdateManyWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    feeTierId?: NullableStringFieldUpdateOperationsInput | string | null
-    customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    ipcApplied?: BoolFieldUpdateOperationsInput | boolean
-    effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
-    effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StudentDiscountUpdateWithoutStudentProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    discount?: DiscountUpdateOneRequiredWithoutStudentDiscountsNestedInput
-  }
-
-  export type StudentDiscountUncheckedUpdateWithoutStudentProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    discountId?: StringFieldUpdateOperationsInput | string
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type StudentDiscountUncheckedUpdateManyWithoutStudentProfileInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    discountId?: StringFieldUpdateOperationsInput | string
-    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  }
-
-  export type BankMandateUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    iban?: StringFieldUpdateOperationsInput | string
-    bic?: NullableStringFieldUpdateOperationsInput | string | null
-    mandateReference?: StringFieldUpdateOperationsInput | string
-    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    remittanceItems?: RemittanceItemUpdateManyWithoutMandateNestedInput
-  }
-
-  export type BankMandateUncheckedUpdateWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    iban?: StringFieldUpdateOperationsInput | string
-    bic?: NullableStringFieldUpdateOperationsInput | string | null
-    mandateReference?: StringFieldUpdateOperationsInput | string
-    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    remittanceItems?: RemittanceItemUncheckedUpdateManyWithoutMandateNestedInput
-  }
-
-  export type BankMandateUncheckedUpdateManyWithoutStudentInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    iban?: StringFieldUpdateOperationsInput | string
-    bic?: NullableStringFieldUpdateOperationsInput | string | null
-    mandateReference?: StringFieldUpdateOperationsInput | string
-    signatureDate?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentGuardianCreateManyGuardianInput = {
@@ -38150,13 +47480,13 @@ export namespace Prisma {
 
   export type StudentFeeUpdateWithoutFeeTierInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     customAmount?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     ipcApplied?: BoolFieldUpdateOperationsInput | boolean
     effectiveFrom?: DateTimeFieldUpdateOperationsInput | Date | string
     effectiveTo?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    student?: StudentProfileUpdateOneRequiredWithoutStudentFeesNestedInput
   }
 
   export type StudentFeeUncheckedUpdateWithoutFeeTierInput = {
@@ -38183,8 +47513,8 @@ export namespace Prisma {
 
   export type StudentSubscriptionUpdateWithoutFeeTierInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    student?: StudentProfileUpdateOneRequiredWithoutSubscriptionsNestedInput
   }
 
   export type StudentSubscriptionUncheckedUpdateWithoutFeeTierInput = {
@@ -38208,9 +47538,9 @@ export namespace Prisma {
 
   export type StudentDiscountUpdateWithoutDiscountInput = {
     id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    studentProfile?: StudentProfileUpdateOneRequiredWithoutStudentDiscountsNestedInput
   }
 
   export type StudentDiscountUncheckedUpdateWithoutDiscountInput = {
@@ -38355,36 +47685,228 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseCreateManyFederationInput = {
+  export type FederationSeasonChargeCreateManyFederationInput = {
     id?: string
-    studentProfileId: string
-    licenseNumber: string
-    validUntil: Date | string
+    tenantId: string
+    season: string
+    holderType: $Enums.LicenseHolderType
+    holderUserId?: string | null
+    studentProfileId?: string | null
+    licenseId?: string | null
+    costAmount: Decimal | DecimalJsLike | number | string
+    saleAmount: Decimal | DecimalJsLike | number | string
+    isPaid?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationContactCreateManyFederationInput = {
+    id?: string
+    medium: $Enums.FederationContactMedium
+    value: string
+    tag?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationSeasonCreateManyFederationInput = {
+    id?: string
+    seasonName: string
+    currency?: string
+    clubCost?: Decimal | DecimalJsLike | number | string
     isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
-  export type StudentLicenseUpdateWithoutFederationInput = {
+  export type FederationSeasonChargeUpdateWithoutFederationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    student?: StudentProfileUpdateOneRequiredWithoutLicensesNestedInput
+    tenantId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseUncheckedUpdateWithoutFederationInput = {
+  export type FederationSeasonChargeUncheckedUpdateWithoutFederationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
+    tenantId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type StudentLicenseUncheckedUpdateManyWithoutFederationInput = {
+  export type FederationSeasonChargeUncheckedUpdateManyWithoutFederationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    studentProfileId?: StringFieldUpdateOperationsInput | string
-    licenseNumber?: StringFieldUpdateOperationsInput | string
-    validUntil?: DateTimeFieldUpdateOperationsInput | Date | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    season?: StringFieldUpdateOperationsInput | string
+    holderType?: EnumLicenseHolderTypeFieldUpdateOperationsInput | $Enums.LicenseHolderType
+    holderUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    studentProfileId?: NullableStringFieldUpdateOperationsInput | string | null
+    licenseId?: NullableStringFieldUpdateOperationsInput | string | null
+    costAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    saleAmount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isPaid?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationContactUpdateWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationContactUncheckedUpdateWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationContactUncheckedUpdateManyWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    medium?: EnumFederationContactMediumFieldUpdateOperationsInput | $Enums.FederationContactMedium
+    value?: StringFieldUpdateOperationsInput | string
+    tag?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationSeasonUpdateWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    licenseTypes?: FederationLicenseTypeUpdateManyWithoutSeasonNestedInput
+  }
+
+  export type FederationSeasonUncheckedUpdateWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    licenseTypes?: FederationLicenseTypeUncheckedUpdateManyWithoutSeasonNestedInput
+  }
+
+  export type FederationSeasonUncheckedUpdateManyWithoutFederationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    seasonName?: StringFieldUpdateOperationsInput | string
+    currency?: StringFieldUpdateOperationsInput | string
+    clubCost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicenseTypeCreateManySeasonInput = {
+    id?: string
+    name: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicenseTypeUpdateWithoutSeasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    priceRows?: FederationLicensePriceRowUpdateManyWithoutLicenseTypeNestedInput
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateWithoutSeasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    priceRows?: FederationLicensePriceRowUncheckedUpdateManyWithoutLicenseTypeNestedInput
+  }
+
+  export type FederationLicenseTypeUncheckedUpdateManyWithoutSeasonInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowCreateManyLicenseTypeInput = {
+    id?: string
+    kind: $Enums.LicensePriceRowKind
+    label?: string
+    birthYearFrom?: number | null
+    cost?: Decimal | DecimalJsLike | number | string
+    reduction?: Decimal | DecimalJsLike | number | string
+    chargePrice?: Decimal | DecimalJsLike | number | string
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FederationLicensePriceRowUpdateWithoutLicenseTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowUncheckedUpdateWithoutLicenseTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FederationLicensePriceRowUncheckedUpdateManyWithoutLicenseTypeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: EnumLicensePriceRowKindFieldUpdateOperationsInput | $Enums.LicensePriceRowKind
+    label?: StringFieldUpdateOperationsInput | string
+    birthYearFrom?: NullableIntFieldUpdateOperationsInput | number | null
+    cost?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    reduction?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    chargePrice?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
@@ -38436,6 +47958,14 @@ export namespace Prisma {
      * @deprecated Use FederationCountOutputTypeDefaultArgs instead
      */
     export type FederationCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationSeasonCountOutputTypeDefaultArgs instead
+     */
+    export type FederationSeasonCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationSeasonCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationLicenseTypeCountOutputTypeDefaultArgs instead
+     */
+    export type FederationLicenseTypeCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationLicenseTypeCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use UserDefaultArgs instead
      */
@@ -38513,6 +48043,10 @@ export namespace Prisma {
      */
     export type CashTransactionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = CashTransactionDefaultArgs<ExtArgs>
     /**
+     * @deprecated Use TenantFinancialConfigDefaultArgs instead
+     */
+    export type TenantFinancialConfigArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TenantFinancialConfigDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use BankMandateDefaultArgs instead
      */
     export type BankMandateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BankMandateDefaultArgs<ExtArgs>
@@ -38529,9 +48063,29 @@ export namespace Prisma {
      */
     export type FederationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationDefaultArgs<ExtArgs>
     /**
-     * @deprecated Use StudentLicenseDefaultArgs instead
+     * @deprecated Use FederationContactDefaultArgs instead
      */
-    export type StudentLicenseArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StudentLicenseDefaultArgs<ExtArgs>
+    export type FederationContactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationContactDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationSeasonDefaultArgs instead
+     */
+    export type FederationSeasonArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationSeasonDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationLicenseTypeDefaultArgs instead
+     */
+    export type FederationLicenseTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationLicenseTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationLicensePriceRowDefaultArgs instead
+     */
+    export type FederationLicensePriceRowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationLicensePriceRowDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use FederationSeasonChargeDefaultArgs instead
+     */
+    export type FederationSeasonChargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FederationSeasonChargeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AffiliationLicenseDefaultArgs instead
+     */
+    export type AffiliationLicenseArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AffiliationLicenseDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

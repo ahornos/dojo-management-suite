@@ -22,6 +22,7 @@ enum Role {
   INSTRUCTOR
   STUDENT
   PARENT
+  TRIAL
 }
 
 enum RequestStatus {
@@ -89,35 +90,105 @@ enum RemittanceItemStatus {
   RETURNED
 }
 
+/// Competition / statistics identity. Optional so legacy Excel rows can be imported without it.
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  OTHER
+}
+
+/// Structured cause when a student is PAUSED or DROPPED (Excel leave-reason columns).
+enum LeaveReason {
+  ECONOMIC
+  TIME_CONFLICT
+  INJURY
+  MOVED
+  DISSATISFIED
+  OTHER
+}
+
+/// Channel through which staff learned of a pause or drop.
+enum LeaveNoticeMethod {
+  PHONE
+  WHATSAPP
+  IN_PERSON
+  RECEPTION
+  OTHER
+}
+
+/// Who a federation affiliation license (or seasonal charge) belongs to.
+enum LicenseHolderType {
+  STUDENT
+  INSTRUCTOR
+  TECHNICAL_DIRECTOR
+  /// Club-level federation fee (one charge per academy per season, not a person).
+  CLUB
+}
+
+/// Collection state of an affiliation license (academic-service).
+enum AffiliationLicenseStatus {
+  PENDING
+  PAID
+  EXEMPT
+  FAILED
+}
+
+/// Contact medium for a tagged federation contact (financial-service).
+enum FederationContactMedium {
+  EMAIL
+  PHONE
+  ADDRESS
+}
+
+/// One row in a season license-type pricing matrix.
+enum LicensePriceRowKind {
+  INSTRUCTOR
+  ADULT
+  CUSTOM
+}
+
 /// ---------------------------------------------------------
 /// Core Identity & Users
 /// ---------------------------------------------------------
+/// Login identity owned by auth-service. Demographics (dni, birthDate, phone, address)
+/// live exclusively on StudentProfile — never on User.
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
   firstName    String
   lastName     String
-  dni          String?   @unique
-  birthDate    DateTime?
-  phone        String?
-  address      String?
-  city         String?
-  state        String?
-  postalCode   String?
-  country      String?   @default("ES")
-  isActive     Boolean   @default(true)
-  roles        Role[]    @default([STUDENT])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  /// Optional; used for competition categories and academy stats. Null on historical imports.
+  gender       Gender?
+  isActive     Boolean  @default(true)
+  roles        Role[]   @default([STUDENT])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("users")
 }
 
 model StudentProfile {
-  id     String @id @default(uuid())
-  /// Logical reference to the identity owned by auth-service (no physical FK; resolve over HTTP)
-  userId String @unique
+  id     String  @id @default(uuid())
+  /// Login identity in auth-service. Null for minors (they have no User; parents link via StudentGuardian).
+  userId String? @unique
+
+  /// Academic identity of the person-as-student. Adults may also have a User; minors only have these fields.
+  firstName  String    @default("")
+  lastName   String    @default("")
+  dni        String?
+  birthDate  DateTime?
+  phone      String?
+  address    String?
+  city       String?
+  state      String?
+  postalCode String?
+  country    String?   @default("ES")
+  gender     Gender?
+
+  /// Logical financial-service mandate that covers this student's fees (no physical FK).
+  bankMandateId String?
 
   /// Student Lifecycle Management
   status StudentStatus @default(ACTIVE)
@@ -134,12 +205,8 @@ model StudentProfile {
   attendances        Attendance[]
   updateRequests     ProfileUpdateRequest[]
   graduationRequests GraduationRequest[]
-  subscriptions      StudentSubscription[]
-  licenses           StudentLicense[]
-  studentFees        StudentFee[]
-  studentDiscounts   StudentDiscount[]
-  bankMandates       BankMandate[]
 
+  @@index([bankMandateId])
   @@map("student_profiles")
 }
 
@@ -147,14 +214,19 @@ model StudentProfile {
 /// Student Lifecycle Audit Log
 /// ---------------------------------------------------------
 model StudentStatusHistory {
-  id               String         @id @default(uuid())
-  studentProfileId String
-  previousStatus   StudentStatus?
-  newStatus        StudentStatus
-  reason           String?        @db.Text
+  id                  String             @id @default(uuid())
+  studentProfileId    String
+  previousStatus      StudentStatus?
+  newStatus           StudentStatus
+  /// Legacy free-text note. Prefer `leaveReason` / `customReasonDetails` for PAUSED and DROPPED.
+  reason              String?            @db.Text
+  leaveReason         LeaveReason?
+  leaveNoticeMethod   LeaveNoticeMethod?
+  /// Free-text complement when `leaveReason` is OTHER (or extra context for any reason).
+  customReasonDetails String?            @db.Text
   /// Logical reference to the actor in auth-service (no physical FK).
-  changedById      String?
-  createdAt        DateTime       @default(now())
+  changedById         String?
+  createdAt           DateTime           @default(now())
 
   studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
 
@@ -190,6 +262,8 @@ model StudentGuardian {
 model Discipline {
   id          String  @id @default(uuid())
   name        String  @unique
+  /// Short staff-facing label shown in dense tables (e.g. BJJ). Null falls back to `name`.
+  acronym     String?
   description String?
 
   programs DisciplineProgram[]
@@ -309,6 +383,7 @@ model FeeTier {
 
 model StudentFee {
   id               String    @id @default(uuid())
+  /// Logical academic-service StudentProfile id (no physical FK across bounded contexts).
   studentProfileId String
   feeTierId        String?
   customAmount     Decimal?  @db.Decimal(10, 2)
@@ -318,8 +393,7 @@ model StudentFee {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  feeTier FeeTier?       @relation(fields: [feeTierId], references: [id])
+  feeTier FeeTier? @relation(fields: [feeTierId], references: [id])
 
   @@index([studentProfileId])
   @@map("student_fees")
@@ -346,27 +420,29 @@ model Discount {
 
 model StudentDiscount {
   id               String    @id @default(uuid())
+  /// Logical academic-service StudentProfile id (no physical FK across bounded contexts).
   studentProfileId String
   discountId       String
   assignedAt       DateTime  @default(now())
   expiresAt        DateTime?
 
-  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  discount       Discount       @relation(fields: [discountId], references: [id], onDelete: Cascade)
+  discount Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
 
   @@unique([studentProfileId, discountId])
+  @@index([studentProfileId])
   @@map("student_discounts")
 }
 
 model StudentSubscription {
   id               String  @id @default(uuid())
+  /// Logical academic-service StudentProfile id (no physical FK across bounded contexts).
   studentProfileId String
   feeTierId        String
   isActive         Boolean @default(true)
 
-  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  feeTier FeeTier        @relation(fields: [feeTierId], references: [id])
+  feeTier FeeTier @relation(fields: [feeTierId], references: [id])
 
+  @@index([studentProfileId])
   @@map("student_subscriptions")
 }
 
@@ -413,22 +489,60 @@ model CashTransaction {
 }
 
 /// ---------------------------------------------------------
+/// Tenant Financial Configuration (SEPA creditor / invoicing)
+/// Owned exclusively by financial-service. `tenantId` is the logical academy
+/// key from `x-school-id` (no physical Tenant table / cross-service FK).
+/// Empty-string defaults let GET create a blank row until staff complete it.
+/// ---------------------------------------------------------
+model TenantFinancialConfig {
+  id         String   @id @default(uuid())
+  tenantId   String   @unique
+  legalName  String   @default("")
+  taxId      String   @default("")
+  address    String   @default("")
+  city       String   @default("")
+  postalCode String   @default("")
+  country    String   @default("ES")
+  /// SEPA Creditor Identifier (e.g. ES12ZZZ1234567) used in pain.008.
+  creditorId String   @default("")
+  iban       String   @default("")
+  bic        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("tenant_financial_configs")
+}
+
+/// ---------------------------------------------------------
 /// Bank Remittance Submodule (SEPA / Caixabank Integration)
 /// ---------------------------------------------------------
 model BankMandate {
-  id               String   @id @default(uuid())
-  studentProfileId String
-  iban             String
-  bic              String?
-  mandateReference String   @unique
-  signatureDate    DateTime
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id                String    @id @default(uuid())
+  /// Logical auth-service user id of the payer who owns the IBAN (parent or adult student). Not a User FK.
+  payerUserId       String
+  iban              String
+  bic               String?
+  mandateReference  String    @unique
+  signatureDate     DateTime
+  /// Legal name of the bank-account holder (SEPA debtor).
+  accountHolderName String
+  /// National ID (DNI/NIF/NIE) of the account holder. Required by Spanish banks (e.g. CaixaBank) on SEPA Direct Debit.
+  accountHolderDni  String
+  /// Academy key from `x-school-id`. Logical tenant isolation (no Tenant table FK).
+  tenantId          String    @default("")
+  /// Clickwrap acceptance. `signatureDate` is the SEPA mandate date; `signedAt` is the audit timestamp.
+  isSigned          Boolean   @default(false)
+  signedAt          DateTime?
+  /// Logical auth-service user id of the person who ticked accept (no User @relation).
+  signedByUserId    String?
+  signatureIp       String?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  student         StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   remittanceItems RemittanceItem[]
 
+  @@index([tenantId, payerUserId])
   @@map("bank_mandates")
 }
 
@@ -466,28 +580,187 @@ model RemittanceItem {
 }
 
 /// ---------------------------------------------------------
-/// Federations & Licenses (Foundation)
+/// Federations (financial-service) & Affiliation Licenses (academic-service)
+/// `federationId` on licenses/charges is a logical id — no cross-service FK.
+/// `holderUserId` is a logical auth-service identity (no User @relation).
 /// ---------------------------------------------------------
 model Federation {
-  id      String @id @default(uuid())
-  name    String
-  country String
+  id        String    @id @default(uuid())
+  /// Academy key from `x-school-id`. Catalogs are tenant-scoped (no global sharing).
+  tenantId  String
+  name      String
+  acronym   String    @default("")
+  /// ISO 3166-1 alpha-2 (e.g. "ES").
+  country   String    @default("ES")
+  /// Official federation contact email (mandatory).
+  email     String
+  isActive  Boolean   @default(true)
+  /// Soft-delete timestamp. Live uniqueness of `(tenantId, name)` is a partial SQL index (`deletedAt IS NULL`).
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  licenses StudentLicense[]
+  charges  FederationSeasonCharge[]
+  contacts FederationContact[]
+  seasons  FederationSeason[]
 
+  @@index([tenantId])
+  @@index([tenantId, deletedAt])
+  @@index([tenantId, name])
   @@map("federations")
 }
 
-model StudentLicense {
-  id               String   @id @default(uuid())
-  studentProfileId String
+/// Tagged multi-value contact for a federation (several phones/emails/addresses).
+model FederationContact {
+  id           String                  @id @default(uuid())
+  federationId String
+  medium       FederationContactMedium
+  value        String
+  /// Staff label, e.g. "Sede nacional", "Presidencia", "Secretaria".
+  tag          String                  @default("")
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  federation Federation @relation(fields: [federationId], references: [id], onDelete: Cascade)
+
+  @@index([federationId, medium])
+  @@map("federation_contacts")
+}
+
+/// One pricing season for a federation (identity stays on `Federation`).
+model FederationSeason {
+  id           String   @id @default(uuid())
+  federationId String
+  /// Display label, e.g. "2026" or "26/27".
+  seasonName   String
+  /// ISO 4217, e.g. "EUR".
+  currency     String   @default("EUR")
+  clubCost     Decimal  @default(0) @db.Decimal(10, 2)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  federation   Federation              @relation(fields: [federationId], references: [id], onDelete: Cascade)
+  licenseTypes FederationLicenseType[]
+
+  @@unique([federationId, seasonName])
+  @@index([federationId])
+  @@map("federation_seasons")
+}
+
+/// One license product offered in a federation season (insurance variant, etc.).
+model FederationLicenseType {
+  id        String   @id @default(uuid())
+  seasonId  String
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  season    FederationSeason            @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  priceRows FederationLicensePriceRow[]
+
+  @@unique([seasonId, name])
+  @@index([seasonId])
+  @@map("federation_license_types")
+}
+
+/// One pricing-matrix row (instructor, adult, or custom birth-year band).
+model FederationLicensePriceRow {
+  id            String              @id @default(uuid())
+  licenseTypeId String
+  kind          LicensePriceRowKind
+  /// Editable label for CUSTOM rows (e.g. "Infantil/Juvenil").
+  label         String              @default("")
+  /// Inclusive birth year: members born in this year or later use this row.
+  birthYearFrom Int?
+  cost          Decimal             @default(0) @db.Decimal(10, 2)
+  reduction     Decimal             @default(0) @db.Decimal(10, 2)
+  /// Face value charged to the member (`precio cobro`).
+  chargePrice   Decimal             @default(0) @db.Decimal(10, 2)
+  sortOrder     Int                 @default(0)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  licenseType FederationLicenseType @relation(fields: [licenseTypeId], references: [id], onDelete: Cascade)
+
+  @@index([licenseTypeId, kind])
+  @@map("federation_license_price_rows")
+}
+
+/// Seasonal charge row owned by financial-service (budget + future remittance source).
+model FederationSeasonCharge {
+  id               String            @id @default(uuid())
+  tenantId         String
   federationId     String
+  season           String
+  holderType       LicenseHolderType
+  /// Logical auth-service user id. Null only for `CLUB` rows.
+  holderUserId     String?
+  /// Logical academic student profile id. Null for staff and club rows.
+  studentProfileId String?
+  /// Logical academic license id (issued in academic-service).
+  licenseId        String?
+  /// What the academy owes the federation for this holder.
+  costAmount       Decimal           @db.Decimal(10, 2)
+  /// What the academy charges the member (0 for club).
+  saleAmount       Decimal           @db.Decimal(10, 2)
+  isPaid           Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  federation Federation @relation(fields: [federationId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, federationId, season, holderType, holderUserId])
+  @@index([tenantId, federationId, season])
+  @@map("federation_season_charges")
+}
+
+/// Affiliation license history owned by academic-service.
+model AffiliationLicense {
+  id               String                   @id @default(uuid())
+  tenantId         String
+  /// Logical academic StudentProfile id. Required for STUDENT holders, including minors (no User).
+  studentProfileId String?
+  /// Logical auth-service identity. Null for minors who have no User.
+  holderUserId     String?
+  holderType       LicenseHolderType
+  /// Logical financial-service federation id (no Federation @relation).
+  federationId     String
+  /// Logical financial-service `FederationLicenseType` id (no cross-context @relation).
+  licenseTypeId    String?
   licenseNumber    String
+  /// Season label, e.g. "2026-2027".
+  season           String
   validUntil       DateTime
-  isActive         Boolean  @default(true)
+  isActive         Boolean                  @default(true)
+  isPaid           Boolean                  @default(false)
+  amountCharged    Decimal                  @default(0) @db.Decimal(10, 2)
+  status           AffiliationLicenseStatus @default(PENDING)
+  /// Logical auth-service identity that funds this license (adult student or parent payer).
+  payerUserId      String?
+  /// Staff, instructors, or designated profiles issued at zero sale amount.
+  isExempt         Boolean                  @default(false)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
 
-  student    StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  federation Federation     @relation(fields: [federationId], references: [id])
-
+  /// Staff uniqueness (nullable holderUserId allows multiple minor rows).
+  @@unique([tenantId, federationId, holderUserId, season])
+  /// Student uniqueness, including minors without a User.
+  @@unique([tenantId, federationId, studentProfileId, season])
+  @@index([tenantId, validUntil, isActive])
+  @@index([tenantId, federationId, season])
+  @@index([studentProfileId])
+  @@index([payerUserId])
+  @@index([licenseTypeId])
   @@map("student_licenses")
 }
+
+/// ---------------------------------------------------------
+/// Equipment & Inventory (Future Service)
+/// ---------------------------------------------------------
+/// Merchandising, stock, Gi loans, and POS sales belong to a dedicated inventory
+/// bounded context — not academic-service and not extra JSON on `StudentProfile`.
+/// When that microservice is introduced, persist gear/loan/sale records there and
+/// resolve `studentProfileId` / `userId` over internal HTTP (no cross-service FKs).
+/// Do not add inventory tables to this schema until that service owns them.

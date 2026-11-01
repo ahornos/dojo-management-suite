@@ -4,7 +4,7 @@
  * @description Shared system-wide and domain enumerations decoupled from the ORM.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RemittanceItemStatus = exports.RemittanceStatus = exports.PaymentMethod = exports.CashCategory = exports.CashMovementType = exports.DiscountCategory = exports.DiscountType = exports.Role = void 0;
+exports.LicenseHolderType = exports.LeaveNoticeMethod = exports.LeaveReason = exports.Gender = exports.RemittanceItemStatus = exports.RemittanceStatus = exports.PaymentMethod = exports.CashCategory = exports.CashMovementType = exports.DiscountCategory = exports.DiscountType = exports.Role = void 0;
 var Role;
 (function (Role) {
     Role["SUPER_ADMIN"] = "SUPER_ADMIN";
@@ -13,6 +13,7 @@ var Role;
     Role["INSTRUCTOR"] = "INSTRUCTOR";
     Role["STUDENT"] = "STUDENT";
     Role["PARENT"] = "PARENT";
+    Role["TRIAL"] = "TRIAL";
 })(Role || (exports.Role = Role = {}));
 var DiscountType;
 (function (DiscountType) {
@@ -59,3 +60,34 @@ var RemittanceItemStatus;
     RemittanceItemStatus["SETTLED"] = "SETTLED";
     RemittanceItemStatus["RETURNED"] = "RETURNED";
 })(RemittanceItemStatus || (exports.RemittanceItemStatus = RemittanceItemStatus = {}));
+var Gender;
+(function (Gender) {
+    Gender["MALE"] = "MALE";
+    Gender["FEMALE"] = "FEMALE";
+    Gender["NON_BINARY"] = "NON_BINARY";
+    Gender["OTHER"] = "OTHER";
+})(Gender || (exports.Gender = Gender = {}));
+var LeaveReason;
+(function (LeaveReason) {
+    LeaveReason["ECONOMIC"] = "ECONOMIC";
+    LeaveReason["TIME_CONFLICT"] = "TIME_CONFLICT";
+    LeaveReason["INJURY"] = "INJURY";
+    LeaveReason["MOVED"] = "MOVED";
+    LeaveReason["DISSATISFIED"] = "DISSATISFIED";
+    LeaveReason["OTHER"] = "OTHER";
+})(LeaveReason || (exports.LeaveReason = LeaveReason = {}));
+var LeaveNoticeMethod;
+(function (LeaveNoticeMethod) {
+    LeaveNoticeMethod["PHONE"] = "PHONE";
+    LeaveNoticeMethod["WHATSAPP"] = "WHATSAPP";
+    LeaveNoticeMethod["IN_PERSON"] = "IN_PERSON";
+    LeaveNoticeMethod["RECEPTION"] = "RECEPTION";
+    LeaveNoticeMethod["OTHER"] = "OTHER";
+})(LeaveNoticeMethod || (exports.LeaveNoticeMethod = LeaveNoticeMethod = {}));
+var LicenseHolderType;
+(function (LicenseHolderType) {
+    LicenseHolderType["STUDENT"] = "STUDENT";
+    LicenseHolderType["INSTRUCTOR"] = "INSTRUCTOR";
+    LicenseHolderType["TECHNICAL_DIRECTOR"] = "TECHNICAL_DIRECTOR";
+    LicenseHolderType["CLUB"] = "CLUB";
+})(LicenseHolderType || (exports.LicenseHolderType = LicenseHolderType = {}));

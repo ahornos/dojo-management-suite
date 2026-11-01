@@ -10,6 +10,7 @@ export enum Role {
   INSTRUCTOR = 'INSTRUCTOR',
   STUDENT = 'STUDENT',
   PARENT = 'PARENT',
+  TRIAL = 'TRIAL',
 }
 
 export enum DiscountType {
@@ -55,4 +56,48 @@ export enum RemittanceItemStatus {
   PENDING = 'PENDING',
   SETTLED = 'SETTLED',
   RETURNED = 'RETURNED',
+}
+
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  NON_BINARY = 'NON_BINARY',
+  OTHER = 'OTHER',
+}
+
+export enum LeaveReason {
+  ECONOMIC = 'ECONOMIC',
+  TIME_CONFLICT = 'TIME_CONFLICT',
+  INJURY = 'INJURY',
+  MOVED = 'MOVED',
+  DISSATISFIED = 'DISSATISFIED',
+  OTHER = 'OTHER',
+}
+
+export enum LeaveNoticeMethod {
+  PHONE = 'PHONE',
+  WHATSAPP = 'WHATSAPP',
+  IN_PERSON = 'IN_PERSON',
+  RECEPTION = 'RECEPTION',
+  OTHER = 'OTHER',
+}
+
+export enum LicenseHolderType {
+  STUDENT = 'STUDENT',
+  INSTRUCTOR = 'INSTRUCTOR',
+  TECHNICAL_DIRECTOR = 'TECHNICAL_DIRECTOR',
+  CLUB = 'CLUB',
+}
+
+export enum AffiliationLicenseStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  EXEMPT = 'EXEMPT',
+  FAILED = 'FAILED',
+}
+
+export enum FederationContactMedium {
+  EMAIL = 'EMAIL',
+  PHONE = 'PHONE',
+  ADDRESS = 'ADDRESS',
 }

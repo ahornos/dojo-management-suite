@@ -6,12 +6,20 @@ export {
   CashCategory,
   PaymentMethod,
   RemittanceStatus,
-  RemittanceItemStatus
+  RemittanceItemStatus,
+  Gender,
+  LeaveReason,
+  LeaveNoticeMethod,
+  LicenseHolderType,
+  AffiliationLicenseStatus,
+  FederationContactMedium,
 } from './common.enums';
 export type { JwtPayload, AuthenticatedUser } from './auth.types';
+export type { DisciplineSummary } from './academic.types';
 export type {
   UserSummary,
   UserBatchRequest,
+  UserByRolesRequest,
   ProvisionableRole,
   UserPersonalData,
   ProvisionUserRequest,
