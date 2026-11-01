@@ -5,6 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
+import { localeTagFromLanguage } from '@/lib/i18n-locale';
 import type { BankMandate } from '../types';
 
 interface MandateStatusBadgeProps {
@@ -19,7 +20,7 @@ interface MandateStatusBadgeProps {
  * @returns {string} Localized date and time.
  */
 function formatSignedAt(iso: string, locale: string): string {
-  return new Date(iso).toLocaleString(locale, { dateStyle: 'short', timeStyle: 'short' });
+  return new Date(iso).toLocaleString(localeTagFromLanguage(locale), { dateStyle: 'short', timeStyle: 'short' });
 }
 
 /**

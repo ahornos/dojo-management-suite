@@ -74,6 +74,35 @@ export function matchesAgeFilter(
 }
 
 /**
+ * Whether a birth date falls inside an inclusive UTC birth-year window.
+ *
+ * @param {Date | null | undefined} birthDate - Identity birth date.
+ * @param {number | undefined} birthYearFrom - Inclusive lower year (e.g. 2010).
+ * @param {number | undefined} birthYearTo - Inclusive upper year (e.g. 2015).
+ * @returns {boolean} `true` when no bound is set, or the year matches.
+ */
+export function matchesBirthYearFilter(
+  birthDate: Date | null | undefined,
+  birthYearFrom: number | undefined,
+  birthYearTo: number | undefined,
+): boolean {
+  if (birthYearFrom === undefined && birthYearTo === undefined) {
+    return true;
+  }
+  if (!birthDate || Number.isNaN(birthDate.getTime())) {
+    return false;
+  }
+  const year = birthDate.getUTCFullYear();
+  if (birthYearFrom !== undefined && year < birthYearFrom) {
+    return false;
+  }
+  if (birthYearTo !== undefined && year > birthYearTo) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Whether the profile was created strictly before the given date.
  *
  * @param {Date} createdAt - Enrollment / profile creation timestamp.

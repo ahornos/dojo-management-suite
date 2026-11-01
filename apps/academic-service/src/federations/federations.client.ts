@@ -55,12 +55,25 @@ export interface FederationChargeHolder {
 }
 
 /**
+ * One one-off member charge posted to financial-service.
+ */
+export interface MemberChargeItem {
+  payerUserId: string;
+  studentProfileId: string;
+  amount: string;
+  concept: string;
+  seasonName: string;
+  dueDate: string;
+}
+
+/**
  * HTTP client for `/api/internal/federations`.
  */
 @Injectable()
 export class FederationsClient {
   private readonly logger = new Logger(FederationsClient.name);
   private readonly baseUrl: string;
+  private readonly feesUrl: string;
   private readonly apiKey: string;
 
   /**
@@ -74,6 +87,7 @@ export class FederationsClient {
   ) {
     const host = configService.getOrThrow<string>('FINANCIAL_SERVICE_URL').replace(/\/+$/, '');
     this.baseUrl = `${host}/api/internal/federations`;
+    this.feesUrl = `${host}/api/internal/financial/fees`;
     this.apiKey = configService.getOrThrow<string>('INTERNAL_API_KEY');
   }
 
@@ -114,6 +128,23 @@ export class FederationsClient {
       this.httpService.post<{ created: number; skipped: number }>(
         `${this.baseUrl}/${encodeURIComponent(federationId)}/charges`,
         { season, includeClubFee, holders },
+        this.requestConfig(tenantId),
+      ),
+    );
+  }
+
+  /**
+   * Creates one-off member charges (`StudentCharge`) for priced license holders.
+   *
+   * @param {string} tenantId - Academy key.
+   * @param {MemberChargeItem[]} fees - Charge rows with Decimal string amounts.
+   * @returns {Promise<{ feeIds: string[] }>} Generated financial charge ids.
+   */
+  createMemberCharges(tenantId: string, fees: MemberChargeItem[]): Promise<{ feeIds: string[] }> {
+    return this.execute<{ feeIds: string[] }>(() =>
+      this.httpService.post<{ feeIds: string[] }>(
+        `${this.feesUrl}/batch`,
+        { fees },
         this.requestConfig(tenantId),
       ),
     );

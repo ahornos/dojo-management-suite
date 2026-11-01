@@ -5,7 +5,19 @@
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsIn, IsInt, IsOptional, IsString, IsUUID, Matches, Min } from 'class-validator';
+import {
+  IsArray,
+  IsDateString,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 import { LicenseHolderType } from '@dms/shared-types';
 
 const PERSON_HOLDER_TYPES = [
@@ -27,6 +39,17 @@ function toInt(value: unknown): unknown {
 }
 
 /**
+ * Selected-student batch bodies omit filter fields (`holderType`, `season`).
+ *
+ * @param {object} dto - Incoming body (preview or batch).
+ * @returns {boolean} Whether `studentProfileIds` selects explicit holders.
+ */
+function hasSelectedStudents(dto: object): boolean {
+  const ids = (dto as { studentProfileIds?: unknown }).studentProfileIds;
+  return Array.isArray(ids) && ids.length > 0;
+}
+
+/**
  * Validated body of `POST /licenses/preview` and `POST /licenses/batch`.
  */
 export class PreviewLicensesDto {
@@ -34,12 +57,14 @@ export class PreviewLicensesDto {
   @IsUUID()
   federationId: string;
 
-  @ApiProperty({ example: '2026-2027' })
+  @ApiProperty({ example: '2026-2027', description: 'Catalog season label (`YYYY-YYYY` or federation seasonName).' })
+  @ValidateIf((dto: object) => !hasSelectedStudents(dto))
   @IsString()
-  @Matches(/^\d{4}-\d{4}$/, { message: 'LICENSE_SEASON_INVALID' })
+  @IsNotEmpty()
   season: string;
 
   @ApiProperty({ enum: PERSON_HOLDER_TYPES })
+  @ValidateIf((dto: object) => !hasSelectedStudents(dto))
   @IsIn(PERSON_HOLDER_TYPES)
   holderType: (typeof PERSON_HOLDER_TYPES)[number];
 
@@ -78,4 +103,29 @@ export class PreviewLicensesDto {
   @IsOptional()
   @IsUUID()
   licenseTypeId?: string;
+
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Student lifecycle statuses. Defaults to ACTIVE when omitted.',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsIn(['ACTIVE', 'TRIAL', 'PAUSED', 'DROPPED'], { each: true })
+  statuses?: Array<'ACTIVE' | 'TRIAL' | 'PAUSED' | 'DROPPED'>;
+
+  @ApiPropertyOptional({ description: 'Inclusive UTC birth-year lower bound (custom age bracket).' })
+  @Transform(({ value }) => toInt(value))
+  @IsOptional()
+  @IsInt()
+  @Min(1900)
+  @Max(2100)
+  birthYearFrom?: number;
+
+  @ApiPropertyOptional({ description: 'Inclusive UTC birth-year upper bound (custom age bracket).' })
+  @Transform(({ value }) => toInt(value))
+  @IsOptional()
+  @IsInt()
+  @Min(1900)
+  @Max(2100)
+  birthYearTo?: number;
 }

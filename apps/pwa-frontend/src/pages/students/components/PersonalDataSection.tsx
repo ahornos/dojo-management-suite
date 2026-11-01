@@ -6,6 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import { CountrySelector } from '@/components/forms/CountrySelector';
 import { Field, FormGrid, FormSection } from '@/components/forms/FormSection';
+import { DateInput } from '@/components/ui/date-input';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { GENDERS } from '@/lib/domain-enums';
@@ -90,9 +91,8 @@ export function PersonalDataSection({ formData, onChange, isMinor }: PersonalDat
           <Input id="dni" value={formData.dni} onChange={(event) => onChange('dni', event.target.value)} />
         </Field>
         <Field id="birthDate" label={t('users.birth_date')} required>
-          <Input
+          <DateInput
             id="birthDate"
-            type="date"
             required
             value={formData.birthDate}
             onChange={(event) => onChange('birthDate', event.target.value)}

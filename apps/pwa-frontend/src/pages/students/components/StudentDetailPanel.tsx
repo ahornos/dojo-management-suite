@@ -6,6 +6,7 @@
 import { Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { formatLocalizedDate } from '@/components/ui/localized-date';
 import { getLocalizedBeltName } from '@/lib/beltTranslations';
 import { getLocalizedRelationship } from '@/lib/relationships';
 import { FederationStatusBadge } from './FederationStatusBadge';
@@ -28,10 +29,7 @@ interface StudentDetailPanelProps {
  * @returns {string} Localized date, or an em dash.
  */
 function formatDate(iso: string | undefined, locale: string): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString(locale, { dateStyle: 'medium' });
+  return formatLocalizedDate(iso, locale);
 }
 
 /**

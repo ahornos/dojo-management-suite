@@ -6,9 +6,16 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { LocalizedDate } from '@/components/ui/localized-date';
 import { translateApiError } from '@/lib/errors';
 import { useFederations } from '../federations/useFederations';
 import { LicenseStatusBadge } from './LicenseStatusBadge';
+import {
+  federationShortName,
+  formatLicenseAmount,
+  licenseHolderName,
+  seasonCurrency,
+} from './licenseDisplay';
 import { useLicenses } from './useLicenses';
 
 /**
@@ -17,10 +24,10 @@ import { useLicenses } from './useLicenses';
  * @returns {JSX.Element} Licenses workspace.
  */
 export default function Licenses() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: licenses = [], isLoading, error } = useLicenses();
   const { federations } = useFederations();
-  const names = new Map(federations.map((federation) => [federation.id, federation.name]));
+  const catalog = new Map(federations.map((federation) => [federation.id, federation]));
 
   return (
     <div className="space-y-6">
@@ -62,30 +69,44 @@ export default function Licenses() {
               </tr>
             </thead>
             <tbody>
-              {licenses.map((license) => (
-                <tr key={license.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 text-foreground">
-                    {license.holder
-                      ? `${license.holder.lastName}, ${license.holder.firstName}`
-                      : license.studentProfileId ?? license.holderUserId}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {t(`enums.license_holder.${license.holderType}`)}
-                  </td>
-                  <td className="px-4 py-3 text-foreground">
-                    {names.get(license.federationId) ?? license.federationId}
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{license.season}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{license.licenseNumber}</td>
-                  <td className="px-4 py-3 text-foreground">
-                    {new Date(license.validUntil).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-foreground">{license.amountCharged ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <LicenseStatusBadge license={license} />
-                  </td>
-                </tr>
-              ))}
+              {licenses.map((license) => {
+                const federation = catalog.get(license.federationId);
+                const holderName = licenseHolderName(license);
+                const number = license.licenseNumber?.trim() ?? '';
+                const amount = formatLicenseAmount(
+                  license.amountCharged,
+                  seasonCurrency(federation, license.season),
+                  i18n.language,
+                );
+                return (
+                  <tr key={license.id} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3 text-foreground">{holderName || '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {t(`enums.license_holder.${license.holderType}`)}
+                    </td>
+                    <td className="px-4 py-3 text-foreground">
+                      {federationShortName(federation) || license.federationId}
+                    </td>
+                    <td className="px-4 py-3 text-foreground">{license.season}</td>
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {number ? (
+                        <span className="text-muted-foreground">{number}</span>
+                      ) : (
+                        <span className="font-sans text-muted-foreground">
+                          {t('financial.licenses.number_pending')}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-foreground">
+                      <LocalizedDate value={license.validUntil} />
+                    </td>
+                    <td className="px-4 py-3 text-foreground">{amount || '—'}</td>
+                    <td className="px-4 py-3">
+                      <LicenseStatusBadge license={license} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

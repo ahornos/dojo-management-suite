@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFeeTierDto } from './dto/create-fee-tier.dto';
 import { AssignStudentFeeDto } from './dto/assign-student-fee.dto';
 import { MassFeeUpdateDto } from './dto/mass-fee-update.dto';
+import { BatchStudentChargesDto } from './dto/batch-student-charges.dto';
 
 /**
  * @file fees.service.ts
@@ -94,6 +95,42 @@ export class FeesService {
 
       return updatedTiers;
     });
+  }
+
+  /**
+   * Persists one-off member charges (`StudentCharge`) in a single transaction.
+   * Used by academic-service after pricing a federative license batch.
+   *
+   * @param {string} tenantId - Academy key from `x-school-id`.
+   * @param {BatchStudentChargesDto} dto - Charge rows with Decimal string amounts.
+   * @returns {Promise<{ feeIds: string[] }>} Generated ids in input order.
+   * @throws {BadRequestException} `BATCH_FEES_REQUIRED` when the payload is empty.
+   */
+  async createChargeBatch(tenantId: string, dto: BatchStudentChargesDto): Promise<{ feeIds: string[] }> {
+    if (dto.fees.length === 0) {
+      throw new BadRequestException('BATCH_FEES_REQUIRED');
+    }
+
+    const feeIds = await this.prisma.$transaction((tx) =>
+      Promise.all(
+        dto.fees.map((fee) =>
+          tx.studentCharge.create({
+            data: {
+              tenantId,
+              studentProfileId: fee.studentProfileId,
+              payerUserId: fee.payerUserId,
+              amount: new Prisma.Decimal(fee.amount),
+              concept: fee.concept,
+              seasonName: fee.seasonName,
+              dueDate: new Date(fee.dueDate),
+            },
+            select: { id: true },
+          }),
+        ),
+      ),
+    );
+
+    return { feeIds: feeIds.map((row) => row.id) };
   }
 
   /**

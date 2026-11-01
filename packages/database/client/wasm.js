@@ -267,6 +267,19 @@ exports.Prisma.StudentFeeScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StudentChargeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  studentProfileId: 'studentProfileId',
+  payerUserId: 'payerUserId',
+  amount: 'amount',
+  concept: 'concept',
+  seasonName: 'seasonName',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.DiscountScalarFieldEnum = {
   id: 'id',
   code: 'code',
@@ -647,6 +660,7 @@ exports.Prisma.ModelName = {
   GraduationRequest: 'GraduationRequest',
   FeeTier: 'FeeTier',
   StudentFee: 'StudentFee',
+  StudentCharge: 'StudentCharge',
   Discount: 'Discount',
   StudentDiscount: 'StudentDiscount',
   StudentSubscription: 'StudentSubscription',

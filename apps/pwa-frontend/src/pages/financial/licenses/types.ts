@@ -12,6 +12,12 @@ export interface LicenseHolderIdentity {
   email: string;
 }
 
+export interface LicenseStudentIdentity {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface AffiliationLicense {
   id: string;
   tenantId: string;
@@ -20,7 +26,7 @@ export interface AffiliationLicense {
   holderType: LicenseHolderType;
   federationId: string;
   licenseTypeId?: string | null;
-  licenseNumber: string;
+  licenseNumber?: string | null;
   season: string;
   validUntil: string;
   isActive: boolean;
@@ -30,6 +36,7 @@ export interface AffiliationLicense {
   payerUserId?: string | null;
   isExempt?: boolean;
   holder: LicenseHolderIdentity | null;
+  student?: LicenseStudentIdentity | null;
   expiringSoon: boolean;
 }
 
@@ -53,6 +60,11 @@ export interface LicensePreviewFilters {
   season: string;
   holderType: LicenseHolderType;
   age?: number;
+  minAge?: number;
+  maxAge?: number;
+  birthYearFrom?: number;
+  birthYearTo?: number;
+  statuses?: Array<'ACTIVE' | 'TRIAL' | 'PAUSED' | 'DROPPED'>;
   disciplineId?: string;
   enrollmentDateBefore?: string;
   licenseTypeId?: string;
@@ -64,4 +76,33 @@ export interface LicenseBatchResult {
   charged?: number;
   warnings?: Array<{ code: string; studentProfileId: string | null; holderUserId: string | null }>;
   licenses: AffiliationLicense[];
+}
+
+/**
+ * Explicit-id payload for `POST /academic/licenses/batch` (selected-student engine).
+ */
+export interface SelectedLicenseBatchPayload {
+  federationId: string;
+  seasonId?: string;
+  seasonName?: string;
+  licenseTypeId: string;
+  studentProfileIds: string[];
+}
+
+/**
+ * One student skipped by the selected-student batch engine.
+ */
+export interface SelectedLicenseSkip {
+  studentId: string;
+  reason: string;
+}
+
+/**
+ * Summary returned by the selected-student batch engine.
+ */
+export interface SelectedLicenseBatchResult {
+  totalProcessed: number;
+  successCount: number;
+  skippedCount: number;
+  skippedDetails: SelectedLicenseSkip[];
 }

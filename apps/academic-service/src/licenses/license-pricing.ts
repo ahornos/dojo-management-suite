@@ -88,6 +88,30 @@ export function resolveSeasonCatalog(
 }
 
 /**
+ * Resolves a season by catalog id, then by label. Used by the selected-student batch.
+ *
+ * @param {FederationSeasonCatalog[] | undefined} seasons - Catalog seasons.
+ * @param {{ seasonId?: string; seasonName?: string }} ref - Explicit id or label.
+ * @returns {FederationSeasonCatalog | undefined} Matching season.
+ */
+export function resolveSeasonFromCatalog(
+  seasons: FederationSeasonCatalog[] | undefined,
+  ref: { seasonId?: string; seasonName?: string },
+): FederationSeasonCatalog | undefined {
+  const rows = seasons ?? [];
+  if (ref.seasonId) {
+    const byId = rows.find((row) => row.id === ref.seasonId);
+    if (byId) {
+      return byId;
+    }
+  }
+  if (ref.seasonName) {
+    return resolveSeasonCatalog(rows, ref.seasonName);
+  }
+  return rows.find((row) => row.isActive) ?? rows[0];
+}
+
+/**
  * Picks an explicit type, otherwise the first active type.
  *
  * @param {LicenseTypeCatalog[]} types - Season license products.

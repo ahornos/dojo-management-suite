@@ -5,7 +5,7 @@
 
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDateString, IsOptional, IsUUID, Matches } from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsOptional, IsString, IsUUID, Matches } from 'class-validator';
 import { PreviewLicensesDto } from './preview-licenses.dto';
 
 const MONEY_PATTERN = /^\d{1,8}(\.\d{1,2})?$/;
@@ -53,4 +53,23 @@ export class BatchIssueLicensesDto extends PreviewLicensesDto {
   @IsDateString()
   @Type(() => String)
   issuedAt?: string;
+
+  @ApiPropertyOptional({ description: 'Financial-service FederationSeason id (selected-student batch).' })
+  @IsOptional()
+  @IsUUID()
+  seasonId?: string;
+
+  @ApiPropertyOptional({ description: 'Season label when `seasonId` is omitted (selected-student batch).' })
+  @IsOptional()
+  @IsString()
+  seasonName?: string;
+
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'Explicit student profile ids. When set, filter fields are ignored.',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  studentProfileIds?: string[];
 }

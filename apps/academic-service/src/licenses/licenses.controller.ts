@@ -93,15 +93,19 @@ export class LicensesController {
   }
 
   /**
-   * Issues licenses for every unlicensed holder matching the filters.
+   * Issues licenses in bulk. When `studentProfileIds` is present, runs the
+   * selected-student engine (hydrate, price, charge, persist). Otherwise uses filters.
    *
    * @param {string} tenantId - Academy key from `x-school-id`.
-   * @param {BatchIssueLicensesDto} dto - Filters and sale amount.
-   * @returns {Promise<object>} Created vs skipped counts, charges, and skip warnings.
+   * @param {BatchIssueLicensesDto} dto - Filters or explicit student profile ids.
+   * @returns {Promise<object>} Filter summary or selected-student `{ totalProcessed, successCount, skippedCount, skippedDetails }`.
    */
   @Post('batch')
-  @ApiOperation({ summary: 'Issue licenses in bulk from filters' })
+  @ApiOperation({ summary: 'Issue licenses in bulk (filters or explicit student ids)' })
   issueBatch(@TenantId() tenantId: string, @Body() dto: BatchIssueLicensesDto) {
+    if (dto.studentProfileIds?.length) {
+      return this.licensesService.issueSelectedStudents(tenantId, dto);
+    }
     return this.licensesService.issueBatch(tenantId, dto);
   }
 

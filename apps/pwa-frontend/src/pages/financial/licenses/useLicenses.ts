@@ -10,6 +10,8 @@ import type {
   LicenseBatchResult,
   LicensePreviewFilters,
   LicensePreviewHolder,
+  SelectedLicenseBatchPayload,
+  SelectedLicenseBatchResult,
 } from './types';
 
 const LIST_KEY = ['academic', 'licenses'] as const;
@@ -74,4 +76,25 @@ export function useLicenseBatch() {
   });
 
   return { preview, issueBatch };
+}
+
+/**
+ * Issues licenses for an explicit list of student profiles (financial charges first).
+ *
+ * @returns Mutation posting `{ federationId, seasonId|seasonName, licenseTypeId, studentProfileIds }`.
+ */
+export function useBatchIssueLicenses() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: SelectedLicenseBatchPayload) => {
+      const response = await apiClient.post('/academic/licenses/batch', payload);
+      return response.data as SelectedLicenseBatchResult;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: LIST_KEY });
+      void queryClient.invalidateQueries({ queryKey: EXPIRING_KEY });
+      void queryClient.invalidateQueries({ queryKey: ['academic', 'licenses', 'affiliation-status'] });
+    },
+  });
 }

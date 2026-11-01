@@ -1,6 +1,7 @@
 /**
  * @file licenses.service.ts
- * @description Affiliation license history, expiry alerts, and filtered batch issuance.
+ * @description Affiliation license history, expiry alerts, filtered batch issuance, and
+ * selected-student batch issuance (price → financial charges → academic persist).
  * Student age and identity come from StudentProfile. Minors (userId null) are first-class holders.
  * Federation catalog and charges live in financial-service (logical ids, HTTP only).
  */
@@ -11,16 +12,24 @@ import { LicenseHolderType, Role, UserSummary } from '@dms/shared-types';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersDirectoryClient } from '../users-directory/users-directory.client';
-import { FederationsClient, FederationCatalog, FederationChargeHolder } from '../federations/federations.client';
+import { FederationsClient, FederationCatalog, FederationChargeHolder, MemberChargeItem } from '../federations/federations.client';
 import { IssueLicenseDto } from './dto/issue-license.dto';
 import { PreviewLicensesDto } from './dto/preview-licenses.dto';
 import { BatchIssueLicensesDto } from './dto/batch-issue-licenses.dto';
-import { ageInYears, defaultValidUntil, isMinor, matchesAgeFilter, matchesEnrollmentFilter } from './license-filters';
+import {
+  ageInYears,
+  defaultValidUntil,
+  isMinor,
+  matchesAgeFilter,
+  matchesBirthYearFilter,
+  matchesEnrollmentFilter,
+} from './license-filters';
 import {
   pickLicenseType,
   pickPriceRow,
   priceRowAmounts,
   resolveSeasonCatalog,
+  resolveSeasonFromCatalog,
 } from './license-pricing';
 
 const EXPIRING_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -65,8 +74,30 @@ export interface LicenseBatchResult {
   licenses: object[];
 }
 
+/**
+ * One student skipped during selected-student batch issuance.
+ */
+export interface SelectedLicenseSkip {
+  studentId: string;
+  reason: string;
+}
+
+/**
+ * Result of the explicit-id `POST /licenses/batch` engine.
+ */
+export interface SelectedLicenseBatchResult {
+  totalProcessed: number;
+  successCount: number;
+  skippedCount: number;
+  skippedDetails: SelectedLicenseSkip[];
+}
+
 type StudentProfileCandidate = Prisma.StudentProfileGetPayload<{
   include: { ranks: { include: { beltRank: { include: { program: true } } } }; guardians: { include: { guardian: true } } };
+}>;
+
+type StudentProfileWithGuardians = Prisma.StudentProfileGetPayload<{
+  include: { guardians: { include: { guardian: true } } };
 }>;
 
 /**
@@ -354,6 +385,160 @@ export class LicensesService {
   }
 
   /**
+   * Issues licenses for an explicit list of student profiles.
+   * Already-licensed students are skipped (not a fatal error). Financial charges are
+   * created first; academic rows persist only after that call succeeds.
+   *
+   * @param {string} tenantId - Academy key from `x-school-id`.
+   * @param {BatchIssueLicensesDto} dto - Federation, season, license type, and profile ids.
+   * @returns {Promise<SelectedLicenseBatchResult>} Processed / success / skipped summary.
+   * @throws {BadRequestException} When the season or license type cannot be resolved.
+   */
+  async issueSelectedStudents(tenantId: string, dto: BatchIssueLicensesDto): Promise<SelectedLicenseBatchResult> {
+    const studentProfileIds = dto.studentProfileIds ?? [];
+    if (studentProfileIds.length === 0) {
+      throw new BadRequestException('STUDENT_PROFILE_IDS_REQUIRED');
+    }
+    if (!dto.licenseTypeId) {
+      throw new BadRequestException('LICENSE_TYPE_REQUIRED');
+    }
+
+    const catalog = await this.federationsClient.getFederation(tenantId, dto.federationId);
+    const season = resolveSeasonFromCatalog(catalog.seasons, {
+      seasonId: dto.seasonId,
+      seasonName: dto.seasonName ?? dto.season,
+    });
+    if (!season) {
+      throw new BadRequestException('LICENSE_SEASON_NOT_FOUND');
+    }
+
+    const licenseType = pickLicenseType(season.licenseTypes, dto.licenseTypeId);
+    if (!licenseType || licenseType.id !== dto.licenseTypeId) {
+      throw new BadRequestException('LICENSE_TYPE_NOT_FOUND');
+    }
+
+    const seasonLabel = season.seasonName;
+    const validUntil = dto.validUntil ? new Date(dto.validUntil) : defaultValidUntil(seasonLabel);
+    const skippedDetails: SelectedLicenseSkip[] = [];
+    const uniqueIds: string[] = [];
+    const seen = new Set<string>();
+
+    for (const studentId of studentProfileIds) {
+      if (seen.has(studentId)) {
+        skippedDetails.push({ studentId, reason: 'DUPLICATE_STUDENT_IN_BATCH' });
+        continue;
+      }
+      seen.add(studentId);
+      uniqueIds.push(studentId);
+    }
+
+    const profiles = await this.prisma.studentProfile.findMany({
+      where: { id: { in: uniqueIds } },
+      include: { guardians: { include: { guardian: true } } },
+    });
+    const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
+
+    const existing = await this.prisma.affiliationLicense.findMany({
+      where: {
+        tenantId,
+        federationId: dto.federationId,
+        season: seasonLabel,
+        studentProfileId: { in: uniqueIds },
+      },
+      select: { studentProfileId: true },
+    });
+    const licensedProfiles = new Set(
+      existing.map((row) => row.studentProfileId).filter((id): id is string => Boolean(id)),
+    );
+
+    const issuable: Array<{
+      profile: StudentProfileWithGuardians;
+      payerUserId: string;
+      saleAmount: Prisma.Decimal;
+    }> = [];
+
+    for (const studentId of uniqueIds) {
+      const profile = profilesById.get(studentId);
+      if (!profile) {
+        skippedDetails.push({ studentId, reason: 'STUDENT_PROFILE_NOT_FOUND' });
+        continue;
+      }
+      if (licensedProfiles.has(studentId)) {
+        skippedDetails.push({ studentId, reason: 'LICENSE_ALREADY_EXISTS_FOR_SEASON' });
+        continue;
+      }
+
+      const birthYear = profile.birthDate ? profile.birthDate.getUTCFullYear() : null;
+      const row = pickPriceRow(licenseType.priceRows, LicenseHolderType.STUDENT, birthYear);
+      if (!row) {
+        skippedDetails.push({ studentId, reason: 'LICENSE_PRICE_UNRESOLVED' });
+        continue;
+      }
+
+      const { saleAmount } = priceRowAmounts(row);
+      const payerUserId = this.resolveSelectedStudentPayer(profile);
+      if (!payerUserId) {
+        skippedDetails.push({ studentId, reason: 'PAYER_UNRESOLVED' });
+        continue;
+      }
+
+      issuable.push({ profile, payerUserId, saleAmount });
+    }
+
+    if (issuable.length === 0) {
+      return {
+        totalProcessed: studentProfileIds.length,
+        successCount: 0,
+        skippedCount: skippedDetails.length,
+        skippedDetails,
+      };
+    }
+
+    const dueDate = validUntil.toISOString();
+    const fees: MemberChargeItem[] = issuable.map((item) => ({
+      payerUserId: item.payerUserId,
+      studentProfileId: item.profile.id,
+      amount: item.saleAmount.toFixed(2),
+      concept: `Affiliation license ${licenseType.name} ${seasonLabel}`,
+      seasonName: seasonLabel,
+      dueDate,
+    }));
+
+    await this.federationsClient.createMemberCharges(tenantId, fees);
+
+    await this.prisma.$transaction(
+      issuable.map((item) =>
+        this.prisma.affiliationLicense.create({
+          data: {
+            tenantId,
+            studentProfileId: item.profile.id,
+            holderUserId: item.profile.userId,
+            holderType: LicenseHolderType.STUDENT,
+            federationId: dto.federationId,
+            licenseTypeId: licenseType.id,
+            licenseNumber: this.generateLicenseNumber(seasonLabel),
+            season: seasonLabel,
+            validUntil,
+            amountCharged: item.saleAmount,
+            isPaid: false,
+            status: AffiliationLicenseStatus.PENDING,
+            payerUserId: item.payerUserId,
+            isExempt: false,
+            isActive: true,
+          },
+        }),
+      ),
+    );
+
+    return {
+      totalProcessed: studentProfileIds.length,
+      successCount: issuable.length,
+      skippedCount: skippedDetails.length,
+      skippedDetails,
+    };
+  }
+
+  /**
    * Resolves student or staff candidates and flags those already licensed this season.
    *
    * @param {string} tenantId - Academy key from `x-school-id`.
@@ -408,8 +593,8 @@ export class LicensesService {
   }
 
   /**
-   * Loads ACTIVE students (including minors with `userId: null`), applies discipline/enrollment/age
-   * filters using `StudentProfile.birthDate`, and resolves the guardian payer for minors.
+   * Loads students (default ACTIVE; optional TRIAL/PAUSED) including minors with `userId: null`.
+   * Applies discipline/enrollment/age/birth-year filters from `StudentProfile.birthDate`.
    *
    * @param {Set<string>} licensedUsers - Holder user ids already licensed this season.
    * @param {Set<string>} licensedProfiles - Student profile ids already licensed this season.
@@ -430,9 +615,14 @@ export class LicensesService {
     enrollmentDateBefore: Date | undefined,
     today: Date,
   ): Promise<LicensePreviewHolder[]> {
+    const statuses =
+      dto.statuses && dto.statuses.length > 0
+        ? dto.statuses.map((status) => status as StudentStatus)
+        : [StudentStatus.ACTIVE];
+
     const profiles = await this.prisma.studentProfile.findMany({
       where: {
-        status: StudentStatus.ACTIVE,
+        status: { in: statuses },
         ...(enrollmentDateBefore ? { createdAt: { lt: enrollmentDateBefore } } : {}),
         ...(dto.disciplineId
           ? { ranks: { some: { beltRank: { program: { disciplineId: dto.disciplineId } } } } }
@@ -450,6 +640,7 @@ export class LicensesService {
     return profiles
       .filter((profile) => matchesEnrollmentFilter(profile.createdAt, enrollmentDateBefore))
       .filter((profile) => matchesAgeFilter(profile.birthDate, minAge, maxAge, today))
+      .filter((profile) => matchesBirthYearFilter(profile.birthDate, dto.birthYearFrom, dto.birthYearTo))
       .map((profile) => {
         const user = profile.userId ? users.get(profile.userId) : undefined;
         const alreadyLicensed =
@@ -473,6 +664,20 @@ export class LicensesService {
           suggestedLicenseTypeName: licenseType?.name ?? null,
         };
       });
+  }
+
+  /**
+   * Selected-student batch: adults pay themselves (`userId`); minors have no User
+   * and use the first linked `StudentGuardian.guardian.userId`.
+   *
+   * @param {StudentProfileWithGuardians} profile - Profile plus guardians.
+   * @returns {string | null} Payer user id, or null when unresolved.
+   */
+  private resolveSelectedStudentPayer(profile: StudentProfileWithGuardians): string | null {
+    if (profile.userId) {
+      return profile.userId;
+    }
+    return profile.guardians?.[0]?.guardian.userId ?? null;
   }
 
   /**
@@ -655,20 +860,49 @@ export class LicensesService {
    * @param {Array<{ holderUserId: string | null }>} rows - License records.
    * @returns {Promise<object[]>} Rows plus `holder`.
    */
-  private async withIdentities<T extends { holderUserId: string | null }>(rows: T[]) {
+  private async withIdentities<
+    T extends { holderUserId: string | null; studentProfileId?: string | null },
+  >(rows: T[]) {
     const users = await this.usersClient.findManyByIds(rows.map((row) => row.holderUserId));
-    return rows.map((row) => ({
-      ...row,
-      amountCharged:
-        'amountCharged' in row && row.amountCharged instanceof Prisma.Decimal
-          ? row.amountCharged.toFixed(2)
-          : undefined,
-      holder: row.holderUserId ? users.get(row.holderUserId) ?? null : null,
-      expiringSoon:
-        'validUntil' in row && row.validUntil instanceof Date
-          ? row.validUntil.getTime() - Date.now() <= EXPIRING_WINDOW_MS && row.validUntil.getTime() >= Date.now()
-          : false,
-    }));
+    const profileIds = [
+      ...new Set(rows.map((row) => row.studentProfileId).filter((id): id is string => Boolean(id))),
+    ];
+    const profiles =
+      profileIds.length === 0
+        ? []
+        : await this.prisma.studentProfile.findMany({
+            where: { id: { in: profileIds } },
+            select: { id: true, firstName: true, lastName: true },
+          });
+    const profileById = new Map(profiles.map((profile) => [profile.id, profile]));
+
+    return rows.map((row) => {
+      const user = row.holderUserId ? users.get(row.holderUserId) ?? null : null;
+      const student = row.studentProfileId ? profileById.get(row.studentProfileId) ?? null : null;
+      const firstName = student?.firstName || user?.firstName || '';
+      const lastName = student?.lastName || user?.lastName || '';
+      return {
+        ...row,
+        amountCharged:
+          'amountCharged' in row && row.amountCharged instanceof Prisma.Decimal
+            ? row.amountCharged.toFixed(2)
+            : undefined,
+        student: student ? { id: student.id, firstName: student.firstName, lastName: student.lastName } : null,
+        holder:
+          firstName || lastName || user
+            ? {
+                id: user?.id ?? student?.id ?? row.holderUserId ?? row.studentProfileId ?? '',
+                firstName,
+                lastName,
+                email: user?.email ?? '',
+              }
+            : null,
+        expiringSoon:
+          'validUntil' in row && row.validUntil instanceof Date
+            ? row.validUntil.getTime() - Date.now() <= EXPIRING_WINDOW_MS && row.validUntil.getTime() >= Date.now()
+            : false,
+      };
+    });
   }
 }
 

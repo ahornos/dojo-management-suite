@@ -390,6 +390,29 @@ model StudentFee {
   @@map("student_fees")
 }
 
+/// One-off member charge (federative license sale). Distinct from `StudentFee`,
+/// which is a recurring membership assignment (`feeTier` + effective window).
+/// Cross-domain ids (`studentProfileId`, `payerUserId`) are logical UUIDs only.
+model StudentCharge {
+  id               String   @id @default(uuid())
+  tenantId         String
+  /// Logical academic-service StudentProfile id (no physical FK).
+  studentProfileId String
+  /// Logical auth-service User id of the payer (adult student or guardian).
+  payerUserId      String
+  amount           Decimal  @db.Decimal(10, 2)
+  concept          String
+  seasonName       String
+  dueDate          DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([tenantId, studentProfileId])
+  @@index([tenantId, payerUserId])
+  @@index([tenantId, seasonName])
+  @@map("student_charges")
+}
+
 model Discount {
   id          String            @id @default(uuid())
   code        String            @unique

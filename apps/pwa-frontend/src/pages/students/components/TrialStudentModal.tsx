@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Field, FormGrid, FormSection } from '@/components/forms/FormSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DateInput } from '@/components/ui/date-input';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { translateApiError } from '@/lib/errors';
@@ -206,7 +207,7 @@ export function TrialStudentModal({
                   error={errors.birthDate?.message}
                   hint={isAdult === null ? t('students.trial.age_hint') : undefined}
                 >
-                  <Input id="trial-birthDate" type="date" {...register('birthDate')} />
+                  <DateInput id="trial-birthDate" {...register('birthDate')} />
                 </Field>
                 {isAdult === true ? (
                   <>

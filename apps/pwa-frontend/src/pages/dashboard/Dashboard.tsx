@@ -5,7 +5,9 @@
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { formatLocalizedDate } from '@/components/ui/localized-date';
 import { useAuthStore } from '@/store/useAuthStore';
+import { federationShortName, licenseHolderName } from '@/pages/financial/licenses/licenseDisplay';
 import { useExpiringLicenses } from '@/pages/financial/licenses/useLicenses';
 import { useFederations } from '@/pages/financial/federations/useFederations';
 
@@ -17,12 +19,12 @@ const STAFF_ALERT_ROLES = ['SUPER_ADMIN', 'ADMIN_STAFF'];
  * @returns {JSX.Element} Dashboard view.
  */
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const roles = useAuthStore((state) => state.user?.roles) ?? [];
   const canSeeAlerts = roles.some((role) => STAFF_ALERT_ROLES.includes(role));
   const { data: expiring = [] } = useExpiringLicenses(canSeeAlerts);
   const { federations } = useFederations(canSeeAlerts);
-  const names = new Map(federations.map((federation) => [federation.id, federation.name]));
+  const catalog = new Map(federations.map((federation) => [federation.id, federation]));
 
   return (
     <div className="space-y-6">
@@ -41,13 +43,11 @@ export default function Dashboard() {
           <ul className="mt-4 space-y-2">
             {expiring.slice(0, 8).map((license) => (
               <li key={license.id} className="text-sm text-foreground">
-                {license.holder
-                  ? `${license.holder.lastName}, ${license.holder.firstName}`
-                  : license.studentProfileId ?? license.holderUserId}
+                {licenseHolderName(license) || '—'}
                 {' · '}
-                {names.get(license.federationId) ?? license.federationId}
+                {federationShortName(catalog.get(license.federationId)) || license.federationId}
                 {' · '}
-                {t('dashboard.expires_on', { date: new Date(license.validUntil).toLocaleDateString() })}
+                {t('dashboard.expires_on', { date: formatLocalizedDate(license.validUntil, i18n.language) })}
               </li>
             ))}
           </ul>

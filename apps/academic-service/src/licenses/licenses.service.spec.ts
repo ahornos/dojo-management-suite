@@ -81,9 +81,10 @@ describe('LicensesService', () => {
       updateMany: jest.fn(),
     },
     studentProfile: { findMany: jest.fn() },
+    $transaction: jest.fn(),
   };
   const usersClient = { findManyByIds: jest.fn(), findByRoles: jest.fn() };
-  const federationsClient = { getFederation: jest.fn(), registerCharges: jest.fn() };
+  const federationsClient = { getFederation: jest.fn(), registerCharges: jest.fn(), createMemberCharges: jest.fn() };
 
   beforeEach(async () => {
     jest.resetAllMocks();
@@ -97,9 +98,20 @@ describe('LicensesService', () => {
     }).compile();
     service = module.get(LicensesService);
     prisma.affiliationLicense.findMany.mockResolvedValue([]);
+    prisma.studentProfile.findMany.mockResolvedValue([]);
     usersClient.findManyByIds.mockResolvedValue(new Map());
     federationsClient.getFederation.mockResolvedValue(catalog);
     federationsClient.registerCharges.mockResolvedValue({ created: 1, skipped: 0 });
+    federationsClient.createMemberCharges.mockResolvedValue({ feeIds: ['fee-1'] });
+    prisma.$transaction.mockImplementation(async (ops: unknown) => {
+      if (typeof ops === 'function') {
+        return (ops as (tx: typeof prisma) => unknown)(prisma);
+      }
+      return Promise.all(ops as Promise<unknown>[]);
+    });
+    prisma.affiliationLicense.create.mockImplementation((args: { data: { studentProfileId?: string | null } }) =>
+      Promise.resolve({ id: `lic-${args.data.studentProfileId ?? 'holder'}`, ...args.data }),
+    );
   });
 
   it('previews ACTIVE students matching age, discipline and enrollment date from StudentProfile', async () => {
@@ -132,7 +144,7 @@ describe('LicensesService', () => {
     expect(prisma.studentProfile.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          status: StudentStatus.ACTIVE,
+          status: { in: [StudentStatus.ACTIVE] },
           createdAt: { lt: new Date('2026-02-01') },
           ranks: { some: { beltRank: { program: { disciplineId } } } },
         }),
@@ -143,6 +155,25 @@ describe('LicensesService', () => {
     expect(result.holders[0].holderUserId).toBe('user-1');
     expect(result.holders[0].payerUserId).toBe('parent-1');
     expect(result.holders[0].age).toBe(12);
+  });
+
+  it('defaults preview status to ACTIVE and accepts extra lifecycle statuses', async () => {
+    prisma.studentProfile.findMany.mockResolvedValue([]);
+
+    await service.preview(tenantId, {
+      federationId,
+      season: '2026-2027',
+      holderType: LicenseHolderType.STUDENT,
+      statuses: ['ACTIVE', 'TRIAL', 'PAUSED'],
+    });
+
+    expect(prisma.studentProfile.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: { in: [StudentStatus.ACTIVE, StudentStatus.TRIAL, StudentStatus.PAUSED] },
+        }),
+      }),
+    );
   });
 
   it('includes minors with userId null and ages them from StudentProfile.birthDate', async () => {
@@ -491,5 +522,183 @@ describe('LicensesService', () => {
 
     expect(result).toEqual({ studentProfileId: 'profile-1', federated: false, affiliations: [] });
     expect(federationsClient.getFederation).not.toHaveBeenCalled();
+  });
+
+  it('selected batch matches youth vs adult matrix rows and bills a minor via the guardian', async () => {
+    const today = new Date();
+    const youthFromYear = today.getUTCFullYear() - 16;
+    const childBirth = new Date(Date.UTC(today.getUTCFullYear() - 8, 0, 15));
+    const adultBirth = new Date(Date.UTC(today.getUTCFullYear() - 25, 0, 15));
+    const childId = '11111111-1111-4111-8111-111111111111';
+    const adultId = '22222222-2222-4222-8222-222222222222';
+    const alreadyId = '33333333-3333-4333-8333-333333333333';
+
+    federationsClient.getFederation.mockResolvedValue({
+      ...catalog,
+      seasons: [
+        {
+          ...catalog.seasons[0],
+          licenseTypes: [
+            {
+              ...catalog.seasons[0].licenseTypes[0],
+              priceRows: [
+                ...catalog.seasons[0].licenseTypes[0].priceRows,
+                {
+                  id: 'row-youth',
+                  kind: 'CUSTOM' as const,
+                  label: 'Child/Youth',
+                  birthYearFrom: youthFromYear,
+                  cost: '20.00',
+                  reduction: '0.00',
+                  chargePrice: '25.00',
+                  sortOrder: 2,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    prisma.studentProfile.findMany.mockResolvedValue([
+      {
+        id: childId,
+        userId: null,
+        firstName: 'Mia',
+        lastName: 'Kid',
+        birthDate: childBirth,
+        guardians: [{ guardian: { userId: 'parent-9' } }],
+      },
+      {
+        id: adultId,
+        userId: 'user-adult',
+        firstName: 'Ada',
+        lastName: 'Adult',
+        birthDate: adultBirth,
+        guardians: [],
+      },
+      {
+        id: alreadyId,
+        userId: 'user-already',
+        firstName: 'Already',
+        lastName: 'Licensed',
+        birthDate: adultBirth,
+        guardians: [],
+      },
+    ]);
+    prisma.affiliationLicense.findMany.mockResolvedValue([{ studentProfileId: alreadyId }]);
+
+    const result = await service.issueSelectedStudents(tenantId, {
+      federationId,
+      season: '2026-2027',
+      holderType: LicenseHolderType.STUDENT,
+      seasonId: 'season-1',
+      licenseTypeId: 'type-standard',
+      studentProfileIds: [childId, adultId, alreadyId],
+    });
+
+    expect(federationsClient.createMemberCharges).toHaveBeenCalledWith(tenantId, [
+      expect.objectContaining({
+        studentProfileId: childId,
+        payerUserId: 'parent-9',
+        amount: '25.00',
+        seasonName: '2026-2027',
+      }),
+      expect.objectContaining({
+        studentProfileId: adultId,
+        payerUserId: 'user-adult',
+        amount: '40.00',
+        seasonName: '2026-2027',
+      }),
+    ]);
+    expect(prisma.$transaction).toHaveBeenCalled();
+    const childWrite = prisma.affiliationLicense.create.mock.calls.find(
+      (call) => call[0].data.studentProfileId === childId,
+    );
+    const adultWrite = prisma.affiliationLicense.create.mock.calls.find(
+      (call) => call[0].data.studentProfileId === adultId,
+    );
+    expect(childWrite?.[0].data).toEqual(
+      expect.objectContaining({
+        holderUserId: null,
+        payerUserId: 'parent-9',
+        amountCharged: expect.any(Prisma.Decimal),
+      }),
+    );
+    expect((childWrite?.[0].data.amountCharged as Prisma.Decimal).toFixed(2)).toBe('25.00');
+    expect((adultWrite?.[0].data.amountCharged as Prisma.Decimal).toFixed(2)).toBe('40.00');
+    expect(result).toEqual({
+      totalProcessed: 3,
+      successCount: 2,
+      skippedCount: 1,
+      skippedDetails: [{ studentId: alreadyId, reason: 'LICENSE_ALREADY_EXISTS_FOR_SEASON' }],
+    });
+  });
+
+  it('selected batch skips already-licensed students without calling financial-service', async () => {
+    const profileId = '11111111-1111-4111-8111-111111111111';
+    prisma.studentProfile.findMany.mockResolvedValue([
+      {
+        id: profileId,
+        userId: 'user-1',
+        firstName: 'Ana',
+        lastName: 'Gomez',
+        birthDate: new Date('2000-01-01T00:00:00.000Z'),
+        guardians: [],
+      },
+    ]);
+    prisma.affiliationLicense.findMany.mockResolvedValue([{ studentProfileId: profileId }]);
+
+    const result = await service.issueSelectedStudents(tenantId, {
+      federationId,
+      seasonName: '2026-2027',
+      holderType: LicenseHolderType.STUDENT,
+      season: '2026-2027',
+      licenseTypeId: 'type-standard',
+      studentProfileIds: [profileId],
+    });
+
+    expect(federationsClient.createMemberCharges).not.toHaveBeenCalled();
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      totalProcessed: 1,
+      successCount: 0,
+      skippedCount: 1,
+      skippedDetails: [{ studentId: profileId, reason: 'LICENSE_ALREADY_EXISTS_FOR_SEASON' }],
+    });
+  });
+
+  it('lists licenses with student profile names for minors who have no User', async () => {
+    prisma.affiliationLicense.findMany.mockResolvedValue([
+      {
+        id: 'lic-minor',
+        studentProfileId: 'profile-minor',
+        holderUserId: null,
+        licenseNumber: '',
+        amountCharged: new Prisma.Decimal('25.00'),
+        validUntil: new Date('2027-08-31T00:00:00.000Z'),
+      },
+    ]);
+    prisma.studentProfile.findMany.mockResolvedValue([
+      { id: 'profile-minor', firstName: 'Lukeny Jahseh', lastName: 'Quevedo Vidal' },
+    ]);
+
+    const rows = await service.findAll(tenantId, {});
+
+    expect(prisma.studentProfile.findMany).toHaveBeenCalledWith({
+      where: { id: { in: ['profile-minor'] } },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        student: { id: 'profile-minor', firstName: 'Lukeny Jahseh', lastName: 'Quevedo Vidal' },
+        holder: {
+          id: 'profile-minor',
+          firstName: 'Lukeny Jahseh',
+          lastName: 'Quevedo Vidal',
+          email: '',
+        },
+        amountCharged: '25.00',
+      }),
+    );
   });
 });

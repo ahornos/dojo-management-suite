@@ -17,6 +17,11 @@ describe('FeesService', () => {
       findMany: jest.fn(),
       update: jest.fn().mockImplementation((args) => Promise.resolve({ id: args.where.id, ...args.data })),
     },
+    studentCharge: {
+      create: jest.fn().mockImplementation((args: { data: { studentProfileId: string } }) =>
+        Promise.resolve({ id: `fee-${args.data.studentProfileId}` }),
+      ),
+    },
   };
 
   const mockPrismaService = {
@@ -143,6 +148,52 @@ describe('FeesService', () => {
       mockTx.feeTier.update.mockResolvedValueOnce({ id: 'tier-1' }).mockRejectedValueOnce(new Error('db down'));
 
       await expect(service.massFeeUpdate({ percentage: 5 })).rejects.toThrow('db down');
+    });
+  });
+
+  describe('createChargeBatch', () => {
+    beforeEach(() => {
+      mockTx.studentCharge.create.mockClear();
+      mockPrismaService.$transaction.mockClear();
+    });
+
+    it('persists StudentCharge rows in one transaction with Prisma.Decimal amounts', async () => {
+      const result = await service.createChargeBatch('fox-jiujitsu-academy', {
+        fees: [
+          {
+            payerUserId: '11111111-1111-4111-8111-111111111111',
+            studentProfileId: '22222222-2222-4222-8222-222222222222',
+            amount: '25.00',
+            concept: 'Affiliation license Standard 2026-2027',
+            seasonName: '2026-2027',
+            dueDate: '2027-08-31T00:00:00.000Z',
+          },
+        ],
+      });
+
+      expect(mockPrismaService.$transaction).toHaveBeenCalledTimes(1);
+      expect(mockTx.studentCharge.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            tenantId: 'fox-jiujitsu-academy',
+            payerUserId: '11111111-1111-4111-8111-111111111111',
+            studentProfileId: '22222222-2222-4222-8222-222222222222',
+            amount: expect.any(Prisma.Decimal),
+            concept: 'Affiliation license Standard 2026-2027',
+            seasonName: '2026-2027',
+          }),
+        }),
+      );
+      const amount = mockTx.studentCharge.create.mock.calls[0][0].data.amount as Prisma.Decimal;
+      expect(amount.toFixed(2)).toBe('25.00');
+      expect(result).toEqual({ feeIds: ['fee-22222222-2222-4222-8222-222222222222'] });
+    });
+
+    it('rejects an empty fee list with a stable code', async () => {
+      await expect(service.createChargeBatch('fox-jiujitsu-academy', { fees: [] })).rejects.toThrow(
+        'BATCH_FEES_REQUIRED',
+      );
+      expect(mockPrismaService.$transaction).not.toHaveBeenCalled();
     });
   });
 });
