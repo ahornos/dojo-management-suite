@@ -77,3 +77,9 @@ IDEs and OS Specific
 Thumbs.db
 .cursorignore
 .cursorrules
+
+# ==========================================
+# Local import datasets (PII)
+# ==========================================
+# Real CSVs stay on disk for bootstrap; only sanitized *.csv.mock templates are committed.
+import-data/*.csv

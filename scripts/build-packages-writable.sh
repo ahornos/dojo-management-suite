@@ -1,9 +1,10 @@
 #!/bin/sh
-# Compiles workspace packages and marks their dist/ trees world-writable
-# so a host user can clean bind-mounted artifacts created by the container as root.
+# Compiles workspace packages (so Nest `tsconfig.build.json` can resolve @dms/* from dist/)
+# and marks their dist/ trees world-writable so a host user can clean bind-mounted
+# artifacts created by the container as root.
 set -e
 
-pnpm --filter @dms/shared-types --filter @dms/shared-auth run build
+node /app/scripts/ensure-workspace-packages.cjs --build
 
 for dir in /app/packages/shared-types/dist /app/packages/shared-auth/dist; do
   if [ -d "$dir" ]; then

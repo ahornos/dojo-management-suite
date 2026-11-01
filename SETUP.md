@@ -39,8 +39,8 @@ Replace at least `JWT_SECRET` and `INTERNAL_API_KEY` with long random values. Se
 Host commands must override `DATABASE_URL`:
 
 ```bash
-export DATABASE_URL="${DATABASE_URL_HOST:-postgresql://dojo_admin:dojo_password@localhost:5433/dojo_management_suite?schema=public}"
-pnpm --filter @dms/database db:push
+export DATABASE_URL="${DATABASE_URL_HOST}"
+pnpm db:migrate:deploy
 ```
 
 If you leave the in-container URL on the host, Prisma cannot resolve hostname `postgres`.
@@ -59,23 +59,17 @@ See [`.env.example`](./.env.example). Summary:
 | `REDIS_HOST` / `REDIS_PORT` | Provisioned; no app client yet |
 | `AUTH_SERVICE_URL` / `ACADEMIC_SERVICE_URL` / `FINANCIAL_SERVICE_URL` | Gateway proxy + peer HTTP |
 | `ALLOWED_ORIGINS` | Gateway CORS (comma-separated) |
-| `DEFAULT_SUPER_ADMIN_EMAIL` / `DEFAULT_SUPER_ADMIN_PASSWORD` | Seed account |
+| `DEFAULT_SUPER_ADMIN_EMAIL` / `DEFAULT_SUPER_ADMIN_PASSWORD` | Seed account (password is required; seed throws if missing) |
 | `VITE_DEFAULT_TENANT_ID` | Local tenant when there is no subdomain |
-| `DOJO_CREDITOR_IBAN` / `DOJO_CREDITOR_BIC` | Optional SEPA creditor identity |
+| `VITE_API_BASE_URL` | PWA Axios base URL (API Gateway) |
 
-### 2.3 Per-service templates (local `pnpm start:dev` without Compose)
+SEPA creditor IBAN/BIC live on `TenantFinancialConfig` (staff UI `/financial/config`), not in environment variables.
 
-Each app also has `.env.example`. Copy next to that app only when you run the process on the host:
+### 2.3 Host `pnpm start:dev` without Compose
 
-| File | Required extras |
-|---|---|
-| [`apps/auth-service/.env.example`](./apps/auth-service/.env.example) | `JWT_SECRET`, `INTERNAL_API_KEY`, `DATABASE_URL` (use `localhost:5433`) |
-| [`apps/academic-service/.env.example`](./apps/academic-service/.env.example) | plus `AUTH_SERVICE_URL` |
-| [`apps/financial-service/.env.example`](./apps/financial-service/.env.example) | plus `AUTH_SERVICE_URL`, optional SEPA |
-| [`apps/api-gateway/.env.example`](./apps/api-gateway/.env.example) | downstream URLs (`http://localhost:3001` etc. on the host) |
-| [`apps/pwa-frontend/.env.example`](./apps/pwa-frontend/.env.example) | `VITE_DEFAULT_TENANT_ID` |
+There is a single catalog: [`.env.example`](./.env.example). Copy it to the repo root as `.env`. Nest apps also read `../../.env`; Vite loads `VITE_*` from the repo root (`envDir`). For host-side Prisma and Nest processes, set `DATABASE_URL` to `DATABASE_URL_HOST` (`localhost:5433`) and point `AUTH_SERVICE_URL` / peers at `http://localhost:<port>`.
 
-Vite only exposes variables prefixed with `VITE_`.
+Vite only exposes variables prefixed with `VITE_`. Production `validateEnv` rejects catalog placeholders such as `replace-with-a-long-random-secret`.
 
 ---
 
@@ -84,24 +78,22 @@ Vite only exposes variables prefixed with `VITE_`.
 Compose publishes Postgres on **host 5433 → container 5432** so it does not collide with a local Postgres on 5432.
 
 ```bash
-docker compose up -d postgres redis
+docker compose --profile infra up -d --remove-orphans
 docker compose ps
 ```
 
 Wait until `dms-postgres` is `healthy`, then:
 
 ```bash
-export DATABASE_URL="postgresql://dojo_admin:dojo_password@localhost:5433/dojo_management_suite?schema=public"
+export DATABASE_URL="${DATABASE_URL_HOST}"
 pnpm --filter @dms/database db:generate
-pnpm --filter @dms/database db:push
-pnpm --filter @dms/database db:seed
+pnpm db:migrate:reset   # local from-scratch; confirm when prompted
+# or: pnpm db:migrate:deploy && pnpm db:seed
 ```
 
 - `db:generate` writes `packages/database/client` (`@dms/database`).
-- `db:push` applies `schema.prisma` without creating a migration (local / bootstrap).
-- `db:seed` creates the default `SUPER_ADMIN` and baseline BJJ belt ranks.
-
-Production-shaped changes must go through `packages/database/prisma/migrations` and `prisma migrate deploy`.
+- `db:migrate:reset` / `db:migrate:deploy` apply committed SQL in `packages/database/prisma/migrations`. Do not use `db:push` on a shared database.
+- `db:seed` creates the default `SUPER_ADMIN` and baseline BJJ belt ranks (also runs at the end of `migrate reset` unless `--skip-seed`).
 
 ### Optional users CSV
 
@@ -142,7 +134,7 @@ Images build from the **repository root** so they can `COPY` `pnpm-lock.yaml` an
 
 ```bash
 export DOCKER_BUILDKIT=1
-docker compose up -d --build
+pnpm docker:up    # or: make up
 ```
 
 The first build still downloads the pnpm store into a BuildKit cache (`id=pnpm-store`). Later builds reuse that mount and the manifest layers; source-only changes skip `pnpm fetch`.

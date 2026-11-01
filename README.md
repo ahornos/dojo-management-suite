@@ -123,13 +123,12 @@ Manual equivalent:
 cp .env.example .env
 pnpm install
 pnpm build
-docker compose up -d postgres redis
+docker compose --profile infra up -d --remove-orphans
 # wait until postgres is healthy, then from the host:
 export DATABASE_URL="$(grep '^DATABASE_URL_HOST=' .env | cut -d= -f2-)"
-pnpm --filter @dms/database db:push
 pnpm --filter @dms/database db:generate
-pnpm --filter @dms/database db:seed
-docker compose up -d --build
+pnpm db:migrate:reset
+pnpm docker:up
 ```
 
 Open http://localhost:5173 and sign in with `DEFAULT_SUPER_ADMIN_EMAIL` / `DEFAULT_SUPER_ADMIN_PASSWORD` from `.env`.
@@ -145,8 +144,8 @@ pnpm install                          # workspace install
 pnpm build                            # compile packages/* (shared-types, shared-auth)
 pnpm test:unit                        # Jest unit suites
 pnpm test:e2e                         # Jest E2E suites
-pnpm --filter @dms/database db:push   # sync schema (host: set DATABASE_URL to DATABASE_URL_HOST)
-docker compose up -d --build          # stack
+pnpm db:migrate:deploy                # apply committed Prisma migrations
+pnpm docker:up                        # infra + app profiles
 docker compose logs -f api-gateway    # follow one service
 ```
 

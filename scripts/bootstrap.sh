@@ -25,9 +25,10 @@ fi
 
 UNIT_STATUS="skipped"
 E2E_STATUS="skipped"
-CSV_PATH=""
+USERS_IMPORT="skipped"
+STUDENTS_IMPORT="skipped"
 CLEANED="no"
-PRUNED="no"
+MIGRATED="no"
 
 log()  { printf '%b\n' "${C_CYAN}▸${C_RESET} $*"; }
 ok()   { printf '%b\n' "${C_GREEN}✔${C_RESET} $*"; }
@@ -53,52 +54,16 @@ load_env() {
   set +a
 }
 
-# Strip surrounding quotes/whitespace and expand ~ / ~/... without eval.
-# Relative paths resolve against WORKSPACE_ROOT. Prints an absolute path or returns 1.
-resolve_user_file() {
-  local raw="$1"
-  local resolved
-
-  raw="${raw#"${raw%%[![:space:]]*}"}"
-  raw="${raw%"${raw##*[![:space:]]}"}"
-
-  if [[ ${#raw} -ge 2 ]]; then
-    local first="${raw:0:1}"
-    local last="${raw: -1}"
-    if [[ ( "${first}" == '"' && "${last}" == '"' ) || ( "${first}" == "'" && "${last}" == "'" ) ]]; then
-      raw="${raw:1:${#raw}-2}"
-    fi
-  fi
-
-  if [[ "${raw}" == "~" ]]; then
-    raw="${HOME}"
-  elif [[ "${raw}" == "~/"* ]]; then
-    raw="${HOME}/${raw:2}"
-  fi
-
-  if [[ "${raw}" != /* ]]; then
-    raw="${WORKSPACE_ROOT}/${raw}"
-  fi
-
-  if command -v realpath >/dev/null 2>&1; then
-    resolved="$(realpath -m "${raw}")"
-  else
-    resolved="${raw}"
-  fi
-
-  if [[ ! -f "${resolved}" ]]; then
-    return 1
-  fi
-
-  printf '%s' "${resolved}"
-}
-
 host_database_url() {
   if [[ -n "${DATABASE_URL_HOST:-}" ]]; then
     printf '%s' "${DATABASE_URL_HOST}"
     return
   fi
-  printf '%s' "postgresql://dojo_admin:dojo_password@localhost:5433/dojo_management_suite?schema=public"
+  if [[ -z "${POSTGRES_USER:-}" || -z "${POSTGRES_PASSWORD:-}" || -z "${POSTGRES_DB:-}" ]]; then
+    err "DATABASE_URL_HOST or POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB must be set in .env"
+    exit 1
+  fi
+  printf '%s' "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5433/${POSTGRES_DB}?schema=public"
 }
 
 wait_healthy() {
@@ -170,41 +135,21 @@ hr
 # 1. Clean state
 # -----------------------------------------------------------------------------
 log "Step 1/7  Clean Docker state"
-if confirm "Stop the stack and delete Compose volumes (docker compose down -v)?"; then
-  docker compose down -v
+if confirm "Stop the stack and delete Compose volumes (docker compose --profile infra --profile app down -v --remove-orphans)?"; then
+  docker compose --profile infra --profile app down -v --remove-orphans
   CLEANED="yes"
   ok "Volumes removed"
-  if confirm "Also run docker system prune -a --volumes -f (wipe all unused images/networks/volumes)?"; then
-    docker system prune -a --volumes -f
-    PRUNED="yes"
-    ok "System prune finished"
-  fi
 else
   warn "Skipped volume teardown"
 fi
 hr
 
 # -----------------------------------------------------------------------------
-# 2. Environment + CSV
+# 2. Environment
 # -----------------------------------------------------------------------------
-log "Step 2/7  Environment and seed CSV"
+log "Step 2/7  Environment"
 load_env
-
-DEFAULT_CSV_HINT="${WORKSPACE_ROOT}/data/users.csv"
-printf '%b\n' "${C_DIM}CSV headers: Name, Surname/s, Email, Init password, Role, ID / Passport,${C_RESET}"
-printf '%b\n' "${C_DIM}birthDate, Phone, Address, City, State / Province, Postal Code, Country${C_RESET}"
-printf '%b\n' "${C_DIM}Tab-complete a path. ~ is expanded; relative paths are from the repo root.${C_RESET}"
-read -e -r -p "$(printf '%b' "${C_YELLOW}?${C_RESET} Users CSV path [Enter to skip, example ${DEFAULT_CSV_HINT}]: ")" CSV_INPUT || true
-
-if [[ -n "${CSV_INPUT}" ]]; then
-  if ! CSV_PATH="$(resolve_user_file "${CSV_INPUT}")"; then
-    err "CSV not found after resolving '${CSV_INPUT}' (repo root: ${WORKSPACE_ROOT})"
-    exit 1
-  fi
-  ok "Will import users from ${CSV_PATH}"
-else
-  warn "No CSV — seed will create SUPER_ADMIN and belt ranks only"
-fi
+ok "Imports will read import-data/*.csv (falling back to *.csv.mock) after seed"
 hr
 
 # -----------------------------------------------------------------------------
@@ -219,9 +164,9 @@ hr
 # -----------------------------------------------------------------------------
 # 4. Database & seeding (Postgres must be up first)
 # -----------------------------------------------------------------------------
-log "Step 4/7  Database generate, push, seed"
-docker compose up -d postgres redis
-wait_healthy dms-postgres 40
+log "Step 4/7  Database migrate reset + seed"
+docker compose --profile infra up -d --remove-orphans
+bash "${WORKSPACE_ROOT}/scripts/wait-for-db.sh"
 wait_healthy dms-redis 20
 
 export DATABASE_URL
@@ -229,22 +174,37 @@ DATABASE_URL="$(host_database_url)"
 log "Host Prisma URL uses localhost:5433 (not the in-container hostname)"
 
 pnpm --filter @dms/database db:generate
-pnpm --filter @dms/database db:push
-pnpm --filter @dms/database db:seed
-ok "Schema applied and default seed executed"
+if confirm "Reset the database from committed migrations (pnpm db:migrate:reset — ALL DATA LOST)?"; then
+  pnpm db:migrate:reset -- --force --skip-seed
+  pnpm db:seed
+  MIGRATED="yes"
+  ok "Migrations applied and default seed executed"
+else
+  warn "Skipped migrate reset — schema may be stale"
+fi
 
-if [[ -n "${CSV_PATH}" ]]; then
-  log "Importing users CSV"
-  pnpm --filter @dms/database exec ts-node prisma/import-users.ts "${CSV_PATH}"
-  ok "CSV import finished"
+if confirm "Import users from import-data/ (pnpm import:users)?"; then
+  pnpm import:users
+  USERS_IMPORT="imported"
+  ok "User import finished"
+else
+  warn "Skipped user import"
+fi
+
+if confirm "Import students from import-data/ (pnpm import:students)?"; then
+  pnpm import:students
+  STUDENTS_IMPORT="imported"
+  ok "Student import finished"
+else
+  warn "Skipped student import"
 fi
 hr
 
 # -----------------------------------------------------------------------------
 # 5. Full stack
 # -----------------------------------------------------------------------------
-log "Step 5/7  docker compose up -d --build"
-docker compose up -d --build
+log "Step 5/7  docker compose --profile infra --profile app up -d --build"
+pnpm docker:up
 ok "Compose project started"
 log "Waiting for HTTP surfaces"
 wait_http "http://localhost:3000/api" 60 || true
@@ -291,8 +251,9 @@ docker compose ps
 
 printf '\n%bLifecycle%b\n' "${C_BOLD}" "${C_RESET}"
 printf '  volumes wiped     : %b%s%b\n' "$(status_color "${CLEANED}")" "${CLEANED}" "${C_RESET}"
-printf '  system prune      : %b%s%b\n' "$(status_color "${PRUNED}")" "${PRUNED}" "${C_RESET}"
-printf '  users CSV         : %s\n' "${CSV_PATH:-skipped}"
+printf '  migrate reset     : %b%s%b\n' "$(status_color "${MIGRATED}")" "${MIGRATED}" "${C_RESET}"
+printf '  users import      : %s\n' "${USERS_IMPORT}"
+printf '  students import   : %s\n' "${STUDENTS_IMPORT}"
 
 printf '\n%bTests%b\n' "${C_BOLD}" "${C_RESET}"
 printf '  unit              : %b%s%b\n' "$(status_color "${UNIT_STATUS}")" "${UNIT_STATUS}" "${C_RESET}"
