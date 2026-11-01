@@ -223,6 +223,93 @@ exports.Prisma.AttendanceScalarFieldEnum = {
   countedForRank: 'countedForRank'
 };
 
+exports.Prisma.AcademySettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  legalName: 'legalName',
+  tradeName: 'tradeName',
+  taxId: 'taxId',
+  officialEmail: 'officialEmail',
+  timezone: 'timezone',
+  defaultCurrency: 'defaultCurrency',
+  phone: 'phone',
+  address: 'address',
+  city: 'city',
+  postalCode: 'postalCode',
+  country: 'country',
+  displayName: 'displayName',
+  brandName: 'brandName',
+  website: 'website',
+  logoUrl: 'logoUrl',
+  isotypeUrl: 'isotypeUrl',
+  pdfLogoUrl: 'pdfLogoUrl',
+  themeConfig: 'themeConfig',
+  activeAppearanceKey: 'activeAppearanceKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AcademySavedThemeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  name: 'name',
+  themeConfig: 'themeConfig',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AgeBracketScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  code: 'code',
+  name: 'name',
+  minAge: 'minAge',
+  maxAge: 'maxAge',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AcademyScheduleSlotScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  weekday: 'weekday',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  disciplineId: 'disciplineId',
+  instructorUserId: 'instructorUserId',
+  maxCapacity: 'maxCapacity',
+  ageBracketIds: 'ageBracketIds',
+  label: 'label',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AttendanceSessionScalarFieldEnum = {
+  id: 'id',
+  disciplineId: 'disciplineId',
+  date: 'date',
+  instructorUserId: 'instructorUserId',
+  maxCapacity: 'maxCapacity',
+  scheduleSlotId: 'scheduleSlotId',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  isExceptional: 'isExceptional',
+  ageBracketIds: 'ageBracketIds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AttendanceRecordScalarFieldEnum = {
+  id: 'id',
+  sessionId: 'sessionId',
+  studentProfileId: 'studentProfileId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ProfileUpdateRequestScalarFieldEnum = {
   id: 'id',
   studentProfileId: 'studentProfileId',
@@ -351,6 +438,7 @@ exports.Prisma.TenantFinancialConfigScalarFieldEnum = {
   creditorId: 'creditorId',
   iban: 'iban',
   bic: 'bic',
+  stripeAccountId: 'stripeAccountId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -562,6 +650,13 @@ exports.LeaveNoticeMethod = exports.$Enums.LeaveNoticeMethod = {
   OTHER: 'OTHER'
 };
 
+exports.AttendanceStatus = exports.$Enums.AttendanceStatus = {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT',
+  LATE: 'LATE',
+  EXCUSED: 'EXCUSED'
+};
+
 exports.RequestStatus = exports.$Enums.RequestStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -656,6 +751,12 @@ exports.Prisma.ModelName = {
   BeltRank: 'BeltRank',
   StudentRank: 'StudentRank',
   Attendance: 'Attendance',
+  AcademySettings: 'AcademySettings',
+  AcademySavedTheme: 'AcademySavedTheme',
+  AgeBracket: 'AgeBracket',
+  AcademyScheduleSlot: 'AcademyScheduleSlot',
+  AttendanceSession: 'AttendanceSession',
+  AttendanceRecord: 'AttendanceRecord',
   ProfileUpdateRequest: 'ProfileUpdateRequest',
   GraduationRequest: 'GraduationRequest',
   FeeTier: 'FeeTier',

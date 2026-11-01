@@ -117,6 +117,14 @@ enum LeaveNoticeMethod {
   OTHER
 }
 
+/// Roll-call mark for one student in one class session.
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
 /// Who a federation affiliation license (or seasonal charge) belongs to.
 enum LicenseHolderType {
   STUDENT
@@ -323,6 +331,149 @@ model Attendance {
   @@map("attendances")
 }
 
+/// Tenant-scoped academy identity, locale, and white-label theme.
+/// SEPA / creditor banking stays on `TenantFinancialConfig` (financial BC).
+model AcademySettings {
+  id              String   @id @default(uuid())
+  /// Academy key from `x-school-id`. One row per tenant (future locations hang off this).
+  tenantId        String   @unique
+  /// Legal name (razón social) of the tenant.
+  legalName       String   @default("")
+  /// Public trade name shown in the workspace chrome.
+  tradeName       String   @default("")
+  /// Tax identifier (CIF/NIF). Not a SEPA credential.
+  taxId           String   @default("")
+  officialEmail   String   @default("")
+  /// IANA timezone used when materializing daily attendance sessions.
+  timezone        String   @default("Europe/Madrid")
+  /// ISO 4217 currency used as the academy default (EUR today).
+  defaultCurrency String   @default("EUR")
+  phone           String   @default("")
+  address         String   @default("")
+  city            String   @default("")
+  postalCode      String   @default("")
+  country         String   @default("ES")
+  /// @deprecated Prefer `tradeName`. Kept so historical rows remain readable.
+  displayName     String   @default("")
+  /// @deprecated Prefer `tradeName`.
+  brandName       String   @default("")
+  website         String   @default("")
+  logoUrl         String   @default("")
+  /// Compact mark used in dense chrome (sidebar / favicon). Upload storage is out of scope.
+  isotypeUrl      String   @default("")
+  /// High-resolution horizontal mark for invoices and graduation diplomas.
+  pdfLogoUrl      String   @default("")
+  /// Design-token catalog injected as Tailwind / CSS variables.
+  themeConfig     Json     @default("{}")
+  /// Last activated appearance: `preset:<id>` or `saved:<uuid>`. Empty when never switched.
+  activeAppearanceKey String @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("academy_settings")
+}
+
+/// Tenant-owned named token catalog. System presets stay in code and are never stored here.
+model AcademySavedTheme {
+  id          String   @id @default(uuid())
+  /// Academy key from `x-school-id`. Logical tenant pointer (no physical FK).
+  tenantId    String
+  name        String
+  themeConfig Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@map("academy_saved_themes")
+}
+
+/// Named age range used by the student directory, license wizard, and attendance roster.
+model AgeBracket {
+  id        String   @id @default(uuid())
+  tenantId  String
+  /// Stable filter key (e.g. `kids`). Unique per tenant.
+  code      String
+  name      String
+  minAge    Int
+  maxAge    Int
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, code])
+  @@index([tenantId, sortOrder])
+  @@map("age_brackets")
+}
+
+/// Weekly master timetable slot. `disciplineId` and `instructorUserId` are logical UUIDs (no `@relation`).
+model AcademyScheduleSlot {
+  id               String   @id @default(uuid())
+  tenantId         String
+  /// ISO weekday: 1 = Monday … 7 = Sunday.
+  weekday          Int
+  startTime        String
+  endTime          String
+  disciplineId     String
+  instructorUserId String
+  maxCapacity      Int?
+  /// Logical `AgeBracket.id` list copied onto generated sessions.
+  ageBracketIds    String[]
+  label            String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([tenantId, weekday])
+  @@index([disciplineId])
+  @@map("academy_schedule_slots")
+}
+
+/// One class meeting used by the quick check-in grid. Discipline and instructor are logical UUIDs.
+model AttendanceSession {
+  id               String   @id @default(uuid())
+  /// Academic `Discipline.id` (same BC, no `@relation` so sessions stay decoupled from catalog edits).
+  disciplineId     String
+  date             DateTime
+  /// Auth-service login that teaches the class (no physical FK).
+  instructorUserId String
+  maxCapacity      Int?
+  /// Logical `AcademyScheduleSlot.id` when generated from the master calendar.
+  scheduleSlotId   String?
+  startTime        String?
+  endTime          String?
+  isExceptional    Boolean  @default(false)
+  /// Logical `AgeBracket.id` list inherited from the slot (or chosen for an ad-hoc session).
+  ageBracketIds    String[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  records          AttendanceRecord[]
+
+  @@index([disciplineId, date])
+  @@index([instructorUserId])
+  @@index([scheduleSlotId, date])
+  @@map("attendance_sessions")
+}
+
+/// One student's mark in a session. `studentProfileId` is a logical academic UUID (no `@relation`).
+model AttendanceRecord {
+  id               String           @id @default(uuid())
+  sessionId        String
+  studentProfileId String
+  status           AttendanceStatus
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  session          AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, studentProfileId])
+  @@index([studentProfileId])
+  @@map("attendance_records")
+}
+
 /// ---------------------------------------------------------
 /// Approval Workflows (IAM & Validation)
 /// ---------------------------------------------------------
@@ -516,6 +667,8 @@ model TenantFinancialConfig {
   creditorId String   @default("")
   iban       String   @default("")
   bic        String?
+  /// Reserved for a future connected Stripe account. Empty until onboarding exists.
+  stripeAccountId String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

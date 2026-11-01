@@ -74,6 +74,37 @@ export type StudentRank = $Result.DefaultSelection<Prisma.$StudentRankPayload>
  */
 export type Attendance = $Result.DefaultSelection<Prisma.$AttendancePayload>
 /**
+ * Model AcademySettings
+ * Tenant-scoped academy identity, locale, and white-label theme.
+ * SEPA / creditor banking stays on `TenantFinancialConfig` (financial BC).
+ */
+export type AcademySettings = $Result.DefaultSelection<Prisma.$AcademySettingsPayload>
+/**
+ * Model AcademySavedTheme
+ * Tenant-owned named token catalog. System presets stay in code and are never stored here.
+ */
+export type AcademySavedTheme = $Result.DefaultSelection<Prisma.$AcademySavedThemePayload>
+/**
+ * Model AgeBracket
+ * Named age range used by the student directory, license wizard, and attendance roster.
+ */
+export type AgeBracket = $Result.DefaultSelection<Prisma.$AgeBracketPayload>
+/**
+ * Model AcademyScheduleSlot
+ * Weekly master timetable slot. `disciplineId` and `instructorUserId` are logical UUIDs (no `@relation`).
+ */
+export type AcademyScheduleSlot = $Result.DefaultSelection<Prisma.$AcademyScheduleSlotPayload>
+/**
+ * Model AttendanceSession
+ * One class meeting used by the quick check-in grid. Discipline and instructor are logical UUIDs.
+ */
+export type AttendanceSession = $Result.DefaultSelection<Prisma.$AttendanceSessionPayload>
+/**
+ * Model AttendanceRecord
+ * One student's mark in a session. `studentProfileId` is a logical academic UUID (no `@relation`).
+ */
+export type AttendanceRecord = $Result.DefaultSelection<Prisma.$AttendanceRecordPayload>
+/**
  * Model ProfileUpdateRequest
  * ---------------------------------------------------------
  * Approval Workflows (IAM & Validation)
@@ -258,6 +289,16 @@ export const LeaveNoticeMethod: {
 export type LeaveNoticeMethod = (typeof LeaveNoticeMethod)[keyof typeof LeaveNoticeMethod]
 
 
+export const AttendanceStatus: {
+  PRESENT: 'PRESENT',
+  ABSENT: 'ABSENT',
+  LATE: 'LATE',
+  EXCUSED: 'EXCUSED'
+};
+
+export type AttendanceStatus = (typeof AttendanceStatus)[keyof typeof AttendanceStatus]
+
+
 export const RequestStatus: {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -400,6 +441,10 @@ export const LeaveReason: typeof $Enums.LeaveReason
 export type LeaveNoticeMethod = $Enums.LeaveNoticeMethod
 
 export const LeaveNoticeMethod: typeof $Enums.LeaveNoticeMethod
+
+export type AttendanceStatus = $Enums.AttendanceStatus
+
+export const AttendanceStatus: typeof $Enums.AttendanceStatus
 
 export type RequestStatus = $Enums.RequestStatus
 
@@ -675,6 +720,66 @@ export class PrismaClient<
     * ```
     */
   get attendance(): Prisma.AttendanceDelegate<ExtArgs>;
+
+  /**
+   * `prisma.academySettings`: Exposes CRUD operations for the **AcademySettings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AcademySettings
+    * const academySettings = await prisma.academySettings.findMany()
+    * ```
+    */
+  get academySettings(): Prisma.AcademySettingsDelegate<ExtArgs>;
+
+  /**
+   * `prisma.academySavedTheme`: Exposes CRUD operations for the **AcademySavedTheme** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AcademySavedThemes
+    * const academySavedThemes = await prisma.academySavedTheme.findMany()
+    * ```
+    */
+  get academySavedTheme(): Prisma.AcademySavedThemeDelegate<ExtArgs>;
+
+  /**
+   * `prisma.ageBracket`: Exposes CRUD operations for the **AgeBracket** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AgeBrackets
+    * const ageBrackets = await prisma.ageBracket.findMany()
+    * ```
+    */
+  get ageBracket(): Prisma.AgeBracketDelegate<ExtArgs>;
+
+  /**
+   * `prisma.academyScheduleSlot`: Exposes CRUD operations for the **AcademyScheduleSlot** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AcademyScheduleSlots
+    * const academyScheduleSlots = await prisma.academyScheduleSlot.findMany()
+    * ```
+    */
+  get academyScheduleSlot(): Prisma.AcademyScheduleSlotDelegate<ExtArgs>;
+
+  /**
+   * `prisma.attendanceSession`: Exposes CRUD operations for the **AttendanceSession** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AttendanceSessions
+    * const attendanceSessions = await prisma.attendanceSession.findMany()
+    * ```
+    */
+  get attendanceSession(): Prisma.AttendanceSessionDelegate<ExtArgs>;
+
+  /**
+   * `prisma.attendanceRecord`: Exposes CRUD operations for the **AttendanceRecord** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AttendanceRecords
+    * const attendanceRecords = await prisma.attendanceRecord.findMany()
+    * ```
+    */
+  get attendanceRecord(): Prisma.AttendanceRecordDelegate<ExtArgs>;
 
   /**
    * `prisma.profileUpdateRequest`: Exposes CRUD operations for the **ProfileUpdateRequest** model.
@@ -1336,6 +1441,12 @@ export namespace Prisma {
     BeltRank: 'BeltRank',
     StudentRank: 'StudentRank',
     Attendance: 'Attendance',
+    AcademySettings: 'AcademySettings',
+    AcademySavedTheme: 'AcademySavedTheme',
+    AgeBracket: 'AgeBracket',
+    AcademyScheduleSlot: 'AcademyScheduleSlot',
+    AttendanceSession: 'AttendanceSession',
+    AttendanceRecord: 'AttendanceRecord',
     ProfileUpdateRequest: 'ProfileUpdateRequest',
     GraduationRequest: 'GraduationRequest',
     FeeTier: 'FeeTier',
@@ -1372,7 +1483,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "studentProfile" | "studentStatusHistory" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "studentCharge" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "tenantFinancialConfig" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "federationContact" | "federationSeason" | "federationLicenseType" | "federationLicensePriceRow" | "federationSeasonCharge" | "affiliationLicense"
+      modelProps: "user" | "studentProfile" | "studentStatusHistory" | "guardian" | "studentGuardian" | "discipline" | "disciplineProgram" | "beltRank" | "studentRank" | "attendance" | "academySettings" | "academySavedTheme" | "ageBracket" | "academyScheduleSlot" | "attendanceSession" | "attendanceRecord" | "profileUpdateRequest" | "graduationRequest" | "feeTier" | "studentFee" | "studentCharge" | "discount" | "studentDiscount" | "studentSubscription" | "cashRegisterSession" | "cashTransaction" | "tenantFinancialConfig" | "bankMandate" | "remittanceBatch" | "remittanceItem" | "federation" | "federationContact" | "federationSeason" | "federationLicenseType" | "federationLicensePriceRow" | "federationSeasonCharge" | "affiliationLicense"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2073,6 +2184,426 @@ export namespace Prisma {
           count: {
             args: Prisma.AttendanceCountArgs<ExtArgs>
             result: $Utils.Optional<AttendanceCountAggregateOutputType> | number
+          }
+        }
+      }
+      AcademySettings: {
+        payload: Prisma.$AcademySettingsPayload<ExtArgs>
+        fields: Prisma.AcademySettingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AcademySettingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AcademySettingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          findFirst: {
+            args: Prisma.AcademySettingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AcademySettingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          findMany: {
+            args: Prisma.AcademySettingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>[]
+          }
+          create: {
+            args: Prisma.AcademySettingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          createMany: {
+            args: Prisma.AcademySettingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AcademySettingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>[]
+          }
+          delete: {
+            args: Prisma.AcademySettingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          update: {
+            args: Prisma.AcademySettingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.AcademySettingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AcademySettingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AcademySettingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySettingsPayload>
+          }
+          aggregate: {
+            args: Prisma.AcademySettingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAcademySettings>
+          }
+          groupBy: {
+            args: Prisma.AcademySettingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AcademySettingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AcademySettingsCountArgs<ExtArgs>
+            result: $Utils.Optional<AcademySettingsCountAggregateOutputType> | number
+          }
+        }
+      }
+      AcademySavedTheme: {
+        payload: Prisma.$AcademySavedThemePayload<ExtArgs>
+        fields: Prisma.AcademySavedThemeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AcademySavedThemeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AcademySavedThemeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          findFirst: {
+            args: Prisma.AcademySavedThemeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AcademySavedThemeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          findMany: {
+            args: Prisma.AcademySavedThemeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>[]
+          }
+          create: {
+            args: Prisma.AcademySavedThemeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          createMany: {
+            args: Prisma.AcademySavedThemeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AcademySavedThemeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>[]
+          }
+          delete: {
+            args: Prisma.AcademySavedThemeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          update: {
+            args: Prisma.AcademySavedThemeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          deleteMany: {
+            args: Prisma.AcademySavedThemeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AcademySavedThemeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AcademySavedThemeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademySavedThemePayload>
+          }
+          aggregate: {
+            args: Prisma.AcademySavedThemeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAcademySavedTheme>
+          }
+          groupBy: {
+            args: Prisma.AcademySavedThemeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AcademySavedThemeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AcademySavedThemeCountArgs<ExtArgs>
+            result: $Utils.Optional<AcademySavedThemeCountAggregateOutputType> | number
+          }
+        }
+      }
+      AgeBracket: {
+        payload: Prisma.$AgeBracketPayload<ExtArgs>
+        fields: Prisma.AgeBracketFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AgeBracketFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AgeBracketFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          findFirst: {
+            args: Prisma.AgeBracketFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AgeBracketFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          findMany: {
+            args: Prisma.AgeBracketFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>[]
+          }
+          create: {
+            args: Prisma.AgeBracketCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          createMany: {
+            args: Prisma.AgeBracketCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AgeBracketCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>[]
+          }
+          delete: {
+            args: Prisma.AgeBracketDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          update: {
+            args: Prisma.AgeBracketUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          deleteMany: {
+            args: Prisma.AgeBracketDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AgeBracketUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AgeBracketUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AgeBracketPayload>
+          }
+          aggregate: {
+            args: Prisma.AgeBracketAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAgeBracket>
+          }
+          groupBy: {
+            args: Prisma.AgeBracketGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AgeBracketGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AgeBracketCountArgs<ExtArgs>
+            result: $Utils.Optional<AgeBracketCountAggregateOutputType> | number
+          }
+        }
+      }
+      AcademyScheduleSlot: {
+        payload: Prisma.$AcademyScheduleSlotPayload<ExtArgs>
+        fields: Prisma.AcademyScheduleSlotFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AcademyScheduleSlotFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AcademyScheduleSlotFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          findFirst: {
+            args: Prisma.AcademyScheduleSlotFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AcademyScheduleSlotFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          findMany: {
+            args: Prisma.AcademyScheduleSlotFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>[]
+          }
+          create: {
+            args: Prisma.AcademyScheduleSlotCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          createMany: {
+            args: Prisma.AcademyScheduleSlotCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AcademyScheduleSlotCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>[]
+          }
+          delete: {
+            args: Prisma.AcademyScheduleSlotDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          update: {
+            args: Prisma.AcademyScheduleSlotUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          deleteMany: {
+            args: Prisma.AcademyScheduleSlotDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AcademyScheduleSlotUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AcademyScheduleSlotUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AcademyScheduleSlotPayload>
+          }
+          aggregate: {
+            args: Prisma.AcademyScheduleSlotAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAcademyScheduleSlot>
+          }
+          groupBy: {
+            args: Prisma.AcademyScheduleSlotGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AcademyScheduleSlotGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AcademyScheduleSlotCountArgs<ExtArgs>
+            result: $Utils.Optional<AcademyScheduleSlotCountAggregateOutputType> | number
+          }
+        }
+      }
+      AttendanceSession: {
+        payload: Prisma.$AttendanceSessionPayload<ExtArgs>
+        fields: Prisma.AttendanceSessionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AttendanceSessionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AttendanceSessionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          findFirst: {
+            args: Prisma.AttendanceSessionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AttendanceSessionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          findMany: {
+            args: Prisma.AttendanceSessionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>[]
+          }
+          create: {
+            args: Prisma.AttendanceSessionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          createMany: {
+            args: Prisma.AttendanceSessionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AttendanceSessionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>[]
+          }
+          delete: {
+            args: Prisma.AttendanceSessionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          update: {
+            args: Prisma.AttendanceSessionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          deleteMany: {
+            args: Prisma.AttendanceSessionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AttendanceSessionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AttendanceSessionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceSessionPayload>
+          }
+          aggregate: {
+            args: Prisma.AttendanceSessionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAttendanceSession>
+          }
+          groupBy: {
+            args: Prisma.AttendanceSessionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AttendanceSessionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AttendanceSessionCountArgs<ExtArgs>
+            result: $Utils.Optional<AttendanceSessionCountAggregateOutputType> | number
+          }
+        }
+      }
+      AttendanceRecord: {
+        payload: Prisma.$AttendanceRecordPayload<ExtArgs>
+        fields: Prisma.AttendanceRecordFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AttendanceRecordFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AttendanceRecordFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          findFirst: {
+            args: Prisma.AttendanceRecordFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AttendanceRecordFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          findMany: {
+            args: Prisma.AttendanceRecordFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>[]
+          }
+          create: {
+            args: Prisma.AttendanceRecordCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          createMany: {
+            args: Prisma.AttendanceRecordCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AttendanceRecordCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>[]
+          }
+          delete: {
+            args: Prisma.AttendanceRecordDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          update: {
+            args: Prisma.AttendanceRecordUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          deleteMany: {
+            args: Prisma.AttendanceRecordDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AttendanceRecordUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.AttendanceRecordUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AttendanceRecordPayload>
+          }
+          aggregate: {
+            args: Prisma.AttendanceRecordAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAttendanceRecord>
+          }
+          groupBy: {
+            args: Prisma.AttendanceRecordGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AttendanceRecordGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AttendanceRecordCountArgs<ExtArgs>
+            result: $Utils.Optional<AttendanceRecordCountAggregateOutputType> | number
           }
         }
       }
@@ -3899,6 +4430,37 @@ export namespace Prisma {
    */
   export type BeltRankCountOutputTypeCountStudentRanksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: StudentRankWhereInput
+  }
+
+
+  /**
+   * Count Type AttendanceSessionCountOutputType
+   */
+
+  export type AttendanceSessionCountOutputType = {
+    records: number
+  }
+
+  export type AttendanceSessionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    records?: boolean | AttendanceSessionCountOutputTypeCountRecordsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AttendanceSessionCountOutputType without action
+   */
+  export type AttendanceSessionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSessionCountOutputType
+     */
+    select?: AttendanceSessionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AttendanceSessionCountOutputType without action
+   */
+  export type AttendanceSessionCountOutputTypeCountRecordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceRecordWhereInput
   }
 
 
@@ -14085,6 +14647,6025 @@ export namespace Prisma {
 
 
   /**
+   * Model AcademySettings
+   */
+
+  export type AggregateAcademySettings = {
+    _count: AcademySettingsCountAggregateOutputType | null
+    _min: AcademySettingsMinAggregateOutputType | null
+    _max: AcademySettingsMaxAggregateOutputType | null
+  }
+
+  export type AcademySettingsMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    legalName: string | null
+    tradeName: string | null
+    taxId: string | null
+    officialEmail: string | null
+    timezone: string | null
+    defaultCurrency: string | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    postalCode: string | null
+    country: string | null
+    displayName: string | null
+    brandName: string | null
+    website: string | null
+    logoUrl: string | null
+    isotypeUrl: string | null
+    pdfLogoUrl: string | null
+    activeAppearanceKey: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademySettingsMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    legalName: string | null
+    tradeName: string | null
+    taxId: string | null
+    officialEmail: string | null
+    timezone: string | null
+    defaultCurrency: string | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    postalCode: string | null
+    country: string | null
+    displayName: string | null
+    brandName: string | null
+    website: string | null
+    logoUrl: string | null
+    isotypeUrl: string | null
+    pdfLogoUrl: string | null
+    activeAppearanceKey: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademySettingsCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    legalName: number
+    tradeName: number
+    taxId: number
+    officialEmail: number
+    timezone: number
+    defaultCurrency: number
+    phone: number
+    address: number
+    city: number
+    postalCode: number
+    country: number
+    displayName: number
+    brandName: number
+    website: number
+    logoUrl: number
+    isotypeUrl: number
+    pdfLogoUrl: number
+    themeConfig: number
+    activeAppearanceKey: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AcademySettingsMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    tradeName?: true
+    taxId?: true
+    officialEmail?: true
+    timezone?: true
+    defaultCurrency?: true
+    phone?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    displayName?: true
+    brandName?: true
+    website?: true
+    logoUrl?: true
+    isotypeUrl?: true
+    pdfLogoUrl?: true
+    activeAppearanceKey?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademySettingsMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    tradeName?: true
+    taxId?: true
+    officialEmail?: true
+    timezone?: true
+    defaultCurrency?: true
+    phone?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    displayName?: true
+    brandName?: true
+    website?: true
+    logoUrl?: true
+    isotypeUrl?: true
+    pdfLogoUrl?: true
+    activeAppearanceKey?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademySettingsCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    legalName?: true
+    tradeName?: true
+    taxId?: true
+    officialEmail?: true
+    timezone?: true
+    defaultCurrency?: true
+    phone?: true
+    address?: true
+    city?: true
+    postalCode?: true
+    country?: true
+    displayName?: true
+    brandName?: true
+    website?: true
+    logoUrl?: true
+    isotypeUrl?: true
+    pdfLogoUrl?: true
+    themeConfig?: true
+    activeAppearanceKey?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AcademySettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademySettings to aggregate.
+     */
+    where?: AcademySettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySettings to fetch.
+     */
+    orderBy?: AcademySettingsOrderByWithRelationInput | AcademySettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AcademySettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AcademySettings
+    **/
+    _count?: true | AcademySettingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AcademySettingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AcademySettingsMaxAggregateInputType
+  }
+
+  export type GetAcademySettingsAggregateType<T extends AcademySettingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateAcademySettings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAcademySettings[P]>
+      : GetScalarType<T[P], AggregateAcademySettings[P]>
+  }
+
+
+
+
+  export type AcademySettingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AcademySettingsWhereInput
+    orderBy?: AcademySettingsOrderByWithAggregationInput | AcademySettingsOrderByWithAggregationInput[]
+    by: AcademySettingsScalarFieldEnum[] | AcademySettingsScalarFieldEnum
+    having?: AcademySettingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AcademySettingsCountAggregateInputType | true
+    _min?: AcademySettingsMinAggregateInputType
+    _max?: AcademySettingsMaxAggregateInputType
+  }
+
+  export type AcademySettingsGroupByOutputType = {
+    id: string
+    tenantId: string
+    legalName: string
+    tradeName: string
+    taxId: string
+    officialEmail: string
+    timezone: string
+    defaultCurrency: string
+    phone: string
+    address: string
+    city: string
+    postalCode: string
+    country: string
+    displayName: string
+    brandName: string
+    website: string
+    logoUrl: string
+    isotypeUrl: string
+    pdfLogoUrl: string
+    themeConfig: JsonValue
+    activeAppearanceKey: string
+    createdAt: Date
+    updatedAt: Date
+    _count: AcademySettingsCountAggregateOutputType | null
+    _min: AcademySettingsMinAggregateOutputType | null
+    _max: AcademySettingsMaxAggregateOutputType | null
+  }
+
+  type GetAcademySettingsGroupByPayload<T extends AcademySettingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AcademySettingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AcademySettingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AcademySettingsGroupByOutputType[P]>
+            : GetScalarType<T[P], AcademySettingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AcademySettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    tradeName?: boolean
+    taxId?: boolean
+    officialEmail?: boolean
+    timezone?: boolean
+    defaultCurrency?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    displayName?: boolean
+    brandName?: boolean
+    website?: boolean
+    logoUrl?: boolean
+    isotypeUrl?: boolean
+    pdfLogoUrl?: boolean
+    themeConfig?: boolean
+    activeAppearanceKey?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academySettings"]>
+
+  export type AcademySettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    tradeName?: boolean
+    taxId?: boolean
+    officialEmail?: boolean
+    timezone?: boolean
+    defaultCurrency?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    displayName?: boolean
+    brandName?: boolean
+    website?: boolean
+    logoUrl?: boolean
+    isotypeUrl?: boolean
+    pdfLogoUrl?: boolean
+    themeConfig?: boolean
+    activeAppearanceKey?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academySettings"]>
+
+  export type AcademySettingsSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    legalName?: boolean
+    tradeName?: boolean
+    taxId?: boolean
+    officialEmail?: boolean
+    timezone?: boolean
+    defaultCurrency?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    postalCode?: boolean
+    country?: boolean
+    displayName?: boolean
+    brandName?: boolean
+    website?: boolean
+    logoUrl?: boolean
+    isotypeUrl?: boolean
+    pdfLogoUrl?: boolean
+    themeConfig?: boolean
+    activeAppearanceKey?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $AcademySettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AcademySettings"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * Academy key from `x-school-id`. One row per tenant (future locations hang off this).
+       */
+      tenantId: string
+      /**
+       * Legal name (razón social) of the tenant.
+       */
+      legalName: string
+      /**
+       * Public trade name shown in the workspace chrome.
+       */
+      tradeName: string
+      /**
+       * Tax identifier (CIF/NIF). Not a SEPA credential.
+       */
+      taxId: string
+      officialEmail: string
+      /**
+       * IANA timezone used when materializing daily attendance sessions.
+       */
+      timezone: string
+      /**
+       * ISO 4217 currency used as the academy default (EUR today).
+       */
+      defaultCurrency: string
+      phone: string
+      address: string
+      city: string
+      postalCode: string
+      country: string
+      /**
+       * @deprecated Prefer `tradeName`. Kept so historical rows remain readable.
+       */
+      displayName: string
+      /**
+       * @deprecated Prefer `tradeName`.
+       */
+      brandName: string
+      website: string
+      logoUrl: string
+      /**
+       * Compact mark used in dense chrome (sidebar / favicon). Upload storage is out of scope.
+       */
+      isotypeUrl: string
+      /**
+       * High-resolution horizontal mark for invoices and graduation diplomas.
+       */
+      pdfLogoUrl: string
+      /**
+       * Design-token catalog injected as Tailwind / CSS variables.
+       */
+      themeConfig: Prisma.JsonValue
+      /**
+       * Last activated appearance: `preset:<id>` or `saved:<uuid>`. Empty when never switched.
+       */
+      activeAppearanceKey: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["academySettings"]>
+    composites: {}
+  }
+
+  type AcademySettingsGetPayload<S extends boolean | null | undefined | AcademySettingsDefaultArgs> = $Result.GetResult<Prisma.$AcademySettingsPayload, S>
+
+  type AcademySettingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AcademySettingsFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AcademySettingsCountAggregateInputType | true
+    }
+
+  export interface AcademySettingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AcademySettings'], meta: { name: 'AcademySettings' } }
+    /**
+     * Find zero or one AcademySettings that matches the filter.
+     * @param {AcademySettingsFindUniqueArgs} args - Arguments to find a AcademySettings
+     * @example
+     * // Get one AcademySettings
+     * const academySettings = await prisma.academySettings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AcademySettingsFindUniqueArgs>(args: SelectSubset<T, AcademySettingsFindUniqueArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AcademySettings that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AcademySettingsFindUniqueOrThrowArgs} args - Arguments to find a AcademySettings
+     * @example
+     * // Get one AcademySettings
+     * const academySettings = await prisma.academySettings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AcademySettingsFindUniqueOrThrowArgs>(args: SelectSubset<T, AcademySettingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AcademySettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsFindFirstArgs} args - Arguments to find a AcademySettings
+     * @example
+     * // Get one AcademySettings
+     * const academySettings = await prisma.academySettings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AcademySettingsFindFirstArgs>(args?: SelectSubset<T, AcademySettingsFindFirstArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AcademySettings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsFindFirstOrThrowArgs} args - Arguments to find a AcademySettings
+     * @example
+     * // Get one AcademySettings
+     * const academySettings = await prisma.academySettings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AcademySettingsFindFirstOrThrowArgs>(args?: SelectSubset<T, AcademySettingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AcademySettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AcademySettings
+     * const academySettings = await prisma.academySettings.findMany()
+     * 
+     * // Get first 10 AcademySettings
+     * const academySettings = await prisma.academySettings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const academySettingsWithIdOnly = await prisma.academySettings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AcademySettingsFindManyArgs>(args?: SelectSubset<T, AcademySettingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AcademySettings.
+     * @param {AcademySettingsCreateArgs} args - Arguments to create a AcademySettings.
+     * @example
+     * // Create one AcademySettings
+     * const AcademySettings = await prisma.academySettings.create({
+     *   data: {
+     *     // ... data to create a AcademySettings
+     *   }
+     * })
+     * 
+     */
+    create<T extends AcademySettingsCreateArgs>(args: SelectSubset<T, AcademySettingsCreateArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AcademySettings.
+     * @param {AcademySettingsCreateManyArgs} args - Arguments to create many AcademySettings.
+     * @example
+     * // Create many AcademySettings
+     * const academySettings = await prisma.academySettings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AcademySettingsCreateManyArgs>(args?: SelectSubset<T, AcademySettingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AcademySettings and returns the data saved in the database.
+     * @param {AcademySettingsCreateManyAndReturnArgs} args - Arguments to create many AcademySettings.
+     * @example
+     * // Create many AcademySettings
+     * const academySettings = await prisma.academySettings.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AcademySettings and only return the `id`
+     * const academySettingsWithIdOnly = await prisma.academySettings.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AcademySettingsCreateManyAndReturnArgs>(args?: SelectSubset<T, AcademySettingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AcademySettings.
+     * @param {AcademySettingsDeleteArgs} args - Arguments to delete one AcademySettings.
+     * @example
+     * // Delete one AcademySettings
+     * const AcademySettings = await prisma.academySettings.delete({
+     *   where: {
+     *     // ... filter to delete one AcademySettings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AcademySettingsDeleteArgs>(args: SelectSubset<T, AcademySettingsDeleteArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AcademySettings.
+     * @param {AcademySettingsUpdateArgs} args - Arguments to update one AcademySettings.
+     * @example
+     * // Update one AcademySettings
+     * const academySettings = await prisma.academySettings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AcademySettingsUpdateArgs>(args: SelectSubset<T, AcademySettingsUpdateArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AcademySettings.
+     * @param {AcademySettingsDeleteManyArgs} args - Arguments to filter AcademySettings to delete.
+     * @example
+     * // Delete a few AcademySettings
+     * const { count } = await prisma.academySettings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AcademySettingsDeleteManyArgs>(args?: SelectSubset<T, AcademySettingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AcademySettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AcademySettings
+     * const academySettings = await prisma.academySettings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AcademySettingsUpdateManyArgs>(args: SelectSubset<T, AcademySettingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AcademySettings.
+     * @param {AcademySettingsUpsertArgs} args - Arguments to update or create a AcademySettings.
+     * @example
+     * // Update or create a AcademySettings
+     * const academySettings = await prisma.academySettings.upsert({
+     *   create: {
+     *     // ... data to create a AcademySettings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AcademySettings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AcademySettingsUpsertArgs>(args: SelectSubset<T, AcademySettingsUpsertArgs<ExtArgs>>): Prisma__AcademySettingsClient<$Result.GetResult<Prisma.$AcademySettingsPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AcademySettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsCountArgs} args - Arguments to filter AcademySettings to count.
+     * @example
+     * // Count the number of AcademySettings
+     * const count = await prisma.academySettings.count({
+     *   where: {
+     *     // ... the filter for the AcademySettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends AcademySettingsCountArgs>(
+      args?: Subset<T, AcademySettingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AcademySettingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AcademySettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AcademySettingsAggregateArgs>(args: Subset<T, AcademySettingsAggregateArgs>): Prisma.PrismaPromise<GetAcademySettingsAggregateType<T>>
+
+    /**
+     * Group by AcademySettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySettingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AcademySettingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AcademySettingsGroupByArgs['orderBy'] }
+        : { orderBy?: AcademySettingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AcademySettingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAcademySettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AcademySettings model
+   */
+  readonly fields: AcademySettingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AcademySettings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AcademySettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AcademySettings model
+   */ 
+  interface AcademySettingsFieldRefs {
+    readonly id: FieldRef<"AcademySettings", 'String'>
+    readonly tenantId: FieldRef<"AcademySettings", 'String'>
+    readonly legalName: FieldRef<"AcademySettings", 'String'>
+    readonly tradeName: FieldRef<"AcademySettings", 'String'>
+    readonly taxId: FieldRef<"AcademySettings", 'String'>
+    readonly officialEmail: FieldRef<"AcademySettings", 'String'>
+    readonly timezone: FieldRef<"AcademySettings", 'String'>
+    readonly defaultCurrency: FieldRef<"AcademySettings", 'String'>
+    readonly phone: FieldRef<"AcademySettings", 'String'>
+    readonly address: FieldRef<"AcademySettings", 'String'>
+    readonly city: FieldRef<"AcademySettings", 'String'>
+    readonly postalCode: FieldRef<"AcademySettings", 'String'>
+    readonly country: FieldRef<"AcademySettings", 'String'>
+    readonly displayName: FieldRef<"AcademySettings", 'String'>
+    readonly brandName: FieldRef<"AcademySettings", 'String'>
+    readonly website: FieldRef<"AcademySettings", 'String'>
+    readonly logoUrl: FieldRef<"AcademySettings", 'String'>
+    readonly isotypeUrl: FieldRef<"AcademySettings", 'String'>
+    readonly pdfLogoUrl: FieldRef<"AcademySettings", 'String'>
+    readonly themeConfig: FieldRef<"AcademySettings", 'Json'>
+    readonly activeAppearanceKey: FieldRef<"AcademySettings", 'String'>
+    readonly createdAt: FieldRef<"AcademySettings", 'DateTime'>
+    readonly updatedAt: FieldRef<"AcademySettings", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AcademySettings findUnique
+   */
+  export type AcademySettingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySettings to fetch.
+     */
+    where: AcademySettingsWhereUniqueInput
+  }
+
+  /**
+   * AcademySettings findUniqueOrThrow
+   */
+  export type AcademySettingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySettings to fetch.
+     */
+    where: AcademySettingsWhereUniqueInput
+  }
+
+  /**
+   * AcademySettings findFirst
+   */
+  export type AcademySettingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySettings to fetch.
+     */
+    where?: AcademySettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySettings to fetch.
+     */
+    orderBy?: AcademySettingsOrderByWithRelationInput | AcademySettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademySettings.
+     */
+    cursor?: AcademySettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademySettings.
+     */
+    distinct?: AcademySettingsScalarFieldEnum | AcademySettingsScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySettings findFirstOrThrow
+   */
+  export type AcademySettingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySettings to fetch.
+     */
+    where?: AcademySettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySettings to fetch.
+     */
+    orderBy?: AcademySettingsOrderByWithRelationInput | AcademySettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademySettings.
+     */
+    cursor?: AcademySettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademySettings.
+     */
+    distinct?: AcademySettingsScalarFieldEnum | AcademySettingsScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySettings findMany
+   */
+  export type AcademySettingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySettings to fetch.
+     */
+    where?: AcademySettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySettings to fetch.
+     */
+    orderBy?: AcademySettingsOrderByWithRelationInput | AcademySettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AcademySettings.
+     */
+    cursor?: AcademySettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySettings.
+     */
+    skip?: number
+    distinct?: AcademySettingsScalarFieldEnum | AcademySettingsScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySettings create
+   */
+  export type AcademySettingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AcademySettings.
+     */
+    data: XOR<AcademySettingsCreateInput, AcademySettingsUncheckedCreateInput>
+  }
+
+  /**
+   * AcademySettings createMany
+   */
+  export type AcademySettingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AcademySettings.
+     */
+    data: AcademySettingsCreateManyInput | AcademySettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademySettings createManyAndReturn
+   */
+  export type AcademySettingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AcademySettings.
+     */
+    data: AcademySettingsCreateManyInput | AcademySettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademySettings update
+   */
+  export type AcademySettingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AcademySettings.
+     */
+    data: XOR<AcademySettingsUpdateInput, AcademySettingsUncheckedUpdateInput>
+    /**
+     * Choose, which AcademySettings to update.
+     */
+    where: AcademySettingsWhereUniqueInput
+  }
+
+  /**
+   * AcademySettings updateMany
+   */
+  export type AcademySettingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AcademySettings.
+     */
+    data: XOR<AcademySettingsUpdateManyMutationInput, AcademySettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which AcademySettings to update
+     */
+    where?: AcademySettingsWhereInput
+  }
+
+  /**
+   * AcademySettings upsert
+   */
+  export type AcademySettingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AcademySettings to update in case it exists.
+     */
+    where: AcademySettingsWhereUniqueInput
+    /**
+     * In case the AcademySettings found by the `where` argument doesn't exist, create a new AcademySettings with this data.
+     */
+    create: XOR<AcademySettingsCreateInput, AcademySettingsUncheckedCreateInput>
+    /**
+     * In case the AcademySettings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AcademySettingsUpdateInput, AcademySettingsUncheckedUpdateInput>
+  }
+
+  /**
+   * AcademySettings delete
+   */
+  export type AcademySettingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+    /**
+     * Filter which AcademySettings to delete.
+     */
+    where: AcademySettingsWhereUniqueInput
+  }
+
+  /**
+   * AcademySettings deleteMany
+   */
+  export type AcademySettingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademySettings to delete
+     */
+    where?: AcademySettingsWhereInput
+  }
+
+  /**
+   * AcademySettings without action
+   */
+  export type AcademySettingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySettings
+     */
+    select?: AcademySettingsSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AcademySavedTheme
+   */
+
+  export type AggregateAcademySavedTheme = {
+    _count: AcademySavedThemeCountAggregateOutputType | null
+    _min: AcademySavedThemeMinAggregateOutputType | null
+    _max: AcademySavedThemeMaxAggregateOutputType | null
+  }
+
+  export type AcademySavedThemeMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademySavedThemeMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademySavedThemeCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    name: number
+    themeConfig: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AcademySavedThemeMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademySavedThemeMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademySavedThemeCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    name?: true
+    themeConfig?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AcademySavedThemeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademySavedTheme to aggregate.
+     */
+    where?: AcademySavedThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySavedThemes to fetch.
+     */
+    orderBy?: AcademySavedThemeOrderByWithRelationInput | AcademySavedThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AcademySavedThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySavedThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySavedThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AcademySavedThemes
+    **/
+    _count?: true | AcademySavedThemeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AcademySavedThemeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AcademySavedThemeMaxAggregateInputType
+  }
+
+  export type GetAcademySavedThemeAggregateType<T extends AcademySavedThemeAggregateArgs> = {
+        [P in keyof T & keyof AggregateAcademySavedTheme]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAcademySavedTheme[P]>
+      : GetScalarType<T[P], AggregateAcademySavedTheme[P]>
+  }
+
+
+
+
+  export type AcademySavedThemeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AcademySavedThemeWhereInput
+    orderBy?: AcademySavedThemeOrderByWithAggregationInput | AcademySavedThemeOrderByWithAggregationInput[]
+    by: AcademySavedThemeScalarFieldEnum[] | AcademySavedThemeScalarFieldEnum
+    having?: AcademySavedThemeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AcademySavedThemeCountAggregateInputType | true
+    _min?: AcademySavedThemeMinAggregateInputType
+    _max?: AcademySavedThemeMaxAggregateInputType
+  }
+
+  export type AcademySavedThemeGroupByOutputType = {
+    id: string
+    tenantId: string
+    name: string
+    themeConfig: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: AcademySavedThemeCountAggregateOutputType | null
+    _min: AcademySavedThemeMinAggregateOutputType | null
+    _max: AcademySavedThemeMaxAggregateOutputType | null
+  }
+
+  type GetAcademySavedThemeGroupByPayload<T extends AcademySavedThemeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AcademySavedThemeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AcademySavedThemeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AcademySavedThemeGroupByOutputType[P]>
+            : GetScalarType<T[P], AcademySavedThemeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AcademySavedThemeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    name?: boolean
+    themeConfig?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academySavedTheme"]>
+
+  export type AcademySavedThemeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    name?: boolean
+    themeConfig?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academySavedTheme"]>
+
+  export type AcademySavedThemeSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    name?: boolean
+    themeConfig?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $AcademySavedThemePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AcademySavedTheme"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * Academy key from `x-school-id`. Logical tenant pointer (no physical FK).
+       */
+      tenantId: string
+      name: string
+      themeConfig: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["academySavedTheme"]>
+    composites: {}
+  }
+
+  type AcademySavedThemeGetPayload<S extends boolean | null | undefined | AcademySavedThemeDefaultArgs> = $Result.GetResult<Prisma.$AcademySavedThemePayload, S>
+
+  type AcademySavedThemeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AcademySavedThemeFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AcademySavedThemeCountAggregateInputType | true
+    }
+
+  export interface AcademySavedThemeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AcademySavedTheme'], meta: { name: 'AcademySavedTheme' } }
+    /**
+     * Find zero or one AcademySavedTheme that matches the filter.
+     * @param {AcademySavedThemeFindUniqueArgs} args - Arguments to find a AcademySavedTheme
+     * @example
+     * // Get one AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AcademySavedThemeFindUniqueArgs>(args: SelectSubset<T, AcademySavedThemeFindUniqueArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AcademySavedTheme that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AcademySavedThemeFindUniqueOrThrowArgs} args - Arguments to find a AcademySavedTheme
+     * @example
+     * // Get one AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AcademySavedThemeFindUniqueOrThrowArgs>(args: SelectSubset<T, AcademySavedThemeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AcademySavedTheme that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeFindFirstArgs} args - Arguments to find a AcademySavedTheme
+     * @example
+     * // Get one AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AcademySavedThemeFindFirstArgs>(args?: SelectSubset<T, AcademySavedThemeFindFirstArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AcademySavedTheme that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeFindFirstOrThrowArgs} args - Arguments to find a AcademySavedTheme
+     * @example
+     * // Get one AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AcademySavedThemeFindFirstOrThrowArgs>(args?: SelectSubset<T, AcademySavedThemeFindFirstOrThrowArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AcademySavedThemes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AcademySavedThemes
+     * const academySavedThemes = await prisma.academySavedTheme.findMany()
+     * 
+     * // Get first 10 AcademySavedThemes
+     * const academySavedThemes = await prisma.academySavedTheme.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const academySavedThemeWithIdOnly = await prisma.academySavedTheme.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AcademySavedThemeFindManyArgs>(args?: SelectSubset<T, AcademySavedThemeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AcademySavedTheme.
+     * @param {AcademySavedThemeCreateArgs} args - Arguments to create a AcademySavedTheme.
+     * @example
+     * // Create one AcademySavedTheme
+     * const AcademySavedTheme = await prisma.academySavedTheme.create({
+     *   data: {
+     *     // ... data to create a AcademySavedTheme
+     *   }
+     * })
+     * 
+     */
+    create<T extends AcademySavedThemeCreateArgs>(args: SelectSubset<T, AcademySavedThemeCreateArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AcademySavedThemes.
+     * @param {AcademySavedThemeCreateManyArgs} args - Arguments to create many AcademySavedThemes.
+     * @example
+     * // Create many AcademySavedThemes
+     * const academySavedTheme = await prisma.academySavedTheme.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AcademySavedThemeCreateManyArgs>(args?: SelectSubset<T, AcademySavedThemeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AcademySavedThemes and returns the data saved in the database.
+     * @param {AcademySavedThemeCreateManyAndReturnArgs} args - Arguments to create many AcademySavedThemes.
+     * @example
+     * // Create many AcademySavedThemes
+     * const academySavedTheme = await prisma.academySavedTheme.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AcademySavedThemes and only return the `id`
+     * const academySavedThemeWithIdOnly = await prisma.academySavedTheme.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AcademySavedThemeCreateManyAndReturnArgs>(args?: SelectSubset<T, AcademySavedThemeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AcademySavedTheme.
+     * @param {AcademySavedThemeDeleteArgs} args - Arguments to delete one AcademySavedTheme.
+     * @example
+     * // Delete one AcademySavedTheme
+     * const AcademySavedTheme = await prisma.academySavedTheme.delete({
+     *   where: {
+     *     // ... filter to delete one AcademySavedTheme
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AcademySavedThemeDeleteArgs>(args: SelectSubset<T, AcademySavedThemeDeleteArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AcademySavedTheme.
+     * @param {AcademySavedThemeUpdateArgs} args - Arguments to update one AcademySavedTheme.
+     * @example
+     * // Update one AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AcademySavedThemeUpdateArgs>(args: SelectSubset<T, AcademySavedThemeUpdateArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AcademySavedThemes.
+     * @param {AcademySavedThemeDeleteManyArgs} args - Arguments to filter AcademySavedThemes to delete.
+     * @example
+     * // Delete a few AcademySavedThemes
+     * const { count } = await prisma.academySavedTheme.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AcademySavedThemeDeleteManyArgs>(args?: SelectSubset<T, AcademySavedThemeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AcademySavedThemes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AcademySavedThemes
+     * const academySavedTheme = await prisma.academySavedTheme.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AcademySavedThemeUpdateManyArgs>(args: SelectSubset<T, AcademySavedThemeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AcademySavedTheme.
+     * @param {AcademySavedThemeUpsertArgs} args - Arguments to update or create a AcademySavedTheme.
+     * @example
+     * // Update or create a AcademySavedTheme
+     * const academySavedTheme = await prisma.academySavedTheme.upsert({
+     *   create: {
+     *     // ... data to create a AcademySavedTheme
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AcademySavedTheme we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AcademySavedThemeUpsertArgs>(args: SelectSubset<T, AcademySavedThemeUpsertArgs<ExtArgs>>): Prisma__AcademySavedThemeClient<$Result.GetResult<Prisma.$AcademySavedThemePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AcademySavedThemes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeCountArgs} args - Arguments to filter AcademySavedThemes to count.
+     * @example
+     * // Count the number of AcademySavedThemes
+     * const count = await prisma.academySavedTheme.count({
+     *   where: {
+     *     // ... the filter for the AcademySavedThemes we want to count
+     *   }
+     * })
+    **/
+    count<T extends AcademySavedThemeCountArgs>(
+      args?: Subset<T, AcademySavedThemeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AcademySavedThemeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AcademySavedTheme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AcademySavedThemeAggregateArgs>(args: Subset<T, AcademySavedThemeAggregateArgs>): Prisma.PrismaPromise<GetAcademySavedThemeAggregateType<T>>
+
+    /**
+     * Group by AcademySavedTheme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademySavedThemeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AcademySavedThemeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AcademySavedThemeGroupByArgs['orderBy'] }
+        : { orderBy?: AcademySavedThemeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AcademySavedThemeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAcademySavedThemeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AcademySavedTheme model
+   */
+  readonly fields: AcademySavedThemeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AcademySavedTheme.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AcademySavedThemeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AcademySavedTheme model
+   */ 
+  interface AcademySavedThemeFieldRefs {
+    readonly id: FieldRef<"AcademySavedTheme", 'String'>
+    readonly tenantId: FieldRef<"AcademySavedTheme", 'String'>
+    readonly name: FieldRef<"AcademySavedTheme", 'String'>
+    readonly themeConfig: FieldRef<"AcademySavedTheme", 'Json'>
+    readonly createdAt: FieldRef<"AcademySavedTheme", 'DateTime'>
+    readonly updatedAt: FieldRef<"AcademySavedTheme", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AcademySavedTheme findUnique
+   */
+  export type AcademySavedThemeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySavedTheme to fetch.
+     */
+    where: AcademySavedThemeWhereUniqueInput
+  }
+
+  /**
+   * AcademySavedTheme findUniqueOrThrow
+   */
+  export type AcademySavedThemeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySavedTheme to fetch.
+     */
+    where: AcademySavedThemeWhereUniqueInput
+  }
+
+  /**
+   * AcademySavedTheme findFirst
+   */
+  export type AcademySavedThemeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySavedTheme to fetch.
+     */
+    where?: AcademySavedThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySavedThemes to fetch.
+     */
+    orderBy?: AcademySavedThemeOrderByWithRelationInput | AcademySavedThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademySavedThemes.
+     */
+    cursor?: AcademySavedThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySavedThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySavedThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademySavedThemes.
+     */
+    distinct?: AcademySavedThemeScalarFieldEnum | AcademySavedThemeScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySavedTheme findFirstOrThrow
+   */
+  export type AcademySavedThemeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySavedTheme to fetch.
+     */
+    where?: AcademySavedThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySavedThemes to fetch.
+     */
+    orderBy?: AcademySavedThemeOrderByWithRelationInput | AcademySavedThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademySavedThemes.
+     */
+    cursor?: AcademySavedThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySavedThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySavedThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademySavedThemes.
+     */
+    distinct?: AcademySavedThemeScalarFieldEnum | AcademySavedThemeScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySavedTheme findMany
+   */
+  export type AcademySavedThemeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademySavedThemes to fetch.
+     */
+    where?: AcademySavedThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademySavedThemes to fetch.
+     */
+    orderBy?: AcademySavedThemeOrderByWithRelationInput | AcademySavedThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AcademySavedThemes.
+     */
+    cursor?: AcademySavedThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademySavedThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademySavedThemes.
+     */
+    skip?: number
+    distinct?: AcademySavedThemeScalarFieldEnum | AcademySavedThemeScalarFieldEnum[]
+  }
+
+  /**
+   * AcademySavedTheme create
+   */
+  export type AcademySavedThemeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AcademySavedTheme.
+     */
+    data: XOR<AcademySavedThemeCreateInput, AcademySavedThemeUncheckedCreateInput>
+  }
+
+  /**
+   * AcademySavedTheme createMany
+   */
+  export type AcademySavedThemeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AcademySavedThemes.
+     */
+    data: AcademySavedThemeCreateManyInput | AcademySavedThemeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademySavedTheme createManyAndReturn
+   */
+  export type AcademySavedThemeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AcademySavedThemes.
+     */
+    data: AcademySavedThemeCreateManyInput | AcademySavedThemeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademySavedTheme update
+   */
+  export type AcademySavedThemeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AcademySavedTheme.
+     */
+    data: XOR<AcademySavedThemeUpdateInput, AcademySavedThemeUncheckedUpdateInput>
+    /**
+     * Choose, which AcademySavedTheme to update.
+     */
+    where: AcademySavedThemeWhereUniqueInput
+  }
+
+  /**
+   * AcademySavedTheme updateMany
+   */
+  export type AcademySavedThemeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AcademySavedThemes.
+     */
+    data: XOR<AcademySavedThemeUpdateManyMutationInput, AcademySavedThemeUncheckedUpdateManyInput>
+    /**
+     * Filter which AcademySavedThemes to update
+     */
+    where?: AcademySavedThemeWhereInput
+  }
+
+  /**
+   * AcademySavedTheme upsert
+   */
+  export type AcademySavedThemeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AcademySavedTheme to update in case it exists.
+     */
+    where: AcademySavedThemeWhereUniqueInput
+    /**
+     * In case the AcademySavedTheme found by the `where` argument doesn't exist, create a new AcademySavedTheme with this data.
+     */
+    create: XOR<AcademySavedThemeCreateInput, AcademySavedThemeUncheckedCreateInput>
+    /**
+     * In case the AcademySavedTheme was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AcademySavedThemeUpdateInput, AcademySavedThemeUncheckedUpdateInput>
+  }
+
+  /**
+   * AcademySavedTheme delete
+   */
+  export type AcademySavedThemeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+    /**
+     * Filter which AcademySavedTheme to delete.
+     */
+    where: AcademySavedThemeWhereUniqueInput
+  }
+
+  /**
+   * AcademySavedTheme deleteMany
+   */
+  export type AcademySavedThemeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademySavedThemes to delete
+     */
+    where?: AcademySavedThemeWhereInput
+  }
+
+  /**
+   * AcademySavedTheme without action
+   */
+  export type AcademySavedThemeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademySavedTheme
+     */
+    select?: AcademySavedThemeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AgeBracket
+   */
+
+  export type AggregateAgeBracket = {
+    _count: AgeBracketCountAggregateOutputType | null
+    _avg: AgeBracketAvgAggregateOutputType | null
+    _sum: AgeBracketSumAggregateOutputType | null
+    _min: AgeBracketMinAggregateOutputType | null
+    _max: AgeBracketMaxAggregateOutputType | null
+  }
+
+  export type AgeBracketAvgAggregateOutputType = {
+    minAge: number | null
+    maxAge: number | null
+    sortOrder: number | null
+  }
+
+  export type AgeBracketSumAggregateOutputType = {
+    minAge: number | null
+    maxAge: number | null
+    sortOrder: number | null
+  }
+
+  export type AgeBracketMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    code: string | null
+    name: string | null
+    minAge: number | null
+    maxAge: number | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgeBracketMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    code: string | null
+    name: string | null
+    minAge: number | null
+    maxAge: number | null
+    sortOrder: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AgeBracketCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    code: number
+    name: number
+    minAge: number
+    maxAge: number
+    sortOrder: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AgeBracketAvgAggregateInputType = {
+    minAge?: true
+    maxAge?: true
+    sortOrder?: true
+  }
+
+  export type AgeBracketSumAggregateInputType = {
+    minAge?: true
+    maxAge?: true
+    sortOrder?: true
+  }
+
+  export type AgeBracketMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    code?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgeBracketMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    code?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AgeBracketCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    code?: true
+    name?: true
+    minAge?: true
+    maxAge?: true
+    sortOrder?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AgeBracketAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgeBracket to aggregate.
+     */
+    where?: AgeBracketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgeBrackets to fetch.
+     */
+    orderBy?: AgeBracketOrderByWithRelationInput | AgeBracketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AgeBracketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgeBrackets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgeBrackets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AgeBrackets
+    **/
+    _count?: true | AgeBracketCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AgeBracketAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AgeBracketSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AgeBracketMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AgeBracketMaxAggregateInputType
+  }
+
+  export type GetAgeBracketAggregateType<T extends AgeBracketAggregateArgs> = {
+        [P in keyof T & keyof AggregateAgeBracket]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAgeBracket[P]>
+      : GetScalarType<T[P], AggregateAgeBracket[P]>
+  }
+
+
+
+
+  export type AgeBracketGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AgeBracketWhereInput
+    orderBy?: AgeBracketOrderByWithAggregationInput | AgeBracketOrderByWithAggregationInput[]
+    by: AgeBracketScalarFieldEnum[] | AgeBracketScalarFieldEnum
+    having?: AgeBracketScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AgeBracketCountAggregateInputType | true
+    _avg?: AgeBracketAvgAggregateInputType
+    _sum?: AgeBracketSumAggregateInputType
+    _min?: AgeBracketMinAggregateInputType
+    _max?: AgeBracketMaxAggregateInputType
+  }
+
+  export type AgeBracketGroupByOutputType = {
+    id: string
+    tenantId: string
+    code: string
+    name: string
+    minAge: number
+    maxAge: number
+    sortOrder: number
+    createdAt: Date
+    updatedAt: Date
+    _count: AgeBracketCountAggregateOutputType | null
+    _avg: AgeBracketAvgAggregateOutputType | null
+    _sum: AgeBracketSumAggregateOutputType | null
+    _min: AgeBracketMinAggregateOutputType | null
+    _max: AgeBracketMaxAggregateOutputType | null
+  }
+
+  type GetAgeBracketGroupByPayload<T extends AgeBracketGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AgeBracketGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AgeBracketGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AgeBracketGroupByOutputType[P]>
+            : GetScalarType<T[P], AgeBracketGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AgeBracketSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    code?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["ageBracket"]>
+
+  export type AgeBracketSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    code?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["ageBracket"]>
+
+  export type AgeBracketSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    code?: boolean
+    name?: boolean
+    minAge?: boolean
+    maxAge?: boolean
+    sortOrder?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $AgeBracketPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AgeBracket"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tenantId: string
+      /**
+       * Stable filter key (e.g. `kids`). Unique per tenant.
+       */
+      code: string
+      name: string
+      minAge: number
+      maxAge: number
+      sortOrder: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["ageBracket"]>
+    composites: {}
+  }
+
+  type AgeBracketGetPayload<S extends boolean | null | undefined | AgeBracketDefaultArgs> = $Result.GetResult<Prisma.$AgeBracketPayload, S>
+
+  type AgeBracketCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AgeBracketFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AgeBracketCountAggregateInputType | true
+    }
+
+  export interface AgeBracketDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AgeBracket'], meta: { name: 'AgeBracket' } }
+    /**
+     * Find zero or one AgeBracket that matches the filter.
+     * @param {AgeBracketFindUniqueArgs} args - Arguments to find a AgeBracket
+     * @example
+     * // Get one AgeBracket
+     * const ageBracket = await prisma.ageBracket.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AgeBracketFindUniqueArgs>(args: SelectSubset<T, AgeBracketFindUniqueArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AgeBracket that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AgeBracketFindUniqueOrThrowArgs} args - Arguments to find a AgeBracket
+     * @example
+     * // Get one AgeBracket
+     * const ageBracket = await prisma.ageBracket.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AgeBracketFindUniqueOrThrowArgs>(args: SelectSubset<T, AgeBracketFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AgeBracket that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketFindFirstArgs} args - Arguments to find a AgeBracket
+     * @example
+     * // Get one AgeBracket
+     * const ageBracket = await prisma.ageBracket.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AgeBracketFindFirstArgs>(args?: SelectSubset<T, AgeBracketFindFirstArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AgeBracket that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketFindFirstOrThrowArgs} args - Arguments to find a AgeBracket
+     * @example
+     * // Get one AgeBracket
+     * const ageBracket = await prisma.ageBracket.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AgeBracketFindFirstOrThrowArgs>(args?: SelectSubset<T, AgeBracketFindFirstOrThrowArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AgeBrackets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AgeBrackets
+     * const ageBrackets = await prisma.ageBracket.findMany()
+     * 
+     * // Get first 10 AgeBrackets
+     * const ageBrackets = await prisma.ageBracket.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const ageBracketWithIdOnly = await prisma.ageBracket.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AgeBracketFindManyArgs>(args?: SelectSubset<T, AgeBracketFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AgeBracket.
+     * @param {AgeBracketCreateArgs} args - Arguments to create a AgeBracket.
+     * @example
+     * // Create one AgeBracket
+     * const AgeBracket = await prisma.ageBracket.create({
+     *   data: {
+     *     // ... data to create a AgeBracket
+     *   }
+     * })
+     * 
+     */
+    create<T extends AgeBracketCreateArgs>(args: SelectSubset<T, AgeBracketCreateArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AgeBrackets.
+     * @param {AgeBracketCreateManyArgs} args - Arguments to create many AgeBrackets.
+     * @example
+     * // Create many AgeBrackets
+     * const ageBracket = await prisma.ageBracket.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AgeBracketCreateManyArgs>(args?: SelectSubset<T, AgeBracketCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AgeBrackets and returns the data saved in the database.
+     * @param {AgeBracketCreateManyAndReturnArgs} args - Arguments to create many AgeBrackets.
+     * @example
+     * // Create many AgeBrackets
+     * const ageBracket = await prisma.ageBracket.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AgeBrackets and only return the `id`
+     * const ageBracketWithIdOnly = await prisma.ageBracket.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AgeBracketCreateManyAndReturnArgs>(args?: SelectSubset<T, AgeBracketCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AgeBracket.
+     * @param {AgeBracketDeleteArgs} args - Arguments to delete one AgeBracket.
+     * @example
+     * // Delete one AgeBracket
+     * const AgeBracket = await prisma.ageBracket.delete({
+     *   where: {
+     *     // ... filter to delete one AgeBracket
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AgeBracketDeleteArgs>(args: SelectSubset<T, AgeBracketDeleteArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AgeBracket.
+     * @param {AgeBracketUpdateArgs} args - Arguments to update one AgeBracket.
+     * @example
+     * // Update one AgeBracket
+     * const ageBracket = await prisma.ageBracket.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AgeBracketUpdateArgs>(args: SelectSubset<T, AgeBracketUpdateArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AgeBrackets.
+     * @param {AgeBracketDeleteManyArgs} args - Arguments to filter AgeBrackets to delete.
+     * @example
+     * // Delete a few AgeBrackets
+     * const { count } = await prisma.ageBracket.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AgeBracketDeleteManyArgs>(args?: SelectSubset<T, AgeBracketDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AgeBrackets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AgeBrackets
+     * const ageBracket = await prisma.ageBracket.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AgeBracketUpdateManyArgs>(args: SelectSubset<T, AgeBracketUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AgeBracket.
+     * @param {AgeBracketUpsertArgs} args - Arguments to update or create a AgeBracket.
+     * @example
+     * // Update or create a AgeBracket
+     * const ageBracket = await prisma.ageBracket.upsert({
+     *   create: {
+     *     // ... data to create a AgeBracket
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AgeBracket we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AgeBracketUpsertArgs>(args: SelectSubset<T, AgeBracketUpsertArgs<ExtArgs>>): Prisma__AgeBracketClient<$Result.GetResult<Prisma.$AgeBracketPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AgeBrackets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketCountArgs} args - Arguments to filter AgeBrackets to count.
+     * @example
+     * // Count the number of AgeBrackets
+     * const count = await prisma.ageBracket.count({
+     *   where: {
+     *     // ... the filter for the AgeBrackets we want to count
+     *   }
+     * })
+    **/
+    count<T extends AgeBracketCountArgs>(
+      args?: Subset<T, AgeBracketCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AgeBracketCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AgeBracket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AgeBracketAggregateArgs>(args: Subset<T, AgeBracketAggregateArgs>): Prisma.PrismaPromise<GetAgeBracketAggregateType<T>>
+
+    /**
+     * Group by AgeBracket.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AgeBracketGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AgeBracketGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AgeBracketGroupByArgs['orderBy'] }
+        : { orderBy?: AgeBracketGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AgeBracketGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAgeBracketGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AgeBracket model
+   */
+  readonly fields: AgeBracketFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AgeBracket.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AgeBracketClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AgeBracket model
+   */ 
+  interface AgeBracketFieldRefs {
+    readonly id: FieldRef<"AgeBracket", 'String'>
+    readonly tenantId: FieldRef<"AgeBracket", 'String'>
+    readonly code: FieldRef<"AgeBracket", 'String'>
+    readonly name: FieldRef<"AgeBracket", 'String'>
+    readonly minAge: FieldRef<"AgeBracket", 'Int'>
+    readonly maxAge: FieldRef<"AgeBracket", 'Int'>
+    readonly sortOrder: FieldRef<"AgeBracket", 'Int'>
+    readonly createdAt: FieldRef<"AgeBracket", 'DateTime'>
+    readonly updatedAt: FieldRef<"AgeBracket", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AgeBracket findUnique
+   */
+  export type AgeBracketFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter, which AgeBracket to fetch.
+     */
+    where: AgeBracketWhereUniqueInput
+  }
+
+  /**
+   * AgeBracket findUniqueOrThrow
+   */
+  export type AgeBracketFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter, which AgeBracket to fetch.
+     */
+    where: AgeBracketWhereUniqueInput
+  }
+
+  /**
+   * AgeBracket findFirst
+   */
+  export type AgeBracketFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter, which AgeBracket to fetch.
+     */
+    where?: AgeBracketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgeBrackets to fetch.
+     */
+    orderBy?: AgeBracketOrderByWithRelationInput | AgeBracketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgeBrackets.
+     */
+    cursor?: AgeBracketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgeBrackets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgeBrackets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgeBrackets.
+     */
+    distinct?: AgeBracketScalarFieldEnum | AgeBracketScalarFieldEnum[]
+  }
+
+  /**
+   * AgeBracket findFirstOrThrow
+   */
+  export type AgeBracketFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter, which AgeBracket to fetch.
+     */
+    where?: AgeBracketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgeBrackets to fetch.
+     */
+    orderBy?: AgeBracketOrderByWithRelationInput | AgeBracketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AgeBrackets.
+     */
+    cursor?: AgeBracketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgeBrackets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgeBrackets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AgeBrackets.
+     */
+    distinct?: AgeBracketScalarFieldEnum | AgeBracketScalarFieldEnum[]
+  }
+
+  /**
+   * AgeBracket findMany
+   */
+  export type AgeBracketFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter, which AgeBrackets to fetch.
+     */
+    where?: AgeBracketWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AgeBrackets to fetch.
+     */
+    orderBy?: AgeBracketOrderByWithRelationInput | AgeBracketOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AgeBrackets.
+     */
+    cursor?: AgeBracketWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AgeBrackets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AgeBrackets.
+     */
+    skip?: number
+    distinct?: AgeBracketScalarFieldEnum | AgeBracketScalarFieldEnum[]
+  }
+
+  /**
+   * AgeBracket create
+   */
+  export type AgeBracketCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AgeBracket.
+     */
+    data: XOR<AgeBracketCreateInput, AgeBracketUncheckedCreateInput>
+  }
+
+  /**
+   * AgeBracket createMany
+   */
+  export type AgeBracketCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AgeBrackets.
+     */
+    data: AgeBracketCreateManyInput | AgeBracketCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgeBracket createManyAndReturn
+   */
+  export type AgeBracketCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AgeBrackets.
+     */
+    data: AgeBracketCreateManyInput | AgeBracketCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AgeBracket update
+   */
+  export type AgeBracketUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AgeBracket.
+     */
+    data: XOR<AgeBracketUpdateInput, AgeBracketUncheckedUpdateInput>
+    /**
+     * Choose, which AgeBracket to update.
+     */
+    where: AgeBracketWhereUniqueInput
+  }
+
+  /**
+   * AgeBracket updateMany
+   */
+  export type AgeBracketUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AgeBrackets.
+     */
+    data: XOR<AgeBracketUpdateManyMutationInput, AgeBracketUncheckedUpdateManyInput>
+    /**
+     * Filter which AgeBrackets to update
+     */
+    where?: AgeBracketWhereInput
+  }
+
+  /**
+   * AgeBracket upsert
+   */
+  export type AgeBracketUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AgeBracket to update in case it exists.
+     */
+    where: AgeBracketWhereUniqueInput
+    /**
+     * In case the AgeBracket found by the `where` argument doesn't exist, create a new AgeBracket with this data.
+     */
+    create: XOR<AgeBracketCreateInput, AgeBracketUncheckedCreateInput>
+    /**
+     * In case the AgeBracket was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AgeBracketUpdateInput, AgeBracketUncheckedUpdateInput>
+  }
+
+  /**
+   * AgeBracket delete
+   */
+  export type AgeBracketDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+    /**
+     * Filter which AgeBracket to delete.
+     */
+    where: AgeBracketWhereUniqueInput
+  }
+
+  /**
+   * AgeBracket deleteMany
+   */
+  export type AgeBracketDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AgeBrackets to delete
+     */
+    where?: AgeBracketWhereInput
+  }
+
+  /**
+   * AgeBracket without action
+   */
+  export type AgeBracketDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AgeBracket
+     */
+    select?: AgeBracketSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AcademyScheduleSlot
+   */
+
+  export type AggregateAcademyScheduleSlot = {
+    _count: AcademyScheduleSlotCountAggregateOutputType | null
+    _avg: AcademyScheduleSlotAvgAggregateOutputType | null
+    _sum: AcademyScheduleSlotSumAggregateOutputType | null
+    _min: AcademyScheduleSlotMinAggregateOutputType | null
+    _max: AcademyScheduleSlotMaxAggregateOutputType | null
+  }
+
+  export type AcademyScheduleSlotAvgAggregateOutputType = {
+    weekday: number | null
+    maxCapacity: number | null
+  }
+
+  export type AcademyScheduleSlotSumAggregateOutputType = {
+    weekday: number | null
+    maxCapacity: number | null
+  }
+
+  export type AcademyScheduleSlotMinAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    weekday: number | null
+    startTime: string | null
+    endTime: string | null
+    disciplineId: string | null
+    instructorUserId: string | null
+    maxCapacity: number | null
+    label: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademyScheduleSlotMaxAggregateOutputType = {
+    id: string | null
+    tenantId: string | null
+    weekday: number | null
+    startTime: string | null
+    endTime: string | null
+    disciplineId: string | null
+    instructorUserId: string | null
+    maxCapacity: number | null
+    label: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AcademyScheduleSlotCountAggregateOutputType = {
+    id: number
+    tenantId: number
+    weekday: number
+    startTime: number
+    endTime: number
+    disciplineId: number
+    instructorUserId: number
+    maxCapacity: number
+    ageBracketIds: number
+    label: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AcademyScheduleSlotAvgAggregateInputType = {
+    weekday?: true
+    maxCapacity?: true
+  }
+
+  export type AcademyScheduleSlotSumAggregateInputType = {
+    weekday?: true
+    maxCapacity?: true
+  }
+
+  export type AcademyScheduleSlotMinAggregateInputType = {
+    id?: true
+    tenantId?: true
+    weekday?: true
+    startTime?: true
+    endTime?: true
+    disciplineId?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    label?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademyScheduleSlotMaxAggregateInputType = {
+    id?: true
+    tenantId?: true
+    weekday?: true
+    startTime?: true
+    endTime?: true
+    disciplineId?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    label?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AcademyScheduleSlotCountAggregateInputType = {
+    id?: true
+    tenantId?: true
+    weekday?: true
+    startTime?: true
+    endTime?: true
+    disciplineId?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    ageBracketIds?: true
+    label?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AcademyScheduleSlotAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademyScheduleSlot to aggregate.
+     */
+    where?: AcademyScheduleSlotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademyScheduleSlots to fetch.
+     */
+    orderBy?: AcademyScheduleSlotOrderByWithRelationInput | AcademyScheduleSlotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AcademyScheduleSlotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademyScheduleSlots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademyScheduleSlots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AcademyScheduleSlots
+    **/
+    _count?: true | AcademyScheduleSlotCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AcademyScheduleSlotAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AcademyScheduleSlotSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AcademyScheduleSlotMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AcademyScheduleSlotMaxAggregateInputType
+  }
+
+  export type GetAcademyScheduleSlotAggregateType<T extends AcademyScheduleSlotAggregateArgs> = {
+        [P in keyof T & keyof AggregateAcademyScheduleSlot]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAcademyScheduleSlot[P]>
+      : GetScalarType<T[P], AggregateAcademyScheduleSlot[P]>
+  }
+
+
+
+
+  export type AcademyScheduleSlotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AcademyScheduleSlotWhereInput
+    orderBy?: AcademyScheduleSlotOrderByWithAggregationInput | AcademyScheduleSlotOrderByWithAggregationInput[]
+    by: AcademyScheduleSlotScalarFieldEnum[] | AcademyScheduleSlotScalarFieldEnum
+    having?: AcademyScheduleSlotScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AcademyScheduleSlotCountAggregateInputType | true
+    _avg?: AcademyScheduleSlotAvgAggregateInputType
+    _sum?: AcademyScheduleSlotSumAggregateInputType
+    _min?: AcademyScheduleSlotMinAggregateInputType
+    _max?: AcademyScheduleSlotMaxAggregateInputType
+  }
+
+  export type AcademyScheduleSlotGroupByOutputType = {
+    id: string
+    tenantId: string
+    weekday: number
+    startTime: string
+    endTime: string
+    disciplineId: string
+    instructorUserId: string
+    maxCapacity: number | null
+    ageBracketIds: string[]
+    label: string | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: AcademyScheduleSlotCountAggregateOutputType | null
+    _avg: AcademyScheduleSlotAvgAggregateOutputType | null
+    _sum: AcademyScheduleSlotSumAggregateOutputType | null
+    _min: AcademyScheduleSlotMinAggregateOutputType | null
+    _max: AcademyScheduleSlotMaxAggregateOutputType | null
+  }
+
+  type GetAcademyScheduleSlotGroupByPayload<T extends AcademyScheduleSlotGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AcademyScheduleSlotGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AcademyScheduleSlotGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AcademyScheduleSlotGroupByOutputType[P]>
+            : GetScalarType<T[P], AcademyScheduleSlotGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AcademyScheduleSlotSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    weekday?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    disciplineId?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    ageBracketIds?: boolean
+    label?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academyScheduleSlot"]>
+
+  export type AcademyScheduleSlotSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tenantId?: boolean
+    weekday?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    disciplineId?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    ageBracketIds?: boolean
+    label?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["academyScheduleSlot"]>
+
+  export type AcademyScheduleSlotSelectScalar = {
+    id?: boolean
+    tenantId?: boolean
+    weekday?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    disciplineId?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    ageBracketIds?: boolean
+    label?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+
+  export type $AcademyScheduleSlotPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AcademyScheduleSlot"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tenantId: string
+      /**
+       * ISO weekday: 1 = Monday … 7 = Sunday.
+       */
+      weekday: number
+      startTime: string
+      endTime: string
+      disciplineId: string
+      instructorUserId: string
+      maxCapacity: number | null
+      /**
+       * Logical `AgeBracket.id` list copied onto generated sessions.
+       */
+      ageBracketIds: string[]
+      label: string | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["academyScheduleSlot"]>
+    composites: {}
+  }
+
+  type AcademyScheduleSlotGetPayload<S extends boolean | null | undefined | AcademyScheduleSlotDefaultArgs> = $Result.GetResult<Prisma.$AcademyScheduleSlotPayload, S>
+
+  type AcademyScheduleSlotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AcademyScheduleSlotFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AcademyScheduleSlotCountAggregateInputType | true
+    }
+
+  export interface AcademyScheduleSlotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AcademyScheduleSlot'], meta: { name: 'AcademyScheduleSlot' } }
+    /**
+     * Find zero or one AcademyScheduleSlot that matches the filter.
+     * @param {AcademyScheduleSlotFindUniqueArgs} args - Arguments to find a AcademyScheduleSlot
+     * @example
+     * // Get one AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AcademyScheduleSlotFindUniqueArgs>(args: SelectSubset<T, AcademyScheduleSlotFindUniqueArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AcademyScheduleSlot that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AcademyScheduleSlotFindUniqueOrThrowArgs} args - Arguments to find a AcademyScheduleSlot
+     * @example
+     * // Get one AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AcademyScheduleSlotFindUniqueOrThrowArgs>(args: SelectSubset<T, AcademyScheduleSlotFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AcademyScheduleSlot that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotFindFirstArgs} args - Arguments to find a AcademyScheduleSlot
+     * @example
+     * // Get one AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AcademyScheduleSlotFindFirstArgs>(args?: SelectSubset<T, AcademyScheduleSlotFindFirstArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AcademyScheduleSlot that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotFindFirstOrThrowArgs} args - Arguments to find a AcademyScheduleSlot
+     * @example
+     * // Get one AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AcademyScheduleSlotFindFirstOrThrowArgs>(args?: SelectSubset<T, AcademyScheduleSlotFindFirstOrThrowArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AcademyScheduleSlots that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AcademyScheduleSlots
+     * const academyScheduleSlots = await prisma.academyScheduleSlot.findMany()
+     * 
+     * // Get first 10 AcademyScheduleSlots
+     * const academyScheduleSlots = await prisma.academyScheduleSlot.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const academyScheduleSlotWithIdOnly = await prisma.academyScheduleSlot.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AcademyScheduleSlotFindManyArgs>(args?: SelectSubset<T, AcademyScheduleSlotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AcademyScheduleSlot.
+     * @param {AcademyScheduleSlotCreateArgs} args - Arguments to create a AcademyScheduleSlot.
+     * @example
+     * // Create one AcademyScheduleSlot
+     * const AcademyScheduleSlot = await prisma.academyScheduleSlot.create({
+     *   data: {
+     *     // ... data to create a AcademyScheduleSlot
+     *   }
+     * })
+     * 
+     */
+    create<T extends AcademyScheduleSlotCreateArgs>(args: SelectSubset<T, AcademyScheduleSlotCreateArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AcademyScheduleSlots.
+     * @param {AcademyScheduleSlotCreateManyArgs} args - Arguments to create many AcademyScheduleSlots.
+     * @example
+     * // Create many AcademyScheduleSlots
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AcademyScheduleSlotCreateManyArgs>(args?: SelectSubset<T, AcademyScheduleSlotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AcademyScheduleSlots and returns the data saved in the database.
+     * @param {AcademyScheduleSlotCreateManyAndReturnArgs} args - Arguments to create many AcademyScheduleSlots.
+     * @example
+     * // Create many AcademyScheduleSlots
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AcademyScheduleSlots and only return the `id`
+     * const academyScheduleSlotWithIdOnly = await prisma.academyScheduleSlot.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AcademyScheduleSlotCreateManyAndReturnArgs>(args?: SelectSubset<T, AcademyScheduleSlotCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AcademyScheduleSlot.
+     * @param {AcademyScheduleSlotDeleteArgs} args - Arguments to delete one AcademyScheduleSlot.
+     * @example
+     * // Delete one AcademyScheduleSlot
+     * const AcademyScheduleSlot = await prisma.academyScheduleSlot.delete({
+     *   where: {
+     *     // ... filter to delete one AcademyScheduleSlot
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AcademyScheduleSlotDeleteArgs>(args: SelectSubset<T, AcademyScheduleSlotDeleteArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AcademyScheduleSlot.
+     * @param {AcademyScheduleSlotUpdateArgs} args - Arguments to update one AcademyScheduleSlot.
+     * @example
+     * // Update one AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AcademyScheduleSlotUpdateArgs>(args: SelectSubset<T, AcademyScheduleSlotUpdateArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AcademyScheduleSlots.
+     * @param {AcademyScheduleSlotDeleteManyArgs} args - Arguments to filter AcademyScheduleSlots to delete.
+     * @example
+     * // Delete a few AcademyScheduleSlots
+     * const { count } = await prisma.academyScheduleSlot.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AcademyScheduleSlotDeleteManyArgs>(args?: SelectSubset<T, AcademyScheduleSlotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AcademyScheduleSlots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AcademyScheduleSlots
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AcademyScheduleSlotUpdateManyArgs>(args: SelectSubset<T, AcademyScheduleSlotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AcademyScheduleSlot.
+     * @param {AcademyScheduleSlotUpsertArgs} args - Arguments to update or create a AcademyScheduleSlot.
+     * @example
+     * // Update or create a AcademyScheduleSlot
+     * const academyScheduleSlot = await prisma.academyScheduleSlot.upsert({
+     *   create: {
+     *     // ... data to create a AcademyScheduleSlot
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AcademyScheduleSlot we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AcademyScheduleSlotUpsertArgs>(args: SelectSubset<T, AcademyScheduleSlotUpsertArgs<ExtArgs>>): Prisma__AcademyScheduleSlotClient<$Result.GetResult<Prisma.$AcademyScheduleSlotPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AcademyScheduleSlots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotCountArgs} args - Arguments to filter AcademyScheduleSlots to count.
+     * @example
+     * // Count the number of AcademyScheduleSlots
+     * const count = await prisma.academyScheduleSlot.count({
+     *   where: {
+     *     // ... the filter for the AcademyScheduleSlots we want to count
+     *   }
+     * })
+    **/
+    count<T extends AcademyScheduleSlotCountArgs>(
+      args?: Subset<T, AcademyScheduleSlotCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AcademyScheduleSlotCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AcademyScheduleSlot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AcademyScheduleSlotAggregateArgs>(args: Subset<T, AcademyScheduleSlotAggregateArgs>): Prisma.PrismaPromise<GetAcademyScheduleSlotAggregateType<T>>
+
+    /**
+     * Group by AcademyScheduleSlot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AcademyScheduleSlotGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AcademyScheduleSlotGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AcademyScheduleSlotGroupByArgs['orderBy'] }
+        : { orderBy?: AcademyScheduleSlotGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AcademyScheduleSlotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAcademyScheduleSlotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AcademyScheduleSlot model
+   */
+  readonly fields: AcademyScheduleSlotFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AcademyScheduleSlot.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AcademyScheduleSlotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AcademyScheduleSlot model
+   */ 
+  interface AcademyScheduleSlotFieldRefs {
+    readonly id: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly tenantId: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly weekday: FieldRef<"AcademyScheduleSlot", 'Int'>
+    readonly startTime: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly endTime: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly disciplineId: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly instructorUserId: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly maxCapacity: FieldRef<"AcademyScheduleSlot", 'Int'>
+    readonly ageBracketIds: FieldRef<"AcademyScheduleSlot", 'String[]'>
+    readonly label: FieldRef<"AcademyScheduleSlot", 'String'>
+    readonly isActive: FieldRef<"AcademyScheduleSlot", 'Boolean'>
+    readonly createdAt: FieldRef<"AcademyScheduleSlot", 'DateTime'>
+    readonly updatedAt: FieldRef<"AcademyScheduleSlot", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AcademyScheduleSlot findUnique
+   */
+  export type AcademyScheduleSlotFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademyScheduleSlot to fetch.
+     */
+    where: AcademyScheduleSlotWhereUniqueInput
+  }
+
+  /**
+   * AcademyScheduleSlot findUniqueOrThrow
+   */
+  export type AcademyScheduleSlotFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademyScheduleSlot to fetch.
+     */
+    where: AcademyScheduleSlotWhereUniqueInput
+  }
+
+  /**
+   * AcademyScheduleSlot findFirst
+   */
+  export type AcademyScheduleSlotFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademyScheduleSlot to fetch.
+     */
+    where?: AcademyScheduleSlotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademyScheduleSlots to fetch.
+     */
+    orderBy?: AcademyScheduleSlotOrderByWithRelationInput | AcademyScheduleSlotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademyScheduleSlots.
+     */
+    cursor?: AcademyScheduleSlotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademyScheduleSlots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademyScheduleSlots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademyScheduleSlots.
+     */
+    distinct?: AcademyScheduleSlotScalarFieldEnum | AcademyScheduleSlotScalarFieldEnum[]
+  }
+
+  /**
+   * AcademyScheduleSlot findFirstOrThrow
+   */
+  export type AcademyScheduleSlotFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademyScheduleSlot to fetch.
+     */
+    where?: AcademyScheduleSlotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademyScheduleSlots to fetch.
+     */
+    orderBy?: AcademyScheduleSlotOrderByWithRelationInput | AcademyScheduleSlotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AcademyScheduleSlots.
+     */
+    cursor?: AcademyScheduleSlotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademyScheduleSlots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademyScheduleSlots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AcademyScheduleSlots.
+     */
+    distinct?: AcademyScheduleSlotScalarFieldEnum | AcademyScheduleSlotScalarFieldEnum[]
+  }
+
+  /**
+   * AcademyScheduleSlot findMany
+   */
+  export type AcademyScheduleSlotFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter, which AcademyScheduleSlots to fetch.
+     */
+    where?: AcademyScheduleSlotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AcademyScheduleSlots to fetch.
+     */
+    orderBy?: AcademyScheduleSlotOrderByWithRelationInput | AcademyScheduleSlotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AcademyScheduleSlots.
+     */
+    cursor?: AcademyScheduleSlotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AcademyScheduleSlots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AcademyScheduleSlots.
+     */
+    skip?: number
+    distinct?: AcademyScheduleSlotScalarFieldEnum | AcademyScheduleSlotScalarFieldEnum[]
+  }
+
+  /**
+   * AcademyScheduleSlot create
+   */
+  export type AcademyScheduleSlotCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * The data needed to create a AcademyScheduleSlot.
+     */
+    data: XOR<AcademyScheduleSlotCreateInput, AcademyScheduleSlotUncheckedCreateInput>
+  }
+
+  /**
+   * AcademyScheduleSlot createMany
+   */
+  export type AcademyScheduleSlotCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AcademyScheduleSlots.
+     */
+    data: AcademyScheduleSlotCreateManyInput | AcademyScheduleSlotCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademyScheduleSlot createManyAndReturn
+   */
+  export type AcademyScheduleSlotCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AcademyScheduleSlots.
+     */
+    data: AcademyScheduleSlotCreateManyInput | AcademyScheduleSlotCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AcademyScheduleSlot update
+   */
+  export type AcademyScheduleSlotUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * The data needed to update a AcademyScheduleSlot.
+     */
+    data: XOR<AcademyScheduleSlotUpdateInput, AcademyScheduleSlotUncheckedUpdateInput>
+    /**
+     * Choose, which AcademyScheduleSlot to update.
+     */
+    where: AcademyScheduleSlotWhereUniqueInput
+  }
+
+  /**
+   * AcademyScheduleSlot updateMany
+   */
+  export type AcademyScheduleSlotUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AcademyScheduleSlots.
+     */
+    data: XOR<AcademyScheduleSlotUpdateManyMutationInput, AcademyScheduleSlotUncheckedUpdateManyInput>
+    /**
+     * Filter which AcademyScheduleSlots to update
+     */
+    where?: AcademyScheduleSlotWhereInput
+  }
+
+  /**
+   * AcademyScheduleSlot upsert
+   */
+  export type AcademyScheduleSlotUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * The filter to search for the AcademyScheduleSlot to update in case it exists.
+     */
+    where: AcademyScheduleSlotWhereUniqueInput
+    /**
+     * In case the AcademyScheduleSlot found by the `where` argument doesn't exist, create a new AcademyScheduleSlot with this data.
+     */
+    create: XOR<AcademyScheduleSlotCreateInput, AcademyScheduleSlotUncheckedCreateInput>
+    /**
+     * In case the AcademyScheduleSlot was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AcademyScheduleSlotUpdateInput, AcademyScheduleSlotUncheckedUpdateInput>
+  }
+
+  /**
+   * AcademyScheduleSlot delete
+   */
+  export type AcademyScheduleSlotDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+    /**
+     * Filter which AcademyScheduleSlot to delete.
+     */
+    where: AcademyScheduleSlotWhereUniqueInput
+  }
+
+  /**
+   * AcademyScheduleSlot deleteMany
+   */
+  export type AcademyScheduleSlotDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AcademyScheduleSlots to delete
+     */
+    where?: AcademyScheduleSlotWhereInput
+  }
+
+  /**
+   * AcademyScheduleSlot without action
+   */
+  export type AcademyScheduleSlotDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AcademyScheduleSlot
+     */
+    select?: AcademyScheduleSlotSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AttendanceSession
+   */
+
+  export type AggregateAttendanceSession = {
+    _count: AttendanceSessionCountAggregateOutputType | null
+    _avg: AttendanceSessionAvgAggregateOutputType | null
+    _sum: AttendanceSessionSumAggregateOutputType | null
+    _min: AttendanceSessionMinAggregateOutputType | null
+    _max: AttendanceSessionMaxAggregateOutputType | null
+  }
+
+  export type AttendanceSessionAvgAggregateOutputType = {
+    maxCapacity: number | null
+  }
+
+  export type AttendanceSessionSumAggregateOutputType = {
+    maxCapacity: number | null
+  }
+
+  export type AttendanceSessionMinAggregateOutputType = {
+    id: string | null
+    disciplineId: string | null
+    date: Date | null
+    instructorUserId: string | null
+    maxCapacity: number | null
+    scheduleSlotId: string | null
+    startTime: string | null
+    endTime: string | null
+    isExceptional: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AttendanceSessionMaxAggregateOutputType = {
+    id: string | null
+    disciplineId: string | null
+    date: Date | null
+    instructorUserId: string | null
+    maxCapacity: number | null
+    scheduleSlotId: string | null
+    startTime: string | null
+    endTime: string | null
+    isExceptional: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AttendanceSessionCountAggregateOutputType = {
+    id: number
+    disciplineId: number
+    date: number
+    instructorUserId: number
+    maxCapacity: number
+    scheduleSlotId: number
+    startTime: number
+    endTime: number
+    isExceptional: number
+    ageBracketIds: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AttendanceSessionAvgAggregateInputType = {
+    maxCapacity?: true
+  }
+
+  export type AttendanceSessionSumAggregateInputType = {
+    maxCapacity?: true
+  }
+
+  export type AttendanceSessionMinAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    date?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    scheduleSlotId?: true
+    startTime?: true
+    endTime?: true
+    isExceptional?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AttendanceSessionMaxAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    date?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    scheduleSlotId?: true
+    startTime?: true
+    endTime?: true
+    isExceptional?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AttendanceSessionCountAggregateInputType = {
+    id?: true
+    disciplineId?: true
+    date?: true
+    instructorUserId?: true
+    maxCapacity?: true
+    scheduleSlotId?: true
+    startTime?: true
+    endTime?: true
+    isExceptional?: true
+    ageBracketIds?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AttendanceSessionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AttendanceSession to aggregate.
+     */
+    where?: AttendanceSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceSessions to fetch.
+     */
+    orderBy?: AttendanceSessionOrderByWithRelationInput | AttendanceSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AttendanceSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AttendanceSessions
+    **/
+    _count?: true | AttendanceSessionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: AttendanceSessionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: AttendanceSessionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AttendanceSessionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AttendanceSessionMaxAggregateInputType
+  }
+
+  export type GetAttendanceSessionAggregateType<T extends AttendanceSessionAggregateArgs> = {
+        [P in keyof T & keyof AggregateAttendanceSession]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAttendanceSession[P]>
+      : GetScalarType<T[P], AggregateAttendanceSession[P]>
+  }
+
+
+
+
+  export type AttendanceSessionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceSessionWhereInput
+    orderBy?: AttendanceSessionOrderByWithAggregationInput | AttendanceSessionOrderByWithAggregationInput[]
+    by: AttendanceSessionScalarFieldEnum[] | AttendanceSessionScalarFieldEnum
+    having?: AttendanceSessionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AttendanceSessionCountAggregateInputType | true
+    _avg?: AttendanceSessionAvgAggregateInputType
+    _sum?: AttendanceSessionSumAggregateInputType
+    _min?: AttendanceSessionMinAggregateInputType
+    _max?: AttendanceSessionMaxAggregateInputType
+  }
+
+  export type AttendanceSessionGroupByOutputType = {
+    id: string
+    disciplineId: string
+    date: Date
+    instructorUserId: string
+    maxCapacity: number | null
+    scheduleSlotId: string | null
+    startTime: string | null
+    endTime: string | null
+    isExceptional: boolean
+    ageBracketIds: string[]
+    createdAt: Date
+    updatedAt: Date
+    _count: AttendanceSessionCountAggregateOutputType | null
+    _avg: AttendanceSessionAvgAggregateOutputType | null
+    _sum: AttendanceSessionSumAggregateOutputType | null
+    _min: AttendanceSessionMinAggregateOutputType | null
+    _max: AttendanceSessionMaxAggregateOutputType | null
+  }
+
+  type GetAttendanceSessionGroupByPayload<T extends AttendanceSessionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AttendanceSessionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AttendanceSessionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AttendanceSessionGroupByOutputType[P]>
+            : GetScalarType<T[P], AttendanceSessionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AttendanceSessionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    disciplineId?: boolean
+    date?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    scheduleSlotId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    isExceptional?: boolean
+    ageBracketIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    records?: boolean | AttendanceSession$recordsArgs<ExtArgs>
+    _count?: boolean | AttendanceSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["attendanceSession"]>
+
+  export type AttendanceSessionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    disciplineId?: boolean
+    date?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    scheduleSlotId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    isExceptional?: boolean
+    ageBracketIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["attendanceSession"]>
+
+  export type AttendanceSessionSelectScalar = {
+    id?: boolean
+    disciplineId?: boolean
+    date?: boolean
+    instructorUserId?: boolean
+    maxCapacity?: boolean
+    scheduleSlotId?: boolean
+    startTime?: boolean
+    endTime?: boolean
+    isExceptional?: boolean
+    ageBracketIds?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AttendanceSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    records?: boolean | AttendanceSession$recordsArgs<ExtArgs>
+    _count?: boolean | AttendanceSessionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type AttendanceSessionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $AttendanceSessionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AttendanceSession"
+    objects: {
+      records: Prisma.$AttendanceRecordPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      /**
+       * Academic `Discipline.id` (same BC, no `@relation` so sessions stay decoupled from catalog edits).
+       */
+      disciplineId: string
+      date: Date
+      /**
+       * Auth-service login that teaches the class (no physical FK).
+       */
+      instructorUserId: string
+      maxCapacity: number | null
+      /**
+       * Logical `AcademyScheduleSlot.id` when generated from the master calendar.
+       */
+      scheduleSlotId: string | null
+      startTime: string | null
+      endTime: string | null
+      isExceptional: boolean
+      /**
+       * Logical `AgeBracket.id` list inherited from the slot (or chosen for an ad-hoc session).
+       */
+      ageBracketIds: string[]
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["attendanceSession"]>
+    composites: {}
+  }
+
+  type AttendanceSessionGetPayload<S extends boolean | null | undefined | AttendanceSessionDefaultArgs> = $Result.GetResult<Prisma.$AttendanceSessionPayload, S>
+
+  type AttendanceSessionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AttendanceSessionFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AttendanceSessionCountAggregateInputType | true
+    }
+
+  export interface AttendanceSessionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AttendanceSession'], meta: { name: 'AttendanceSession' } }
+    /**
+     * Find zero or one AttendanceSession that matches the filter.
+     * @param {AttendanceSessionFindUniqueArgs} args - Arguments to find a AttendanceSession
+     * @example
+     * // Get one AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AttendanceSessionFindUniqueArgs>(args: SelectSubset<T, AttendanceSessionFindUniqueArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AttendanceSession that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AttendanceSessionFindUniqueOrThrowArgs} args - Arguments to find a AttendanceSession
+     * @example
+     * // Get one AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AttendanceSessionFindUniqueOrThrowArgs>(args: SelectSubset<T, AttendanceSessionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AttendanceSession that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionFindFirstArgs} args - Arguments to find a AttendanceSession
+     * @example
+     * // Get one AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AttendanceSessionFindFirstArgs>(args?: SelectSubset<T, AttendanceSessionFindFirstArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AttendanceSession that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionFindFirstOrThrowArgs} args - Arguments to find a AttendanceSession
+     * @example
+     * // Get one AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AttendanceSessionFindFirstOrThrowArgs>(args?: SelectSubset<T, AttendanceSessionFindFirstOrThrowArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AttendanceSessions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AttendanceSessions
+     * const attendanceSessions = await prisma.attendanceSession.findMany()
+     * 
+     * // Get first 10 AttendanceSessions
+     * const attendanceSessions = await prisma.attendanceSession.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const attendanceSessionWithIdOnly = await prisma.attendanceSession.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AttendanceSessionFindManyArgs>(args?: SelectSubset<T, AttendanceSessionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AttendanceSession.
+     * @param {AttendanceSessionCreateArgs} args - Arguments to create a AttendanceSession.
+     * @example
+     * // Create one AttendanceSession
+     * const AttendanceSession = await prisma.attendanceSession.create({
+     *   data: {
+     *     // ... data to create a AttendanceSession
+     *   }
+     * })
+     * 
+     */
+    create<T extends AttendanceSessionCreateArgs>(args: SelectSubset<T, AttendanceSessionCreateArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AttendanceSessions.
+     * @param {AttendanceSessionCreateManyArgs} args - Arguments to create many AttendanceSessions.
+     * @example
+     * // Create many AttendanceSessions
+     * const attendanceSession = await prisma.attendanceSession.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AttendanceSessionCreateManyArgs>(args?: SelectSubset<T, AttendanceSessionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AttendanceSessions and returns the data saved in the database.
+     * @param {AttendanceSessionCreateManyAndReturnArgs} args - Arguments to create many AttendanceSessions.
+     * @example
+     * // Create many AttendanceSessions
+     * const attendanceSession = await prisma.attendanceSession.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AttendanceSessions and only return the `id`
+     * const attendanceSessionWithIdOnly = await prisma.attendanceSession.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AttendanceSessionCreateManyAndReturnArgs>(args?: SelectSubset<T, AttendanceSessionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AttendanceSession.
+     * @param {AttendanceSessionDeleteArgs} args - Arguments to delete one AttendanceSession.
+     * @example
+     * // Delete one AttendanceSession
+     * const AttendanceSession = await prisma.attendanceSession.delete({
+     *   where: {
+     *     // ... filter to delete one AttendanceSession
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AttendanceSessionDeleteArgs>(args: SelectSubset<T, AttendanceSessionDeleteArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AttendanceSession.
+     * @param {AttendanceSessionUpdateArgs} args - Arguments to update one AttendanceSession.
+     * @example
+     * // Update one AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AttendanceSessionUpdateArgs>(args: SelectSubset<T, AttendanceSessionUpdateArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AttendanceSessions.
+     * @param {AttendanceSessionDeleteManyArgs} args - Arguments to filter AttendanceSessions to delete.
+     * @example
+     * // Delete a few AttendanceSessions
+     * const { count } = await prisma.attendanceSession.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AttendanceSessionDeleteManyArgs>(args?: SelectSubset<T, AttendanceSessionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AttendanceSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AttendanceSessions
+     * const attendanceSession = await prisma.attendanceSession.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AttendanceSessionUpdateManyArgs>(args: SelectSubset<T, AttendanceSessionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AttendanceSession.
+     * @param {AttendanceSessionUpsertArgs} args - Arguments to update or create a AttendanceSession.
+     * @example
+     * // Update or create a AttendanceSession
+     * const attendanceSession = await prisma.attendanceSession.upsert({
+     *   create: {
+     *     // ... data to create a AttendanceSession
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AttendanceSession we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AttendanceSessionUpsertArgs>(args: SelectSubset<T, AttendanceSessionUpsertArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AttendanceSessions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionCountArgs} args - Arguments to filter AttendanceSessions to count.
+     * @example
+     * // Count the number of AttendanceSessions
+     * const count = await prisma.attendanceSession.count({
+     *   where: {
+     *     // ... the filter for the AttendanceSessions we want to count
+     *   }
+     * })
+    **/
+    count<T extends AttendanceSessionCountArgs>(
+      args?: Subset<T, AttendanceSessionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AttendanceSessionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AttendanceSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AttendanceSessionAggregateArgs>(args: Subset<T, AttendanceSessionAggregateArgs>): Prisma.PrismaPromise<GetAttendanceSessionAggregateType<T>>
+
+    /**
+     * Group by AttendanceSession.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceSessionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AttendanceSessionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AttendanceSessionGroupByArgs['orderBy'] }
+        : { orderBy?: AttendanceSessionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AttendanceSessionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAttendanceSessionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AttendanceSession model
+   */
+  readonly fields: AttendanceSessionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AttendanceSession.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AttendanceSessionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    records<T extends AttendanceSession$recordsArgs<ExtArgs> = {}>(args?: Subset<T, AttendanceSession$recordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany"> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AttendanceSession model
+   */ 
+  interface AttendanceSessionFieldRefs {
+    readonly id: FieldRef<"AttendanceSession", 'String'>
+    readonly disciplineId: FieldRef<"AttendanceSession", 'String'>
+    readonly date: FieldRef<"AttendanceSession", 'DateTime'>
+    readonly instructorUserId: FieldRef<"AttendanceSession", 'String'>
+    readonly maxCapacity: FieldRef<"AttendanceSession", 'Int'>
+    readonly scheduleSlotId: FieldRef<"AttendanceSession", 'String'>
+    readonly startTime: FieldRef<"AttendanceSession", 'String'>
+    readonly endTime: FieldRef<"AttendanceSession", 'String'>
+    readonly isExceptional: FieldRef<"AttendanceSession", 'Boolean'>
+    readonly ageBracketIds: FieldRef<"AttendanceSession", 'String[]'>
+    readonly createdAt: FieldRef<"AttendanceSession", 'DateTime'>
+    readonly updatedAt: FieldRef<"AttendanceSession", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AttendanceSession findUnique
+   */
+  export type AttendanceSessionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceSession to fetch.
+     */
+    where: AttendanceSessionWhereUniqueInput
+  }
+
+  /**
+   * AttendanceSession findUniqueOrThrow
+   */
+  export type AttendanceSessionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceSession to fetch.
+     */
+    where: AttendanceSessionWhereUniqueInput
+  }
+
+  /**
+   * AttendanceSession findFirst
+   */
+  export type AttendanceSessionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceSession to fetch.
+     */
+    where?: AttendanceSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceSessions to fetch.
+     */
+    orderBy?: AttendanceSessionOrderByWithRelationInput | AttendanceSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AttendanceSessions.
+     */
+    cursor?: AttendanceSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AttendanceSessions.
+     */
+    distinct?: AttendanceSessionScalarFieldEnum | AttendanceSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceSession findFirstOrThrow
+   */
+  export type AttendanceSessionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceSession to fetch.
+     */
+    where?: AttendanceSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceSessions to fetch.
+     */
+    orderBy?: AttendanceSessionOrderByWithRelationInput | AttendanceSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AttendanceSessions.
+     */
+    cursor?: AttendanceSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceSessions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AttendanceSessions.
+     */
+    distinct?: AttendanceSessionScalarFieldEnum | AttendanceSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceSession findMany
+   */
+  export type AttendanceSessionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceSessions to fetch.
+     */
+    where?: AttendanceSessionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceSessions to fetch.
+     */
+    orderBy?: AttendanceSessionOrderByWithRelationInput | AttendanceSessionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AttendanceSessions.
+     */
+    cursor?: AttendanceSessionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceSessions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceSessions.
+     */
+    skip?: number
+    distinct?: AttendanceSessionScalarFieldEnum | AttendanceSessionScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceSession create
+   */
+  export type AttendanceSessionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AttendanceSession.
+     */
+    data: XOR<AttendanceSessionCreateInput, AttendanceSessionUncheckedCreateInput>
+  }
+
+  /**
+   * AttendanceSession createMany
+   */
+  export type AttendanceSessionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AttendanceSessions.
+     */
+    data: AttendanceSessionCreateManyInput | AttendanceSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AttendanceSession createManyAndReturn
+   */
+  export type AttendanceSessionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AttendanceSessions.
+     */
+    data: AttendanceSessionCreateManyInput | AttendanceSessionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AttendanceSession update
+   */
+  export type AttendanceSessionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AttendanceSession.
+     */
+    data: XOR<AttendanceSessionUpdateInput, AttendanceSessionUncheckedUpdateInput>
+    /**
+     * Choose, which AttendanceSession to update.
+     */
+    where: AttendanceSessionWhereUniqueInput
+  }
+
+  /**
+   * AttendanceSession updateMany
+   */
+  export type AttendanceSessionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AttendanceSessions.
+     */
+    data: XOR<AttendanceSessionUpdateManyMutationInput, AttendanceSessionUncheckedUpdateManyInput>
+    /**
+     * Filter which AttendanceSessions to update
+     */
+    where?: AttendanceSessionWhereInput
+  }
+
+  /**
+   * AttendanceSession upsert
+   */
+  export type AttendanceSessionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AttendanceSession to update in case it exists.
+     */
+    where: AttendanceSessionWhereUniqueInput
+    /**
+     * In case the AttendanceSession found by the `where` argument doesn't exist, create a new AttendanceSession with this data.
+     */
+    create: XOR<AttendanceSessionCreateInput, AttendanceSessionUncheckedCreateInput>
+    /**
+     * In case the AttendanceSession was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AttendanceSessionUpdateInput, AttendanceSessionUncheckedUpdateInput>
+  }
+
+  /**
+   * AttendanceSession delete
+   */
+  export type AttendanceSessionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+    /**
+     * Filter which AttendanceSession to delete.
+     */
+    where: AttendanceSessionWhereUniqueInput
+  }
+
+  /**
+   * AttendanceSession deleteMany
+   */
+  export type AttendanceSessionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AttendanceSessions to delete
+     */
+    where?: AttendanceSessionWhereInput
+  }
+
+  /**
+   * AttendanceSession.records
+   */
+  export type AttendanceSession$recordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    where?: AttendanceRecordWhereInput
+    orderBy?: AttendanceRecordOrderByWithRelationInput | AttendanceRecordOrderByWithRelationInput[]
+    cursor?: AttendanceRecordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AttendanceRecordScalarFieldEnum | AttendanceRecordScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceSession without action
+   */
+  export type AttendanceSessionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceSession
+     */
+    select?: AttendanceSessionSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceSessionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AttendanceRecord
+   */
+
+  export type AggregateAttendanceRecord = {
+    _count: AttendanceRecordCountAggregateOutputType | null
+    _min: AttendanceRecordMinAggregateOutputType | null
+    _max: AttendanceRecordMaxAggregateOutputType | null
+  }
+
+  export type AttendanceRecordMinAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    studentProfileId: string | null
+    status: $Enums.AttendanceStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AttendanceRecordMaxAggregateOutputType = {
+    id: string | null
+    sessionId: string | null
+    studentProfileId: string | null
+    status: $Enums.AttendanceStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AttendanceRecordCountAggregateOutputType = {
+    id: number
+    sessionId: number
+    studentProfileId: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AttendanceRecordMinAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AttendanceRecordMaxAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AttendanceRecordCountAggregateInputType = {
+    id?: true
+    sessionId?: true
+    studentProfileId?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AttendanceRecordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AttendanceRecord to aggregate.
+     */
+    where?: AttendanceRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceRecords to fetch.
+     */
+    orderBy?: AttendanceRecordOrderByWithRelationInput | AttendanceRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AttendanceRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AttendanceRecords
+    **/
+    _count?: true | AttendanceRecordCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AttendanceRecordMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AttendanceRecordMaxAggregateInputType
+  }
+
+  export type GetAttendanceRecordAggregateType<T extends AttendanceRecordAggregateArgs> = {
+        [P in keyof T & keyof AggregateAttendanceRecord]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAttendanceRecord[P]>
+      : GetScalarType<T[P], AggregateAttendanceRecord[P]>
+  }
+
+
+
+
+  export type AttendanceRecordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AttendanceRecordWhereInput
+    orderBy?: AttendanceRecordOrderByWithAggregationInput | AttendanceRecordOrderByWithAggregationInput[]
+    by: AttendanceRecordScalarFieldEnum[] | AttendanceRecordScalarFieldEnum
+    having?: AttendanceRecordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AttendanceRecordCountAggregateInputType | true
+    _min?: AttendanceRecordMinAggregateInputType
+    _max?: AttendanceRecordMaxAggregateInputType
+  }
+
+  export type AttendanceRecordGroupByOutputType = {
+    id: string
+    sessionId: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt: Date
+    updatedAt: Date
+    _count: AttendanceRecordCountAggregateOutputType | null
+    _min: AttendanceRecordMinAggregateOutputType | null
+    _max: AttendanceRecordMaxAggregateOutputType | null
+  }
+
+  type GetAttendanceRecordGroupByPayload<T extends AttendanceRecordGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AttendanceRecordGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AttendanceRecordGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AttendanceRecordGroupByOutputType[P]>
+            : GetScalarType<T[P], AttendanceRecordGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AttendanceRecordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    session?: boolean | AttendanceSessionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["attendanceRecord"]>
+
+  export type AttendanceRecordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    session?: boolean | AttendanceSessionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["attendanceRecord"]>
+
+  export type AttendanceRecordSelectScalar = {
+    id?: boolean
+    sessionId?: boolean
+    studentProfileId?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AttendanceRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | AttendanceSessionDefaultArgs<ExtArgs>
+  }
+  export type AttendanceRecordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    session?: boolean | AttendanceSessionDefaultArgs<ExtArgs>
+  }
+
+  export type $AttendanceRecordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AttendanceRecord"
+    objects: {
+      session: Prisma.$AttendanceSessionPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sessionId: string
+      studentProfileId: string
+      status: $Enums.AttendanceStatus
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["attendanceRecord"]>
+    composites: {}
+  }
+
+  type AttendanceRecordGetPayload<S extends boolean | null | undefined | AttendanceRecordDefaultArgs> = $Result.GetResult<Prisma.$AttendanceRecordPayload, S>
+
+  type AttendanceRecordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<AttendanceRecordFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: AttendanceRecordCountAggregateInputType | true
+    }
+
+  export interface AttendanceRecordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AttendanceRecord'], meta: { name: 'AttendanceRecord' } }
+    /**
+     * Find zero or one AttendanceRecord that matches the filter.
+     * @param {AttendanceRecordFindUniqueArgs} args - Arguments to find a AttendanceRecord
+     * @example
+     * // Get one AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AttendanceRecordFindUniqueArgs>(args: SelectSubset<T, AttendanceRecordFindUniqueArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one AttendanceRecord that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {AttendanceRecordFindUniqueOrThrowArgs} args - Arguments to find a AttendanceRecord
+     * @example
+     * // Get one AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AttendanceRecordFindUniqueOrThrowArgs>(args: SelectSubset<T, AttendanceRecordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first AttendanceRecord that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordFindFirstArgs} args - Arguments to find a AttendanceRecord
+     * @example
+     * // Get one AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AttendanceRecordFindFirstArgs>(args?: SelectSubset<T, AttendanceRecordFindFirstArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first AttendanceRecord that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordFindFirstOrThrowArgs} args - Arguments to find a AttendanceRecord
+     * @example
+     * // Get one AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AttendanceRecordFindFirstOrThrowArgs>(args?: SelectSubset<T, AttendanceRecordFindFirstOrThrowArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more AttendanceRecords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AttendanceRecords
+     * const attendanceRecords = await prisma.attendanceRecord.findMany()
+     * 
+     * // Get first 10 AttendanceRecords
+     * const attendanceRecords = await prisma.attendanceRecord.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const attendanceRecordWithIdOnly = await prisma.attendanceRecord.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AttendanceRecordFindManyArgs>(args?: SelectSubset<T, AttendanceRecordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a AttendanceRecord.
+     * @param {AttendanceRecordCreateArgs} args - Arguments to create a AttendanceRecord.
+     * @example
+     * // Create one AttendanceRecord
+     * const AttendanceRecord = await prisma.attendanceRecord.create({
+     *   data: {
+     *     // ... data to create a AttendanceRecord
+     *   }
+     * })
+     * 
+     */
+    create<T extends AttendanceRecordCreateArgs>(args: SelectSubset<T, AttendanceRecordCreateArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many AttendanceRecords.
+     * @param {AttendanceRecordCreateManyArgs} args - Arguments to create many AttendanceRecords.
+     * @example
+     * // Create many AttendanceRecords
+     * const attendanceRecord = await prisma.attendanceRecord.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AttendanceRecordCreateManyArgs>(args?: SelectSubset<T, AttendanceRecordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AttendanceRecords and returns the data saved in the database.
+     * @param {AttendanceRecordCreateManyAndReturnArgs} args - Arguments to create many AttendanceRecords.
+     * @example
+     * // Create many AttendanceRecords
+     * const attendanceRecord = await prisma.attendanceRecord.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AttendanceRecords and only return the `id`
+     * const attendanceRecordWithIdOnly = await prisma.attendanceRecord.createManyAndReturn({ 
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AttendanceRecordCreateManyAndReturnArgs>(args?: SelectSubset<T, AttendanceRecordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "createManyAndReturn">>
+
+    /**
+     * Delete a AttendanceRecord.
+     * @param {AttendanceRecordDeleteArgs} args - Arguments to delete one AttendanceRecord.
+     * @example
+     * // Delete one AttendanceRecord
+     * const AttendanceRecord = await prisma.attendanceRecord.delete({
+     *   where: {
+     *     // ... filter to delete one AttendanceRecord
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AttendanceRecordDeleteArgs>(args: SelectSubset<T, AttendanceRecordDeleteArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one AttendanceRecord.
+     * @param {AttendanceRecordUpdateArgs} args - Arguments to update one AttendanceRecord.
+     * @example
+     * // Update one AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AttendanceRecordUpdateArgs>(args: SelectSubset<T, AttendanceRecordUpdateArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more AttendanceRecords.
+     * @param {AttendanceRecordDeleteManyArgs} args - Arguments to filter AttendanceRecords to delete.
+     * @example
+     * // Delete a few AttendanceRecords
+     * const { count } = await prisma.attendanceRecord.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AttendanceRecordDeleteManyArgs>(args?: SelectSubset<T, AttendanceRecordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AttendanceRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AttendanceRecords
+     * const attendanceRecord = await prisma.attendanceRecord.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AttendanceRecordUpdateManyArgs>(args: SelectSubset<T, AttendanceRecordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one AttendanceRecord.
+     * @param {AttendanceRecordUpsertArgs} args - Arguments to update or create a AttendanceRecord.
+     * @example
+     * // Update or create a AttendanceRecord
+     * const attendanceRecord = await prisma.attendanceRecord.upsert({
+     *   create: {
+     *     // ... data to create a AttendanceRecord
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AttendanceRecord we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AttendanceRecordUpsertArgs>(args: SelectSubset<T, AttendanceRecordUpsertArgs<ExtArgs>>): Prisma__AttendanceRecordClient<$Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of AttendanceRecords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordCountArgs} args - Arguments to filter AttendanceRecords to count.
+     * @example
+     * // Count the number of AttendanceRecords
+     * const count = await prisma.attendanceRecord.count({
+     *   where: {
+     *     // ... the filter for the AttendanceRecords we want to count
+     *   }
+     * })
+    **/
+    count<T extends AttendanceRecordCountArgs>(
+      args?: Subset<T, AttendanceRecordCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AttendanceRecordCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AttendanceRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AttendanceRecordAggregateArgs>(args: Subset<T, AttendanceRecordAggregateArgs>): Prisma.PrismaPromise<GetAttendanceRecordAggregateType<T>>
+
+    /**
+     * Group by AttendanceRecord.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AttendanceRecordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AttendanceRecordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AttendanceRecordGroupByArgs['orderBy'] }
+        : { orderBy?: AttendanceRecordGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AttendanceRecordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAttendanceRecordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AttendanceRecord model
+   */
+  readonly fields: AttendanceRecordFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AttendanceRecord.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AttendanceRecordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    session<T extends AttendanceSessionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, AttendanceSessionDefaultArgs<ExtArgs>>): Prisma__AttendanceSessionClient<$Result.GetResult<Prisma.$AttendanceSessionPayload<ExtArgs>, T, "findUniqueOrThrow"> | Null, Null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AttendanceRecord model
+   */ 
+  interface AttendanceRecordFieldRefs {
+    readonly id: FieldRef<"AttendanceRecord", 'String'>
+    readonly sessionId: FieldRef<"AttendanceRecord", 'String'>
+    readonly studentProfileId: FieldRef<"AttendanceRecord", 'String'>
+    readonly status: FieldRef<"AttendanceRecord", 'AttendanceStatus'>
+    readonly createdAt: FieldRef<"AttendanceRecord", 'DateTime'>
+    readonly updatedAt: FieldRef<"AttendanceRecord", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AttendanceRecord findUnique
+   */
+  export type AttendanceRecordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceRecord to fetch.
+     */
+    where: AttendanceRecordWhereUniqueInput
+  }
+
+  /**
+   * AttendanceRecord findUniqueOrThrow
+   */
+  export type AttendanceRecordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceRecord to fetch.
+     */
+    where: AttendanceRecordWhereUniqueInput
+  }
+
+  /**
+   * AttendanceRecord findFirst
+   */
+  export type AttendanceRecordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceRecord to fetch.
+     */
+    where?: AttendanceRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceRecords to fetch.
+     */
+    orderBy?: AttendanceRecordOrderByWithRelationInput | AttendanceRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AttendanceRecords.
+     */
+    cursor?: AttendanceRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AttendanceRecords.
+     */
+    distinct?: AttendanceRecordScalarFieldEnum | AttendanceRecordScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceRecord findFirstOrThrow
+   */
+  export type AttendanceRecordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceRecord to fetch.
+     */
+    where?: AttendanceRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceRecords to fetch.
+     */
+    orderBy?: AttendanceRecordOrderByWithRelationInput | AttendanceRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AttendanceRecords.
+     */
+    cursor?: AttendanceRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceRecords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AttendanceRecords.
+     */
+    distinct?: AttendanceRecordScalarFieldEnum | AttendanceRecordScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceRecord findMany
+   */
+  export type AttendanceRecordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter, which AttendanceRecords to fetch.
+     */
+    where?: AttendanceRecordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AttendanceRecords to fetch.
+     */
+    orderBy?: AttendanceRecordOrderByWithRelationInput | AttendanceRecordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AttendanceRecords.
+     */
+    cursor?: AttendanceRecordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AttendanceRecords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AttendanceRecords.
+     */
+    skip?: number
+    distinct?: AttendanceRecordScalarFieldEnum | AttendanceRecordScalarFieldEnum[]
+  }
+
+  /**
+   * AttendanceRecord create
+   */
+  export type AttendanceRecordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AttendanceRecord.
+     */
+    data: XOR<AttendanceRecordCreateInput, AttendanceRecordUncheckedCreateInput>
+  }
+
+  /**
+   * AttendanceRecord createMany
+   */
+  export type AttendanceRecordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AttendanceRecords.
+     */
+    data: AttendanceRecordCreateManyInput | AttendanceRecordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AttendanceRecord createManyAndReturn
+   */
+  export type AttendanceRecordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * The data used to create many AttendanceRecords.
+     */
+    data: AttendanceRecordCreateManyInput | AttendanceRecordCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AttendanceRecord update
+   */
+  export type AttendanceRecordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AttendanceRecord.
+     */
+    data: XOR<AttendanceRecordUpdateInput, AttendanceRecordUncheckedUpdateInput>
+    /**
+     * Choose, which AttendanceRecord to update.
+     */
+    where: AttendanceRecordWhereUniqueInput
+  }
+
+  /**
+   * AttendanceRecord updateMany
+   */
+  export type AttendanceRecordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AttendanceRecords.
+     */
+    data: XOR<AttendanceRecordUpdateManyMutationInput, AttendanceRecordUncheckedUpdateManyInput>
+    /**
+     * Filter which AttendanceRecords to update
+     */
+    where?: AttendanceRecordWhereInput
+  }
+
+  /**
+   * AttendanceRecord upsert
+   */
+  export type AttendanceRecordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AttendanceRecord to update in case it exists.
+     */
+    where: AttendanceRecordWhereUniqueInput
+    /**
+     * In case the AttendanceRecord found by the `where` argument doesn't exist, create a new AttendanceRecord with this data.
+     */
+    create: XOR<AttendanceRecordCreateInput, AttendanceRecordUncheckedCreateInput>
+    /**
+     * In case the AttendanceRecord was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AttendanceRecordUpdateInput, AttendanceRecordUncheckedUpdateInput>
+  }
+
+  /**
+   * AttendanceRecord delete
+   */
+  export type AttendanceRecordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+    /**
+     * Filter which AttendanceRecord to delete.
+     */
+    where: AttendanceRecordWhereUniqueInput
+  }
+
+  /**
+   * AttendanceRecord deleteMany
+   */
+  export type AttendanceRecordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AttendanceRecords to delete
+     */
+    where?: AttendanceRecordWhereInput
+  }
+
+  /**
+   * AttendanceRecord without action
+   */
+  export type AttendanceRecordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AttendanceRecord
+     */
+    select?: AttendanceRecordSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AttendanceRecordInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model ProfileUpdateRequest
    */
 
@@ -24160,6 +30741,7 @@ export namespace Prisma {
     creditorId: string | null
     iban: string | null
     bic: string | null
+    stripeAccountId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24176,6 +30758,7 @@ export namespace Prisma {
     creditorId: string | null
     iban: string | null
     bic: string | null
+    stripeAccountId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24192,6 +30775,7 @@ export namespace Prisma {
     creditorId: number
     iban: number
     bic: number
+    stripeAccountId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -24210,6 +30794,7 @@ export namespace Prisma {
     creditorId?: true
     iban?: true
     bic?: true
+    stripeAccountId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24226,6 +30811,7 @@ export namespace Prisma {
     creditorId?: true
     iban?: true
     bic?: true
+    stripeAccountId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24242,6 +30828,7 @@ export namespace Prisma {
     creditorId?: true
     iban?: true
     bic?: true
+    stripeAccountId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -24331,6 +30918,7 @@ export namespace Prisma {
     creditorId: string
     iban: string
     bic: string | null
+    stripeAccountId: string | null
     createdAt: Date
     updatedAt: Date
     _count: TenantFinancialConfigCountAggregateOutputType | null
@@ -24364,6 +30952,7 @@ export namespace Prisma {
     creditorId?: boolean
     iban?: boolean
     bic?: boolean
+    stripeAccountId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["tenantFinancialConfig"]>
@@ -24380,6 +30969,7 @@ export namespace Prisma {
     creditorId?: boolean
     iban?: boolean
     bic?: boolean
+    stripeAccountId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["tenantFinancialConfig"]>
@@ -24396,6 +30986,7 @@ export namespace Prisma {
     creditorId?: boolean
     iban?: boolean
     bic?: boolean
+    stripeAccountId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -24419,6 +31010,10 @@ export namespace Prisma {
       creditorId: string
       iban: string
       bic: string | null
+      /**
+       * Reserved for a future connected Stripe account. Empty until onboarding exists.
+       */
+      stripeAccountId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["tenantFinancialConfig"]>
@@ -24825,6 +31420,7 @@ export namespace Prisma {
     readonly creditorId: FieldRef<"TenantFinancialConfig", 'String'>
     readonly iban: FieldRef<"TenantFinancialConfig", 'String'>
     readonly bic: FieldRef<"TenantFinancialConfig", 'String'>
+    readonly stripeAccountId: FieldRef<"TenantFinancialConfig", 'String'>
     readonly createdAt: FieldRef<"TenantFinancialConfig", 'DateTime'>
     readonly updatedAt: FieldRef<"TenantFinancialConfig", 'DateTime'>
   }
@@ -35682,6 +42278,111 @@ export namespace Prisma {
   export type AttendanceScalarFieldEnum = (typeof AttendanceScalarFieldEnum)[keyof typeof AttendanceScalarFieldEnum]
 
 
+  export const AcademySettingsScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    legalName: 'legalName',
+    tradeName: 'tradeName',
+    taxId: 'taxId',
+    officialEmail: 'officialEmail',
+    timezone: 'timezone',
+    defaultCurrency: 'defaultCurrency',
+    phone: 'phone',
+    address: 'address',
+    city: 'city',
+    postalCode: 'postalCode',
+    country: 'country',
+    displayName: 'displayName',
+    brandName: 'brandName',
+    website: 'website',
+    logoUrl: 'logoUrl',
+    isotypeUrl: 'isotypeUrl',
+    pdfLogoUrl: 'pdfLogoUrl',
+    themeConfig: 'themeConfig',
+    activeAppearanceKey: 'activeAppearanceKey',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AcademySettingsScalarFieldEnum = (typeof AcademySettingsScalarFieldEnum)[keyof typeof AcademySettingsScalarFieldEnum]
+
+
+  export const AcademySavedThemeScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    name: 'name',
+    themeConfig: 'themeConfig',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AcademySavedThemeScalarFieldEnum = (typeof AcademySavedThemeScalarFieldEnum)[keyof typeof AcademySavedThemeScalarFieldEnum]
+
+
+  export const AgeBracketScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    code: 'code',
+    name: 'name',
+    minAge: 'minAge',
+    maxAge: 'maxAge',
+    sortOrder: 'sortOrder',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AgeBracketScalarFieldEnum = (typeof AgeBracketScalarFieldEnum)[keyof typeof AgeBracketScalarFieldEnum]
+
+
+  export const AcademyScheduleSlotScalarFieldEnum: {
+    id: 'id',
+    tenantId: 'tenantId',
+    weekday: 'weekday',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    disciplineId: 'disciplineId',
+    instructorUserId: 'instructorUserId',
+    maxCapacity: 'maxCapacity',
+    ageBracketIds: 'ageBracketIds',
+    label: 'label',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AcademyScheduleSlotScalarFieldEnum = (typeof AcademyScheduleSlotScalarFieldEnum)[keyof typeof AcademyScheduleSlotScalarFieldEnum]
+
+
+  export const AttendanceSessionScalarFieldEnum: {
+    id: 'id',
+    disciplineId: 'disciplineId',
+    date: 'date',
+    instructorUserId: 'instructorUserId',
+    maxCapacity: 'maxCapacity',
+    scheduleSlotId: 'scheduleSlotId',
+    startTime: 'startTime',
+    endTime: 'endTime',
+    isExceptional: 'isExceptional',
+    ageBracketIds: 'ageBracketIds',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AttendanceSessionScalarFieldEnum = (typeof AttendanceSessionScalarFieldEnum)[keyof typeof AttendanceSessionScalarFieldEnum]
+
+
+  export const AttendanceRecordScalarFieldEnum: {
+    id: 'id',
+    sessionId: 'sessionId',
+    studentProfileId: 'studentProfileId',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AttendanceRecordScalarFieldEnum = (typeof AttendanceRecordScalarFieldEnum)[keyof typeof AttendanceRecordScalarFieldEnum]
+
+
   export const ProfileUpdateRequestScalarFieldEnum: {
     id: 'id',
     studentProfileId: 'studentProfileId',
@@ -35840,6 +42541,7 @@ export namespace Prisma {
     creditorId: 'creditorId',
     iban: 'iban',
     bic: 'bic',
+    stripeAccountId: 'stripeAccountId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -36190,6 +42892,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'AttendanceStatus'
+   */
+  export type EnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttendanceStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AttendanceStatus[]'
+   */
+  export type ListEnumAttendanceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AttendanceStatus[]'>
     
 
 
@@ -37092,6 +43808,528 @@ export namespace Prisma {
     countedForRank?: BoolWithAggregatesFilter<"Attendance"> | boolean
   }
 
+  export type AcademySettingsWhereInput = {
+    AND?: AcademySettingsWhereInput | AcademySettingsWhereInput[]
+    OR?: AcademySettingsWhereInput[]
+    NOT?: AcademySettingsWhereInput | AcademySettingsWhereInput[]
+    id?: StringFilter<"AcademySettings"> | string
+    tenantId?: StringFilter<"AcademySettings"> | string
+    legalName?: StringFilter<"AcademySettings"> | string
+    tradeName?: StringFilter<"AcademySettings"> | string
+    taxId?: StringFilter<"AcademySettings"> | string
+    officialEmail?: StringFilter<"AcademySettings"> | string
+    timezone?: StringFilter<"AcademySettings"> | string
+    defaultCurrency?: StringFilter<"AcademySettings"> | string
+    phone?: StringFilter<"AcademySettings"> | string
+    address?: StringFilter<"AcademySettings"> | string
+    city?: StringFilter<"AcademySettings"> | string
+    postalCode?: StringFilter<"AcademySettings"> | string
+    country?: StringFilter<"AcademySettings"> | string
+    displayName?: StringFilter<"AcademySettings"> | string
+    brandName?: StringFilter<"AcademySettings"> | string
+    website?: StringFilter<"AcademySettings"> | string
+    logoUrl?: StringFilter<"AcademySettings"> | string
+    isotypeUrl?: StringFilter<"AcademySettings"> | string
+    pdfLogoUrl?: StringFilter<"AcademySettings"> | string
+    themeConfig?: JsonFilter<"AcademySettings">
+    activeAppearanceKey?: StringFilter<"AcademySettings"> | string
+    createdAt?: DateTimeFilter<"AcademySettings"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademySettings"> | Date | string
+  }
+
+  export type AcademySettingsOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    tradeName?: SortOrder
+    taxId?: SortOrder
+    officialEmail?: SortOrder
+    timezone?: SortOrder
+    defaultCurrency?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    displayName?: SortOrder
+    brandName?: SortOrder
+    website?: SortOrder
+    logoUrl?: SortOrder
+    isotypeUrl?: SortOrder
+    pdfLogoUrl?: SortOrder
+    themeConfig?: SortOrder
+    activeAppearanceKey?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySettingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId?: string
+    AND?: AcademySettingsWhereInput | AcademySettingsWhereInput[]
+    OR?: AcademySettingsWhereInput[]
+    NOT?: AcademySettingsWhereInput | AcademySettingsWhereInput[]
+    legalName?: StringFilter<"AcademySettings"> | string
+    tradeName?: StringFilter<"AcademySettings"> | string
+    taxId?: StringFilter<"AcademySettings"> | string
+    officialEmail?: StringFilter<"AcademySettings"> | string
+    timezone?: StringFilter<"AcademySettings"> | string
+    defaultCurrency?: StringFilter<"AcademySettings"> | string
+    phone?: StringFilter<"AcademySettings"> | string
+    address?: StringFilter<"AcademySettings"> | string
+    city?: StringFilter<"AcademySettings"> | string
+    postalCode?: StringFilter<"AcademySettings"> | string
+    country?: StringFilter<"AcademySettings"> | string
+    displayName?: StringFilter<"AcademySettings"> | string
+    brandName?: StringFilter<"AcademySettings"> | string
+    website?: StringFilter<"AcademySettings"> | string
+    logoUrl?: StringFilter<"AcademySettings"> | string
+    isotypeUrl?: StringFilter<"AcademySettings"> | string
+    pdfLogoUrl?: StringFilter<"AcademySettings"> | string
+    themeConfig?: JsonFilter<"AcademySettings">
+    activeAppearanceKey?: StringFilter<"AcademySettings"> | string
+    createdAt?: DateTimeFilter<"AcademySettings"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademySettings"> | Date | string
+  }, "id" | "tenantId">
+
+  export type AcademySettingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    tradeName?: SortOrder
+    taxId?: SortOrder
+    officialEmail?: SortOrder
+    timezone?: SortOrder
+    defaultCurrency?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    displayName?: SortOrder
+    brandName?: SortOrder
+    website?: SortOrder
+    logoUrl?: SortOrder
+    isotypeUrl?: SortOrder
+    pdfLogoUrl?: SortOrder
+    themeConfig?: SortOrder
+    activeAppearanceKey?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AcademySettingsCountOrderByAggregateInput
+    _max?: AcademySettingsMaxOrderByAggregateInput
+    _min?: AcademySettingsMinOrderByAggregateInput
+  }
+
+  export type AcademySettingsScalarWhereWithAggregatesInput = {
+    AND?: AcademySettingsScalarWhereWithAggregatesInput | AcademySettingsScalarWhereWithAggregatesInput[]
+    OR?: AcademySettingsScalarWhereWithAggregatesInput[]
+    NOT?: AcademySettingsScalarWhereWithAggregatesInput | AcademySettingsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AcademySettings"> | string
+    tenantId?: StringWithAggregatesFilter<"AcademySettings"> | string
+    legalName?: StringWithAggregatesFilter<"AcademySettings"> | string
+    tradeName?: StringWithAggregatesFilter<"AcademySettings"> | string
+    taxId?: StringWithAggregatesFilter<"AcademySettings"> | string
+    officialEmail?: StringWithAggregatesFilter<"AcademySettings"> | string
+    timezone?: StringWithAggregatesFilter<"AcademySettings"> | string
+    defaultCurrency?: StringWithAggregatesFilter<"AcademySettings"> | string
+    phone?: StringWithAggregatesFilter<"AcademySettings"> | string
+    address?: StringWithAggregatesFilter<"AcademySettings"> | string
+    city?: StringWithAggregatesFilter<"AcademySettings"> | string
+    postalCode?: StringWithAggregatesFilter<"AcademySettings"> | string
+    country?: StringWithAggregatesFilter<"AcademySettings"> | string
+    displayName?: StringWithAggregatesFilter<"AcademySettings"> | string
+    brandName?: StringWithAggregatesFilter<"AcademySettings"> | string
+    website?: StringWithAggregatesFilter<"AcademySettings"> | string
+    logoUrl?: StringWithAggregatesFilter<"AcademySettings"> | string
+    isotypeUrl?: StringWithAggregatesFilter<"AcademySettings"> | string
+    pdfLogoUrl?: StringWithAggregatesFilter<"AcademySettings"> | string
+    themeConfig?: JsonWithAggregatesFilter<"AcademySettings">
+    activeAppearanceKey?: StringWithAggregatesFilter<"AcademySettings"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"AcademySettings"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AcademySettings"> | Date | string
+  }
+
+  export type AcademySavedThemeWhereInput = {
+    AND?: AcademySavedThemeWhereInput | AcademySavedThemeWhereInput[]
+    OR?: AcademySavedThemeWhereInput[]
+    NOT?: AcademySavedThemeWhereInput | AcademySavedThemeWhereInput[]
+    id?: StringFilter<"AcademySavedTheme"> | string
+    tenantId?: StringFilter<"AcademySavedTheme"> | string
+    name?: StringFilter<"AcademySavedTheme"> | string
+    themeConfig?: JsonFilter<"AcademySavedTheme">
+    createdAt?: DateTimeFilter<"AcademySavedTheme"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademySavedTheme"> | Date | string
+  }
+
+  export type AcademySavedThemeOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    name?: SortOrder
+    themeConfig?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySavedThemeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId_name?: AcademySavedThemeTenantIdNameCompoundUniqueInput
+    AND?: AcademySavedThemeWhereInput | AcademySavedThemeWhereInput[]
+    OR?: AcademySavedThemeWhereInput[]
+    NOT?: AcademySavedThemeWhereInput | AcademySavedThemeWhereInput[]
+    tenantId?: StringFilter<"AcademySavedTheme"> | string
+    name?: StringFilter<"AcademySavedTheme"> | string
+    themeConfig?: JsonFilter<"AcademySavedTheme">
+    createdAt?: DateTimeFilter<"AcademySavedTheme"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademySavedTheme"> | Date | string
+  }, "id" | "tenantId_name">
+
+  export type AcademySavedThemeOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    name?: SortOrder
+    themeConfig?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AcademySavedThemeCountOrderByAggregateInput
+    _max?: AcademySavedThemeMaxOrderByAggregateInput
+    _min?: AcademySavedThemeMinOrderByAggregateInput
+  }
+
+  export type AcademySavedThemeScalarWhereWithAggregatesInput = {
+    AND?: AcademySavedThemeScalarWhereWithAggregatesInput | AcademySavedThemeScalarWhereWithAggregatesInput[]
+    OR?: AcademySavedThemeScalarWhereWithAggregatesInput[]
+    NOT?: AcademySavedThemeScalarWhereWithAggregatesInput | AcademySavedThemeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AcademySavedTheme"> | string
+    tenantId?: StringWithAggregatesFilter<"AcademySavedTheme"> | string
+    name?: StringWithAggregatesFilter<"AcademySavedTheme"> | string
+    themeConfig?: JsonWithAggregatesFilter<"AcademySavedTheme">
+    createdAt?: DateTimeWithAggregatesFilter<"AcademySavedTheme"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AcademySavedTheme"> | Date | string
+  }
+
+  export type AgeBracketWhereInput = {
+    AND?: AgeBracketWhereInput | AgeBracketWhereInput[]
+    OR?: AgeBracketWhereInput[]
+    NOT?: AgeBracketWhereInput | AgeBracketWhereInput[]
+    id?: StringFilter<"AgeBracket"> | string
+    tenantId?: StringFilter<"AgeBracket"> | string
+    code?: StringFilter<"AgeBracket"> | string
+    name?: StringFilter<"AgeBracket"> | string
+    minAge?: IntFilter<"AgeBracket"> | number
+    maxAge?: IntFilter<"AgeBracket"> | number
+    sortOrder?: IntFilter<"AgeBracket"> | number
+    createdAt?: DateTimeFilter<"AgeBracket"> | Date | string
+    updatedAt?: DateTimeFilter<"AgeBracket"> | Date | string
+  }
+
+  export type AgeBracketOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgeBracketWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tenantId_code?: AgeBracketTenantIdCodeCompoundUniqueInput
+    AND?: AgeBracketWhereInput | AgeBracketWhereInput[]
+    OR?: AgeBracketWhereInput[]
+    NOT?: AgeBracketWhereInput | AgeBracketWhereInput[]
+    tenantId?: StringFilter<"AgeBracket"> | string
+    code?: StringFilter<"AgeBracket"> | string
+    name?: StringFilter<"AgeBracket"> | string
+    minAge?: IntFilter<"AgeBracket"> | number
+    maxAge?: IntFilter<"AgeBracket"> | number
+    sortOrder?: IntFilter<"AgeBracket"> | number
+    createdAt?: DateTimeFilter<"AgeBracket"> | Date | string
+    updatedAt?: DateTimeFilter<"AgeBracket"> | Date | string
+  }, "id" | "tenantId_code">
+
+  export type AgeBracketOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AgeBracketCountOrderByAggregateInput
+    _avg?: AgeBracketAvgOrderByAggregateInput
+    _max?: AgeBracketMaxOrderByAggregateInput
+    _min?: AgeBracketMinOrderByAggregateInput
+    _sum?: AgeBracketSumOrderByAggregateInput
+  }
+
+  export type AgeBracketScalarWhereWithAggregatesInput = {
+    AND?: AgeBracketScalarWhereWithAggregatesInput | AgeBracketScalarWhereWithAggregatesInput[]
+    OR?: AgeBracketScalarWhereWithAggregatesInput[]
+    NOT?: AgeBracketScalarWhereWithAggregatesInput | AgeBracketScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AgeBracket"> | string
+    tenantId?: StringWithAggregatesFilter<"AgeBracket"> | string
+    code?: StringWithAggregatesFilter<"AgeBracket"> | string
+    name?: StringWithAggregatesFilter<"AgeBracket"> | string
+    minAge?: IntWithAggregatesFilter<"AgeBracket"> | number
+    maxAge?: IntWithAggregatesFilter<"AgeBracket"> | number
+    sortOrder?: IntWithAggregatesFilter<"AgeBracket"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"AgeBracket"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AgeBracket"> | Date | string
+  }
+
+  export type AcademyScheduleSlotWhereInput = {
+    AND?: AcademyScheduleSlotWhereInput | AcademyScheduleSlotWhereInput[]
+    OR?: AcademyScheduleSlotWhereInput[]
+    NOT?: AcademyScheduleSlotWhereInput | AcademyScheduleSlotWhereInput[]
+    id?: StringFilter<"AcademyScheduleSlot"> | string
+    tenantId?: StringFilter<"AcademyScheduleSlot"> | string
+    weekday?: IntFilter<"AcademyScheduleSlot"> | number
+    startTime?: StringFilter<"AcademyScheduleSlot"> | string
+    endTime?: StringFilter<"AcademyScheduleSlot"> | string
+    disciplineId?: StringFilter<"AcademyScheduleSlot"> | string
+    instructorUserId?: StringFilter<"AcademyScheduleSlot"> | string
+    maxCapacity?: IntNullableFilter<"AcademyScheduleSlot"> | number | null
+    ageBracketIds?: StringNullableListFilter<"AcademyScheduleSlot">
+    label?: StringNullableFilter<"AcademyScheduleSlot"> | string | null
+    isActive?: BoolFilter<"AcademyScheduleSlot"> | boolean
+    createdAt?: DateTimeFilter<"AcademyScheduleSlot"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademyScheduleSlot"> | Date | string
+  }
+
+  export type AcademyScheduleSlotOrderByWithRelationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    weekday?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    disciplineId?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrderInput | SortOrder
+    ageBracketIds?: SortOrder
+    label?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademyScheduleSlotWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AcademyScheduleSlotWhereInput | AcademyScheduleSlotWhereInput[]
+    OR?: AcademyScheduleSlotWhereInput[]
+    NOT?: AcademyScheduleSlotWhereInput | AcademyScheduleSlotWhereInput[]
+    tenantId?: StringFilter<"AcademyScheduleSlot"> | string
+    weekday?: IntFilter<"AcademyScheduleSlot"> | number
+    startTime?: StringFilter<"AcademyScheduleSlot"> | string
+    endTime?: StringFilter<"AcademyScheduleSlot"> | string
+    disciplineId?: StringFilter<"AcademyScheduleSlot"> | string
+    instructorUserId?: StringFilter<"AcademyScheduleSlot"> | string
+    maxCapacity?: IntNullableFilter<"AcademyScheduleSlot"> | number | null
+    ageBracketIds?: StringNullableListFilter<"AcademyScheduleSlot">
+    label?: StringNullableFilter<"AcademyScheduleSlot"> | string | null
+    isActive?: BoolFilter<"AcademyScheduleSlot"> | boolean
+    createdAt?: DateTimeFilter<"AcademyScheduleSlot"> | Date | string
+    updatedAt?: DateTimeFilter<"AcademyScheduleSlot"> | Date | string
+  }, "id">
+
+  export type AcademyScheduleSlotOrderByWithAggregationInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    weekday?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    disciplineId?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrderInput | SortOrder
+    ageBracketIds?: SortOrder
+    label?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AcademyScheduleSlotCountOrderByAggregateInput
+    _avg?: AcademyScheduleSlotAvgOrderByAggregateInput
+    _max?: AcademyScheduleSlotMaxOrderByAggregateInput
+    _min?: AcademyScheduleSlotMinOrderByAggregateInput
+    _sum?: AcademyScheduleSlotSumOrderByAggregateInput
+  }
+
+  export type AcademyScheduleSlotScalarWhereWithAggregatesInput = {
+    AND?: AcademyScheduleSlotScalarWhereWithAggregatesInput | AcademyScheduleSlotScalarWhereWithAggregatesInput[]
+    OR?: AcademyScheduleSlotScalarWhereWithAggregatesInput[]
+    NOT?: AcademyScheduleSlotScalarWhereWithAggregatesInput | AcademyScheduleSlotScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    tenantId?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    weekday?: IntWithAggregatesFilter<"AcademyScheduleSlot"> | number
+    startTime?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    endTime?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    disciplineId?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    instructorUserId?: StringWithAggregatesFilter<"AcademyScheduleSlot"> | string
+    maxCapacity?: IntNullableWithAggregatesFilter<"AcademyScheduleSlot"> | number | null
+    ageBracketIds?: StringNullableListFilter<"AcademyScheduleSlot">
+    label?: StringNullableWithAggregatesFilter<"AcademyScheduleSlot"> | string | null
+    isActive?: BoolWithAggregatesFilter<"AcademyScheduleSlot"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"AcademyScheduleSlot"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AcademyScheduleSlot"> | Date | string
+  }
+
+  export type AttendanceSessionWhereInput = {
+    AND?: AttendanceSessionWhereInput | AttendanceSessionWhereInput[]
+    OR?: AttendanceSessionWhereInput[]
+    NOT?: AttendanceSessionWhereInput | AttendanceSessionWhereInput[]
+    id?: StringFilter<"AttendanceSession"> | string
+    disciplineId?: StringFilter<"AttendanceSession"> | string
+    date?: DateTimeFilter<"AttendanceSession"> | Date | string
+    instructorUserId?: StringFilter<"AttendanceSession"> | string
+    maxCapacity?: IntNullableFilter<"AttendanceSession"> | number | null
+    scheduleSlotId?: StringNullableFilter<"AttendanceSession"> | string | null
+    startTime?: StringNullableFilter<"AttendanceSession"> | string | null
+    endTime?: StringNullableFilter<"AttendanceSession"> | string | null
+    isExceptional?: BoolFilter<"AttendanceSession"> | boolean
+    ageBracketIds?: StringNullableListFilter<"AttendanceSession">
+    createdAt?: DateTimeFilter<"AttendanceSession"> | Date | string
+    updatedAt?: DateTimeFilter<"AttendanceSession"> | Date | string
+    records?: AttendanceRecordListRelationFilter
+  }
+
+  export type AttendanceSessionOrderByWithRelationInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    date?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrderInput | SortOrder
+    scheduleSlotId?: SortOrderInput | SortOrder
+    startTime?: SortOrderInput | SortOrder
+    endTime?: SortOrderInput | SortOrder
+    isExceptional?: SortOrder
+    ageBracketIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    records?: AttendanceRecordOrderByRelationAggregateInput
+  }
+
+  export type AttendanceSessionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AttendanceSessionWhereInput | AttendanceSessionWhereInput[]
+    OR?: AttendanceSessionWhereInput[]
+    NOT?: AttendanceSessionWhereInput | AttendanceSessionWhereInput[]
+    disciplineId?: StringFilter<"AttendanceSession"> | string
+    date?: DateTimeFilter<"AttendanceSession"> | Date | string
+    instructorUserId?: StringFilter<"AttendanceSession"> | string
+    maxCapacity?: IntNullableFilter<"AttendanceSession"> | number | null
+    scheduleSlotId?: StringNullableFilter<"AttendanceSession"> | string | null
+    startTime?: StringNullableFilter<"AttendanceSession"> | string | null
+    endTime?: StringNullableFilter<"AttendanceSession"> | string | null
+    isExceptional?: BoolFilter<"AttendanceSession"> | boolean
+    ageBracketIds?: StringNullableListFilter<"AttendanceSession">
+    createdAt?: DateTimeFilter<"AttendanceSession"> | Date | string
+    updatedAt?: DateTimeFilter<"AttendanceSession"> | Date | string
+    records?: AttendanceRecordListRelationFilter
+  }, "id">
+
+  export type AttendanceSessionOrderByWithAggregationInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    date?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrderInput | SortOrder
+    scheduleSlotId?: SortOrderInput | SortOrder
+    startTime?: SortOrderInput | SortOrder
+    endTime?: SortOrderInput | SortOrder
+    isExceptional?: SortOrder
+    ageBracketIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AttendanceSessionCountOrderByAggregateInput
+    _avg?: AttendanceSessionAvgOrderByAggregateInput
+    _max?: AttendanceSessionMaxOrderByAggregateInput
+    _min?: AttendanceSessionMinOrderByAggregateInput
+    _sum?: AttendanceSessionSumOrderByAggregateInput
+  }
+
+  export type AttendanceSessionScalarWhereWithAggregatesInput = {
+    AND?: AttendanceSessionScalarWhereWithAggregatesInput | AttendanceSessionScalarWhereWithAggregatesInput[]
+    OR?: AttendanceSessionScalarWhereWithAggregatesInput[]
+    NOT?: AttendanceSessionScalarWhereWithAggregatesInput | AttendanceSessionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AttendanceSession"> | string
+    disciplineId?: StringWithAggregatesFilter<"AttendanceSession"> | string
+    date?: DateTimeWithAggregatesFilter<"AttendanceSession"> | Date | string
+    instructorUserId?: StringWithAggregatesFilter<"AttendanceSession"> | string
+    maxCapacity?: IntNullableWithAggregatesFilter<"AttendanceSession"> | number | null
+    scheduleSlotId?: StringNullableWithAggregatesFilter<"AttendanceSession"> | string | null
+    startTime?: StringNullableWithAggregatesFilter<"AttendanceSession"> | string | null
+    endTime?: StringNullableWithAggregatesFilter<"AttendanceSession"> | string | null
+    isExceptional?: BoolWithAggregatesFilter<"AttendanceSession"> | boolean
+    ageBracketIds?: StringNullableListFilter<"AttendanceSession">
+    createdAt?: DateTimeWithAggregatesFilter<"AttendanceSession"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AttendanceSession"> | Date | string
+  }
+
+  export type AttendanceRecordWhereInput = {
+    AND?: AttendanceRecordWhereInput | AttendanceRecordWhereInput[]
+    OR?: AttendanceRecordWhereInput[]
+    NOT?: AttendanceRecordWhereInput | AttendanceRecordWhereInput[]
+    id?: StringFilter<"AttendanceRecord"> | string
+    sessionId?: StringFilter<"AttendanceRecord"> | string
+    studentProfileId?: StringFilter<"AttendanceRecord"> | string
+    status?: EnumAttendanceStatusFilter<"AttendanceRecord"> | $Enums.AttendanceStatus
+    createdAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+    session?: XOR<AttendanceSessionRelationFilter, AttendanceSessionWhereInput>
+  }
+
+  export type AttendanceRecordOrderByWithRelationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    session?: AttendanceSessionOrderByWithRelationInput
+  }
+
+  export type AttendanceRecordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    sessionId_studentProfileId?: AttendanceRecordSessionIdStudentProfileIdCompoundUniqueInput
+    AND?: AttendanceRecordWhereInput | AttendanceRecordWhereInput[]
+    OR?: AttendanceRecordWhereInput[]
+    NOT?: AttendanceRecordWhereInput | AttendanceRecordWhereInput[]
+    sessionId?: StringFilter<"AttendanceRecord"> | string
+    studentProfileId?: StringFilter<"AttendanceRecord"> | string
+    status?: EnumAttendanceStatusFilter<"AttendanceRecord"> | $Enums.AttendanceStatus
+    createdAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+    session?: XOR<AttendanceSessionRelationFilter, AttendanceSessionWhereInput>
+  }, "id" | "sessionId_studentProfileId">
+
+  export type AttendanceRecordOrderByWithAggregationInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AttendanceRecordCountOrderByAggregateInput
+    _max?: AttendanceRecordMaxOrderByAggregateInput
+    _min?: AttendanceRecordMinOrderByAggregateInput
+  }
+
+  export type AttendanceRecordScalarWhereWithAggregatesInput = {
+    AND?: AttendanceRecordScalarWhereWithAggregatesInput | AttendanceRecordScalarWhereWithAggregatesInput[]
+    OR?: AttendanceRecordScalarWhereWithAggregatesInput[]
+    NOT?: AttendanceRecordScalarWhereWithAggregatesInput | AttendanceRecordScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AttendanceRecord"> | string
+    sessionId?: StringWithAggregatesFilter<"AttendanceRecord"> | string
+    studentProfileId?: StringWithAggregatesFilter<"AttendanceRecord"> | string
+    status?: EnumAttendanceStatusWithAggregatesFilter<"AttendanceRecord"> | $Enums.AttendanceStatus
+    createdAt?: DateTimeWithAggregatesFilter<"AttendanceRecord"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AttendanceRecord"> | Date | string
+  }
+
   export type ProfileUpdateRequestWhereInput = {
     AND?: ProfileUpdateRequestWhereInput | ProfileUpdateRequestWhereInput[]
     OR?: ProfileUpdateRequestWhereInput[]
@@ -37852,6 +45090,7 @@ export namespace Prisma {
     creditorId?: StringFilter<"TenantFinancialConfig"> | string
     iban?: StringFilter<"TenantFinancialConfig"> | string
     bic?: StringNullableFilter<"TenantFinancialConfig"> | string | null
+    stripeAccountId?: StringNullableFilter<"TenantFinancialConfig"> | string | null
     createdAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
     updatedAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
   }
@@ -37868,6 +45107,7 @@ export namespace Prisma {
     creditorId?: SortOrder
     iban?: SortOrder
     bic?: SortOrderInput | SortOrder
+    stripeAccountId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -37887,6 +45127,7 @@ export namespace Prisma {
     creditorId?: StringFilter<"TenantFinancialConfig"> | string
     iban?: StringFilter<"TenantFinancialConfig"> | string
     bic?: StringNullableFilter<"TenantFinancialConfig"> | string | null
+    stripeAccountId?: StringNullableFilter<"TenantFinancialConfig"> | string | null
     createdAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
     updatedAt?: DateTimeFilter<"TenantFinancialConfig"> | Date | string
   }, "id" | "tenantId">
@@ -37903,6 +45144,7 @@ export namespace Prisma {
     creditorId?: SortOrder
     iban?: SortOrder
     bic?: SortOrderInput | SortOrder
+    stripeAccountId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: TenantFinancialConfigCountOrderByAggregateInput
@@ -37925,6 +45167,7 @@ export namespace Prisma {
     creditorId?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
     iban?: StringWithAggregatesFilter<"TenantFinancialConfig"> | string
     bic?: StringNullableWithAggregatesFilter<"TenantFinancialConfig"> | string | null
+    stripeAccountId?: StringNullableWithAggregatesFilter<"TenantFinancialConfig"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"TenantFinancialConfig"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"TenantFinancialConfig"> | Date | string
   }
@@ -39532,6 +46775,618 @@ export namespace Prisma {
     countedForRank?: BoolFieldUpdateOperationsInput | boolean
   }
 
+  export type AcademySettingsCreateInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    tradeName?: string
+    taxId?: string
+    officialEmail?: string
+    timezone?: string
+    defaultCurrency?: string
+    phone?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    displayName?: string
+    brandName?: string
+    website?: string
+    logoUrl?: string
+    isotypeUrl?: string
+    pdfLogoUrl?: string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySettingsUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    tradeName?: string
+    taxId?: string
+    officialEmail?: string
+    timezone?: string
+    defaultCurrency?: string
+    phone?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    displayName?: string
+    brandName?: string
+    website?: string
+    logoUrl?: string
+    isotypeUrl?: string
+    pdfLogoUrl?: string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySettingsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    tradeName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    officialEmail?: StringFieldUpdateOperationsInput | string
+    timezone?: StringFieldUpdateOperationsInput | string
+    defaultCurrency?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    brandName?: StringFieldUpdateOperationsInput | string
+    website?: StringFieldUpdateOperationsInput | string
+    logoUrl?: StringFieldUpdateOperationsInput | string
+    isotypeUrl?: StringFieldUpdateOperationsInput | string
+    pdfLogoUrl?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySettingsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    tradeName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    officialEmail?: StringFieldUpdateOperationsInput | string
+    timezone?: StringFieldUpdateOperationsInput | string
+    defaultCurrency?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    brandName?: StringFieldUpdateOperationsInput | string
+    website?: StringFieldUpdateOperationsInput | string
+    logoUrl?: StringFieldUpdateOperationsInput | string
+    isotypeUrl?: StringFieldUpdateOperationsInput | string
+    pdfLogoUrl?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySettingsCreateManyInput = {
+    id?: string
+    tenantId: string
+    legalName?: string
+    tradeName?: string
+    taxId?: string
+    officialEmail?: string
+    timezone?: string
+    defaultCurrency?: string
+    phone?: string
+    address?: string
+    city?: string
+    postalCode?: string
+    country?: string
+    displayName?: string
+    brandName?: string
+    website?: string
+    logoUrl?: string
+    isotypeUrl?: string
+    pdfLogoUrl?: string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySettingsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    tradeName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    officialEmail?: StringFieldUpdateOperationsInput | string
+    timezone?: StringFieldUpdateOperationsInput | string
+    defaultCurrency?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    brandName?: StringFieldUpdateOperationsInput | string
+    website?: StringFieldUpdateOperationsInput | string
+    logoUrl?: StringFieldUpdateOperationsInput | string
+    isotypeUrl?: StringFieldUpdateOperationsInput | string
+    pdfLogoUrl?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySettingsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    legalName?: StringFieldUpdateOperationsInput | string
+    tradeName?: StringFieldUpdateOperationsInput | string
+    taxId?: StringFieldUpdateOperationsInput | string
+    officialEmail?: StringFieldUpdateOperationsInput | string
+    timezone?: StringFieldUpdateOperationsInput | string
+    defaultCurrency?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    city?: StringFieldUpdateOperationsInput | string
+    postalCode?: StringFieldUpdateOperationsInput | string
+    country?: StringFieldUpdateOperationsInput | string
+    displayName?: StringFieldUpdateOperationsInput | string
+    brandName?: StringFieldUpdateOperationsInput | string
+    website?: StringFieldUpdateOperationsInput | string
+    logoUrl?: StringFieldUpdateOperationsInput | string
+    isotypeUrl?: StringFieldUpdateOperationsInput | string
+    pdfLogoUrl?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    activeAppearanceKey?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySavedThemeCreateInput = {
+    id?: string
+    tenantId: string
+    name: string
+    themeConfig: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySavedThemeUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    name: string
+    themeConfig: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySavedThemeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySavedThemeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySavedThemeCreateManyInput = {
+    id?: string
+    tenantId: string
+    name: string
+    themeConfig: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademySavedThemeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademySavedThemeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    themeConfig?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgeBracketCreateInput = {
+    id?: string
+    tenantId: string
+    code: string
+    name: string
+    minAge: number
+    maxAge: number
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgeBracketUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    code: string
+    name: string
+    minAge: number
+    maxAge: number
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgeBracketUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: IntFieldUpdateOperationsInput | number
+    maxAge?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgeBracketUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: IntFieldUpdateOperationsInput | number
+    maxAge?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgeBracketCreateManyInput = {
+    id?: string
+    tenantId: string
+    code: string
+    name: string
+    minAge: number
+    maxAge: number
+    sortOrder?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AgeBracketUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: IntFieldUpdateOperationsInput | number
+    maxAge?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AgeBracketUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    minAge?: IntFieldUpdateOperationsInput | number
+    maxAge?: IntFieldUpdateOperationsInput | number
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademyScheduleSlotCreateInput = {
+    id?: string
+    tenantId: string
+    weekday: number
+    startTime: string
+    endTime: string
+    disciplineId: string
+    instructorUserId: string
+    maxCapacity?: number | null
+    ageBracketIds?: AcademyScheduleSlotCreateageBracketIdsInput | string[]
+    label?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademyScheduleSlotUncheckedCreateInput = {
+    id?: string
+    tenantId: string
+    weekday: number
+    startTime: string
+    endTime: string
+    disciplineId: string
+    instructorUserId: string
+    maxCapacity?: number | null
+    ageBracketIds?: AcademyScheduleSlotCreateageBracketIdsInput | string[]
+    label?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademyScheduleSlotUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    weekday?: IntFieldUpdateOperationsInput | number
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    ageBracketIds?: AcademyScheduleSlotUpdateageBracketIdsInput | string[]
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademyScheduleSlotUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    weekday?: IntFieldUpdateOperationsInput | number
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    ageBracketIds?: AcademyScheduleSlotUpdateageBracketIdsInput | string[]
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademyScheduleSlotCreateManyInput = {
+    id?: string
+    tenantId: string
+    weekday: number
+    startTime: string
+    endTime: string
+    disciplineId: string
+    instructorUserId: string
+    maxCapacity?: number | null
+    ageBracketIds?: AcademyScheduleSlotCreateageBracketIdsInput | string[]
+    label?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AcademyScheduleSlotUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    weekday?: IntFieldUpdateOperationsInput | number
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    ageBracketIds?: AcademyScheduleSlotUpdateageBracketIdsInput | string[]
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AcademyScheduleSlotUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tenantId?: StringFieldUpdateOperationsInput | string
+    weekday?: IntFieldUpdateOperationsInput | number
+    startTime?: StringFieldUpdateOperationsInput | string
+    endTime?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    ageBracketIds?: AcademyScheduleSlotUpdateageBracketIdsInput | string[]
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceSessionCreateInput = {
+    id?: string
+    disciplineId: string
+    date: Date | string
+    instructorUserId: string
+    maxCapacity?: number | null
+    scheduleSlotId?: string | null
+    startTime?: string | null
+    endTime?: string | null
+    isExceptional?: boolean
+    ageBracketIds?: AttendanceSessionCreateageBracketIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    records?: AttendanceRecordCreateNestedManyWithoutSessionInput
+  }
+
+  export type AttendanceSessionUncheckedCreateInput = {
+    id?: string
+    disciplineId: string
+    date: Date | string
+    instructorUserId: string
+    maxCapacity?: number | null
+    scheduleSlotId?: string | null
+    startTime?: string | null
+    endTime?: string | null
+    isExceptional?: boolean
+    ageBracketIds?: AttendanceSessionCreateageBracketIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    records?: AttendanceRecordUncheckedCreateNestedManyWithoutSessionInput
+  }
+
+  export type AttendanceSessionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    records?: AttendanceRecordUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AttendanceSessionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    records?: AttendanceRecordUncheckedUpdateManyWithoutSessionNestedInput
+  }
+
+  export type AttendanceSessionCreateManyInput = {
+    id?: string
+    disciplineId: string
+    date: Date | string
+    instructorUserId: string
+    maxCapacity?: number | null
+    scheduleSlotId?: string | null
+    startTime?: string | null
+    endTime?: string | null
+    isExceptional?: boolean
+    ageBracketIds?: AttendanceSessionCreateageBracketIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceSessionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceSessionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceRecordCreateInput = {
+    id?: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    session: AttendanceSessionCreateNestedOneWithoutRecordsInput
+  }
+
+  export type AttendanceRecordUncheckedCreateInput = {
+    id?: string
+    sessionId: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceRecordUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    session?: AttendanceSessionUpdateOneRequiredWithoutRecordsNestedInput
+  }
+
+  export type AttendanceRecordUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceRecordCreateManyInput = {
+    id?: string
+    sessionId: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceRecordUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceRecordUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sessionId?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ProfileUpdateRequestCreateInput = {
     id?: string
     requestedChanges: JsonNullValueInput | InputJsonValue
@@ -40366,6 +48221,7 @@ export namespace Prisma {
     creditorId?: string
     iban?: string
     bic?: string | null
+    stripeAccountId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40382,6 +48238,7 @@ export namespace Prisma {
     creditorId?: string
     iban?: string
     bic?: string | null
+    stripeAccountId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40398,6 +48255,7 @@ export namespace Prisma {
     creditorId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40414,6 +48272,7 @@ export namespace Prisma {
     creditorId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40430,6 +48289,7 @@ export namespace Prisma {
     creditorId?: string
     iban?: string
     bic?: string | null
+    stripeAccountId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -40446,6 +48306,7 @@ export namespace Prisma {
     creditorId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40462,6 +48323,7 @@ export namespace Prisma {
     creditorId?: StringFieldUpdateOperationsInput | string
     iban?: StringFieldUpdateOperationsInput | string
     bic?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -42212,6 +50074,396 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type AcademySettingsCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    tradeName?: SortOrder
+    taxId?: SortOrder
+    officialEmail?: SortOrder
+    timezone?: SortOrder
+    defaultCurrency?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    displayName?: SortOrder
+    brandName?: SortOrder
+    website?: SortOrder
+    logoUrl?: SortOrder
+    isotypeUrl?: SortOrder
+    pdfLogoUrl?: SortOrder
+    themeConfig?: SortOrder
+    activeAppearanceKey?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySettingsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    tradeName?: SortOrder
+    taxId?: SortOrder
+    officialEmail?: SortOrder
+    timezone?: SortOrder
+    defaultCurrency?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    displayName?: SortOrder
+    brandName?: SortOrder
+    website?: SortOrder
+    logoUrl?: SortOrder
+    isotypeUrl?: SortOrder
+    pdfLogoUrl?: SortOrder
+    activeAppearanceKey?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySettingsMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    legalName?: SortOrder
+    tradeName?: SortOrder
+    taxId?: SortOrder
+    officialEmail?: SortOrder
+    timezone?: SortOrder
+    defaultCurrency?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    postalCode?: SortOrder
+    country?: SortOrder
+    displayName?: SortOrder
+    brandName?: SortOrder
+    website?: SortOrder
+    logoUrl?: SortOrder
+    isotypeUrl?: SortOrder
+    pdfLogoUrl?: SortOrder
+    activeAppearanceKey?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> = 
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type AcademySavedThemeTenantIdNameCompoundUniqueInput = {
+    tenantId: string
+    name: string
+  }
+
+  export type AcademySavedThemeCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    name?: SortOrder
+    themeConfig?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySavedThemeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademySavedThemeMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgeBracketTenantIdCodeCompoundUniqueInput = {
+    tenantId: string
+    code: string
+  }
+
+  export type AgeBracketCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgeBracketAvgOrderByAggregateInput = {
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type AgeBracketMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgeBracketMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    code?: SortOrder
+    name?: SortOrder
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AgeBracketSumOrderByAggregateInput = {
+    minAge?: SortOrder
+    maxAge?: SortOrder
+    sortOrder?: SortOrder
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type AcademyScheduleSlotCountOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    weekday?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    disciplineId?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    ageBracketIds?: SortOrder
+    label?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademyScheduleSlotAvgOrderByAggregateInput = {
+    weekday?: SortOrder
+    maxCapacity?: SortOrder
+  }
+
+  export type AcademyScheduleSlotMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    weekday?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    disciplineId?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    label?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademyScheduleSlotMinOrderByAggregateInput = {
+    id?: SortOrder
+    tenantId?: SortOrder
+    weekday?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    disciplineId?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    label?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AcademyScheduleSlotSumOrderByAggregateInput = {
+    weekday?: SortOrder
+    maxCapacity?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type AttendanceRecordListRelationFilter = {
+    every?: AttendanceRecordWhereInput
+    some?: AttendanceRecordWhereInput
+    none?: AttendanceRecordWhereInput
+  }
+
+  export type AttendanceRecordOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AttendanceSessionCountOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    date?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    scheduleSlotId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    isExceptional?: SortOrder
+    ageBracketIds?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AttendanceSessionAvgOrderByAggregateInput = {
+    maxCapacity?: SortOrder
+  }
+
+  export type AttendanceSessionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    date?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    scheduleSlotId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    isExceptional?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AttendanceSessionMinOrderByAggregateInput = {
+    id?: SortOrder
+    disciplineId?: SortOrder
+    date?: SortOrder
+    instructorUserId?: SortOrder
+    maxCapacity?: SortOrder
+    scheduleSlotId?: SortOrder
+    startTime?: SortOrder
+    endTime?: SortOrder
+    isExceptional?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AttendanceSessionSumOrderByAggregateInput = {
+    maxCapacity?: SortOrder
+  }
+
+  export type EnumAttendanceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAttendanceStatusFilter<$PrismaModel> | $Enums.AttendanceStatus
+  }
+
+  export type AttendanceSessionRelationFilter = {
+    is?: AttendanceSessionWhereInput
+    isNot?: AttendanceSessionWhereInput
+  }
+
+  export type AttendanceRecordSessionIdStudentProfileIdCompoundUniqueInput = {
+    sessionId: string
+    studentProfileId: string
+  }
+
+  export type AttendanceRecordCountOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AttendanceRecordMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AttendanceRecordMinOrderByAggregateInput = {
+    id?: SortOrder
+    sessionId?: SortOrder
+    studentProfileId?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumAttendanceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAttendanceStatusWithAggregatesFilter<$PrismaModel> | $Enums.AttendanceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAttendanceStatusFilter<$PrismaModel>
+    _max?: NestedEnumAttendanceStatusFilter<$PrismaModel>
+  }
+
   export type EnumRequestStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
     in?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
@@ -42246,31 +50498,6 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> = 
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
-  }
 
   export type EnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
@@ -42280,17 +50507,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRequestStatusFilter<$PrismaModel>
     _max?: NestedEnumRequestStatusFilter<$PrismaModel>
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type GraduationRequestCountOrderByAggregateInput = {
@@ -42332,22 +50548,6 @@ export namespace Prisma {
 
   export type GraduationRequestSumOrderByAggregateInput = {
     proposedStripes?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -42920,6 +51120,7 @@ export namespace Prisma {
     creditorId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
+    stripeAccountId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -42936,6 +51137,7 @@ export namespace Prisma {
     creditorId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
+    stripeAccountId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -42952,6 +51154,7 @@ export namespace Prisma {
     creditorId?: SortOrder
     iban?: SortOrder
     bic?: SortOrder
+    stripeAccountId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -44235,6 +52438,92 @@ export namespace Prisma {
     update?: XOR<XOR<StudentProfileUpdateToOneWithWhereWithoutAttendancesInput, StudentProfileUpdateWithoutAttendancesInput>, StudentProfileUncheckedUpdateWithoutAttendancesInput>
   }
 
+  export type AcademyScheduleSlotCreateageBracketIdsInput = {
+    set: string[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type AcademyScheduleSlotUpdateageBracketIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type AttendanceSessionCreateageBracketIdsInput = {
+    set: string[]
+  }
+
+  export type AttendanceRecordCreateNestedManyWithoutSessionInput = {
+    create?: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput> | AttendanceRecordCreateWithoutSessionInput[] | AttendanceRecordUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: AttendanceRecordCreateOrConnectWithoutSessionInput | AttendanceRecordCreateOrConnectWithoutSessionInput[]
+    createMany?: AttendanceRecordCreateManySessionInputEnvelope
+    connect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+  }
+
+  export type AttendanceRecordUncheckedCreateNestedManyWithoutSessionInput = {
+    create?: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput> | AttendanceRecordCreateWithoutSessionInput[] | AttendanceRecordUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: AttendanceRecordCreateOrConnectWithoutSessionInput | AttendanceRecordCreateOrConnectWithoutSessionInput[]
+    createMany?: AttendanceRecordCreateManySessionInputEnvelope
+    connect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+  }
+
+  export type AttendanceSessionUpdateageBracketIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type AttendanceRecordUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput> | AttendanceRecordCreateWithoutSessionInput[] | AttendanceRecordUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: AttendanceRecordCreateOrConnectWithoutSessionInput | AttendanceRecordCreateOrConnectWithoutSessionInput[]
+    upsert?: AttendanceRecordUpsertWithWhereUniqueWithoutSessionInput | AttendanceRecordUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: AttendanceRecordCreateManySessionInputEnvelope
+    set?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    disconnect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    delete?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    connect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    update?: AttendanceRecordUpdateWithWhereUniqueWithoutSessionInput | AttendanceRecordUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: AttendanceRecordUpdateManyWithWhereWithoutSessionInput | AttendanceRecordUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: AttendanceRecordScalarWhereInput | AttendanceRecordScalarWhereInput[]
+  }
+
+  export type AttendanceRecordUncheckedUpdateManyWithoutSessionNestedInput = {
+    create?: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput> | AttendanceRecordCreateWithoutSessionInput[] | AttendanceRecordUncheckedCreateWithoutSessionInput[]
+    connectOrCreate?: AttendanceRecordCreateOrConnectWithoutSessionInput | AttendanceRecordCreateOrConnectWithoutSessionInput[]
+    upsert?: AttendanceRecordUpsertWithWhereUniqueWithoutSessionInput | AttendanceRecordUpsertWithWhereUniqueWithoutSessionInput[]
+    createMany?: AttendanceRecordCreateManySessionInputEnvelope
+    set?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    disconnect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    delete?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    connect?: AttendanceRecordWhereUniqueInput | AttendanceRecordWhereUniqueInput[]
+    update?: AttendanceRecordUpdateWithWhereUniqueWithoutSessionInput | AttendanceRecordUpdateWithWhereUniqueWithoutSessionInput[]
+    updateMany?: AttendanceRecordUpdateManyWithWhereWithoutSessionInput | AttendanceRecordUpdateManyWithWhereWithoutSessionInput[]
+    deleteMany?: AttendanceRecordScalarWhereInput | AttendanceRecordScalarWhereInput[]
+  }
+
+  export type AttendanceSessionCreateNestedOneWithoutRecordsInput = {
+    create?: XOR<AttendanceSessionCreateWithoutRecordsInput, AttendanceSessionUncheckedCreateWithoutRecordsInput>
+    connectOrCreate?: AttendanceSessionCreateOrConnectWithoutRecordsInput
+    connect?: AttendanceSessionWhereUniqueInput
+  }
+
+  export type EnumAttendanceStatusFieldUpdateOperationsInput = {
+    set?: $Enums.AttendanceStatus
+  }
+
+  export type AttendanceSessionUpdateOneRequiredWithoutRecordsNestedInput = {
+    create?: XOR<AttendanceSessionCreateWithoutRecordsInput, AttendanceSessionUncheckedCreateWithoutRecordsInput>
+    connectOrCreate?: AttendanceSessionCreateOrConnectWithoutRecordsInput
+    upsert?: AttendanceSessionUpsertWithoutRecordsInput
+    connect?: AttendanceSessionWhereUniqueInput
+    update?: XOR<XOR<AttendanceSessionUpdateToOneWithWhereWithoutRecordsInput, AttendanceSessionUpdateWithoutRecordsInput>, AttendanceSessionUncheckedUpdateWithoutRecordsInput>
+  }
+
   export type StudentProfileCreateNestedOneWithoutUpdateRequestsInput = {
     create?: XOR<StudentProfileCreateWithoutUpdateRequestsInput, StudentProfileUncheckedCreateWithoutUpdateRequestsInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutUpdateRequestsInput
@@ -44257,14 +52546,6 @@ export namespace Prisma {
     create?: XOR<StudentProfileCreateWithoutGraduationRequestsInput, StudentProfileUncheckedCreateWithoutGraduationRequestsInput>
     connectOrCreate?: StudentProfileCreateOrConnectWithoutGraduationRequestsInput
     connect?: StudentProfileWhereUniqueInput
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type StudentProfileUpdateOneRequiredWithoutGraduationRequestsNestedInput = {
@@ -45237,13 +53518,6 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
-
-  export type NestedEnumRequestStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
-  }
   export type NestedJsonFilter<$PrismaModel = never> = 
     | PatchUndefined<
         Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
@@ -45265,16 +53539,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumRequestStatusFilter<$PrismaModel>
-    _max?: NestedEnumRequestStatusFilter<$PrismaModel>
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -45302,6 +53566,40 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumAttendanceStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAttendanceStatusFilter<$PrismaModel> | $Enums.AttendanceStatus
+  }
+
+  export type NestedEnumAttendanceStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AttendanceStatus | EnumAttendanceStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AttendanceStatus[] | ListEnumAttendanceStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAttendanceStatusWithAggregatesFilter<$PrismaModel> | $Enums.AttendanceStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAttendanceStatusFilter<$PrismaModel>
+    _max?: NestedEnumAttendanceStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRequestStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
+  }
+
+  export type NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RequestStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRequestStatusFilter<$PrismaModel>
+    _max?: NestedEnumRequestStatusFilter<$PrismaModel>
   }
 
   export type NestedDecimalFilter<$PrismaModel = never> = {
@@ -46753,6 +55051,136 @@ export namespace Prisma {
     ranks?: StudentRankUncheckedUpdateManyWithoutStudentNestedInput
     updateRequests?: ProfileUpdateRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
     graduationRequests?: GraduationRequestUncheckedUpdateManyWithoutStudentProfileNestedInput
+  }
+
+  export type AttendanceRecordCreateWithoutSessionInput = {
+    id?: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceRecordUncheckedCreateWithoutSessionInput = {
+    id?: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceRecordCreateOrConnectWithoutSessionInput = {
+    where: AttendanceRecordWhereUniqueInput
+    create: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput>
+  }
+
+  export type AttendanceRecordCreateManySessionInputEnvelope = {
+    data: AttendanceRecordCreateManySessionInput | AttendanceRecordCreateManySessionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type AttendanceRecordUpsertWithWhereUniqueWithoutSessionInput = {
+    where: AttendanceRecordWhereUniqueInput
+    update: XOR<AttendanceRecordUpdateWithoutSessionInput, AttendanceRecordUncheckedUpdateWithoutSessionInput>
+    create: XOR<AttendanceRecordCreateWithoutSessionInput, AttendanceRecordUncheckedCreateWithoutSessionInput>
+  }
+
+  export type AttendanceRecordUpdateWithWhereUniqueWithoutSessionInput = {
+    where: AttendanceRecordWhereUniqueInput
+    data: XOR<AttendanceRecordUpdateWithoutSessionInput, AttendanceRecordUncheckedUpdateWithoutSessionInput>
+  }
+
+  export type AttendanceRecordUpdateManyWithWhereWithoutSessionInput = {
+    where: AttendanceRecordScalarWhereInput
+    data: XOR<AttendanceRecordUpdateManyMutationInput, AttendanceRecordUncheckedUpdateManyWithoutSessionInput>
+  }
+
+  export type AttendanceRecordScalarWhereInput = {
+    AND?: AttendanceRecordScalarWhereInput | AttendanceRecordScalarWhereInput[]
+    OR?: AttendanceRecordScalarWhereInput[]
+    NOT?: AttendanceRecordScalarWhereInput | AttendanceRecordScalarWhereInput[]
+    id?: StringFilter<"AttendanceRecord"> | string
+    sessionId?: StringFilter<"AttendanceRecord"> | string
+    studentProfileId?: StringFilter<"AttendanceRecord"> | string
+    status?: EnumAttendanceStatusFilter<"AttendanceRecord"> | $Enums.AttendanceStatus
+    createdAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+    updatedAt?: DateTimeFilter<"AttendanceRecord"> | Date | string
+  }
+
+  export type AttendanceSessionCreateWithoutRecordsInput = {
+    id?: string
+    disciplineId: string
+    date: Date | string
+    instructorUserId: string
+    maxCapacity?: number | null
+    scheduleSlotId?: string | null
+    startTime?: string | null
+    endTime?: string | null
+    isExceptional?: boolean
+    ageBracketIds?: AttendanceSessionCreateageBracketIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceSessionUncheckedCreateWithoutRecordsInput = {
+    id?: string
+    disciplineId: string
+    date: Date | string
+    instructorUserId: string
+    maxCapacity?: number | null
+    scheduleSlotId?: string | null
+    startTime?: string | null
+    endTime?: string | null
+    isExceptional?: boolean
+    ageBracketIds?: AttendanceSessionCreateageBracketIdsInput | string[]
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceSessionCreateOrConnectWithoutRecordsInput = {
+    where: AttendanceSessionWhereUniqueInput
+    create: XOR<AttendanceSessionCreateWithoutRecordsInput, AttendanceSessionUncheckedCreateWithoutRecordsInput>
+  }
+
+  export type AttendanceSessionUpsertWithoutRecordsInput = {
+    update: XOR<AttendanceSessionUpdateWithoutRecordsInput, AttendanceSessionUncheckedUpdateWithoutRecordsInput>
+    create: XOR<AttendanceSessionCreateWithoutRecordsInput, AttendanceSessionUncheckedCreateWithoutRecordsInput>
+    where?: AttendanceSessionWhereInput
+  }
+
+  export type AttendanceSessionUpdateToOneWithWhereWithoutRecordsInput = {
+    where?: AttendanceSessionWhereInput
+    data: XOR<AttendanceSessionUpdateWithoutRecordsInput, AttendanceSessionUncheckedUpdateWithoutRecordsInput>
+  }
+
+  export type AttendanceSessionUpdateWithoutRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceSessionUncheckedUpdateWithoutRecordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    disciplineId?: StringFieldUpdateOperationsInput | string
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    instructorUserId?: StringFieldUpdateOperationsInput | string
+    maxCapacity?: NullableIntFieldUpdateOperationsInput | number | null
+    scheduleSlotId?: NullableStringFieldUpdateOperationsInput | string | null
+    startTime?: NullableStringFieldUpdateOperationsInput | string | null
+    endTime?: NullableStringFieldUpdateOperationsInput | string | null
+    isExceptional?: BoolFieldUpdateOperationsInput | boolean
+    ageBracketIds?: AttendanceSessionUpdateageBracketIdsInput | string[]
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StudentProfileCreateWithoutUpdateRequestsInput = {
@@ -48760,6 +57188,38 @@ export namespace Prisma {
     lastStripeAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AttendanceRecordCreateManySessionInput = {
+    id?: string
+    studentProfileId: string
+    status: $Enums.AttendanceStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AttendanceRecordUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceRecordUncheckedUpdateWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AttendanceRecordUncheckedUpdateManyWithoutSessionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    studentProfileId?: StringFieldUpdateOperationsInput | string
+    status?: EnumAttendanceStatusFieldUpdateOperationsInput | $Enums.AttendanceStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StudentFeeCreateManyFeeTierInput = {
     id?: string
     studentProfileId: string
@@ -49234,6 +57694,10 @@ export namespace Prisma {
      */
     export type BeltRankCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BeltRankCountOutputTypeDefaultArgs<ExtArgs>
     /**
+     * @deprecated Use AttendanceSessionCountOutputTypeDefaultArgs instead
+     */
+    export type AttendanceSessionCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AttendanceSessionCountOutputTypeDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use FeeTierCountOutputTypeDefaultArgs instead
      */
     export type FeeTierCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = FeeTierCountOutputTypeDefaultArgs<ExtArgs>
@@ -49305,6 +57769,30 @@ export namespace Prisma {
      * @deprecated Use AttendanceDefaultArgs instead
      */
     export type AttendanceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AttendanceDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AcademySettingsDefaultArgs instead
+     */
+    export type AcademySettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AcademySettingsDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AcademySavedThemeDefaultArgs instead
+     */
+    export type AcademySavedThemeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AcademySavedThemeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AgeBracketDefaultArgs instead
+     */
+    export type AgeBracketArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AgeBracketDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AcademyScheduleSlotDefaultArgs instead
+     */
+    export type AcademyScheduleSlotArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AcademyScheduleSlotDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AttendanceSessionDefaultArgs instead
+     */
+    export type AttendanceSessionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AttendanceSessionDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use AttendanceRecordDefaultArgs instead
+     */
+    export type AttendanceRecordArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = AttendanceRecordDefaultArgs<ExtArgs>
     /**
      * @deprecated Use ProfileUpdateRequestDefaultArgs instead
      */
