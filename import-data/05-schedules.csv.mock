@@ -1,0 +1,5 @@
+dayOfWeek,startTime,endTime,disciplineName,instructorName,capacity,ageBracketCode,label
+1,19:00,20:30,Brazilian Jiu-Jitsu,Pau Ribas,28,adults,BJJ Adults Monday
+3,19:00,20:30,Brazilian Jiu-Jitsu,Pau Ribas,28,adults,BJJ Adults Wednesday
+6,10:00,11:00,Brazilian Jiu-Jitsu,Nina Costa,16,kids,BJJ Kids Saturday
+2,18:00,19:00,Jiu-Jitsu Tradicional,Pau Ribas,20,adults,JJT Adults Tuesday

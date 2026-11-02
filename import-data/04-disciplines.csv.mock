@@ -1,0 +1,30 @@
+disciplineName,acronym,description,programName,minAge,maxAge,beltName,order,maxStripes,minMonthsRequired,minHoursRequired
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Adults Program,16,99,White Belt,1,4,0,0
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Adults Program,16,99,Blue Belt,2,4,12,100
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Adults Program,16,99,Purple Belt,3,4,24,250
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Adults Program,16,99,Brown Belt,4,4,18,300
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Adults Program,16,99,Black Belt,5,6,36,500
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,White Belt,1,4,0,0
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Grey/White Belt,2,4,6,30
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Solid Grey Belt,3,4,6,30
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Grey/Black Belt,4,4,6,30
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Yellow/White Belt,5,4,12,50
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Solid Yellow Belt,6,4,12,50
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Yellow/Black Belt,7,4,12,50
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Green/White Belt,8,4,12,60
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Solid Green Belt,9,4,12,60
+Brazilian Jiu-Jitsu,BJJ,"Traditional Brazilian Jiu-Jitsu focusing on grappling, submissions, and self-defense.",Kids Program,4,15,Green/Black Belt,10,4,12,60
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Adults Program,16,99,White Belt,1,4,0,0
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Adults Program,16,99,Blue Belt,2,4,12,80
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Adults Program,16,99,Purple Belt,3,4,18,160
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Adults Program,16,99,Brown Belt,4,4,18,220
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Adults Program,16,99,Black Belt,5,6,24,360
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Kids Program,4,15,White Belt,1,4,0,0
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Kids Program,4,15,Grey/White Belt,2,4,6,24
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Kids Program,4,15,Yellow/White Belt,3,4,12,40
+Jiu-Jitsu Tradicional,JJT,"Standing jiu-jitsu and self-defense syllabus used alongside BJJ classes.",Kids Program,4,15,Green/White Belt,4,4,12,48
+No-Gi Grappling,NOGI,"Gi-less submission grappling for competition and cross-training.",Adults Program,16,99,White Belt,1,4,0,0
+No-Gi Grappling,NOGI,"Gi-less submission grappling for competition and cross-training.",Adults Program,16,99,Blue Belt,2,4,10,80
+No-Gi Grappling,NOGI,"Gi-less submission grappling for competition and cross-training.",Adults Program,16,99,Purple Belt,3,4,18,180
+No-Gi Grappling,NOGI,"Gi-less submission grappling for competition and cross-training.",Adults Program,16,99,Brown Belt,4,4,18,240
+No-Gi Grappling,NOGI,"Gi-less submission grappling for competition and cross-training.",Adults Program,16,99,Black Belt,5,6,24,400

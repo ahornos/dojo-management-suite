@@ -16,6 +16,7 @@
     "test:workspace": "pnpm run verify:workspace",
     "import:users": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec ts-node prisma/import-users.ts",
     "import:students": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec ts-node prisma/import-students.ts",
+    "import:pipeline": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec ts-node prisma/import-pipeline.ts",
     "db:migrate": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec prisma migrate dev",
     "db:migrate:reset": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec prisma migrate reset",
     "db:migrate:deploy": "bash scripts/with-host-database-url.sh pnpm --filter @dms/database exec prisma migrate deploy",

@@ -13,7 +13,7 @@ RESET  := \033[0m
 
 .DEFAULT_GOAL := help
 
-.PHONY: help up down reset nuke deep-clean wait-db fresh-start rebuild db-migrate db-reset seed import bootstrap
+.PHONY: help up down reset nuke deep-clean wait-db fresh-start rebuild db-migrate db-reset seed import import-pipeline bootstrap
 
 help:
 	@printf '$(CYAN)Dojo Management Suite — local orchestration$(RESET)\n\n'
@@ -33,6 +33,7 @@ help:
 	@printf '  make db-reset        prisma migrate reset (interactive)\n'
 	@printf '  make seed            prisma db seed\n'
 	@printf '  make import          Import users then students from import-data/\n'
+	@printf '  make import-pipeline Import numbered 01-08 Google Sheets CSVs from import-data/\n'
 
 up:
 	@printf '$(CYAN)▸$(RESET) Starting infra + app profiles\n'
@@ -74,6 +75,11 @@ import:
 	@printf '$(CYAN)▸$(RESET) Importing users and students\n'
 	pnpm import:users && pnpm import:students
 	@printf '$(GREEN)✔$(RESET) Imports finished\n'
+
+import-pipeline:
+	@printf '$(CYAN)▸$(RESET) Importing numbered Google Sheets CSVs (01-08)\n'
+	pnpm import:pipeline
+	@printf '$(GREEN)✔$(RESET) Pipeline import finished\n'
 
 bootstrap:
 	@bash scripts/bootstrap.sh

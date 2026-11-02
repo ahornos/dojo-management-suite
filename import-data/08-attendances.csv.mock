@@ -1,0 +1,6 @@
+studentFirstName,studentLastName,classDate,status,notes,disciplineName,instructorName,startTime,endTime
+Ana,Gomez,2026-10-05,PRESENT,,Brazilian Jiu-Jitsu,Pau Ribas,19:00,20:30
+Ana,Gomez,2026-10-12,PRESENT,C,Brazilian Jiu-Jitsu,Pau Ribas,19:00,20:30
+Nil,Marti,2026-10-11,PRESENT,G,Brazilian Jiu-Jitsu,Nina Costa,10:00,11:00
+Joan,Sola,2026-10-06,PRESENT,,Jiu-Jitsu Tradicional,Pau Ribas,18:00,19:00
+Carla,Vidal,2026-10-05,PRESENT,,Brazilian Jiu-Jitsu,Pau Ribas,19:00,20:30

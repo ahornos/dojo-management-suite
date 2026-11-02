@@ -691,6 +691,9 @@ importers:
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
+      csv-parser:
+        specifier: ^3.2.1
+        version: 3.2.1
     devDependencies:
       '@types/bcrypt':
         specifier: ^6.0.0
@@ -701,9 +704,6 @@ importers:
       '@types/node':
         specifier: ^20.19.43
         version: 20.19.43
-      csv-parser:
-        specifier: ^3.2.1
-        version: 3.2.1
       jest:
         specifier: ^29.5.0
         version: 29.7.0(@types/node@20.19.43)(supports-color@8.1.1)(ts-node@10.9.2(@swc/core@1.16.13)(@types/node@20.19.43)(typescript@5.9.3))

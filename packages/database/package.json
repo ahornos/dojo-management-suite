@@ -9,6 +9,7 @@
     "db:seed": "prisma db seed",
     "import:users": "ts-node prisma/import-users.ts",
     "import:students": "ts-node prisma/import-students.ts",
+    "import:pipeline": "ts-node prisma/import-pipeline.ts",
     "test": "jest --watchAll=false --config jest.config.cjs"
   },
   "prisma": {
@@ -16,13 +17,13 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "csv-parser": "^3.2.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.19.43",
-    "csv-parser": "^3.2.1",
     "jest": "^29.5.0",
     "prisma": "^5.22.0",
     "ts-jest": "^29.1.0",
